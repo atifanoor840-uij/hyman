@@ -1,0 +1,52 @@
+'use client';
+
+import { Inter, Poppins } from 'next/font/google';
+import Navbar from '../components/Navbar';
+import Pricing from '../components/Pricing';
+
+const bodyFont = Inter({ subsets: ['latin'], weight: ['400', '500', '600'] });
+const display = Poppins({ subsets: ['latin'], weight: ['600', '700', '800'] });
+
+export default function PricingPage() {
+	return (
+		<div className={`min-h-screen bg-white ${bodyFont.className}`}>
+			{/* Header Section with background */}
+			<section className="relative overflow-hidden bg-[#050406]">
+				{/* Decorative gradient overlays */}
+				<div className="pointer-events-none absolute inset-0">
+					<div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[#5235ff]/20 blur-[120px]" />
+					<div className="absolute top-1/2 right-0 h-[480px] w-[480px] -translate-y-1/2 rounded-full bg-[#1cf1ff]/10 blur-[140px]" />
+					<div className="absolute bottom-[-180px] left-1/2 h-[320px] w-[520px] -translate-x-1/2 rounded-[60%] bg-[#ff62c2]/15 blur-[160px]" />
+				</div>
+				{/* Subtle vignette */}
+				<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_10%,transparent_0%,transparent_50%,rgba(0,0,0,0.2)_100%)]" />
+				
+				<div className="relative mx-auto max-w-7xl px-6 py-20 md:px-10 lg:py-32">
+					<Navbar variant="hero" />
+					<div className="mx-auto max-w-4xl space-y-6 text-left mt-16 lg:mt-20">
+						<h1 className={`${display.className} text-4xl font-semibold leading-[1.1] tracking-[-0.02em] text-white md:text-5xl lg:text-6xl`}>
+							Pricing Plans
+						</h1>
+						<p className="text-lg text-white/70 md:text-xl max-w-2xl">
+							Choose the perfect funding plan for your trading journey. Transparent pricing with refundable fees.
+						</p>
+					</div>
+				</div>
+				{/* Subtle divider curve */}
+				<div className="relative h-14 w-full">
+					<div className="absolute inset-0 -mt-10 h-20 w-full bg-[radial-gradient(100%_60%_at_50%_0%,rgba(255,255,255,0.15),transparent)]" />
+				</div>
+			</section>
+
+			{/* Main content with white background */}
+			<main className="bg-white">
+				<Pricing />
+			</main>
+		</div>
+	);
+}
+
+
+
+
+

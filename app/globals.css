@@ -1,0 +1,205 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Dashboard sidebar scrollbar styling */
+.sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f46 #050505; /* thumb color, track color */
+}
+
+.sidebar-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: #050505;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background-color: #3f3f46;
+  border-radius: 999px;
+}
+
+/* Small utilities for neon pulse if needed */
+@keyframes neonPulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(0, 240, 255, 0.5); }
+  50% { box-shadow: 0 0 24px rgba(0, 240, 255, 0.9); }
+}
+
+/* Simple marquee for sliding rows */
+@keyframes marqueeLeft {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee {
+  overflow: hidden;
+  position: relative;
+}
+.marquee-inner {
+  display: flex;
+  width: max-content;
+  animation: marqueeLeft 28s linear infinite;
+}
+.marquee:hover .marquee-inner {
+  animation-play-state: paused;
+}
+
+/* Floating animation for subtle motion */
+@keyframes floatSlow {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0px); }
+}
+
+.float-slow {
+  animation: floatSlow 6s ease-in-out infinite;
+}
+
+/* Brand tile styles */
+.brand-tile {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 92px;
+  height: 92px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  transition: transform 300ms ease, box-shadow 300ms ease, background 300ms ease;
+  backdrop-filter: blur(8px);
+}
+.brand-tile:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+}
+.brand-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #2e2e35;
+}
+.dark .brand-tile {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.14);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+.dark .brand-label {
+  color: rgba(255,255,255,0.85);
+}
+
+/* Optional staggered entrance delays */
+.delay-150 { transition-delay: 150ms; }
+.delay-300 { transition-delay: 300ms; }
+
+/* Infinite scroll animation for Trade2Earn */
+@keyframes scroll {
+	0% {
+		transform: translateX(0);
+	}
+	100% {
+		transform: translateX(-50%);
+	}
+}
+.animate-scroll {
+	animation: scroll 60s linear infinite;
+	width: fit-content;
+}
+.animate-scroll:hover {
+	animation-play-state: paused;
+}
+
+/* Review cards parallel scrolling animations */
+@keyframes scroll-right {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		transform: translateX(-50%);
+	}
+}
+
+@keyframes scroll-left {
+	from {
+		transform: translateX(-50%);
+	}
+	to {
+		transform: translateX(0);
+	}
+}
+
+.animate-scroll-right {
+	animation: scroll-right 40s linear infinite;
+	width: fit-content;
+}
+
+.animate-scroll-left {
+	animation: scroll-left 45s linear infinite;
+	width: fit-content;
+}
+
+.animate-scroll-right-slow {
+	animation: scroll-right 50s linear infinite;
+	width: fit-content;
+}
+
+.animate-scroll-right:hover,
+.animate-scroll-left:hover,
+.animate-scroll-right-slow:hover {
+	animation-play-state: paused;
+}
+
+/* Fast scroll animation for forex ticker */
+@keyframes scroll-fast {
+	0% {
+		transform: translateX(0);
+	}
+	100% {
+		transform: translateX(-50%);
+	}
+}
+.animate-scroll-fast {
+	animation: scroll-fast 30s linear infinite;
+	width: fit-content;
+}
+.animate-scroll-fast:hover {
+	animation-play-state: paused;
+}
+
+/* Text split animation */
+@keyframes textSplitIn {
+	0% {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	100% {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
