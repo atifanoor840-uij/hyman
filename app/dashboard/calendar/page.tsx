@@ -1,48 +1,39 @@
-'use client';
+import { Sidebar } from "@/components/dashboard/sidebar"
+import { Header } from "@/components/dashboard/header"
+import { EconomicCalendarWidget } from "@/components/trading-view/economic-calendar-widget"
+import { Footer } from "@/components/footer"
+import { Button } from "@/components/ui/button"
 
-import { Poppins } from 'next/font/google';
+export default function CalendarPage() {
+  return (
+    <div className="flex min-h-screen bg-background">
+      <div className="hidden lg:block">
+        <Sidebar />
+      </div>
 
-const display = Poppins({ subsets: ['latin'], weight: ['600', '700', '800'] });
+      <main className="min-w-0 flex-1 flex flex-col overflow-x-hidden p-3 md:p-4 lg:p-5 lg:ml-64">
+        <div className="mx-auto w-full max-w-[1200px] flex flex-col flex-1">
+          <Header
+            title="Economic Calendar"
+            description="Track important economic events, news releases, and market announcements."
+            actions={
+              <Button className="w-full sm:w-auto h-9 text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 hover:shadow-md gap-2">
+                + Add Alert
+              </Button>
+            }
+          />
 
-export default function DashboardCalendarPage() {
-	return (
-		<main className="min-h-screen bg-[#f5f5f5]">
-			<div className="p-6 md:p-8 lg:p-12">
-				<h1 className={`${display.className} mb-2 text-2xl font-semibold text-[#0b0b0f]`}>
-					Economical Calendar
-				</h1>
-				<p className="mb-8 text-sm text-[#4b5563]">
-					Track upcoming macroeconomic events and news that can impact the markets.
-				</p>
+          <div className="mt-5 flex-1 min-h-0">
+            <div className="rounded-xl border border-border bg-card overflow-hidden shadow-sm">
+              <EconomicCalendarWidget height={580} />
+            </div>
+          </div>
 
-				<section className="rounded-2xl border border-[#e5e5e5] bg-white p-6 shadow-sm">
-					<div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-						<h2 className="text-sm font-semibold text-[#0b0b0f]">Upcoming events (placeholder)</h2>
-						<div className="flex gap-2 text-xs">
-							<button className="rounded-full border border-[#e5e5e5] bg-black px-3 py-1.5 font-semibold text-white">
-								Today
-							</button>
-							<button className="rounded-full border border-[#e5e5e5] bg-white px-3 py-1.5 font-medium text-[#111827]">
-								This week
-							</button>
-							<button className="rounded-full border border-[#e5e5e5] bg-white px-3 py-1.5 font-medium text-[#111827]">
-								All
-							</button>
-						</div>
-					</div>
-
-					<div className="h-[520px] w-full overflow-hidden rounded-xl border border-dashed border-[#e5e5e5] bg-[#f9fafb]">
-						<iframe
-							title="TradingView Economic Calendar"
-							src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview-econ&symbol=ECONOMICS:WORLD&interval=D&symboledit=1&saveimage=0&toolbarbg=f1f3f6&studies=&hideideas=1&theme=light&style=1&timezone=Etc%2FUTC&withdateranges=1&hide_side_toolbar=1&allow_symbol_change=1&locale=en&utm_source=&utm_medium=widget_new&utm_campaign=economic-calendar"
-							className="h-full w-full border-0"
-							loading="lazy"
-						/>
-					</div>
-				</section>
-			</div>
-		</main>
-	);
+          <div className="mt-8">
+            <Footer />
+          </div>
+        </div>
+      </main>
+    </div>
+  )
 }
-
-
