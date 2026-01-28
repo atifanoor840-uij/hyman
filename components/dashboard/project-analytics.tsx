@@ -168,7 +168,6 @@ export function ProjectAnalytics() {
             <Tooltip
               content={<CustomTooltip />}
               cursor={{ stroke: strokeColor, strokeWidth: 1, strokeDasharray: "5 5" }}
-              coordinate={{ x: 0, y: 0 }}
             />
             <Area
               type="monotone"
