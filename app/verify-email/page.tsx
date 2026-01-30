@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useMemo, useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Inter, Syne } from 'next/font/google';
@@ -13,7 +13,7 @@ const bodyFont = Inter({ subsets: ['latin'], weight: ['400', '500', '600'] });
 const CODE_LENGTH = 6;
 const CURRENT_YEAR = new Date().getFullYear();
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const email = searchParams.get('email') || '';
@@ -427,4 +427,63 @@ export default function VerifyEmailPage() {
 	);
 }
 
+function VerifyEmailPageSkeleton() {
+	return (
+		<main className={`min-h-screen bg-white text-black ${bodyFont.className}`}>
+			<div className="flex min-h-screen flex-col lg:flex-row">
+				{/* Left Side - Info Section */}
+				<aside className="flex flex-1 flex-col justify-between bg-gradient-to-br from-gray-900 via-black to-gray-900 px-6 py-10 lg:px-12 lg:py-16">
+					<div>
+						<Link href="/" className="mb-16 inline-flex items-center gap-3 text-white transition hover:opacity-80">
+							<img
+								src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
+								alt="FxGenz Logo"
+								className="h-12 w-12 object-contain rounded-lg"
+								loading="lazy"
+							/>
+							<span className={`${brandFont.className} text-3xl font-black tracking-tight`}>
+								Fx<span className="text-white">Genz</span>
+							</span>
+						</Link>
+						<div className="max-w-md">
+							<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600/20 mb-6">
+								<Mail className="h-8 w-8 text-blue-400" />
+							</div>
+							<div className="h-8 w-3/4 bg-gray-700 rounded animate-pulse mb-4"></div>
+							<div className="h-4 w-full bg-gray-700 rounded animate-pulse mb-2"></div>
+							<div className="h-4 w-2/3 bg-gray-700 rounded animate-pulse"></div>
+						</div>
+					</div>
+					<div className="mt-auto pt-10 text-xs text-gray-500">
+						© {CURRENT_YEAR} FxGenz. All rights reserved.
+					</div>
+				</aside>
+				
+				{/* Right Side - Loading */}
+				<section className="flex flex-1 items-center justify-center px-6 py-10 lg:px-12 lg:py-16">
+					<div className="w-full max-w-xl">
+						<div className="rounded-3xl border border-zinc-200 bg-white px-8 py-10 shadow-sm">
+							<div className="h-6 w-48 bg-gray-200 rounded animate-pulse mb-4"></div>
+							<div className="h-4 w-64 bg-gray-200 rounded animate-pulse mb-8"></div>
+							<div className="flex justify-center gap-3 mb-8">
+								{[...Array(6)].map((_, i) => (
+									<div key={i} className="h-14 w-12 rounded-xl bg-gray-200 animate-pulse sm:h-16 sm:w-14"></div>
+								))}
+							</div>
+							<div className="h-12 w-full bg-gray-200 rounded-2xl animate-pulse"></div>
+						</div>
+					</div>
+				</section>
+			</div>
+		</main>
+	);
+}
+
+export default function VerifyEmailPage() {
+	return (
+		<Suspense fallback={<VerifyEmailPageSkeleton />}>
+			<VerifyEmailContent />
+		</Suspense>
+	);
+}
 
