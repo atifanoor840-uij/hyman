@@ -1,18 +1,13 @@
 'use client';
 
 import Image from 'next/image';
-import { Poppins } from 'next/font/google';
 
-const display = Poppins({
-	subsets: ['latin'],
-	weight: ['600', '700'],
-});
-
-// Certificate image URLs - replace with actual certificate images
+// Certificate image URLs
 const certificates = [
-	'https://res.cloudinary.com/dejjuhzug/image/upload/v1764395181/f0bdc4ec-31ba-43db-af2d-990985a4827d_ezvlm9.png',
-	'https://res.cloudinary.com/dejjuhzug/image/upload/v1764395131/d1b7332b-1650-4a91-a1a0-8d09b53936ec_ougmpe.png',
-	// Add more certificate image URLs here as needed
+	'https://res.cloudinary.com/dqzibxdtn/image/upload/v1769769389/Black_and_Red_Neon_Black_Friday_Sale_Instagram_Post_lawtrd.png',
+	'https://res.cloudinary.com/dqzibxdtn/image/upload/v1769769389/Black_and_Red_Neon_Black_Friday_Sale_Instagram_Post_lawtrd.png',
+	'https://res.cloudinary.com/dqzibxdtn/image/upload/v1769769389/Black_and_Red_Neon_Black_Friday_Sale_Instagram_Post_lawtrd.png',
+	'https://res.cloudinary.com/dqzibxdtn/image/upload/v1769769389/Black_and_Red_Neon_Black_Friday_Sale_Instagram_Post_lawtrd.png',
 ];
 
 export default function PayoutCertificates() {
@@ -27,7 +22,7 @@ export default function PayoutCertificates() {
 					<div className="inline-flex items-center gap-2 rounded-full border-2 border-white/20 bg-white/5 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white/70 mb-6">
 						Payout Certificates
 					</div>
-					<h2 className={`${display.className} text-4xl font-bold text-white md:text-5xl lg:text-6xl mb-4`}>
+					<h2 className="font-sans text-4xl font-bold tracking-tight text-white md:text-5xl lg:text-6xl mb-4">
 						Over $3.5M in Total Payouts
 					</h2>
 					<p className="mx-auto max-w-3xl text-lg font-semibold text-white/70 md:text-xl">

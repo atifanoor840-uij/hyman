@@ -1,32 +1,24 @@
 'use client';
 
-import { Poppins } from 'next/font/google';
-import { FaDiscord, FaTelegram, FaTwitter, FaYoutube, FaInstagram, FaLinkedin } from 'react-icons/fa';
-
-const display = Poppins({
-	subsets: ['latin'],
-	weight: ['600', '700'],
-});
+import { FaTelegram, FaInstagram, FaWhatsapp, FaFacebook } from 'react-icons/fa';
 
 const socialLinks = [
-	{ name: 'Discord', icon: FaDiscord, url: '#', color: '#5865F2' },
 	{ name: 'Telegram', icon: FaTelegram, url: '#', color: '#0088cc' },
-	{ name: 'Twitter', icon: FaTwitter, url: '#', color: '#1DA1F2' },
-	{ name: 'YouTube', icon: FaYoutube, url: '#', color: '#FF0000' },
+	{ name: 'WhatsApp', icon: FaWhatsapp, url: 'https://wa.me/yourphonenumber', color: '#25D366' },
+	{ name: 'Facebook', icon: FaFacebook, url: 'https://facebook.com/yourpage', color: '#1877F2' },
 	{ name: 'Instagram', icon: FaInstagram, url: '#', color: '#E4405F' },
-	{ name: 'LinkedIn', icon: FaLinkedin, url: '#', color: '#0077B5' },
 ];
 
 export default function Community() {
 	return (
-		<section id="community" className="relative overflow-hidden bg-white py-20 md:py-24">
+		<section id="community" className="relative overflow-hidden bg-slate-50/80 py-20 md:py-24">
 			<div className="mx-auto max-w-7xl px-6 md:px-10">
 				{/* Header */}
 				<div className="mb-12 text-center">
 					<div className="inline-flex items-center gap-2 rounded-full border-2 border-black/10 bg-black/5 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-black/70 mb-6">
 						Community
 					</div>
-					<h2 className={`${display.className} text-4xl font-bold text-black md:text-5xl lg:text-6xl mb-4`}>
+					<h2 className="font-sans text-4xl font-bold tracking-tight text-black md:text-5xl lg:text-6xl mb-4">
 						Join Our Community
 					</h2>
 					<p className="mx-auto max-w-3xl text-lg font-semibold text-black/70 md:text-xl">

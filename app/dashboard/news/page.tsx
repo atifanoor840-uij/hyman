@@ -2,6 +2,7 @@ import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
 import { Footer } from "@/components/footer"
 import { TimelineWidget } from "@/components/trading-view/timeline-widget"
+import { NewsContent } from "@/components/news/news-content"
 
 export default function NewsPage() {
   return (
@@ -21,6 +22,10 @@ export default function NewsPage() {
             <div className="rounded-xl border border-border bg-card overflow-hidden shadow-sm">
               <TimelineWidget height={550} className="w-full" />
             </div>
+          </div>
+
+          <div className="mt-6">
+            <NewsContent />
           </div>
 
           <div className="mt-8">

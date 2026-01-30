@@ -1,26 +1,24 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Inter, Syne } from 'next/font/google';
 import Toast from '../components/Toast';
 import { login } from '../../lib/api/auth';
 import { ApiClientError } from '../../lib/api/client';
+import {
+	sanitizeInput,
+	isValidEmail,
+	setAuthToken,
+	setUser,
+	trackLoginAttempt,
+	clearLoginAttempts,
+	getRemainingLockoutTime,
+} from '../../lib/auth-utils';
 
 const brandFont = Syne({ subsets: ['latin'], weight: ['700', '800'] });
 const bodyFont = Inter({ subsets: ['latin'], weight: ['400', '500', '600'] });
-
-const highlights = [
-	{
-		title: 'Secure Access',
-		description: 'Enterprise-grade security with real-time monitoring.',
-	},
-	{
-		title: '24/7 Support',
-		description: 'Access your trading platform anytime, anywhere.',
-	},
-];
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -29,19 +27,20 @@ export default function LoginPage() {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [rememberMe, setRememberMe] = useState(true);
-	const [showPassword, setShowPassword] = useState(false);
 	const [formErrors, setFormErrors] = useState<{ email?: string; password?: string }>({});
-	const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
-	const [statusMessage, setStatusMessage] = useState('');
+	const [isLoading, setIsLoading] = useState(false);
 	const [toastMessage, setToastMessage] = useState<string | null>(null);
-	const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+	const [toastType, setToastType] = useState<'success' | 'error' | 'info' | 'loading'>('success');
+	const [toastTitle, setToastTitle] = useState<string | undefined>(undefined);
 
 	const validateForm = () => {
 		const nextErrors: typeof formErrors = {};
 
-		if (!email.trim()) {
+		const sanitizedEmail = sanitizeInput(email);
+
+		if (!sanitizedEmail.trim()) {
 			nextErrors.email = 'Please enter the email linked to your FxGenz account.';
-		} else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+		} else if (!isValidEmail(sanitizedEmail)) {
 			nextErrors.email = 'Use a valid email address (e.g. name@domain.com).';
 		}
 
@@ -51,263 +50,284 @@ export default function LoginPage() {
 			nextErrors.password = 'Passwords must be at least 8 characters.';
 		}
 
+		// Check rate limiting
+		const lockoutTime = getRemainingLockoutTime(sanitizedEmail);
+		if (lockoutTime > 0) {
+			nextErrors.email = `Too many failed attempts. Please try again in ${Math.ceil(lockoutTime / 60)} minutes.`;
+		}
+
 		setFormErrors(nextErrors);
 		return Object.keys(nextErrors).length === 0;
 	};
+
+	const handleFormChange =
+		(field: 'email' | 'password') =>
+		(event: ChangeEvent<HTMLInputElement>) => {
+			if (field === 'email') setEmail(event.target.value);
+			else setPassword(event.target.value);
+			if (formErrors[field]) {
+				setFormErrors((prev) => ({ ...prev, [field]: undefined }));
+			}
+		};
 
 	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		if (!validateForm()) return;
 
-		setStatus('loading');
-		setStatusMessage('');
+		const sanitizedEmail = sanitizeInput(email).trim().toLowerCase();
+
+		// Check if user is rate-limited
+		if (!trackLoginAttempt(sanitizedEmail)) {
+			const lockoutTime = getRemainingLockoutTime(sanitizedEmail);
+			setToastType('error');
+			setToastTitle('Account Locked');
+			setToastMessage(`Too many failed login attempts. Please try again in ${Math.ceil(lockoutTime / 60)} minutes.`);
+			return;
+		}
+
+		setIsLoading(true);
 		setFormErrors({});
+		
+		// Show loading toast
+		setToastType('loading');
+		setToastTitle('Signing In');
+		setToastMessage('Verifying your credentials...');
 
 		try {
 			const response = await login({
-				username: email.trim(),
+				username: sanitizedEmail,
 				password: password,
 			});
 
-			// Store token if provided
-			if (response.token) {
-				if (rememberMe) {
-					localStorage.setItem('auth_token', response.token);
-				} else {
-					sessionStorage.setItem('auth_token', response.token);
+			// Handle both 'token' and 'access_token' response formats
+			const authToken = response.token || response.access_token;
+
+			if (authToken) {
+				// Clear failed login attempts on successful login
+				clearLoginAttempts(sanitizedEmail);
+
+				// Store token and user data securely
+				setAuthToken(authToken, rememberMe);
+				if (response.user) {
+					setUser(response.user, rememberMe);
 				}
 			}
 
-			setStatus('success');
-			setStatusMessage('Success! Redirecting you to your dashboard…');
 			setToastType('success');
-			setToastMessage('Login successful. Redirecting you to your FxGenz dashboard.');
+			setToastTitle('Welcome Back!');
+			setToastMessage('Login successful. Taking you to your trading dashboard...');
 
-			// Redirect to dashboard after a short delay
 			setTimeout(() => {
 				router.push('/dashboard');
-			}, 1500);
+			}, 2000);
 		} catch (error) {
-			setStatus('idle');
+			setIsLoading(false);
 			if (error instanceof ApiClientError) {
-				const errorMessage = error.message || 'Failed to log in. Please check your credentials.';
 				setToastType('error');
-				setToastMessage(errorMessage);
 				
-				// Handle specific field errors
-				if (error.status === 401) {
+				if (error.status === 401 || error.status === 400) {
+					setToastTitle('Login Failed');
+					setToastMessage('Invalid email or password. Please check your credentials and try again.');
 					setFormErrors({
 						password: 'Invalid email or password. Please try again.',
 					});
+				} else if (error.status === 429) {
+					setToastTitle('Too Many Attempts');
+					setToastMessage('You have made too many login attempts. Please wait a few minutes and try again.');
+					setFormErrors({
+						email: 'Too many requests. Please try again later.',
+					});
+				} else if (error.status === 403) {
+					setToastTitle('Account Suspended');
+					setToastMessage('Your account has been suspended. Please contact support for assistance.');
+				} else if (error.status === 422) {
+					setToastTitle('Invalid Input');
+					setToastMessage('Please check your email and password format.');
 				} else if (error.errors) {
+					setToastTitle('Login Failed');
+					setToastMessage(error.message || 'Unable to log in. Please check your information.');
+					
 					const fieldErrors: { email?: string; password?: string } = {};
-					if (error.errors.username) {
-						fieldErrors.email = error.errors.username[0];
+					if (error.errors.username || error.errors.email) {
+						fieldErrors.email = (error.errors.username || error.errors.email)[0];
 					}
 					if (error.errors.password) {
 						fieldErrors.password = error.errors.password[0];
 					}
 					setFormErrors(fieldErrors);
+				} else {
+					setToastTitle('Login Failed');
+					setToastMessage(error.message || 'Unable to log in. Please try again.');
 				}
 			} else {
 				setToastType('error');
-				setToastMessage('An unexpected error occurred. Please try again.');
+				setToastTitle('Connection Error');
+				setToastMessage('Unable to connect to the server. Please check your internet connection and try again.');
 			}
 		}
 	};
 
 	return (
-		<main className={`relative min-h-screen overflow-hidden bg-[#050608] text-white ${bodyFont.className}`}>
-			<div className="pointer-events-none absolute inset-0">
-				<div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[#5235ff]/30 blur-[120px]" />
-				<div className="absolute top-1/2 right-0 h-[480px] w-[480px] -translate-y-1/2 rounded-full bg-[#1cf1ff]/10 blur-[140px]" />
-				<div className="absolute bottom-[-180px] left-1/2 h-[320px] w-[520px] -translate-x-1/2 rounded-[60%] bg-[#ff62c2]/20 blur-[160px]" />
-			</div>
-
-			<div className="relative z-10 grid min-h-screen grid-cols-1 gap-y-10 lg:grid-cols-[1fr_1.1fr]">
-				<section className="flex flex-col justify-center px-8 py-10 lg:px-16 lg:py-14">
-					<div className="mb-12">
-						<Link href="/" className="inline-flex items-center gap-3 text-white transition hover:text-white/80">
-							<span className={`${brandFont.className} text-3xl font-extrabold tracking-tight`}>
-								Fx<span className="text-[#61f9e7]">Genz</span>
-							</span>
-						</Link>
-					</div>
+		<main className={`min-h-screen bg-white text-black ${bodyFont.className}`}>
+			<div className="mx-auto flex min-h-screen max-w-6xl flex-col justify-center px-6 py-10 lg:flex-row lg:items-stretch lg:gap-16">
+				<aside className="flex flex-1 flex-col justify-center border-b border-zinc-200 pb-10 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-12">
+					<Link href="/" className="mb-10 inline-flex items-center gap-3 text-black transition hover:opacity-80">
+						<span className={`${brandFont.className} text-3xl font-black tracking-tight`}>
+							Fx<span className="text-black">Genz</span>
+						</span>
+					</Link>
 
 					<div className="max-w-md">
-						<h1 className="text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">
-							Welcome Back
+						<h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+							Sign in to your FxGenz account
 						</h1>
-						<p className="mt-4 text-lg text-white/80">
-							Sign in to access your trading dashboard and manage your funded accounts.
+						<p className="mt-3 text-sm text-zinc-500">
+							Use the same credentials to access all FxGenz products and your trading dashboard.
 						</p>
 					</div>
 
-					<div className="mt-12 space-y-4">
-						{highlights.map((item) => (
-							<div
-								key={item.title}
-								className="flex items-start gap-4 rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm"
-							>
-								<div className="mt-1 h-2 w-2 rounded-full bg-[#61f9e7]" />
-								<div>
-									<h3 className="text-base font-semibold text-white">{item.title}</h3>
-									<p className="mt-1 text-sm text-white/60">{item.description}</p>
-								</div>
-							</div>
-						))}
-					</div>
-
-					<div className="mt-auto pt-12 text-xs text-white/40">
+					<div className="mt-auto pt-10 text-xs text-zinc-400">
 						© {CURRENT_YEAR} FxGenz. All rights reserved.
 					</div>
-				</section>
+				</aside>
 
-				<section className="flex items-center justify-center bg-[#f7f7fa]/90 px-6 py-20 backdrop-blur-xl lg:px-12">
-					<div className="w-full max-w-md rounded-[32px] border border-slate-200/60 bg-white p-10 shadow-[0_25px_80px_rgba(15,20,35,0.18)]">
-						<div className="flex items-center justify-between">
-							<h2 className="text-2xl font-semibold text-slate-900 sm:text-3xl">Welcome back 👋</h2>
-							<Link href="/signup" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+				<section className="flex flex-1 items-center justify-center pt-6 lg:pt-0">
+					<div className="w-full max-w-xl rounded-3xl border border-zinc-200 bg-white px-8 py-10 shadow-sm">
+						<div className="flex items-center justify-between gap-6">
+							<div>
+								<h2 className="text-xl font-semibold text-black sm:text-2xl">
+									Log in
+								</h2>
+								<p className="mt-2 text-sm text-zinc-600">
+									Enter your email and password to access your FxGenz dashboard.
+								</p>
+							</div>
+							<Link
+								href="/signup"
+								className="hidden shrink-0 rounded-full border border-zinc-300 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-700 transition hover:bg-zinc-900 hover:text-white md:inline-flex"
+							>
 								Create account
 							</Link>
 						</div>
-						<p className="mt-2 text-sm text-slate-500">
-							Enter your credentials to access trading workspaces, market automation, and insights.
-						</p>
 
-						<form onSubmit={handleSubmit} className="mt-10 flex flex-col gap-6">
+						<form onSubmit={handleSubmit} className="mt-10 space-y-6">
 							<div>
-								<label htmlFor="email" className="text-sm font-medium text-slate-700">
+								<label
+									htmlFor="email"
+									className="text-xs font-semibold uppercase tracking-wide text-zinc-700"
+								>
 									Email
 								</label>
 								<input
 									id="email"
 									type="email"
 									value={email}
-									onChange={(event) => {
-										setEmail(event.target.value);
-										if (formErrors.email) setFormErrors((prev) => ({ ...prev, email: undefined }));
-									}}
-									className={`mt-2 w-full rounded-2xl border px-4 py-3 text-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200 ${
-										formErrors.email ? 'border-red-400 bg-red-50 text-red-700' : 'border-slate-200 bg-slate-50 text-slate-900'
+									onChange={handleFormChange('email')}
+									className={`mt-2 w-full rounded-2xl border px-4 py-3 text-sm font-semibold tracking-wide text-zinc-900 transition focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10 ${
+										formErrors.email ? 'border-red-500 bg-red-50' : 'border-zinc-200 bg-zinc-50'
 									}`}
 									placeholder="you@fxgenz.com"
 								/>
 								{formErrors.email ? (
 									<p className="mt-2 text-xs font-medium text-red-500">{formErrors.email}</p>
 								) : (
-									<p className="mt-2 text-xs text-slate-400">
-										Prefer passkeys? Enable passwordless access once you sign in.
+									<p className="mt-2 text-xs text-zinc-500">
+										The email you used to create your FxGenz account.
 									</p>
 								)}
 							</div>
 
 							<div>
-								<label htmlFor="password" className="text-sm font-medium text-slate-700">
+								<label
+									htmlFor="password"
+									className="text-xs font-semibold uppercase tracking-wide text-zinc-700"
+								>
 									Password
 								</label>
-								<div
-									className={`mt-2 flex items-center rounded-2xl border px-4 ${
-										formErrors.password ? 'border-red-400 bg-red-50' : 'border-slate-200 bg-slate-50'
+								<input
+									id="password"
+									type="password"
+									value={password}
+									onChange={handleFormChange('password')}
+									className={`mt-2 w-full rounded-2xl border px-4 py-3 text-sm font-semibold tracking-wide text-zinc-900 transition focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10 ${
+										formErrors.password ? 'border-red-500 bg-red-50' : 'border-zinc-200 bg-zinc-50'
 									}`}
-								>
-									<input
-										id="password"
-										type={showPassword ? 'text' : 'password'}
-										value={password}
-										onChange={(event) => {
-											setPassword(event.target.value);
-											if (formErrors.password) setFormErrors((prev) => ({ ...prev, password: undefined }));
-										}}
-										className="w-full bg-transparent py-3 text-sm text-slate-900 outline-none"
-										placeholder="Your secure password"
-									/>
-									<button
-										type="button"
-										onClick={() => setShowPassword((prev) => !prev)}
-										className="ml-3 text-xs font-semibold uppercase tracking-wide text-indigo-600 transition hover:text-indigo-500"
-									>
-										{showPassword ? 'Hide' : 'Show'}
-									</button>
-								</div>
+									placeholder="Your password"
+								/>
 								{formErrors.password ? (
 									<p className="mt-2 text-xs font-medium text-red-500">{formErrors.password}</p>
 								) : (
-									<p className="mt-2 text-xs text-slate-400">Minimum 8 characters with numbers & symbols recommended.</p>
+									<p className="mt-2 text-xs text-zinc-500">
+										Minimum 8 characters. Forgot?{' '}
+										<Link href="/forgot-password" className="font-semibold text-black underline underline-offset-4">
+											Reset password
+										</Link>
+									</p>
 								)}
 							</div>
 
-							<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-								<label className="inline-flex items-center gap-2 text-xs text-slate-500">
-									<input
-										type="checkbox"
-										checked={rememberMe}
-										onChange={(event) => setRememberMe(event.target.checked)}
-										className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-200"
-									/>
-									Remember this device
+							<div className="flex items-start gap-3 rounded-2xl border border-zinc-200 bg-zinc-50 p-5">
+								<input
+									id="remember"
+									type="checkbox"
+									checked={rememberMe}
+									onChange={(e) => setRememberMe(e.target.checked)}
+									className="mt-1 h-4 w-4 rounded border-zinc-300 bg-white text-black focus:ring-black/20"
+								/>
+								<label htmlFor="remember" className="text-xs text-zinc-700">
+									Remember this device so I don&apos;t have to sign in again next time.
 								</label>
-								<Link href="/forgot-password" className="text-xs font-medium text-indigo-600 hover:text-indigo-500">
-									Forgot password?
-								</Link>
 							</div>
 
 							<button
 								type="submit"
-								disabled={status === 'loading'}
-								className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
+								disabled={isLoading}
+								className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-60"
 							>
-								{status === 'loading' ? (
+								{isLoading ? (
 									<>
-										<svg className="h-4 w-4 animate-spin text-white" viewBox="0 0 24 24" fill="none">
-											<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+										<svg className="h-4 w-4 animate-spin text-[#04131a]" viewBox="0 0 24 24" fill="none">
+											<circle
+												className="opacity-25"
+												cx="12"
+												cy="12"
+												r="10"
+												stroke="currentColor"
+												strokeWidth="4"
+											/>
 											<path
 												className="opacity-75"
 												fill="currentColor"
 												d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
 											/>
 										</svg>
-										Processing...
+										Signing in…
 									</>
 								) : (
-									'Sign in to FxGenz'
+									'Sign in'
 								)}
 							</button>
-
-							<div className="flex items-center gap-2 text-xs text-slate-500">
-								<span className="h-px flex-1 bg-slate-200" />
-								Or continue with
-								<span className="h-px flex-1 bg-slate-200" />
-							</div>
-
-							<div className="grid gap-3 sm:grid-cols-2">
-								<button
-									type="button"
-									className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:border-indigo-200 hover:text-indigo-600"
-								>
-									<span className="text-lg">🔐</span>
-									Passkey
-								</button>
-								<button
-									type="button"
-									className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:border-indigo-200 hover:text-indigo-600"
-								>
-									<span className="text-lg">G</span>
-									Google
-								</button>
-							</div>
-
-							{statusMessage && (
-								<div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs font-medium text-emerald-600">
-									{statusMessage}
-								</div>
-							)}
 						</form>
+
+						<div className="mt-10 text-center text-xs text-zinc-500">
+							Don&apos;t have an account?{' '}
+							<Link href="/signup" className="font-semibold text-black underline underline-offset-4">
+								Create one
+							</Link>
+						</div>
 					</div>
 				</section>
 			</div>
-			<Toast message={toastMessage} type={toastType} onClose={() => setToastMessage(null)} />
+			<Toast 
+				message={toastMessage} 
+				type={toastType}
+				title={toastTitle}
+				duration={toastType === 'success' ? 6000 : 5000}
+				onClose={() => {
+					setToastMessage(null);
+					setToastTitle(undefined);
+				}} 
+			/>
 		</main>
 	);
 }
-

@@ -1,22 +1,16 @@
 import Image from "next/image";
-import { Poppins } from "next/font/google";
-
-const display = Poppins({
-	subsets: ["latin"],
-	weight: ["600", "700"],
-});
 
 export default function Payouts() {
 	return (
-		<section id="payouts-pro" className="relative overflow-hidden bg-white">
-			<div className="absolute inset-0 -z-10 bg-white" />
+		<section id="payouts-pro" className="relative overflow-hidden bg-slate-50/80">
+			<div className="absolute inset-0 -z-10 bg-slate-50/80" />
 
 			<div className="mx-auto max-w-7xl px-6 py-18 md:px-10 md:py-24">
 				<header className="mb-12 text-center">
 					<div className="inline-flex items-center gap-2 rounded-full border border-[#0b0b0f]/10 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[#2e2e35]/70">
 						Fast payouts
 					</div>
-					<h2 className={`${display.className} mt-4 text-3xl font-semibold tracking-[-0.02em] text-[#0b0b0f] md:text-5xl`}>
+					<h2 className="font-sans mt-4 text-3xl font-bold tracking-tight text-[#0b0b0f] md:text-5xl">
 						Institutional‑Grade Payout Infrastructure
 					</h2>
 					<p className="mx-auto mt-3 max-w-3xl text-[#2e2e35]/75">
@@ -35,12 +29,12 @@ export default function Payouts() {
 					<Card>
 						<div className="rounded-2xl border border-[#dadfea] bg-gradient-to-b from-[#0d1326] to-[#0a0f22] p-6 text-white shadow-[inset_0_0_1px_rgba(255,255,255,0.06)]">
 							<div className="text-[10px] uppercase tracking-wider text-white/60">Withdrawable profits</div>
-							<div className={`${display.className} mt-2 text-3xl font-semibold`}>$2,800.00</div>
+							<div className="font-sans mt-2 text-3xl font-bold tracking-tight">$2,800.00</div>
 							<button className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#0096ff] to-[#00d99f] px-4 py-2.5 text-sm font-semibold text-[#0b0b0f] transition hover:opacity-90">
 								Request Payout
 							</button>
 						</div>
-						<h3 className={`${display.className} mt-5 text-lg font-semibold text-[#0b0b0f]`}>Streamlined Request Process</h3>
+						<h3 className="font-sans mt-5 text-lg font-semibold tracking-tight text-[#0b0b0f]">Streamlined Request Process</h3>
 						<p className="mt-2 text-sm leading-relaxed text-[#2e2e35]/75">
 							Initiate payouts directly from your dashboard with full visibility into processing status and estimated completion times.
 						</p>
@@ -72,7 +66,7 @@ export default function Payouts() {
 								/>
 							</div>
 						</div>
-						<h3 className={`${display.className} mt-5 text-lg font-semibold text-[#0b0b0f]`}>Cryptocurrency Payouts</h3>
+						<h3 className="font-sans mt-5 text-lg font-semibold tracking-tight text-[#0b0b0f]">Cryptocurrency Payouts</h3>
 						<p className="mt-2 text-sm leading-relaxed text-[#2e2e35]/75">
 							Direct payouts via <strong>USDC</strong> with transparent network fees and secure address management for instant settlement.
 						</p>
@@ -104,7 +98,7 @@ export default function Payouts() {
 								/>
 							</div>
 						</div>
-						<h3 className={`${display.className} mt-5 text-lg font-semibold text-[#0b0b0f]`}>Traditional Banking Rails</h3>
+						<h3 className="font-sans mt-5 text-lg font-semibold tracking-tight text-[#0b0b0f]">Traditional Banking Rails</h3>
 						<p className="mt-2 text-sm leading-relaxed text-[#2e2e35]/75">
 							Global bank transfers through established financial networks with comprehensive coverage and predictable settlement windows.
 						</p>
@@ -187,7 +181,7 @@ function UserSilhouette() {
 function BandStat({ value, label }: { value: string; label: string }) {
 	return (
 		<div className="px-6 py-4">
-			<div className={`${display.className} text-3xl font-semibold text-white`}>{value}</div>
+			<div className="font-sans text-3xl font-bold tracking-tight text-white">{value}</div>
 			<div className="mt-2 text-xs font-medium text-white/90">{label}</div>
 		</div>
 	);

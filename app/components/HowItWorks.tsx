@@ -1,11 +1,5 @@
 import Image from "next/image";
-import { Poppins } from "next/font/google";
 import { ArrowRight } from "lucide-react";
-
-const display = Poppins({
-	subsets: ["latin"],
-	weight: ["600", "700"],
-});
 
 const STEPS = [
 	{
@@ -40,7 +34,7 @@ export default function HowItWorks() {
 					<span className="inline-flex items-center gap-2 rounded-full border-2 border-white/20 bg-white/5 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white/70 mb-6">
 						Process
 					</span>
-					<h2 className={`${display.className} text-4xl font-bold leading-tight text-white md:text-5xl lg:text-6xl mb-4`}>
+					<h2 className="font-sans text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl mb-4">
 						How funding with FxGenz works
 					</h2>
 					<p className="mx-auto max-w-3xl text-lg font-semibold text-white/70 md:text-xl">
@@ -91,7 +85,7 @@ export default function HowItWorks() {
 										<div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/20 bg-white/10">
 											<Icon />
 										</div>
-										<h3 className={`${display.className} text-xl font-bold text-white`}>{title}</h3>
+										<h3 className="font-sans text-xl font-bold tracking-tight text-white">{title}</h3>
 									</div>
 									<p className="mb-6 text-base leading-relaxed text-white/80">{body}</p>
 									<div className="inline-flex items-center gap-2 text-sm font-semibold text-white transition group-hover:gap-3">

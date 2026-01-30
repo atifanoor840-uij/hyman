@@ -203,3 +203,17 @@ body {
 		transform: translateY(0);
 	}
 }
+
+/* Infinite scroll animation for hero image */
+@keyframes infinite-scroll {
+	0% {
+		transform: translateX(0);
+	}
+	100% {
+		transform: translateX(-50%);
+	}
+}
+.animate-infinite-scroll {
+	animation: infinite-scroll 40s linear infinite;
+	width: fit-content;
+}

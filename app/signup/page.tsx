@@ -12,8 +12,16 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Inter, Syne } from 'next/font/google';
 import Toast from '../components/Toast';
+import CountrySelector from '../components/CountrySelector';
 import { signup } from '../../lib/api/auth';
 import { ApiClientError } from '../../lib/api/client';
+import {
+	sanitizeInput,
+	isValidEmail,
+	isStrongPassword,
+	setAuthToken,
+	setUser,
+} from '../../lib/auth-utils';
 
 const brandFont = Syne({ subsets: ['latin'], weight: ['700', '800'] });
 const bodyFont = Inter({ subsets: ['latin'], weight: ['400', '500', '600'] });
@@ -21,20 +29,16 @@ const bodyFont = Inter({ subsets: ['latin'], weight: ['400', '500', '600'] });
 type SignupStep = 'details' | 'verify' | 'complete';
 
 const initialFormState = {
-	firstName: '',
-	lastName: '',
+	name: '',
 	email: '',
 	password: '',
 	confirmPassword: '',
-	phoneNo: '',
+	country: '',
 	referralCode: '',
 };
 
 const generateVerificationCode = () =>
 	Math.floor(100000 + Math.random() * 900000).toString();
-
-const isStrongPassword = (password: string) =>
-	/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password) && password.length >= 8;
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -49,7 +53,8 @@ export default function SignupPage() {
 	const [verificationError, setVerificationError] = useState('');
 	const [resendCooldown, setResendCooldown] = useState(0);
 	const [toastMessage, setToastMessage] = useState<string | null>(null);
-	const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+	const [toastType, setToastType] = useState<'success' | 'error' | 'info' | 'loading'>('success');
+	const [toastTitle, setToastTitle] = useState<string | undefined>(undefined);
 	const verificationInputs = useRef<(HTMLInputElement | null)[]>([]);
 
 	useEffect(() => {
@@ -73,40 +78,47 @@ export default function SignupPage() {
 	const validateDetails = () => {
 		const nextErrors: Partial<typeof initialFormState> = {};
 
-		if (!formData.firstName.trim()) {
-			nextErrors.firstName = 'First name is required.';
-		} else if (formData.firstName.trim().length < 2) {
-			nextErrors.firstName = 'First name should be at least 2 characters.';
+		const sanitizedName = sanitizeInput(formData.name);
+		const sanitizedEmail = sanitizeInput(formData.email);
+
+		if (!sanitizedName.trim()) {
+			nextErrors.name = 'Full name is required.';
+		} else if (sanitizedName.trim().length < 2) {
+			nextErrors.name = 'Name should be at least 2 characters.';
+		} else if (sanitizedName.length > 100) {
+			nextErrors.name = 'Name is too long (max 100 characters).';
 		}
 
-		if (!formData.lastName.trim()) {
-			nextErrors.lastName = 'Last name is required.';
-		} else if (formData.lastName.trim().length < 2) {
-			nextErrors.lastName = 'Last name should be at least 2 characters.';
-		}
-
-		if (!formData.email.trim()) {
+		if (!sanitizedEmail.trim()) {
 			nextErrors.email = 'We need an email to send confirmations and alerts.';
-		} else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+		} else if (!isValidEmail(sanitizedEmail)) {
 			nextErrors.email = 'Use a valid email address (e.g. name@domain.com).';
 		}
 
-		if (!formData.phoneNo.trim()) {
-			nextErrors.phoneNo = 'Phone number is required.';
-		} else if (!/^\+?[\d\s-()]+$/.test(formData.phoneNo.trim())) {
-			nextErrors.phoneNo = 'Please enter a valid phone number.';
+		if (!formData.country.trim()) {
+			nextErrors.country = 'Please select your country.';
 		}
 
 		if (!formData.password) {
 			nextErrors.password = 'Create a password to protect your account.';
 		} else if (!isStrongPassword(formData.password)) {
 			nextErrors.password = 'Mix upper, lower, numbers and make it at least 8 characters.';
+		} else if (formData.password.length > 128) {
+			nextErrors.password = 'Password is too long (max 128 characters).';
 		}
 
 		if (!formData.confirmPassword) {
 			nextErrors.confirmPassword = 'Confirm your password so we know it was typed correctly.';
 		} else if (formData.confirmPassword !== formData.password) {
 			nextErrors.confirmPassword = 'That confirmation does not match.';
+		}
+
+		// Validate referral code if provided
+		if (formData.referralCode.trim()) {
+			const sanitizedReferral = sanitizeInput(formData.referralCode);
+			if (sanitizedReferral.length > 50) {
+				nextErrors.referralCode = 'Referral code is invalid.';
+			}
 		}
 
 		setFormErrors(nextErrors);
@@ -128,46 +140,78 @@ export default function SignupPage() {
 
 		setIsLoading(true);
 		setFormErrors({});
+		
+		// Show loading toast
+		setToastType('loading');
+		setToastTitle('Creating Account');
+		setToastMessage('Please wait while we set up your FxGenz account...');
 
 		try {
+			// Sanitize inputs before sending
 			const signupData = {
-				first_name: formData.firstName.trim(),
-				last_name: formData.lastName.trim(),
-				email: formData.email.trim(),
-				password: formData.password,
-				phone_no: formData.phoneNo.trim(),
-				referral_code: formData.referralCode.trim() || undefined,
+				name: sanitizeInput(formData.name).trim(),
+				email: sanitizeInput(formData.email).trim().toLowerCase(),
+				password: formData.password, // Don't sanitize password
+				country: formData.country.trim(),
+				referral_code: formData.referralCode.trim() ? sanitizeInput(formData.referralCode).trim() : undefined,
+				phone_no: '',
+				address: '',
 			};
 
-			await signup(signupData);
+			const response = await signup(signupData);
 
-			// For now, we'll skip verification and go straight to complete
-			// If the backend requires email verification, we can add that step back
-			setStep('complete');
+			// If the backend returns a token, store it
+			const authToken = response.token || response.access_token;
+			if (authToken) {
+				setAuthToken(authToken, true);
+				if (response.user) {
+					setUser(response.user, true);
+				}
+			}
+
+			// Show success message
 			setToastType('success');
-			setToastMessage('Signup successful! You can now log in to your FxGenz dashboard.');
+			setToastTitle('Account Created!');
+			setToastMessage('Please check your email to verify your account.');
+
+			// Redirect to verify email page
+			setTimeout(() => {
+				router.push(`/verify-email?email=${encodeURIComponent(signupData.email)}`);
+			}, 2000);
 		} catch (err) {
 			const error = err instanceof ApiClientError ? err : null;
 			if (error) {
 				// Handle API errors
-				const errorMessage = error.message || 'Failed to sign up. Please try again.';
 				setToastType('error');
-				setToastMessage(errorMessage);
+				setToastTitle('Signup Failed');
+				
+				if (error.status === 409 || error.message?.toLowerCase().includes('already exists')) {
+					setToastMessage('An account with this email already exists. Please try logging in instead.');
+				} else if (error.status === 422) {
+					setToastMessage('Please check your information and try again.');
+				} else {
+					setToastMessage(error.message || 'Unable to create your account. Please try again.');
+				}
 				
 				// Map field errors if available
 				if (error.errors) {
 					const fieldErrors: Partial<typeof initialFormState> = {};
 					Object.keys(error.errors).forEach((key) => {
-						const mappedKey = key.replace(/_/g, '') as keyof typeof initialFormState;
+						// Map backend field names to form field names
+						let mappedKey = key;
+						if (key === 'phone_no') mappedKey = 'phoneNo';
+						if (key === 'referral_code') mappedKey = 'referralCode';
+						
 						if (mappedKey in initialFormState) {
-							fieldErrors[mappedKey] = error.errors![key][0];
+							fieldErrors[mappedKey as keyof typeof initialFormState] = error.errors![key][0];
 						}
 					});
 					setFormErrors(fieldErrors);
 				}
 			} else {
 				setToastType('error');
-				setToastMessage('An unexpected error occurred. Please try again.');
+				setToastTitle('Connection Error');
+				setToastMessage('Unable to connect to the server. Please check your internet connection and try again.');
 			}
 		} finally {
 			setIsLoading(false);
@@ -259,29 +303,75 @@ export default function SignupPage() {
 
 	return (
 		<main className={`min-h-screen bg-white text-black ${bodyFont.className}`}>
-			<div className="mx-auto flex min-h-screen max-w-6xl flex-col justify-center px-6 py-10 lg:flex-row lg:items-stretch lg:gap-16">
-				<aside className="flex flex-1 flex-col justify-center border-b border-zinc-200 pb-10 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-12">
-					<Link href="/" className="mb-10 inline-flex items-center gap-3 text-black transition hover:opacity-80">
-						<span className={`${brandFont.className} text-3xl font-black tracking-tight`}>
-							Fx<span className="text-black">Genz</span>
-						</span>
-					</Link>
+			<div className="flex min-h-screen flex-col lg:flex-row">
+				<aside className="flex flex-1 flex-col justify-between bg-gradient-to-br from-gray-900 via-black to-gray-900 px-6 py-10 lg:px-12 lg:py-16">
+					<div>
+						<Link href="/" className="mb-16 inline-flex items-center gap-3 text-white transition hover:opacity-80">
+							<img
+								src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
+								alt="FxGenz Logo"
+								className="h-12 w-12 object-contain rounded-lg"
+								loading="lazy"
+							/>
+							<span className={`${brandFont.className} text-3xl font-black tracking-tight`}>
+								Fx<span className="text-white">Genz</span>
+							</span>
+						</Link>
 
-					<div className="max-w-md">
-						<h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-							Create your FxGenz account
-						</h1>
-						<p className="mt-3 text-sm text-zinc-500">
-							Set up your login once, then access all FxGenz products with the same credentials.
-						</p>
+						<div className="max-w-md">
+							<h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
+								Start Trading with FxGenz
+							</h1>
+							<p className="mt-6 text-lg text-gray-300 leading-relaxed">
+								Join thousands of successful traders. Get funded, trade with confidence, and scale your profits.
+							</p>
+
+							<div className="mt-10 space-y-4">
+								<div className="flex items-start gap-3">
+									<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600/20 text-blue-400 flex-shrink-0">
+										<svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+										</svg>
+									</div>
+									<div>
+										<p className="font-semibold text-white">Instant Account Access</p>
+										<p className="text-sm text-gray-400">Start trading within minutes of signup</p>
+									</div>
+								</div>
+
+								<div className="flex items-start gap-3">
+									<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600/20 text-blue-400 flex-shrink-0">
+										<svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+										</svg>
+									</div>
+									<div>
+										<p className="font-semibold text-white">Multiple Account Types</p>
+										<p className="text-sm text-gray-400">Choose from Alpha, Beta, or Sigma</p>
+									</div>
+								</div>
+
+								<div className="flex items-start gap-3">
+									<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600/20 text-blue-400 flex-shrink-0">
+										<svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+										</svg>
+									</div>
+									<div>
+										<p className="font-semibold text-white">Lightning Fast Payouts</p>
+										<p className="text-sm text-gray-400">Get your profits within 24-48 hours</p>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 
-					<div className="mt-auto pt-10 text-xs text-zinc-400">
+					<div className="mt-auto pt-10 text-xs text-gray-500">
 						© {CURRENT_YEAR} FxGenz. All rights reserved.
 					</div>
 				</aside>
 
-				<section className="flex flex-1 items-center justify-center pt-6 lg:pt-0">
+				<section className="flex flex-1 items-center justify-center px-6 py-10 lg:px-12 lg:py-16">
 					<div className="w-full max-w-xl rounded-3xl border border-zinc-200 bg-white px-8 py-10 shadow-sm">
 						{step === 'details' && (
 							<>
@@ -306,50 +396,26 @@ export default function SignupPage() {
 								</div>
 
 								<form onSubmit={handleDetailsSubmit} className="mt-10 space-y-6">
-									<div className="grid gap-6 sm:grid-cols-2">
-										<div>
-											<label
-												htmlFor="firstName"
-												className="text-xs font-semibold uppercase tracking-wide text-zinc-700"
-											>
-												First name
-											</label>
-											<input
-												id="firstName"
-												type="text"
-												value={formData.firstName}
-												onChange={handleFormChange('firstName')}
-												className={`mt-2 w-full rounded-2xl border px-4 py-3 text-sm font-semibold tracking-wide text-zinc-900 transition focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10 ${
-													formErrors.firstName ? 'border-red-500 bg-red-50' : 'border-zinc-200 bg-zinc-50'
-												}`}
-												placeholder="Ava"
-											/>
-											{formErrors.firstName && (
-												<p className="mt-2 text-xs font-medium text-red-500">{formErrors.firstName}</p>
-											)}
-										</div>
-
-										<div>
-											<label
-												htmlFor="lastName"
-												className="text-xs font-semibold uppercase tracking-wide text-zinc-700"
-											>
-												Last name
-											</label>
-											<input
-												id="lastName"
-												type="text"
-												value={formData.lastName}
-												onChange={handleFormChange('lastName')}
-												className={`mt-2 w-full rounded-2xl border px-4 py-3 text-sm font-semibold tracking-wide text-zinc-900 transition focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10 ${
-													formErrors.lastName ? 'border-red-500 bg-red-50' : 'border-zinc-200 bg-zinc-50'
-												}`}
-												placeholder="Martinez"
-											/>
-											{formErrors.lastName && (
-												<p className="mt-2 text-xs font-medium text-red-500">{formErrors.lastName}</p>
-											)}
-										</div>
+									<div>
+										<label
+											htmlFor="name"
+											className="text-xs font-semibold uppercase tracking-wide text-zinc-700"
+										>
+											Full name
+										</label>
+										<input
+											id="name"
+											type="text"
+											value={formData.name}
+											onChange={handleFormChange('name')}
+											className={`mt-2 w-full rounded-2xl border px-4 py-3 text-sm font-semibold tracking-wide text-zinc-900 transition focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10 ${
+												formErrors.name ? 'border-red-500 bg-red-50' : 'border-zinc-200 bg-zinc-50'
+											}`}
+											placeholder="John Doe"
+										/>
+										{formErrors.name && (
+											<p className="mt-2 text-xs font-medium text-red-500">{formErrors.name}</p>
+										)}
 									</div>
 
 									<div>
@@ -380,26 +446,27 @@ export default function SignupPage() {
 
 									<div>
 										<label
-											htmlFor="phoneNo"
+											htmlFor="country"
 											className="text-xs font-semibold uppercase tracking-wide text-zinc-700"
 										>
-											Phone number
+											Country
 										</label>
-										<input
-											id="phoneNo"
-											type="tel"
-											value={formData.phoneNo}
-											onChange={handleFormChange('phoneNo')}
-											className={`mt-2 w-full rounded-2xl border px-4 py-3 text-sm font-semibold tracking-wide text-zinc-900 transition focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10 ${
-												formErrors.phoneNo ? 'border-red-500 bg-red-50' : 'border-zinc-200 bg-zinc-50'
-											}`}
-											placeholder="+1234567890"
+										<CountrySelector
+											value={formData.country}
+											onChange={(value) => {
+												setFormData((prev) => ({ ...prev, country: value }));
+												if (formErrors.country) {
+													setFormErrors((prev) => ({ ...prev, country: undefined }));
+												}
+											}}
+											error={formErrors.country}
+											disabled={isLoading}
 										/>
-										{formErrors.phoneNo ? (
-											<p className="mt-2 text-xs font-medium text-red-500">{formErrors.phoneNo}</p>
+										{formErrors.country ? (
+											<p className="mt-2 text-xs font-medium text-red-500">{formErrors.country}</p>
 										) : (
 											<p className="mt-2 text-xs text-zinc-500">
-												We'll use this for account verification and important updates.
+												We need your country for compliance and regional requirements.
 											</p>
 										)}
 									</div>
@@ -650,7 +717,16 @@ export default function SignupPage() {
 					</div>
 				</section>
 			</div>
-			<Toast message={toastMessage} type={toastType} onClose={() => setToastMessage(null)} />
+			<Toast 
+				message={toastMessage} 
+				type={toastType} 
+				title={toastTitle}
+				duration={toastType === 'success' ? 6000 : 5000}
+				onClose={() => {
+					setToastMessage(null);
+					setToastTitle(undefined);
+				}} 
+			/>
 		</main>
 	);
 }

@@ -1,10 +1,4 @@
-import { Poppins } from "next/font/google";
 import Image from "next/image";
-
-const display = Poppins({
-	subsets: ["latin"],
-	weight: ["600", "700"],
-});
 
 export default function InviteCard() {
 	return (
@@ -16,7 +10,7 @@ export default function InviteCard() {
 
 				<div className="relative flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
 					<div className="space-y-2">
-						<h3 className={`${display.className} text-2xl font-semibold tracking-[-0.01em] text-[#0b0b0f] dark:text-white`}>Invite your network</h3>
+						<h3 className="font-sans text-2xl font-bold tracking-tight text-[#0b0b0f] dark:text-white">Invite your network</h3>
 						<p className="max-w-xl text-sm leading-relaxed text-[#2e2e35]/80 dark:text-white/70">
 							Earn rewards by bringing traders from Google, Yahoo, and top news communities.
 							Professional, fast, and built for scale.

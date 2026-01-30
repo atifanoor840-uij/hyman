@@ -1,12 +1,6 @@
 'use client';
 
 import { useMemo } from "react";
-import { Poppins } from "next/font/google";
-
-const display = Poppins({
-	subsets: ['latin'],
-	weight: ['600', '700'],
-});
 
 type Review = {
 	name: string;
@@ -39,7 +33,7 @@ export default function TrustpilotReviews() {
 					<div className="inline-flex items-center gap-2 rounded-full border-2 border-white/20 bg-white/5 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white/70 mb-6">
 						What traders say
 					</div>
-					<h2 className={`${display.className} text-4xl font-bold text-white md:text-5xl lg:text-6xl mb-4`}>
+					<h2 className="font-sans text-4xl font-bold tracking-tight text-white md:text-5xl lg:text-6xl mb-4">
 						Real Experiences from Real Traders
 					</h2>
 					<p className="mx-auto max-w-3xl text-lg font-semibold text-white/70 md:text-xl">

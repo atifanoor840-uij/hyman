@@ -1,10 +1,3 @@
-import { Poppins } from "next/font/google";
-
-const display = Poppins({
-	subsets: ["latin"],
-	weight: ["600", "700"],
-});
-
 const VIDEOS = [
 	{ id: "1", title: "€5,000 Payout — Same Day", src: "https://www.youtube.com/embed/ysz5S6PUM-U" },
 	{ id: "2", title: "Scaling To €25,000", src: "https://www.youtube.com/embed/aqz-KE-bpKQ" },
@@ -13,11 +6,11 @@ const VIDEOS = [
 
 export default function PayoutVideos() {
 	return (
-		<section id="payouts" className="bg-white">
+		<section id="payouts" className="bg-slate-50/80">
 			<div className="mx-auto max-w-7xl px-6 py-16 md:px-10">
 				<header className="mb-8 flex items-end justify-between gap-4">
 					<div>
-						<h2 className={`${display.className} text-3xl font-semibold tracking-[-0.02em] text-[#0b0b0f] md:text-4xl`}>
+						<h2 className="font-sans text-3xl font-bold tracking-tight text-[#0b0b0f] md:text-4xl">
 							Real payout videos
 						</h2>
 						<p className="mt-2 text-sm text-[#2e2e35]/75">Verified clips from traders receiving payouts.</p>

@@ -31,13 +31,21 @@ export default function Navbar({ variant = "sticky" }: { variant?: NavbarVariant
 			<div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:px-10 lg:py-5">
 				{/* Logo */}
 				<div className="flex items-center gap-4">
-					<Link href="/" className="group flex items-center gap-2.5 transition-all duration-300 hover:opacity-90">
-						<div className="relative">
+					<Link href="/" className="group flex items-center gap-3 transition-all duration-300 hover:opacity-90">
+						<div className="relative flex items-center">
+							{/* Image logo - made larger */}
+							<img
+								src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
+								alt="Brand"
+								className="w-14 h-14 md:w-16 md:h-16 object-contain mr-2 drop-shadow-lg"
+								style={{ minWidth: '3.5rem', minHeight: '3.5rem' }}
+							/>
+							{/* Text logo - made smaller */}
 							<span className={`${brandFont.className} relative flex items-center text-white`}>
-								<span className="text-2xl font-extrabold tracking-tight md:text-3xl">
+								<span className="text-lg font-extrabold tracking-tight md:text-xl">
 									<span className="bg-gradient-to-r from-white via-white to-white/95 bg-clip-text text-transparent">Fx</span>
 								</span>
-								<span className="ml-1 text-xl font-bold tracking-tight text-white md:text-2xl">Genz</span>
+								<span className="ml-2 text-base font-bold tracking-tight text-white md:text-lg">Genz</span>
 							</span>
 							<div className="absolute -inset-1 rounded-lg bg-gradient-to-r from-[#00ff88]/20 to-[#00ff88]/10 opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-300"></div>
 						</div>
@@ -51,6 +59,13 @@ export default function Navbar({ variant = "sticky" }: { variant?: NavbarVariant
 						className="relative px-5 py-2.5 text-sm font-medium text-white/70 transition-all duration-200 hover:text-white rounded-lg group"
 					>
 						<span className="relative z-10">Home</span>
+						<span className="absolute inset-0 bg-white/5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
+					</Link>
+					<Link 
+						href="/blog" 
+						className="relative px-5 py-2.5 text-sm font-medium text-white/70 transition-all duration-200 hover:text-white rounded-lg group"
+					>
+						<span className="relative z-10">News</span>
 						<span className="absolute inset-0 bg-white/5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
 					</Link>
 					
@@ -96,7 +111,7 @@ export default function Navbar({ variant = "sticky" }: { variant?: NavbarVariant
 							</div>
 						)}
 					</div>
-
+                    
 					{/* Resources Dropdown */}
 					<div 
 						className="relative"
@@ -237,6 +252,13 @@ export default function Navbar({ variant = "sticky" }: { variant?: NavbarVariant
 						>
 							Home
 						</Link>
+						<Link 
+							href="/blog" 
+							className="block px-4 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+							onClick={() => setMobileMenuOpen(false)}
+						>
+							News
+						</Link>
 						
 						<div className="space-y-1">
 							<div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white/60">Trading</div>
@@ -364,5 +386,4 @@ export default function Navbar({ variant = "sticky" }: { variant?: NavbarVariant
 		</header>
 	);
 }
-
 

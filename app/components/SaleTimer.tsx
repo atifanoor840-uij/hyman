@@ -1,12 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Poppins } from 'next/font/google';
-
-const display = Poppins({
-	subsets: ['latin'],
-	weight: ['600', '700', '800'],
-});
 
 interface TimeLeft {
 	days: number;
@@ -51,12 +45,24 @@ export default function SaleTimer() {
 	};
 
 	return (
-		<div className="bg-white py-12">
+		<div className="bg-slate-50/80 py-12">
 			<div className="mx-auto max-w-4xl px-6">
 				<div className="text-center mb-8">
-					<h3 className={`${display.className} text-2xl font-bold text-black mb-2 md:text-3xl`}>
+					<h3 className="font-sans text-2xl font-bold tracking-tight text-black mb-2 md:text-3xl">
 						Sale end
 					</h3>
+					<div className="mt-6 inline-block">
+						<div className="relative overflow-hidden rounded-md border border-slate-900/10 bg-white px-8 py-3 shadow-sm">
+							<div className="absolute inset-0 bg-gradient-to-r from-slate-50 via-white to-slate-50"></div>
+							<div className="relative flex items-center gap-3">
+								<div className="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
+								<p className="font-sans text-sm font-semibold uppercase tracking-[0.15em] text-slate-900 md:text-base">
+									Limited Offer: Buy One Get One Free
+								</p>
+								<div className="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
+							</div>
+						</div>
+					</div>
 				</div>
 				
 				<div className="flex items-center justify-center gap-4 md:gap-6">
@@ -66,7 +72,7 @@ export default function SaleTimer() {
 							<div className="absolute inset-0 bg-gradient-to-b from-black/10 to-transparent rounded-xl blur-sm"></div>
 							<div className="relative bg-gradient-to-b from-gray-900 to-black rounded-xl p-4 md:p-6 shadow-2xl border-2 border-black/20">
 								<div className="text-center">
-									<div className={`${display.className} text-4xl font-bold text-white md:text-5xl lg:text-6xl tracking-tight`}>
+									<div className="font-sans text-4xl font-bold text-white md:text-5xl lg:text-6xl tracking-tight">
 										{formatNumber(timeLeft.days)}
 									</div>
 								</div>
@@ -86,7 +92,7 @@ export default function SaleTimer() {
 							<div className="absolute inset-0 bg-gradient-to-b from-black/10 to-transparent rounded-xl blur-sm"></div>
 							<div className="relative bg-gradient-to-b from-gray-900 to-black rounded-xl p-4 md:p-6 shadow-2xl border-2 border-black/20">
 								<div className="text-center">
-									<div className={`${display.className} text-4xl font-bold text-white md:text-5xl lg:text-6xl tracking-tight`}>
+									<div className="font-sans text-4xl font-bold text-white md:text-5xl lg:text-6xl tracking-tight">
 										{formatNumber(timeLeft.hours)}
 									</div>
 								</div>
@@ -106,7 +112,7 @@ export default function SaleTimer() {
 							<div className="absolute inset-0 bg-gradient-to-b from-black/10 to-transparent rounded-xl blur-sm"></div>
 							<div className="relative bg-gradient-to-b from-gray-900 to-black rounded-xl p-4 md:p-6 shadow-2xl border-2 border-black/20">
 								<div className="text-center">
-									<div className={`${display.className} text-4xl font-bold text-white md:text-5xl lg:text-6xl tracking-tight`}>
+									<div className="font-sans text-4xl font-bold text-white md:text-5xl lg:text-6xl tracking-tight">
 										{formatNumber(timeLeft.minutes)}
 									</div>
 								</div>
@@ -126,7 +132,7 @@ export default function SaleTimer() {
 							<div className="absolute inset-0 bg-gradient-to-b from-black/10 to-transparent rounded-xl blur-sm"></div>
 							<div className="relative bg-gradient-to-b from-gray-900 to-black rounded-xl p-4 md:p-6 shadow-2xl border-2 border-black/20">
 								<div className="text-center">
-									<div className={`${display.className} text-4xl font-bold text-white md:text-5xl lg:text-6xl tracking-tight`}>
+									<div className="font-sans text-4xl font-bold text-white md:text-5xl lg:text-6xl tracking-tight">
 										{formatNumber(timeLeft.seconds)}
 									</div>
 								</div>

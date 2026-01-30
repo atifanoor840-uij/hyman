@@ -1,17 +1,11 @@
-import { Poppins } from "next/font/google";
 import Image from "next/image";
-
-const display = Poppins({
-	subsets: ["latin"],
-	weight: ["600", "700"],
-});
 
 export default function WhyFxGenz() {
 	return (
 		<section id="why" className="relative overflow-hidden bg-black">
 			<div className="mx-auto max-w-7xl px-6 py-18 md:px-10 md:py-24">
 				<header className="mb-12">
-					<h2 className={`${display.className} text-3xl font-bold tracking-tight text-white md:text-4xl`}>
+					<h2 className="font-sans text-3xl font-bold tracking-tight text-white md:text-4xl">
 						Why People Choose FxGenz
 					</h2>
 				</header>
@@ -27,7 +21,7 @@ export default function WhyFxGenz() {
 					<div className="absolute inset-0 bg-black/40" />
 					<div className="relative flex min-h-[260px] flex-col justify-between p-6 md:min-h-[320px] md:flex-row md:items-center md:p-10">
 						<div className="mb-6 max-w-xl md:mb-0">
-							<div className="text-3xl font-bold text-white md:text-4xl">More Power, Less Risk</div>
+							<div className="font-sans text-3xl font-bold tracking-tight text-white md:text-4xl">More Power, Less Risk</div>
 							<div className="mt-2 text-base text-white/80 md:text-lg">Up to $200K simulated capital</div>
 						</div>
 						{/* Laptop Image on Right */}
@@ -79,7 +73,7 @@ function Pillar({ icon, title, desc, image }: { icon: React.ReactNode; title: st
 					<div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl border-2 border-white/20 bg-black text-white">
 						{icon}
 					</div>
-					<h3 className={`${display.className} text-lg font-semibold text-white mb-2`}>{title}</h3>
+					<h3 className="font-sans text-lg font-semibold tracking-tight text-white mb-2">{title}</h3>
 					<p className="text-sm text-white/70 leading-relaxed">{desc}</p>
 				</div>
 				{image && (
@@ -101,7 +95,7 @@ function Pillar({ icon, title, desc, image }: { icon: React.ReactNode; title: st
 function Stat({ value, label }: { value: string; label: string }) {
 	return (
 		<div className="rounded-xl border border-[#e6e9ef] bg-white px-4 py-3">
-			<div className={`${display.className} text-2xl font-semibold text-[#0b0b0f]`}>{value}</div>
+			<div className="font-sans text-2xl font-semibold tracking-tight text-[#0b0b0f]">{value}</div>
 			<div className="text-xs text-[#2e2e35]/70">{label}</div>
 		</div>
 	);

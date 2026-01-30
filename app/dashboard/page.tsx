@@ -44,9 +44,9 @@ export default function DashboardPage() {
               <div className="space-y-3 md:space-y-4 min-w-0">
                 <div className="rounded-xl overflow-hidden border border-border bg-card shadow-sm animate-slide-in-up" style={{ animationDelay: "500ms" }}>
                   <img
-                    src="https://files.elfsightcdn.com/eafe4a4d-3436-495d-b748-5bdce62d911d/b67d09f1-6dcd-47e4-b595-9e715bfe6eb3/Q1_Web_704x-830.png"
-                    alt="Q1_Web_704x 830"
-                    className="w-full h-auto max-h-[320px] object-cover object-top"
+                    src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769775710/Black_White_Grunge_Modern_Buy_One_Get_One_Black_Friday_Instagram_Post_plnvf9.png"
+                    alt="Account Performance"
+                    className="w-full h-auto max-h-[320px] object-cover object-center"
                   />
                 </div>
                 <ProjectProgress />
@@ -68,3 +68,25 @@ export default function DashboardPage() {
     </div>
   )
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,12 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { Poppins } from "next/font/google";
-
-const display = Poppins({
-	subsets: ["latin"],
-	weight: ["600", "700"],
-});
 
 const loyaltyCards = [
 	{
@@ -77,8 +71,8 @@ const loyaltyCards = [
 
 export default function LoyaltyPrograms() {
 	return (
-		<section id="loyalty" className="relative overflow-hidden bg-white">
-			<div className="absolute inset-0 -z-10 bg-white" />
+		<section id="loyalty" className="relative overflow-hidden bg-slate-50/80">
+			<div className="absolute inset-0 -z-10 bg-slate-50/80" />
 
 			<div className="mx-auto max-w-7xl px-6 py-18 md:px-10 md:py-24">
 				<header className="mb-8 flex items-end justify-between gap-4">
@@ -86,7 +80,7 @@ export default function LoyaltyPrograms() {
 						<div className="inline-flex items-center gap-2 rounded-full border border-[#0b0b0f]/10 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[#2e2e35]/70">
 							Trade2Earn
 						</div>
-						<h2 className={`${display.className} mt-3 text-3xl font-semibold tracking-[-0.02em] text-[#0b0b0f] md:text-5xl`}>
+						<h2 className="font-sans mt-3 text-3xl font-bold tracking-tight text-[#0b0b0f] md:text-5xl">
 							Discover our Loyalty Program
 						</h2>
 						<p className="mt-3 max-w-3xl text-[#2e2e35]/75">
@@ -164,7 +158,7 @@ function LoyaltyCard({
 				<div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#e6e9ef] bg-[#f7fbff] text-[#0ea5e9]">
 					{icon}
 				</div>
-				<h3 className={`${display.className} text-lg font-semibold text-[#0b0b0f]`}>{title}</h3>
+				<h3 className="font-sans text-lg font-semibold tracking-tight text-[#0b0b0f]">{title}</h3>
 			</div>
 			<div className="mb-4 flex h-32 items-center justify-center overflow-hidden rounded-2xl border border-[#e6e9ef] bg-[#f7fbff]">
 				{imageSrc ? (

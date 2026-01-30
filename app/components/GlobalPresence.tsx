@@ -1,12 +1,6 @@
 'use client';
 
-import { Poppins } from "next/font/google";
 import { ComposableMap, Geographies, Geography, Graticule } from "react-simple-maps";
-
-const display = Poppins({
-	subsets: ["latin"],
-	weight: ["600", "700"],
-});
 
 const COUNTRIES = [
 	{ code: "us", name: "United States" },
@@ -46,7 +40,7 @@ export default function GlobalPresence() {
 						<span className="rounded-full border border-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-white/70">
 							Global presence
 						</span>
-						<h2 className={`${display.className} mt-4 text-3xl font-semibold leading-tight text-white md:text-4xl`}>
+						<h2 className="font-sans mt-4 text-3xl font-bold leading-tight tracking-tight text-white md:text-4xl">
 							Trusted by traders worldwide
 						</h2>
 						<p className="mt-3 text-sm text-white/75">

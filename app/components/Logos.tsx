@@ -1,6 +1,6 @@
 export default function Logos() {
 	return (
-		<section className="bg-white">
+		<section className="bg-slate-50/80">
 			<div className="mx-auto max-w-7xl px-6 py-10 md:px-10">
 				<div className="grid grid-cols-2 items-center gap-8 opacity-80 sm:grid-cols-3 md:grid-cols-6">
 					{["AlphaX", "PrimeFlow", "DeepRate", "VoltEdge", "AstraFX", "ClearRisk"].map((b) => (

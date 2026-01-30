@@ -1,40 +1,60 @@
-function Laurel() {
+'use client';
+
+function ClipboardIcon() {
 	return (
-		<svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-			<path d="M6.5 18c-2.2-1.4-3.5-3.7-3.5-6.5 2.3.2 4.1 1.3 5.5 3-1 1.2-1.5 2.3-2 3.5Z" stroke="currentColor" strokeOpacity=".6" strokeWidth="1.2" strokeLinecap="round" />
-			<path d="M17.5 18c2.2-1.4 3.5-3.7 3.5-6.5-2.3.2-4.1 1.3-5.5 3 1 1.2 1.5 2.3 2 3.5Z" stroke="currentColor" strokeOpacity=".6" strokeWidth="1.2" strokeLinecap="round" />
+		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+			<path d="M21 21H4.6C4.03995 21 3.75992 21 3.54601 20.891C3.35785 20.7951 3.20487 20.6422 3.10899 20.454C3 20.2401 3 19.9601 3 19.4V3M21 7L15.5657 12.4343C15.3677 12.6323 15.2687 12.7313 15.1545 12.7684C15.0541 12.8011 14.9459 12.8011 14.8455 12.7684C14.7313 12.7313 14.6323 12.6323 14.4343 12.4343L12.5657 10.5657C12.3677 10.3677 12.2687 10.2687 12.1545 10.2316C12.0541 10.1989 11.9459 10.1989 11.8455 10.2316C11.7313 10.2687 11.6323 10.3677 11.4343 10.5657L7 15M21 7H17M21 7V11" />
 		</svg>
 	);
 }
 
-export default function HeroStats() {
-	const items = [
-		{ value: "3M+", labelTop: "Customers", labelBottom: "worldwide" },
-		{ value: "4.8/5", labelTop: "Trustpilot", labelBottom: "rating" },
-		{ value: "$450M+", labelTop: "Paid in", labelBottom: "rewards worldwide" },
-		{ value: "140+", labelTop: "Countries", labelBottom: "served" },
-	];
+function UsersIcon() {
 	return (
-		<div className="mt-10 border-t border-white/10 pt-8">
-			<div className="grid grid-cols-2 gap-8 text-center text-white/90 sm:grid-cols-4">
-				{items.map((it) => (
-					<div key={it.value} className="flex flex-col items-center gap-2">
-						<div className="flex items-center gap-2 text-white/70">
-							<Laurel />
-							<div className="text-2xl font-semibold text-white">{it.value}</div>
-							<Laurel />
+		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+			<path d="M16 3.46776C17.4817 4.20411 18.5 5.73314 18.5 7.5C18.5 9.26686 17.4817 10.7959 16 11.5322M18 16.7664C19.5115 17.4503 20.8725 18.565 22 20M2 20C3.94649 17.5226 6.58918 16 9.5 16C12.4108 16 15.0535 17.5226 17 20M14 7.5C14 9.98528 11.9853 12 9.5 12C7.01472 12 5 9.98528 5 7.5C5 5.01472 7.01472 3 9.5 3C11.9853 3 14 5.01472 14 7.5Z" />
+		</svg>
+	);
+}
+
+function GlobeIcon() {
+	return (
+		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+			<path d="M3.07598 7.48282L7.36402 10.5457C7.58715 10.705 7.69872 10.7847 7.81548 10.8031C7.91821 10.8192 8.02343 10.8029 8.11648 10.7565C8.22223 10.7037 8.30449 10.594 8.46901 10.3747L9.37511 9.16652C9.42164 9.10448 9.4449 9.07347 9.47224 9.04671C9.49652 9.02295 9.52315 9.00173 9.55173 8.98338C9.58392 8.9627 9.61935 8.94696 9.6902 8.91546L13.5588 7.19609C13.7192 7.12482 13.7993 7.08918 13.8598 7.03352C13.9133 6.9843 13.9554 6.924 13.9832 6.85684C14.0146 6.78091 14.0204 6.69336 14.0321 6.51826L14.3154 2.2694M13.5 13.5L16.116 14.6211C16.4195 14.7512 16.5713 14.8163 16.6517 14.9243C16.7222 15.0191 16.7569 15.1358 16.7496 15.2537C16.7413 15.3881 16.6497 15.5255 16.4665 15.8002L15.2375 17.6438C15.1507 17.774 15.1072 17.8391 15.0499 17.8863C14.9991 17.928 14.9406 17.9593 14.8777 17.9784C14.8067 18 14.7284 18 14.5719 18H12.5766C12.3693 18 12.2656 18 12.1774 17.9653C12.0995 17.9347 12.0305 17.885 11.9768 17.8208C11.916 17.7481 11.8832 17.6497 11.8177 17.453L11.1048 15.3144C11.0661 15.1983 11.0468 15.1403 11.0417 15.0814C11.0372 15.0291 11.0409 14.9764 11.0528 14.9253C11.0662 14.8677 11.0935 14.813 11.1482 14.7036L11.6897 13.6206C11.7997 13.4005 11.8547 13.2905 11.9395 13.2222C12.0141 13.162 12.1046 13.1246 12.1999 13.1143C12.3081 13.1027 12.4248 13.1416 12.6582 13.2194L13.5 13.5ZM22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" />
+		</svg>
+	);
+}
+
+function AwardIcon() {
+	return (
+		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+			<path d="M7.86866 15.4599L7 22L11.5884 19.247C11.7381 19.1572 11.8129 19.1123 11.8928 19.0947C11.9634 19.0792 12.0366 19.0792 12.1072 19.0947C12.1871 19.1123 12.2619 19.1572 12.4116 19.247L17 22L16.1319 15.4571M16.4259 4.24888C16.5803 4.6224 16.8768 4.9193 17.25 5.0743L18.5589 5.61648C18.9325 5.77121 19.2292 6.06799 19.384 6.44154C19.5387 6.81509 19.5387 7.23481 19.384 7.60836L18.8422 8.91635C18.6874 9.29007 18.6872 9.71021 18.8427 10.0837L19.3835 11.3913C19.4602 11.5764 19.4997 11.7747 19.4997 11.975C19.4998 12.1752 19.4603 12.3736 19.3837 12.5586C19.3071 12.7436 19.1947 12.9118 19.0531 13.0534C18.9114 13.195 18.7433 13.3073 18.5582 13.3839L17.2503 13.9256C16.8768 14.0801 16.5799 14.3765 16.4249 14.7498L15.8827 16.0588C15.728 16.4323 15.4312 16.7291 15.0577 16.8838C14.6841 17.0386 14.2644 17.0386 13.8909 16.8838L12.583 16.342C12.2094 16.1877 11.7899 16.188 11.4166 16.3429L10.1077 16.8843C9.73434 17.0387 9.31501 17.0386 8.94178 16.884C8.56854 16.7293 8.27194 16.4329 8.11711 16.0598L7.57479 14.7504C7.42035 14.3769 7.12391 14.08 6.75064 13.925L5.44175 13.3828C5.06838 13.2282 4.77169 12.9316 4.61691 12.5582C4.46213 12.1849 4.46192 11.7654 4.61633 11.3919L5.1581 10.0839C5.31244 9.71035 5.31213 9.29079 5.15722 8.91746L4.61623 7.60759C4.53953 7.42257 4.50003 7.22426 4.5 7.02397C4.49997 6.82369 4.5394 6.62536 4.61604 6.44032C4.69268 6.25529 4.80504 6.08716 4.94668 5.94556C5.08832 5.80396 5.25647 5.69166 5.44152 5.61508L6.74947 5.07329C7.12265 4.91898 7.41936 4.6229 7.57448 4.25004L8.11664 2.94111C8.27136 2.56756 8.56813 2.27078 8.94167 2.11605C9.3152 1.96132 9.7349 1.96132 10.1084 2.11605L11.4164 2.65784C11.7899 2.81218 12.2095 2.81187 12.5828 2.65696L13.8922 2.11689C14.2657 1.96224 14.6853 1.96228 15.0588 2.11697C15.4322 2.27167 15.729 2.56837 15.8837 2.94182L16.426 4.25115L16.4259 4.24888Z" />
+		</svg>
+	);
+}
+
+const stats = [
+	{ icon: ClipboardIcon, value: "Est. 2021", label: "In the UK" },
+	{ icon: UsersIcon, value: "65,000+", label: "Traders" },
+	{ icon: GlobeIcon, value: "180+", label: "Countries supported" },
+	{ icon: AwardIcon, value: "8", label: "Industry awards" },
+];
+
+export default function HeroStats() {
+	return (
+		<div className="mt-12 border-t border-white/10 pt-10">
+			<div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+				{stats.map(({ icon: Icon, value, label }) => (
+					<div key={label} className="flex flex-col gap-2">
+						<div className="flex items-center gap-3">
+							<div className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 bg-white/5 text-[#7270ff]">
+								<Icon />
+							</div>
+							<span className="font-sans text-2xl font-bold tracking-tight text-white">{value}</span>
 						</div>
-						<div className="text-xs leading-tight text-white/60">
-							<div>{it.labelTop}</div>
-							<div>{it.labelBottom}</div>
-						</div>
+						<h2 className="font-sans text-sm font-medium text-white/80">{label}</h2>
 					</div>
 				))}
 			</div>
 		</div>
 	);
 }
-
-
-
-

@@ -1,12 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import { Poppins } from 'next/font/google';
-
-const display = Poppins({
-	subsets: ['latin'],
-	weight: ['600', '700'],
-});
 
 const platforms = [
 	{ 
@@ -20,23 +14,23 @@ const platforms = [
 		label: 'MetaTrader 5'
 	},
 	{ 
-		name: 'cTrader', 
-		image: null,
-		label: 'cTrader'
+		name: 'DXtrade', 
+		image: 'https://res.cloudinary.com/dqzibxdtn/image/upload/v1769771735/dxtrade_s7srnv.png',
+		label: 'DXtrade'
 	},
 ];
 
 export default function Platforms() {
 	return (
-		<section className="relative overflow-hidden bg-white">
+		<section className="relative overflow-hidden bg-slate-50/80">
 			<div className="mx-auto max-w-7xl px-6 py-20 md:px-10 md:py-24">
 				{/* Heading and Subheading */}
 				<div className="mb-16 text-center">
-					<h2 className={`${display.className} text-4xl font-bold text-black md:text-5xl lg:text-6xl mb-4`}>
+					<h2 className="font-sans text-4xl font-bold tracking-tight text-black md:text-5xl lg:text-6xl mb-4">
 						We Support Major Platforms
 					</h2>
 					<p className="mx-auto max-w-3xl text-lg font-semibold text-black/70 md:text-xl">
-						At FxGenz, we want to give you options. That's why we offer the flexibility to tailor your experience and choose between MT4, MT5, and cTrader. Pick the professional trading platform that suits you best.
+						At FxGenz, we want to give you options. That's why we offer the flexibility to tailor your experience and choose between MT4, MT5, and DXtrade. Pick the professional trading platform that suits you best.
 					</p>
 				</div>
 
@@ -48,17 +42,13 @@ export default function Platforms() {
 							className="group flex flex-col items-center justify-center transition hover:scale-105"
 						>
 							<div className="flex h-24 w-24 items-center justify-center md:h-32 md:w-32">
-								{platform.image ? (
-									<Image
-										src={platform.image}
-										alt={platform.name}
-										width={128}
-										height={128}
-										className="object-contain"
-									/>
-								) : (
-									<CTraderIcon />
-								)}
+								<Image
+									src={platform.image}
+									alt={platform.name}
+									width={128}
+									height={128}
+									className="object-contain"
+								/>
 							</div>
 							<div className="mt-4 text-center">
 								<h3 className="text-sm font-bold text-black md:text-base">
@@ -80,19 +70,6 @@ export default function Platforms() {
 				</div>
 			</div>
 		</section>
-	);
-}
-
-function CTraderIcon() {
-	return (
-		<svg width="128" height="128" viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-			<text x="10" y="50" fill="#FF5252" fontSize="40" fontWeight="bold" fontFamily="Arial, sans-serif">
-				c
-			</text>
-			<text x="50" y="50" fill="#000000" fontSize="28" fontWeight="600" fontFamily="Arial, sans-serif">
-				Trader
-			</text>
-		</svg>
 	);
 }
 
