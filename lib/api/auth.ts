@@ -152,19 +152,19 @@ export interface Order {
 	created_at: string;
 	platform: string;
 	payment_method: string;
-	payment_status: string;
+	payment_status: string | null;
 	oxapay_payment_status: string | null;
 	payment_intent_id: string | null;
 	checkout_session_id: string | null;
-	txid: string;
-	checkout_session_url: string;
+	txid: string | null;
+	checkout_session_url: string | null;
 	image: string | null;
-	completed_at: string | null;
-	credentials: OrderCredentials | null;
-	stage2_created_at: string | null;
-	stage2_credentials: OrderCredentials | null;
-	live_created_at: string | null;
-	live_credentials: OrderCredentials | null;
+	completed_at?: string | null;
+	credentials?: OrderCredentials | null;
+	stage2_created_at?: string | null;
+	stage2_credentials?: OrderCredentials | null;
+	live_created_at?: string | null;
+	live_credentials?: OrderCredentials | null;
 }
 
 export interface MyAccountResponse {

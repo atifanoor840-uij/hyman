@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -12,8 +13,14 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
-  CircleDot,
 } from "lucide-react"
+import {
+  createOrder,
+  createOrderWithOxapay,
+  OXAPAY_ORDER_DESCRIPTION,
+  OXAPAY_THANKS_MESSAGE,
+} from "@/lib/api/orders"
+import { ApiClientError } from "@/lib/api/client"
 
 const platformTypes = [
   { id: "mt4", label: "MT4", logo: "https://res.cloudinary.com/dufcjjaav/image/upload/v1769778769/images__1_-removebg-preview_pbysow.png" },
@@ -264,6 +271,7 @@ const paymentMethods = [
 ]
 
 export function BuysContent() {
+  const router = useRouter()
   const [activePlatform, setActivePlatform] = useState("mt5")
   const [activeAccountType, setActiveAccountType] = useState("alpha")
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
@@ -271,6 +279,8 @@ export function BuysContent() {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("crypto")
   const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   // Get dynamic data based on account type
   const accountSizes = accountSizesByType[activeAccountType] || accountSizesByType.alpha
@@ -305,6 +315,61 @@ export function BuysContent() {
     if (!selectedSize || !pricing[selectedSize]) return "0.00"
     const base = pricing[selectedSize].amount || 0
     return base.toFixed(2)
+  }
+
+  const handleProceedToCheckout = async () => {
+    if (!selectedSize) return
+    const sizeOption = accountSizes.find((s) => s.id === selectedSize)
+    const accountSizeValue = sizeOption?.value ?? 0
+    const amount = getPayableAmount()
+    setSubmitError(null)
+    setIsSubmitting(true)
+    try {
+      let response: Awaited<ReturnType<typeof createOrder>>
+      // Crypto → POST /orders/create-with-oxapay (Oxapay)
+      if (selectedPaymentMethod === "crypto") {
+        response = await createOrderWithOxapay({
+          challenge_type: activeAccountType,
+          account_size: String(accountSizeValue),
+          platform: selectedPlatform,
+          amount,
+          currency: "USD",
+          to_currency: "USDT",
+          order_name: "",
+          description: OXAPAY_ORDER_DESCRIPTION,
+          lifetime: 60,
+          fee_paid_by_payer: 1,
+          under_paid_coverage: 2.5,
+          auto_withdrawal: false,
+          mixed_payment: true,
+          return_url: "https://www.fxonyx.com",
+          thanks_message: OXAPAY_THANKS_MESSAGE,
+        })
+      } else {
+        response = await createOrder({
+          challenge_type: activeAccountType,
+          account_size: String(accountSizeValue),
+          platform: selectedPlatform,
+          payment_method: "CARD",
+          amount,
+          token_name: "",
+          txid: "",
+          image: "",
+        })
+      }
+      closeSidebar()
+      const checkoutUrl = response?.checkout_session_url
+      if (checkoutUrl && typeof checkoutUrl === "string" && checkoutUrl.trim() !== "") {
+        window.location.href = checkoutUrl
+      } else {
+        router.push("/dashboard")
+      }
+    } catch (err) {
+      const message = err instanceof ApiClientError ? err.message : "Failed to create order. Please try again."
+      setSubmitError(message)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -695,14 +760,20 @@ export function BuysContent() {
               </span>
             </label>
 
+            {submitError && (
+              <p className="text-sm text-destructive font-medium mb-2">{submitError}</p>
+            )}
             {/* Get Started Button */}
             <Button
-              disabled={!agreedToTerms}
+              disabled={!agreedToTerms || isSubmitting}
+              onClick={handleProceedToCheckout}
               className="w-full h-14 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold rounded-xl shadow-lg shadow-primary/20 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.01] group"
             >
               <div className="flex items-center gap-3">
                 <div className="flex flex-col items-start">
-                  <span className="text-base font-semibold">Proceed to Checkout</span>
+                  <span className="text-base font-semibold">
+                    {isSubmitting ? "Creating order..." : "Proceed to Checkout"}
+                  </span>
                   <span className="text-xs font-normal opacity-80">${getPayableAmount()} total</span>
                 </div>
                 <ChevronRight className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />

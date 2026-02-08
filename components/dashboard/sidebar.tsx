@@ -42,7 +42,7 @@ const section3 = [
   { icon: IdentificationCard, label: "KYC", href: "/dashboard/kyc" },
   { icon: Wallet, label: "Withdrawal", href: "/dashboard/withdrawal" },
   { icon: Ticket, label: "Coupon codes", href: "/dashboard/coupons" },
-  { icon: Scroll, label: "Facts & rules", href: "/dashboard/facts-rules" },
+  { icon: Scroll, label: "Rules", href: "/dashboard/facts-rules" },
 ]
 
 const generalItems = [
@@ -103,11 +103,13 @@ export function Sidebar() {
   return (
     <aside className="scrollbar-hide fixed left-0 top-0 flex h-screen w-64 flex-col overflow-y-auto border-r border-border bg-card/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-card/80 dark:bg-card/90 lg:block rounded-tr-2xl rounded-br-2xl">
       <div className="shrink-0 border-b border-border/60 px-4 py-4">
-        <Link href="/dashboard" className="flex items-center gap-2.5 group">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary shadow-md shadow-primary/20 transition-all duration-300 group-hover:scale-105 group-hover:shadow-primary/30">
-            <ChartLineUp size={18} weight="duotone" className="text-primary-foreground" />
-          </div>
-          <span className="text-base font-bold tracking-tight text-foreground">Forex Pro</span>
+        <Link href="/dashboard" className="flex items-center gap-3 group">
+          <img
+            src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
+            alt="FxGenz"
+            className="h-12 w-12 shrink-0 object-contain transition-transform duration-300 group-hover:scale-105"
+          />
+          <span className="text-lg font-bold tracking-tight text-foreground">FxGenz</span>
         </Link>
       </div>
 

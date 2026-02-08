@@ -3,9 +3,9 @@ import Image from "next/image";
 export default function WhyFxGenz() {
 	return (
 		<section id="why" className="relative overflow-hidden bg-black">
-			<div className="mx-auto max-w-7xl px-6 py-18 md:px-10 md:py-24">
+			<div className="mx-auto max-w-7xl px-6 py-18 md:px-10 md:py-24 font-display">
 				<header className="mb-12">
-					<h2 className="font-sans text-3xl font-bold tracking-tight text-white md:text-4xl">
+					<h2 className="mw-m-b-0 mw-jumbotron__title mw-display-2 text-white">
 						Why People Choose FxGenz
 					</h2>
 				</header>
@@ -21,7 +21,7 @@ export default function WhyFxGenz() {
 					<div className="absolute inset-0 bg-black/40" />
 					<div className="relative flex min-h-[260px] flex-col justify-between p-6 md:min-h-[320px] md:flex-row md:items-center md:p-10">
 						<div className="mb-6 max-w-xl md:mb-0">
-							<div className="font-sans text-3xl font-bold tracking-tight text-white md:text-4xl">More Power, Less Risk</div>
+							<div className="mw-jumbotron__title mw-display-2 mw-m-b-0 text-white">More Power, Less Risk</div>
 							<div className="mt-2 text-base text-white/80 md:text-lg">Up to $200K simulated capital</div>
 						</div>
 						{/* Laptop Image on Right */}
@@ -38,26 +38,26 @@ export default function WhyFxGenz() {
 				</div>
 
 				{/* Four Feature Cards */}
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
 					<Pillar
 						icon={<SpeedIcon />}
-						title="Efficient, reliable payouts"
-						desc="Same‑day processing with multiple global rails, including cards and crypto, so you can access your profits quickly and predictably."
+						title="Fast payouts"
+						desc="Same-day processing. Cards & crypto."
 					/>
 					<Pillar
 						icon={<ShieldIcon />}
-						title="Clear and balanced conditions"
-						desc="Realistic profit targets, responsible drawdowns, and transparent policies, carefully structured to reward consistency rather than luck."
+						title="Fair rules"
+						desc="Realistic targets. Transparent policies."
 					/>
 					<Pillar
 						icon={<ToolsIcon />}
-						title="Professional trading infrastructure"
-						desc="Trade on MT5, cTrader, or TradingView with low‑latency execution, institutional liquidity, and analytics that support informed decision‑making."
+						title="Pro infrastructure"
+						desc="MT5, cTrader. Low latency, institutional liquidity."
 					/>
 					<Pillar
 						icon={<ScaleIcon />}
-						title="Structured scaling programs"
-						desc="Progress into larger account sizes through a clear scaling framework that rewards sustained discipline and risk management."
+						title="Scale up"
+						desc="Clear path to larger accounts."
 					/>
 				</div>
 			</div>
@@ -67,14 +67,14 @@ export default function WhyFxGenz() {
 
 function Pillar({ icon, title, desc, image }: { icon: React.ReactNode; title: string; desc: string; image?: string }) {
 	return (
-		<div className={`group relative overflow-hidden rounded-2xl border-2 border-white/10 bg-black p-6 transition-all hover:border-white/30 hover:-translate-y-1 ${image ? 'md:col-span-2 lg:col-span-1' : ''}`}>
+		<div className={`group relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] p-5 transition-all duration-200 hover:border-white/20 hover:bg-white/[0.06] font-display ${image ? 'md:col-span-2 lg:col-span-1' : ''}`}>
 			<div className={`flex ${image ? 'flex-row items-center gap-6' : 'flex-col'}`}>
 				<div className={image ? 'flex-1' : ''}>
-					<div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl border-2 border-white/20 bg-black text-white">
+					<div className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-white/90">
 						{icon}
 					</div>
-					<h3 className="font-sans text-lg font-semibold tracking-tight text-white mb-2">{title}</h3>
-					<p className="text-sm text-white/70 leading-relaxed">{desc}</p>
+					<h3 className="text-base font-semibold tracking-tight text-white">{title}</h3>
+					<p className="mt-1.5 text-xs font-medium text-white/60 leading-snug tracking-wide">{desc}</p>
 				</div>
 				{image && (
 					<div className="relative h-40 w-40 flex-shrink-0 rounded-lg overflow-hidden border border-white/10 bg-white/5">

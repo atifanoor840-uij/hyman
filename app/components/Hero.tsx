@@ -16,10 +16,10 @@ export default function Hero() {
 			<div className="relative mx-auto max-w-7xl px-6 py-20 md:px-10 lg:py-28">
 				<Navbar variant="hero" />
 
-				{/* Left: heading + subheading + payment icons | Center: Start trading | Right: platform + vertical press logos */}
+				{/* Left: heading + subheading + payment icons + Start trading | Right: platform + vertical press logos */}
 				<div className="mt-16 flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
 					{/* Left: heading, subheading, payment icons below subheading */}
-					<div className="flex flex-1 flex-col items-start justify-center text-left lg:-translate-x-16">
+					<div className="flex flex-1 flex-col items-start justify-center text-left pl-4 md:pl-8 lg:pl-12">
 						<h2 className="whitespace-nowrap font-sans text-5xl font-bold leading-tight tracking-tight text-white md:text-6xl lg:text-7xl">
 							<span className="text-[#7270ff]">GENZ</span> Don&apos;t Wait ,They Win.
 						</h2>
@@ -55,13 +55,10 @@ export default function Hero() {
 								</div>
 							</div>
 						</div>
-					</div>
-
-					{/* Center: Start trading button */}
-					<div className="flex flex-shrink-0 items-center justify-center lg:px-4">
+						{/* Start trading button below heading block */}
 						<Link
 							href="/dashboard/buys"
-							className="font-sans inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-gray-100 focus:outline-none md:text-base"
+							className="mt-6 font-sans inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-gray-100 focus:outline-none md:text-base"
 						>
 							Start trading
 						</Link>

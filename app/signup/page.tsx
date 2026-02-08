@@ -15,6 +15,7 @@ import Toast from '../components/Toast';
 import CountrySelector from '../components/CountrySelector';
 import { signup } from '../../lib/api/auth';
 import { ApiClientError } from '../../lib/api/client';
+import { Eye, EyeOff } from 'lucide-react';
 import {
 	sanitizeInput,
 	isValidEmail,
@@ -55,6 +56,8 @@ export default function SignupPage() {
 	const [toastMessage, setToastMessage] = useState<string | null>(null);
 	const [toastType, setToastType] = useState<'success' | 'error' | 'info' | 'loading'>('success');
 	const [toastTitle, setToastTitle] = useState<string | undefined>(undefined);
+	const [showPassword, setShowPassword] = useState(false);
+	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const verificationInputs = useRef<(HTMLInputElement | null)[]>([]);
 
 	useEffect(() => {
@@ -499,16 +502,30 @@ export default function SignupPage() {
 											>
 												Password
 											</label>
-											<input
-												id="password"
-												type="password"
-												value={formData.password}
-												onChange={handleFormChange('password')}
-												className={`mt-2 w-full rounded-2xl border px-4 py-3 text-sm font-semibold tracking-wide text-zinc-900 transition focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10 ${
-													formErrors.password ? 'border-red-500 bg-red-50' : 'border-zinc-200 bg-zinc-50'
-												}`}
-												placeholder="Minimum 8 characters"
-											/>
+											<div className="relative mt-2">
+												<input
+													id="password"
+													type={showPassword ? 'text' : 'password'}
+													value={formData.password}
+													onChange={handleFormChange('password')}
+													className={`w-full rounded-2xl border px-4 py-3 pr-11 text-sm font-semibold tracking-wide text-zinc-900 transition focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10 ${
+														formErrors.password ? 'border-red-500 bg-red-50' : 'border-zinc-200 bg-zinc-50'
+													}`}
+													placeholder="Minimum 8 characters"
+												/>
+												<button
+													type="button"
+													onClick={() => setShowPassword((p) => !p)}
+													className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 transition hover:text-zinc-800"
+													aria-label={showPassword ? 'Hide password' : 'Show password'}
+												>
+													{showPassword ? (
+														<EyeOff className="h-4 w-4" />
+													) : (
+														<Eye className="h-4 w-4" />
+													)}
+												</button>
+											</div>
 											{formErrors.password && (
 												<p className="mt-2 text-xs font-medium text-red-500">{formErrors.password}</p>
 											)}
@@ -521,18 +538,32 @@ export default function SignupPage() {
 											>
 												Confirm password
 											</label>
-											<input
-												id="confirmPassword"
-												type="password"
-												value={formData.confirmPassword}
-												onChange={handleFormChange('confirmPassword')}
-												className={`mt-2 w-full rounded-2xl border px-4 py-3 text-sm font-semibold tracking-wide text-zinc-900 transition focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10 ${
-													formErrors.confirmPassword
-														? 'border-red-500 bg-red-50'
-														: 'border-zinc-200 bg-zinc-50'
-												}`}
-												placeholder="Re-type password"
-											/>
+											<div className="relative mt-2">
+												<input
+													id="confirmPassword"
+													type={showConfirmPassword ? 'text' : 'password'}
+													value={formData.confirmPassword}
+													onChange={handleFormChange('confirmPassword')}
+													className={`w-full rounded-2xl border px-4 py-3 pr-11 text-sm font-semibold tracking-wide text-zinc-900 transition focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10 ${
+														formErrors.confirmPassword
+															? 'border-red-500 bg-red-50'
+															: 'border-zinc-200 bg-zinc-50'
+													}`}
+													placeholder="Re-type password"
+												/>
+												<button
+													type="button"
+													onClick={() => setShowConfirmPassword((p) => !p)}
+													className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 transition hover:text-zinc-800"
+													aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+												>
+													{showConfirmPassword ? (
+														<EyeOff className="h-4 w-4" />
+													) : (
+														<Eye className="h-4 w-4" />
+													)}
+												</button>
+											</div>
 											{formErrors.confirmPassword && (
 												<p className="mt-2 text-xs font-medium text-red-500">
 													{formErrors.confirmPassword}

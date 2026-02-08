@@ -10,6 +10,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-plus-jakarta-sans);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,6 +24,25 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Jumbotron display-2 style (e.g. "Meet money without borders" headline) */
+.mw-jumbotron__title.mw-display-2,
+.mw-display-2 {
+  font-family: var(--font-plus-jakarta-sans), var(--font-geist-sans), sans-serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 0;
+}
+.mw-jumbotron__title {
+  font-family: var(--font-plus-jakarta-sans), var(--font-geist-sans), sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.mw-m-b-0 {
+  margin-bottom: 0;
 }
 
 /* Dashboard sidebar scrollbar styling */

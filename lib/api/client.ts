@@ -47,9 +47,20 @@ async function handleResponse<T>(response: Response): Promise<T> {
 	}
 
 	if (!response.ok) {
-		const message = data?.message || data?.error || `Request failed with status ${response.status}`;
-		const errors = data?.errors || undefined;
-		throw new ApiClientError(message, response.status, errors);
+		const errors = data?.errors ?? data?.detail ?? undefined;
+		let message = data?.message ?? data?.error ?? `Request failed with status ${response.status}`;
+		// 422 validation: surface detail or flatten errors so user sees what's wrong
+		if (response.status === 422 && errors != null) {
+			if (Array.isArray(errors)) {
+				message = errors.map((e: any) => e?.msg ?? e?.message ?? String(e)).filter(Boolean).join('; ') || message;
+			} else if (typeof errors === 'object' && !Array.isArray(errors)) {
+				const parts = Object.entries(errors).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`);
+				message = parts.length ? parts.join('; ') : message;
+			} else if (typeof errors === 'string') {
+				message = errors;
+			}
+		}
+		throw new ApiClientError(message, response.status, typeof errors === 'object' && !Array.isArray(errors) ? errors as Record<string, string[]> : undefined);
 	}
 
 	return data;
@@ -82,20 +93,18 @@ export async function apiRequest<T>(
 		return await handleResponse<T>(response);
 	} catch (error) {
 		if (error instanceof ApiClientError) {
-			// Log sanitized error for debugging (without sensitive data)
-			if (process.env.NODE_ENV === 'development') {
-				console.error('API Error:', {
-					message: error.message,
-					status: error.status,
-					errors: sanitizeForLog(error.errors),
+			// Skip console.error for 401/404 so UI can show friendly message only
+			const status = (error as ApiClientError).status;
+			if (process.env.NODE_ENV === 'development' && status !== 401 && status !== 404) {
+				console.error('API Error:', (error as ApiClientError).message || 'Unknown error', {
+					status,
+					errors: sanitizeForLog((error as ApiClientError).errors),
 				});
 			}
 			throw error;
 		}
-		throw new ApiClientError(
-			error instanceof Error ? error.message : 'Network error occurred',
-			0
-		);
+		const msg = error instanceof Error ? error.message : 'Network error occurred';
+		throw new ApiClientError(msg || 'Request failed', 0);
 	}
 }
 
@@ -128,24 +137,17 @@ export async function apiRequestFormData<T>(
 		return await handleResponse<T>(response);
 	} catch (error) {
 		if (error instanceof ApiClientError) {
-			// Log sanitized error for debugging (without sensitive data)
-			if (process.env.NODE_ENV === 'development') {
-				console.error('API Error:', {
-					message: error.message,
-					status: error.status,
-					errors: sanitizeForLog(error.errors),
+			const status = (error as ApiClientError).status;
+			if (process.env.NODE_ENV === 'development' && status !== 401 && status !== 404) {
+				console.error('API Error:', (error as ApiClientError).message || 'Unknown error', {
+					status,
+					errors: sanitizeForLog((error as ApiClientError).errors),
 				});
 			}
 			throw error;
 		}
-		throw new ApiClientError(
-			error instanceof Error ? error.message : 'Network error occurred',
-			0
-		);
+		const msg = error instanceof Error ? error.message : 'Network error occurred';
+		throw new ApiClientError(msg || 'Request failed', 0);
 	}
 }
-
-
-
-
 

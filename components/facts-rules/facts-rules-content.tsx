@@ -2,16 +2,7 @@
 
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { FileText, CheckCircle2, AlertTriangle, Info } from "lucide-react"
-
-const facts = [
-  { text: "Up to 80% profit split on funded accounts.", icon: CheckCircle2 },
-  { text: "No time limit on Phase 1 evaluation.", icon: Info },
-  { text: "Trade during news — no restrictions.", icon: CheckCircle2 },
-  { text: "Scaling plan: grow your account size with consistent performance.", icon: Info },
-  { text: "One-time fee. No recurring charges after passing.", icon: CheckCircle2 },
-  { text: "Instant funding — receive payouts within 24–48 hours.", icon: Info },
-]
+import { FileText, AlertTriangle } from "lucide-react"
 
 const rules = [
   {
@@ -46,25 +37,6 @@ const rules = [
 export function FactsRulesContent() {
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Facts */}
-      <section>
-        <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-          <CheckCircle2 className="w-5 h-5 text-primary" />
-          Key facts
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {facts.map((f, i) => (
-            <Card key={i} className="p-4 flex items-start gap-3 transition-all duration-300 hover:shadow-md">
-              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <f.icon className="w-4 h-4 text-primary" />
-              </div>
-              <p className="text-sm text-foreground leading-relaxed pt-0.5">{f.text}</p>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* Rules */}
       <section>
         <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
           <FileText className="w-5 h-5 text-primary" />

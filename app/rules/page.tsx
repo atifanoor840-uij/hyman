@@ -60,8 +60,11 @@ const SIZES: SizeOption[] = [
 
 const ACCOUNT_TYPES = ["Alpha", "Beta", "Gamma", "Sigma"] as const;
 
+type RuleTab = 'sigma' | 'beta' | 'alpha';
+
 export default function RulesPage() {
 	const [selectedIdx, setSelectedIdx] = useState<number>(4);
+	const [ruleTab, setRuleTab] = useState<RuleTab>('sigma');
 	const size = useMemo(() => SIZES[selectedIdx], [selectedIdx]);
 
 	return (
@@ -97,6 +100,121 @@ export default function RulesPage() {
 			{/* Main content with white background */}
 			<main className="bg-white">
 				<div className="mx-auto max-w-7xl px-6 py-16 md:px-10 md:py-24">
+					{/* Rules by Account Type */}
+					<section className="mb-16">
+						<h2 className={`${display.className} text-3xl font-semibold tracking-tight text-[#0b0b0f] mb-6`}>
+							Rules by Account Type
+						</h2>
+						<div className="mb-6 flex flex-wrap gap-2">
+							{(['sigma', 'beta', 'alpha'] as const).map((tab) => (
+								<button
+									key={tab}
+									onClick={() => setRuleTab(tab)}
+									className={`rounded-full px-5 py-2.5 text-sm font-semibold transition ${
+										ruleTab === tab
+											? 'bg-[#0ea5e9] text-white'
+											: 'bg-[#f0f9ff] text-[#0b0b0f] hover:bg-[#e0f2fe]'
+									}`}
+								>
+									{tab === 'sigma' ? 'Sigma (Instant)' : tab === 'beta' ? 'Beta' : 'Alpha'}
+								</button>
+							))}
+						</div>
+
+						{/* Sigma (Instant) Rules */}
+						{ruleTab === 'sigma' && (
+							<div className="rounded-2xl border border-[#e5e5e5] bg-white p-6 md:p-8 shadow-sm space-y-6">
+								<h3 className={`${display.className} text-xl font-semibold text-[#0b0b0f] border-b border-[#e5e5e5] pb-3`}>Sigma (Instant) — Rules</h3>
+								<ul className="space-y-2 text-[#37353E] text-sm">
+									<li><span className="font-semibold text-[#0b0b0f]">Daily Drawdown:</span> 5% of the initial account balance (static, balance-based)</li>
+									<li><span className="font-semibold text-[#0b0b0f]">Maximum Drawdown:</span> 8% of the initial account balance (static, balance-based)</li>
+									<li>No trailing equity tricks; no hidden floating loss violations</li>
+									<li><span className="font-semibold text-[#0b0b0f]">Leverage:</span> 1:100</li>
+									<li>Breach of any drawdown rule results in account termination</li>
+									<li>Instant Accounts are simulated trading accounts operated under real market conditions. No evaluation or challenge phase is required.</li>
+									<li>Scalping not allowed. Grid, martingale, hedging not allowed. Expert Advisor (EA) not allowed.</li>
+									<li>News Trading allowed. No time restrictions.</li>
+									<li>Consistency rule applied: 25%</li>
+									<li>No IP rule</li>
+									<li>Overnight holding is not allowed — you must close trades before the new day starts.</li>
+									<li>Weekend holding is not allowed; if found mistakenly or unknowingly it will breach your account. Trading is not allowed on weekends on Instant accounts.</li>
+									<li>Copy trading is prohibited on Instant Funded accounts; doing so can result in account termination.</li>
+									<li>No resets or retries — if breached, the only way to try again is to purchase another Instant Funded program.</li>
+									<li><span className="font-semibold text-[#0b0b0f]">Profit split:</span> up to 80%</li>
+									<li><span className="font-semibold text-[#0b0b0f]">Payout:</span> after 21 days</li>
+									<li>Traders must reach at least 5% profit of their account balance before requesting a payout.</li>
+								</ul>
+								<div className="rounded-lg border border-[#e5e5e5] bg-[#f9f9f9] p-4">
+									<p className="font-semibold text-[#0b0b0f] mb-2">Example</p>
+									<p className="text-sm">Account Size: $10,000 → Minimum profit required for payout: 5% × $10,000 = $500. Once your account reaches $500 in profits, you are eligible to request your payout.</p>
+								</div>
+								<div className="rounded-lg border border-[#0ea5e9]/30 bg-[#f0f9ff] p-4">
+									<p className="font-semibold text-[#0b0b0f] mb-2">Trade Holding Rule</p>
+									<ul className="text-sm space-y-1">
+										<li><span className="font-semibold">Max Open Trades:</span> Up to 2 trades simultaneously on the same instrument and direction.</li>
+										<li><span className="font-semibold">Minimum Holding Time:</span> Each trade must be held for at least 3 minutes on live accounts.</li>
+										<li><span className="font-semibold">Stage:</span> Applies only to funded accounts, not during the challenge/evaluation phase.</li>
+									</ul>
+								</div>
+							</div>
+						)}
+
+						{/* Beta Rules */}
+						{ruleTab === 'beta' && (
+							<div className="rounded-2xl border border-[#e5e5e5] bg-white p-6 md:p-8 shadow-sm space-y-6">
+								<h3 className={`${display.className} text-xl font-semibold text-[#0b0b0f] border-b border-[#e5e5e5] pb-3`}>Beta — Rules</h3>
+								<ul className="space-y-2 text-[#37353E] text-sm">
+									<li><span className="font-semibold text-[#0b0b0f]">Daily Drawdown:</span> Typically 5% of account balance per day.</li>
+									<li><span className="font-semibold text-[#0b0b0f]">Maximum Drawdown:</span> Typically 8% of account balance overall.</li>
+									<li>Balance-based: drawdowns are calculated from the initial account balance, including floating losses.</li>
+									<li>Violation: exceeding daily or max drawdown may result in account termination or reset.</li>
+									<li>Consistency rule not applied.</li>
+									<li>EA allowed only on challenge phase.</li>
+									<li>Overnight holding allowed (keeping a trade open after the market closes for the day, into the next trading session).</li>
+									<li>Weekend holding is allowed.</li>
+									<li>News trading is allowed. Hedging is allowed.</li>
+									<li>Stop loss is not mandatory.</li>
+									<li><span className="font-semibold text-[#0b0b0f]">Inactivity Rule:</span> If you do not open any trade within 30 days, your account will be marked as failed.</li>
+									<li>On weekends, crypto trading is allowed.</li>
+									<li>No IP rule applied. Cryptocurrency markets (e.g. BTC) never fully close, so trading can happen 24/7, including weekends.</li>
+									<li>Traders must reach at least 5% profit of their account balance before requesting a payout.</li>
+								</ul>
+								<div className="rounded-lg border border-[#e5e5e5] bg-[#f9f9f9] p-4">
+									<p className="font-semibold text-[#0b0b0f] mb-2">Example</p>
+									<p className="text-sm">Account Size: $10,000 → Minimum profit required for payout: 5% × $10,000 = $500. Once your account reaches $500 in profits, you are eligible to request your payout.</p>
+								</div>
+							</div>
+						)}
+
+						{/* Alpha Rules */}
+						{ruleTab === 'alpha' && (
+							<div className="rounded-2xl border border-[#e5e5e5] bg-white p-6 md:p-8 shadow-sm space-y-6">
+								<h3 className={`${display.className} text-xl font-semibold text-[#0b0b0f] border-b border-[#e5e5e5] pb-3`}>Alpha — Rules</h3>
+								<ul className="space-y-2 text-[#37353E] text-sm">
+									<li><span className="font-semibold text-[#0b0b0f]">Minimum trading days:</span> 5</li>
+									<li>Alpha consists of a single phase; once you pass the challenge you receive a live funded account.</li>
+									<li><span className="font-semibold text-[#0b0b0f]">Daily drawdown:</span> 5%. <span className="font-semibold text-[#0b0b0f]">Maximum drawdown:</span> 8%.</li>
+									<li><span className="font-semibold text-[#0b0b0f]">Profit split:</span> 80–100%. After first withdrawal, profit split increases by 5% on the next payout.</li>
+									<li><span className="font-semibold text-[#0b0b0f]">Leverage:</span> 1:100</li>
+									<li><span className="font-semibold text-[#0b0b0f]">Payout:</span> 21 days on funded account</li>
+									<li>Weekend holding is not allowed.</li>
+									<li>EA, scalping, grid, martingale strategy not allowed. Hedging and news trading allowed. Layering not allowed.</li>
+									<li><span className="font-semibold text-[#0b0b0f]">Minimum Trade Holding Time (live account):</span> 3 minutes on funded stage; does not apply during the challenge phase.</li>
+									<li>Purchase fee is refundable on first payout on every account.</li>
+									<li><span className="font-semibold text-[#0b0b0f]">Consistency Rule:</span> Your whole trading day must not exceed 25%.</li>
+									<li>Stop loss and take profit are not mandatory.</li>
+									<li>Overnight holding not allowed (keeping a trade open after the market closes for the day, into the next trading session).</li>
+									<li><span className="font-semibold text-[#0b0b0f]">Inactivity Rule:</span> If you do not open any trade within 30 days, your account will be marked as failed.</li>
+									<li>Traders must reach at least 5% profit of their account balance before requesting a payout.</li>
+								</ul>
+								<div className="rounded-lg border border-[#e5e5e5] bg-[#f9f9f9] p-4">
+									<p className="font-semibold text-[#0b0b0f] mb-2">Example</p>
+									<p className="text-sm">Account Size: $10,000 → Minimum profit required for payout: 5% × $10,000 = $500. Once your account reaches $500 in profits, you are eligible to request your payout.</p>
+								</div>
+							</div>
+						)}
+					</section>
+
 					{/* General Trading Rules Section */}
 					<section className="mb-16">
 						<h2 className={`${display.className} text-3xl font-semibold tracking-tight text-[#0b0b0f] mb-8`}>

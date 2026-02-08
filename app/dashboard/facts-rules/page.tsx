@@ -13,8 +13,8 @@ export default function FactsRulesPage() {
       <main className="min-w-0 flex-1 flex flex-col overflow-x-hidden p-3 md:p-4 lg:p-5 lg:ml-64">
         <div className="mx-auto w-full max-w-[1200px] flex flex-col flex-1">
           <Header
-            title="Facts & rules"
-            description="Key facts about our program and trading rules you must follow."
+            title="Rules"
+            description="Trading rules you must follow."
           />
 
           <div className="mt-5 flex-1">

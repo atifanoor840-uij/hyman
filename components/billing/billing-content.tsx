@@ -1,53 +1,28 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Receipt } from "lucide-react"
+import { Receipt, Loader2 } from "lucide-react"
+import { getMyAccount, type Order } from "@/lib/api/auth"
+import { ApiClientError } from "@/lib/api/client"
 
-const orders = [
-  {
-    id: "d9fc7f44-4739-4d02-ba8",
-    accountSize: "$100,000.00",
-    orderCreation: "25.01.2026 23:32 PM",
-    orderPayment: "-",
-    price: "€495.00",
-    status: "Pending",
-  },
-  {
-    id: "cd49fa79-0fa4-491d-b7fd",
-    accountSize: "$5,000.00",
-    orderCreation: "24.01.2026 14:20 PM",
-    orderPayment: "-",
-    price: "€63.25",
-    status: "Pending",
-  },
-  {
-    id: "a1b2c3d4-5e6f-7g8h-9i0j",
-    accountSize: "$25,000.00",
-    orderCreation: "23.01.2026 10:15 AM",
-    orderPayment: "€250.00",
-    price: "€250.00",
-    status: "Completed",
-  },
-  {
-    id: "e5f6g7h8-9i0j-1k2l-3m4n",
-    accountSize: "$50,000.00",
-    orderCreation: "22.01.2026 16:45 PM",
-    orderPayment: "€500.00",
-    price: "€500.00",
-    status: "Completed",
-  },
-  {
-    id: "o9p0q1r2-3s4t-5u6v-7w8x",
-    accountSize: "$10,000.00",
-    orderCreation: "21.01.2026 09:30 AM",
-    orderPayment: "-",
-    price: "€100.00",
-    status: "Pending",
-  },
-]
+function formatCreatedAt(iso: string): string {
+  try {
+    const d = new Date(iso)
+    return d.toLocaleDateString(undefined, {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  } catch {
+    return iso
+  }
+}
 
 const getStatusBadge = (status: string) => {
   switch (status) {
@@ -62,70 +37,121 @@ const getStatusBadge = (status: string) => {
   }
 }
 
+const getPaymentStatusBadge = (paymentStatus: string | null) => {
+  if (paymentStatus == null || paymentStatus === "") {
+    return <span className="text-muted-foreground/70 text-sm">—</span>
+  }
+  switch (String(paymentStatus).toLowerCase()) {
+    case "paid":
+    case "completed":
+      return <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs">Paid</Badge>
+    case "pending":
+      return <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-xs">Pending</Badge>
+    case "failed":
+      return <Badge className="bg-red-500/10 text-red-600 border-red-500/20 text-xs">Failed</Badge>
+    default:
+      return <Badge variant="secondary" className="text-xs">{paymentStatus}</Badge>
+  }
+}
+
 export function BillingContent() {
+  const [orders, setOrders] = useState<Order[]>([])
+  const [totalOrders, setTotalOrders] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    async function fetchOrders() {
+      setIsLoading(true)
+      setError(null)
+      try {
+        const data = await getMyAccount()
+        if (!cancelled) {
+          setOrders(data.orders ?? [])
+          setTotalOrders(data.total_orders ?? 0)
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof ApiClientError ? err.message : "Failed to load orders.")
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false)
+      }
+    }
+    fetchOrders()
+    return () => { cancelled = true }
+  }, [])
+
   return (
     <div className="space-y-4 animate-fade-in font-sans">
-      {/* Orders Table */}
       <Card className="border border-border shadow-sm">
         <CardHeader className="pb-3 px-4 pt-4">
-          <div className="flex items-center gap-2">
-            <Receipt className="h-4 w-4 text-muted-foreground" />
-            <CardTitle className="text-base font-semibold">Order History</CardTitle>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Receipt className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-base font-semibold">Order History</CardTitle>
+            </div>
+            {!isLoading && !error && (
+              <span className="text-xs text-muted-foreground">Total: {totalOrders}</span>
+            )}
           </div>
         </CardHeader>
         <CardContent className="px-0 pb-0">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-border bg-muted/30 hover:bg-muted/30">
-                  <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9 px-4">Account Size</TableHead>
-                  <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9">Order ID</TableHead>
-                  <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9">Created</TableHead>
-                  <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9">Payment</TableHead>
-                  <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9">Price</TableHead>
-                  <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9">Status</TableHead>
-                  <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9 px-4">Action</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {orders.map((order, index) => (
-                  <TableRow
-                    key={order.id}
-                    className="border-border hover:bg-muted/40 transition-colors"
-                    style={{ animationDelay: `${index * 50}ms` }}
-                  >
-                    <TableCell className="text-sm font-medium px-4 py-3">{order.accountSize}</TableCell>
-                    <TableCell className="font-mono text-xs text-muted-foreground py-3">{order.id}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground py-3">{order.orderCreation}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground py-3">
-                      {order.orderPayment === "-" ? <span className="text-muted-foreground/50">—</span> : order.orderPayment}
-                    </TableCell>
-                    <TableCell className="text-sm font-semibold py-3">{order.price}</TableCell>
-                    <TableCell className="py-3">{getStatusBadge(order.status)}</TableCell>
-                    <TableCell className="px-4 py-3">
-                      {order.status === "Pending" ? (
-                        <Button
-                          variant="default"
-                          size="sm"
-                          className="h-7 text-xs px-3"
-                        >
-                          Complete
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-7 text-xs px-3"
-                        >
-                          Download
-                        </Button>
-                      )}
-                    </TableCell>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : error ? (
+            <div className="px-4 pb-6 text-sm text-destructive">{error}</div>
+          ) : orders.length === 0 ? (
+            <div className="px-4 pb-6 text-sm text-muted-foreground">No orders yet.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-border bg-muted/30 hover:bg-muted/30">
+                    <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9 px-4">Challenge Type</TableHead>
+                    <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9">Platform</TableHead>
+                    <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9">Order ID</TableHead>
+                    <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9">Created At</TableHead>
+                    <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9">Payment Method</TableHead>
+                    <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9">Payment Status</TableHead>
+                    <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9">Status</TableHead>
+                    <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9 px-4">Action</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {orders.map((order, index) => (
+                    <TableRow
+                      key={order.order_id}
+                      className="border-border hover:bg-muted/40 transition-colors"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <TableCell className="text-sm font-medium px-4 py-3 capitalize">{order.challenge_type}</TableCell>
+                      <TableCell className="text-sm py-3 uppercase">{order.platform}</TableCell>
+                      <TableCell className="font-mono text-xs text-muted-foreground py-3">{order.order_id}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground py-3">{formatCreatedAt(order.created_at)}</TableCell>
+                      <TableCell className="text-sm py-3">{order.payment_method || "—"}</TableCell>
+                      <TableCell className="py-3">{getPaymentStatusBadge(order.payment_status)}</TableCell>
+                      <TableCell className="py-3">{getStatusBadge(order.status)}</TableCell>
+                      <TableCell className="px-4 py-3">
+                        {order.status === "Pending" ? (
+                          <Button variant="default" size="sm" className="h-7 text-xs px-3">
+                            Complete
+                          </Button>
+                        ) : (
+                          <Button variant="outline" size="sm" className="h-7 text-xs px-3">
+                            Download
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

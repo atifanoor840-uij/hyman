@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Search, Mail, Bell, Loader2 } from "lucide-react"
+import { Search, Mail, Bell, Loader2, KeyRound, Copy, Check, Wallet, TrendingUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -12,9 +12,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { MobileNav } from "./mobile-nav"
-import { getMyAccount, type Order } from "@/lib/api/auth"
+import { getMyAccount, type Order, type OrderCredentials } from "@/lib/api/auth"
 import { getUser } from "@/lib/auth-utils"
+import { getShowMyTradesStats } from "@/lib/api/showmytrades"
+import type { PerformanceResponse } from "@/lib/api/performance"
 import type { ReactNode } from "react"
 
 interface HeaderProps {
@@ -22,18 +30,28 @@ interface HeaderProps {
   description?: string
   actions?: ReactNode
   useOrderIdSelect?: boolean
+  /** Controlled order ID (when set, parent controls selection) */
+  selectedOrderId?: string
+  onOrderIdChange?: (orderId: string) => void
+  /** When provided, Header uses these orders instead of fetching */
+  orders?: Order[]
 }
 
 const saleTickerText = "🔥 Sale — 20% off challenges • Use code WELCOME20 • Limited time • "
 
-export function Header({ title, description, actions, useOrderIdSelect }: HeaderProps) {
+export function Header({ title, description, actions, useOrderIdSelect, selectedOrderId: controlledOrderId, onOrderIdChange, orders: ordersProp }: HeaderProps) {
   const [orders, setOrders] = useState<Order[]>([])
   const [isLoadingOrders, setIsLoadingOrders] = useState(false)
-  const [selectedOrderId, setSelectedOrderId] = useState<string>("")
+  const [internalOrderId, setInternalOrderId] = useState<string>("")
   const [userData, setUserData] = useState<{ name: string; email: string } | null>(null)
+  const [credentialsOpen, setCredentialsOpen] = useState(false)
+  const [copiedField, setCopiedField] = useState<string | null>(null)
+  const isControlled = controlledOrderId !== undefined
+  const selectedOrderId = isControlled ? controlledOrderId : internalOrderId
+  const setSelectedOrderId = isControlled && onOrderIdChange ? onOrderIdChange : (id: string) => { setInternalOrderId(id) }
+  const ordersSource = ordersProp ?? orders
 
   useEffect(() => {
-    // Get user data from storage
     const user = getUser()
     if (user) {
       setUserData({
@@ -41,22 +59,22 @@ export function Header({ title, description, actions, useOrderIdSelect }: Header
         email: user.email || ''
       })
     }
-
-    // Fetch orders if order select is enabled
-    if (useOrderIdSelect) {
+    if (useOrderIdSelect && ordersProp === undefined) {
       fetchOrders()
     }
-  }, [useOrderIdSelect])
+  }, [useOrderIdSelect, ordersProp])
+
 
   const fetchOrders = async () => {
     setIsLoadingOrders(true)
     try {
       const response = await getMyAccount()
-      setOrders(response.orders || [])
-      
-      // Auto-select first order if available
-      if (response.orders && response.orders.length > 0) {
-        setSelectedOrderId(response.orders[0].order_id)
+      const all = response.orders || []
+      setOrders(all)
+      // Only show non-pending: Completed, Stage 2, Live, etc.
+      const selectable = all.filter((o) => o.status !== "Pending")
+      if (selectable.length > 0) {
+        setSelectedOrderId(selectable[0].order_id)
       }
     } catch (error) {
       console.error('Failed to fetch orders:', error)
@@ -66,6 +84,18 @@ export function Header({ title, description, actions, useOrderIdSelect }: Header
     }
   }
 
+  const selectableOrders = ordersSource.filter((o) => o.status !== "Pending")
+
+  useEffect(() => {
+    if (!useOrderIdSelect || ordersSource.length === 0) return
+    const selectable = ordersSource.filter((o) => o.status !== "Pending")
+    if (selectable.length === 0) return
+    const isSelectable = selectable.some((o) => o.order_id === selectedOrderId)
+    if (!isSelectable) {
+      setSelectedOrderId(selectable[0].order_id)
+    }
+  }, [useOrderIdSelect, ordersSource, selectedOrderId])
+
   const getUserInitials = () => {
     if (!userData?.name) return 'U'
     const names = userData.name.split(' ')
@@ -73,6 +103,47 @@ export function Header({ title, description, actions, useOrderIdSelect }: Header
       return `${names[0][0]}${names[1][0]}`.toUpperCase()
     }
     return userData.name.substring(0, 2).toUpperCase()
+  }
+
+  const currentOrder = ordersSource.find((o) => o.order_id === selectedOrderId)
+  const hasCredentials = !!(
+    currentOrder?.credentials ||
+    currentOrder?.stage2_credentials ||
+    currentOrder?.live_credentials
+  )
+
+  const [stage2Stats, setStage2Stats] = useState<PerformanceResponse | null>(null)
+  const [stage2StatsLoading, setStage2StatsLoading] = useState(false)
+  useEffect(() => {
+    if (!credentialsOpen || !currentOrder?.stage2_credentials || !currentOrder.platform) {
+      setStage2Stats(null)
+      return
+    }
+    let cancelled = false
+    setStage2StatsLoading(true)
+    setStage2Stats(null)
+    getShowMyTradesStats(
+      currentOrder.platform,
+      currentOrder.stage2_credentials!.platform_login
+    )
+      .then((data) => {
+        if (!cancelled) setStage2Stats(data)
+      })
+      .catch(() => {
+        if (!cancelled) setStage2Stats(null)
+      })
+      .finally(() => {
+        if (!cancelled) setStage2StatsLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [credentialsOpen, currentOrder?.order_id, currentOrder?.platform, currentOrder?.stage2_credentials?.platform_login])
+
+  const copyToClipboard = (label: string, value: string) => {
+    navigator.clipboard.writeText(value)
+    setCopiedField(label)
+    setTimeout(() => setCopiedField(null), 1500)
   }
 
   return (
@@ -87,38 +158,53 @@ export function Header({ title, description, actions, useOrderIdSelect }: Header
         <div className="flex items-center gap-2 flex-1">
           <MobileNav />
 
-          <div className="relative flex-1 max-w-md">
+          <div className="relative flex flex-1 max-w-md items-center gap-2">
             {useOrderIdSelect ? (
-              <Select value={selectedOrderId} onValueChange={setSelectedOrderId}>
-                <SelectTrigger className="w-full h-9 text-sm font-bold bg-card border-border transition-all duration-300 focus:shadow-lg focus:shadow-primary/10 [&_[data-slot=select-value]]:font-bold" disabled={isLoadingOrders}>
-                  {isLoadingOrders ? (
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Loading orders...</span>
-                    </div>
-                  ) : (
-                    <SelectValue placeholder={orders.length === 0 ? "No orders found" : "Select Order ID"} />
-                  )}
-                </SelectTrigger>
-                <SelectContent>
-                  {orders.length === 0 && !isLoadingOrders ? (
-                    <div className="px-3 py-2 text-sm text-muted-foreground text-center">
-                      No orders available
-                    </div>
-                  ) : (
-                    orders.map((order) => (
-                      <SelectItem key={order.order_id} value={order.order_id} className="font-bold">
-                        <div className="flex flex-col">
-                          <span>{order.order_id}</span>
-                          <span className="text-xs font-normal text-muted-foreground">
-                            {order.challenge_type} • ${order.account_size}
-                          </span>
+              <>
+                <div className="relative flex-1 min-w-0">
+                  <Select value={selectedOrderId} onValueChange={setSelectedOrderId}>
+                    <SelectTrigger className="w-full h-9 text-sm font-bold bg-card border-border transition-all duration-300 focus:shadow-lg focus:shadow-primary/10 [&_[data-slot=select-value]]:font-bold" disabled={isLoadingOrders}>
+                      {isLoadingOrders ? (
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Loading orders...</span>
                         </div>
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
+                      ) : (
+                        <SelectValue placeholder={selectableOrders.length === 0 ? "No orders found" : "Select Order ID"} />
+                      )}
+                    </SelectTrigger>
+                    <SelectContent>
+                      {selectableOrders.length === 0 && !isLoadingOrders ? (
+                        <div className="px-3 py-2 text-sm text-muted-foreground text-center">
+                          No orders available
+                        </div>
+                      ) : (
+                        selectableOrders.map((order) => (
+                          <SelectItem key={order.order_id} value={order.order_id} className="font-bold">
+                            <div className="flex flex-col">
+                              <span>{order.order_id}</span>
+                              <span className="text-xs font-normal text-muted-foreground">
+                                {order.challenge_type} • ${order.account_size}
+                              </span>
+                            </div>
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-9 text-sm border-border gap-1.5 shrink-0"
+                  disabled={!selectedOrderId || !hasCredentials}
+                  onClick={() => setCredentialsOpen(true)}
+                >
+                  <KeyRound className="h-4 w-4" />
+                  Credentials
+                </Button>
+              </>
             ) : (
               <>
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -133,6 +219,140 @@ export function Header({ title, description, actions, useOrderIdSelect }: Header
             )}
           </div>
         </div>
+
+        <Dialog open={credentialsOpen} onOpenChange={setCredentialsOpen}>
+          <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Account credentials</DialogTitle>
+            </DialogHeader>
+            {currentOrder?.credentials || currentOrder?.stage2_credentials || currentOrder?.live_credentials ? (
+              <div className="space-y-5">
+                {/* Phase 1 / Completed credentials */}
+                {(currentOrder?.credentials || currentOrder?.live_credentials) && (() => {
+                  const creds = currentOrder!.credentials ?? currentOrder!.live_credentials!
+                  const sectionLabel = currentOrder!.live_credentials ? "Live account" : "Phase 1 / Completed"
+                  return (
+                    <div className="space-y-3">
+                      <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border pb-1.5">
+                        {sectionLabel}
+                      </h4>
+                      {[
+                        { label: "Login", value: String(creds.platform_login), key: "p1-login" },
+                        { label: "Password", value: creds.platform_password, key: "p1-password" },
+                        { label: "Server", value: creds.server, key: "p1-server" },
+                        { label: "Profit target", value: creds.profit_target != null ? String(creds.profit_target) : "—", key: "p1-profit_target" },
+                      ].map(({ label, value, key }) => (
+                        <div key={key} className="flex items-center justify-between gap-2">
+                          <span className="text-sm font-medium text-muted-foreground">{label}</span>
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <code className="text-xs font-mono bg-muted px-2 py-1.5 rounded truncate max-w-[200px]">
+                              {value}
+                            </code>
+                            {value !== "—" && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 shrink-0"
+                                onClick={() => copyToClipboard(`${sectionLabel}-${label}`, value)}
+                              >
+                                {copiedField === `${sectionLabel}-${label}` ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )
+                })()}
+
+                {/* Stage 2 credentials */}
+                {currentOrder?.stage2_credentials && (() => {
+                  const creds = currentOrder.stage2_credentials!
+                  const fields: { label: string; value: string; key: string }[] = [
+                    { label: "Login", value: String(creds.platform_login), key: "s2-login" },
+                    { label: "Password", value: creds.platform_password, key: "s2-password" },
+                    { label: "Server", value: creds.server, key: "s2-server" },
+                  ]
+                  if (creds.session_id != null && String(creds.session_id) !== "") {
+                    fields.push({ label: "Session ID", value: String(creds.session_id), key: "s2-session_id" })
+                  }
+                  if (creds.terminal_id != null) {
+                    fields.push({ label: "Terminal ID", value: String(creds.terminal_id), key: "s2-terminal_id" })
+                  }
+                  fields.push({
+                    label: "Profit target",
+                    value: creds.profit_target != null ? String(creds.profit_target) : "—",
+                    key: "s2-profit_target",
+                  })
+                  return (
+                    <div className="space-y-3">
+                      <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border pb-1.5">
+                        Stage 2
+                      </h4>
+                      {fields.map(({ label, value, key }) => (
+                        <div key={key} className="flex items-center justify-between gap-2">
+                          <span className="text-sm font-medium text-muted-foreground">{label}</span>
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <code className="text-xs font-mono bg-muted px-2 py-1.5 rounded truncate max-w-[200px]">
+                              {value}
+                            </code>
+                            {value !== "—" && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 shrink-0"
+                                onClick={() => copyToClipboard(`Stage2-${label}`, value)}
+                              >
+                                {copiedField === `Stage2-${label}` ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                      {/* Stage 2 stats */}
+                      <div className="rounded-lg border border-border bg-muted/30 p-3 mt-3">
+                        <p className="text-xs font-semibold text-muted-foreground mb-2">Stage 2 account stats</p>
+                        {stage2StatsLoading ? (
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Loading…
+                          </div>
+                        ) : stage2Stats?.account_info ? (
+                          <div className="grid grid-cols-3 gap-2 text-sm">
+                            <div className="flex items-center gap-1.5">
+                              <Wallet className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-muted-foreground">Balance:</span>
+                              <span className="font-medium tabular-nums">
+                                ${(stage2Stats.account_info.balance ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-muted-foreground">Equity:</span>
+                              <span className="font-medium tabular-nums">
+                                ${(stage2Stats.account_info.equity ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </span>
+                            </div>
+                            <div className="col-span-1 flex items-center gap-1.5">
+                              <span className="text-muted-foreground">Profit:</span>
+                              <span className={`font-medium tabular-nums ${(stage2Stats.statistics?.account_stats?.profit ?? 0) >= 0 ? "text-foreground" : "text-destructive"}`}>
+                                ${(stage2Stats.statistics?.account_stats?.profit ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </span>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-muted-foreground">Stats unavailable</p>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })()}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No credentials available for this order yet.</p>
+            )}
+          </DialogContent>
+        </Dialog>
 
         <div className="flex items-center gap-1.5 md:gap-2">
           <Button
@@ -165,7 +385,7 @@ export function Header({ title, description, actions, useOrderIdSelect }: Header
       </div>
 
       {title != null && (
-        <div>
+        <div className="pl-10 md:pl-16 lg:pl-20">
           <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground mb-1">{title}</h1>
           {description != null && (
             <p className="text-xs md:text-sm text-muted-foreground">{description}</p>

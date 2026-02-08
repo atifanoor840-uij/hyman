@@ -2,19 +2,30 @@
 
 import { Card } from "@/components/ui/card"
 import { useEffect, useState } from "react"
+import type { PerformanceResponse } from "@/lib/api/performance"
 
-export function ProjectProgress() {
-  const [progress, setProgress] = useState(0)
-  const targetProgress = 68
+export interface ProjectProgressProps {
+  stats?: PerformanceResponse | null
+}
+
+export function ProjectProgress(props: ProjectProgressProps) {
+  const { stats = null } = props
+  const winRateFromApi = stats?.statistics?.advanced_statistics?.win_rate ?? null
+  const targetProgress = winRateFromApi != null ? Math.round(winRateFromApi) : 68
+  const [progress, setProgress] = useState(winRateFromApi != null ? winRateFromApi : 0)
 
   useEffect(() => {
+    if (winRateFromApi != null) {
+      setProgress(Math.round(winRateFromApi))
+      return
+    }
     const timer = setTimeout(() => {
       if (progress < targetProgress) {
         setProgress((prev) => Math.min(prev + 1, targetProgress))
       }
     }, 30)
     return () => clearTimeout(timer)
-  }, [progress, targetProgress])
+  }, [winRateFromApi, progress, targetProgress])
 
   const circumference = 2 * Math.PI * 90
   const strokeDashoffset = circumference - (progress / 100) * circumference

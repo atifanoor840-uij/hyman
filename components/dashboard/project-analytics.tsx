@@ -2,48 +2,68 @@
 
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { Play, Check } from "lucide-react"
+import type { PerformanceResponse } from "@/lib/api/performance"
 
-// Generate chart data for Equity, Profit, or Draw Down
-const generateData = (metric: string) => {
-  const now = new Date()
-  const data = []
+// Deterministic placeholder when no API stats (avoids hydration mismatch: no Math.random or locale dates)
+function getPlaceholderChartData(metric: string) {
   const count = 24
-  let equity = 38154
-  let profit = 0
-  let peak = equity
-  let drawDown = 0
-
+  const data = []
+  const baseEquity = 38154
   for (let i = 0; i < count; i++) {
-    const hour = 8 + i
+    const hour = 8 + (i % 12)
     const time = hour > 12 ? `${hour - 12}:00 PM` : `${hour}:00 AM`
-    const change = (Math.random() - 0.45) * 500
-    equity += change
-    profit += change
-    peak = Math.max(peak, equity)
-    drawDown = Math.min(0, (equity - peak) / peak * 100)
-
+    const t = i / count
+    const equity = baseEquity + (t * 2000 - 500)
+    const profit = t * 1500 - 200
+    const drawDown = -t * 2
     data.push({
       time,
       value: metric === "Equity" ? equity : metric === "Profit" ? profit : drawDown,
       equity,
       profit,
       drawDown,
-      date: now.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" }),
-      fullTime: `${time} - ${now.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })}`,
+      date: "—",
+      fullTime: time,
     })
   }
   return data
 }
 
+function buildChartDataFromStats(stats: PerformanceResponse | null, metric: string) {
+  const daily = stats?.statistics?.equity_curve?.daily_performance
+  if (!daily?.length) return null
+  return daily.map((d) => {
+    const dateStr = d.date
+    const equity = d.cumulative_equity ?? d.cumulative_balance ?? 0
+    const profit = d.cumulative_profit ?? 0
+    const drawDown = d.drawdown ?? 0
+    return {
+      time: dateStr,
+      value: metric === "Equity" ? equity : metric === "Profit" ? profit : drawDown,
+      equity,
+      profit,
+      drawDown,
+      date: dateStr,
+      fullTime: dateStr,
+    }
+  })
+}
+
 const metricOptions = ["Draw Down", "Profit", "Equity"] as const
 
-export function ProjectAnalytics() {
+export interface ProjectAnalyticsProps {
+  stats?: PerformanceResponse | null
+}
+
+export function ProjectAnalytics(props: ProjectAnalyticsProps) {
+  const { stats = null } = props
   const [selectedMetric, setSelectedMetric] = useState<(typeof metricOptions)[number]>("Equity")
-  const chartData = generateData(selectedMetric)
-  const currentBalance = chartData[chartData.length - 1]?.equity || 38154
+  const chartDataFromApi = useMemo(() => buildChartDataFromStats(stats ?? null, selectedMetric), [stats, selectedMetric])
+  const chartData = chartDataFromApi ?? getPlaceholderChartData(selectedMetric)
+  const currentBalance = stats?.account_info?.equity ?? stats?.account_info?.balance ?? chartData[chartData.length - 1]?.equity ?? 38154
   const values = chartData.map((d) => d.value)
   const maxValue = Math.max(...values)
   const minValue = Math.min(...values)

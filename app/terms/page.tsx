@@ -41,105 +41,170 @@ export default function TermsPage() {
 			<main className="bg-white">
 				<div className="mx-auto max-w-4xl px-6 py-16 md:px-10 md:py-24">
 
-					<div className="prose prose-slate max-w-none space-y-8 text-[#37353E]">
-						<section>
-							<h2 className="text-2xl font-semibold text-[#0b0b0f] mb-4">1. Agreement to Terms</h2>
-							<p className="leading-relaxed">
-								By accessing or using FxGenz services, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this service.
-							</p>
-						</section>
+					<div className="prose prose-slate max-w-none space-y-10 text-[#37353E]">
+						<p className="leading-relaxed text-[#37353E]/90">
+							FXGENZ provides funded trading accounts to skilled traders. All participants are required to read and understand these legal terms before registering or trading on the platform.
+						</p>
 
 						<section>
-							<h2 className="text-2xl font-semibold text-[#0b0b0f] mb-4">2. Use License</h2>
-							<p className="leading-relaxed mb-3">
-								Permission is granted to temporarily access the materials on FxGenz's website for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:
-							</p>
-							<ul className="list-disc pl-6 space-y-2">
-								<li>Modify or copy the materials</li>
-								<li>Use the materials for any commercial purpose or for any public display</li>
-								<li>Attempt to reverse engineer any software contained on the website</li>
-								<li>Remove any copyright or other proprietary notations from the materials</li>
+							<h2 className={`${display.className} text-xl font-semibold text-[#0b0b0f] mb-4`}>1️⃣ Service Nature</h2>
+							<ul className="list-disc pl-6 space-y-2 leading-relaxed">
+								<li>FXGENZ offers prop trading accounts that allow qualified traders to trade real capital provided by FXGENZ.</li>
+								<li>FXGENZ does not provide investment advice, manage personal funds, or offer financial planning services.</li>
+								<li>Participation in FXGENZ accounts is performance-based, meaning profits and losses depend entirely on the trader&apos;s skill and adherence to trading rules.</li>
+								<li>By using FXGENZ, traders acknowledge that past results do not guarantee future profits.</li>
 							</ul>
 						</section>
 
 						<section>
-							<h2 className="text-2xl font-semibold text-[#0b0b0f] mb-4">3. Account Registration</h2>
-							<p className="leading-relaxed mb-3">
-								To access certain features of our service, you must register for an account. You agree to:
-							</p>
-							<ul className="list-disc pl-6 space-y-2">
-								<li>Provide accurate, current, and complete information during registration</li>
-								<li>Maintain and promptly update your account information</li>
-								<li>Maintain the security of your password and identification</li>
-								<li>Accept all responsibility for activities that occur under your account</li>
-								<li>Notify us immediately of any unauthorized use of your account</li>
+							<h2 className={`${display.className} text-xl font-semibold text-[#0b0b0f] mb-4`}>2️⃣ Independent Contractor Status</h2>
+							<ul className="list-disc pl-6 space-y-2 leading-relaxed">
+								<li>Traders are considered independent contractors, not employees, partners, or agents of FXGENZ.</li>
+								<li>FXGENZ does not provide salaries, benefits, or employment protections.</li>
+								<li>Traders are responsible for their own tax obligations, legal compliance, and reporting in their jurisdiction.</li>
 							</ul>
 						</section>
 
 						<section>
-							<h2 className="text-2xl font-semibold text-[#0b0b0f] mb-4">4. Trading Rules and Restrictions</h2>
-							<p className="leading-relaxed mb-3">
-								When trading through FxGenz, you must comply with all trading rules and restrictions, including but not limited to:
-							</p>
-							<ul className="list-disc pl-6 space-y-2">
-								<li>Maximum daily loss limits</li>
-								<li>Profit target requirements</li>
-								<li>Prohibited trading strategies (e.g., arbitrage, hedging restrictions)</li>
-								<li>Minimum trading days requirements</li>
-								<li>Maximum drawdown limits</li>
+							<h2 className={`${display.className} text-xl font-semibold text-[#0b0b0f] mb-4`}>3️⃣ Risk & Liability</h2>
+							<ul className="list-disc pl-6 space-y-2 leading-relaxed">
+								<li>All trading carries risk of partial or total loss of the trading capital provided.</li>
+								<li>FXGENZ&apos;s liability is strictly limited to the funded trading account and does not cover indirect losses or damages.</li>
+								<li>Traders agree that they are solely responsible for following account rules including drawdown, lot size, and trade management.</li>
+								<li>FXGENZ does not guarantee profits, and participating in trading is entirely voluntary.</li>
 							</ul>
-							<p className="leading-relaxed mt-3">
-								Violation of trading rules may result in immediate account termination and forfeiture of any profits or fees paid.
+						</section>
+
+						<section>
+							<h2 className={`${display.className} text-xl font-semibold text-[#0b0b0f] mb-4`}>4️⃣ Account Usage Rules</h2>
+							<p className="leading-relaxed mb-3">
+								Each account is intended for single-user trading and must be used independently. Traders may own multiple accounts, but they must not hedge, mirror, or merge accounts.
+							</p>
+							<p className="leading-relaxed mb-2 font-medium text-[#0b0b0f]">Prohibited strategies include:</p>
+							<ul className="list-disc pl-6 space-y-2 leading-relaxed mb-3">
+								<li>Scalping below the minimum trade holding time</li>
+								<li>Grid trading, martingale strategies, or trade layering</li>
+								<li>Use of unapproved Expert Advisors (EAs) or bots</li>
+								<li>Latency or arbitrage exploitation</li>
+							</ul>
+							<p className="leading-relaxed">
+								Violations of account rules may result in warnings, account review, or termination.
 							</p>
 						</section>
 
 						<section>
-							<h2 className="text-2xl font-semibold text-[#0b0b0f] mb-4">5. Payouts and Withdrawals</h2>
+							<h2 className={`${display.className} text-xl font-semibold text-[#0b0b0f] mb-4`}>5️⃣ Profit & Withdrawals</h2>
+							<ul className="list-disc pl-6 space-y-2 leading-relaxed">
+								<li>Traders retain up to 80% of profits, depending on the account and performance tier.</li>
+								<li>Minimum withdrawal requirement: 5% of account balance in profit.</li>
+								<li>Withdrawals are processed weekly, after verification and compliance checks.</li>
+								<li>FXGENZ reserves the right to delay or reject withdrawals in cases of suspected rule violations or fraud.</li>
+								<li>Large withdrawals may be subject to additional KYC verification for security purposes.</li>
+							</ul>
+						</section>
+
+						<section>
+							<h2 className={`${display.className} text-xl font-semibold text-[#0b0b0f] mb-4`}>6️⃣ KYC & Compliance</h2>
+							<p className="leading-relaxed mb-3">
+								Traders must complete KYC (Know Your Customer) verification before their first withdrawal.
+							</p>
+							<p className="leading-relaxed mb-2 font-medium text-[#0b0b0f]">Required documents include:</p>
+							<ul className="list-disc pl-6 space-y-2 leading-relaxed mb-3">
+								<li>Government-issued ID (passport, driver&apos;s license, or national ID)</li>
+								<li>Proof of address (utility bill, bank statement, or government-issued document)</li>
+								<li>Optional selfie with ID for additional verification</li>
+							</ul>
 							<p className="leading-relaxed">
-								Payouts are subject to verification and compliance with all trading rules. We reserve the right to withhold or delay payouts if we suspect fraudulent activity or rule violations. All payouts are processed according to our payout schedule and may be subject to fees as outlined in our pricing structure.
+								All documents are stored securely and used for compliance, anti-fraud, and payout verification purposes.
 							</p>
 						</section>
 
 						<section>
-							<h2 className="text-2xl font-semibold text-[#0b0b0f] mb-4">6. Risk Disclosure</h2>
-							<p className="leading-relaxed">
-								Trading financial instruments involves substantial risk of loss. You should carefully consider whether trading is suitable for you in light of your circumstances, knowledge, and financial resources. Past performance is not indicative of future results. You may lose more than your initial investment.
-							</p>
+							<h2 className={`${display.className} text-xl font-semibold text-[#0b0b0f] mb-4`}>7️⃣ Intellectual Property</h2>
+							<ul className="list-disc pl-6 space-y-2 leading-relaxed">
+								<li>All FXGENZ branding, logos, software, and educational materials are the property of FXGENZ.</li>
+								<li>Traders are not permitted to reproduce, distribute, or resell FXGENZ intellectual property.</li>
+								<li>Unauthorized use may result in legal action and account termination.</li>
+							</ul>
 						</section>
 
 						<section>
-							<h2 className="text-2xl font-semibold text-[#0b0b0f] mb-4">7. Intellectual Property</h2>
-							<p className="leading-relaxed">
-								All content, features, and functionality of the FxGenz platform, including but not limited to text, graphics, logos, icons, images, and software, are the exclusive property of FxGenz and are protected by international copyright, trademark, and other intellectual property laws.
+							<h2 className={`${display.className} text-xl font-semibold text-[#0b0b0f] mb-4`}>8️⃣ Termination Policy</h2>
+							<p className="leading-relaxed mb-3">
+								FXGENZ may terminate accounts at any time if rules are violated or if trading is deemed abusive. Termination does not automatically void earned profits, which may be paid after compliance review.
 							</p>
+							<p className="leading-relaxed mb-2 font-medium text-[#0b0b0f]">Examples of account termination causes include:</p>
+							<ul className="list-disc pl-6 space-y-2 leading-relaxed">
+								<li>Excessive drawdown breaches</li>
+								<li>Rule violations (prohibited strategies, trade manipulation)</li>
+								<li>Fraudulent activity or KYC non-compliance</li>
+							</ul>
 						</section>
 
 						<section>
-							<h2 className="text-2xl font-semibold text-[#0b0b0f] mb-4">8. Limitation of Liability</h2>
-							<p className="leading-relaxed">
-								In no event shall FxGenz or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on FxGenz's website, even if FxGenz or an authorized representative has been notified orally or in writing of the possibility of such damage.
-							</p>
+							<h2 className={`${display.className} text-xl font-semibold text-[#0b0b0f] mb-4`}>9️⃣ Buyback & Account Restart</h2>
+							<ul className="list-disc pl-6 space-y-2 leading-relaxed">
+								<li>Traders may restart a failed account once via the Buyback Feature for a reduced fee.</li>
+								<li>All original trading rules apply during the restarted account.</li>
+								<li>Buyback allows traders a second chance without purchasing a completely new account.</li>
+							</ul>
 						</section>
 
 						<section>
-							<h2 className="text-2xl font-semibold text-[#0b0b0f] mb-4">9. Termination</h2>
-							<p className="leading-relaxed">
-								We may terminate or suspend your account and access to the service immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms. Upon termination, your right to use the service will immediately cease.
-							</p>
+							<h2 className={`${display.className} text-xl font-semibold text-[#0b0b0f] mb-4`}>🔟 Governing Law & Dispute Resolution</h2>
+							<ul className="list-disc pl-6 space-y-2 leading-relaxed">
+								<li>FXGENZ operations are governed by [Insert Jurisdiction] law.</li>
+								<li>Disputes are resolved primarily through internal review and arbitration.</li>
+								<li>By registering, traders agree to resolve disputes according to the laws and regulations of the governing jurisdiction.</li>
+							</ul>
 						</section>
 
 						<section>
-							<h2 className="text-2xl font-semibold text-[#0b0b0f] mb-4">10. Changes to Terms</h2>
-							<p className="leading-relaxed">
-								FxGenz reserves the right to revise these terms of service at any time without notice. By using this website, you are agreeing to be bound by the then current version of these Terms of Service.
-							</p>
-						</section>
-
-						<section>
-							<h2 className="text-2xl font-semibold text-[#0b0b0f] mb-4">11. Contact Information</h2>
-							<p className="leading-relaxed">
-								If you have any questions about these Terms of Service, please contact us through our support channels or email us at legal@fxgenz.com.
-							</p>
+							<h2 className={`${display.className} text-xl font-semibold text-[#0b0b0f] mb-4`}>1️⃣1️⃣ Risk Disclosure & Disclaimer</h2>
+							<div className="space-y-4">
+								<div>
+									<h3 className="font-semibold text-[#0b0b0f] mb-1">No Guarantee of Profit</h3>
+									<p className="leading-relaxed text-sm">
+										FXGENZ does not provide any guarantees, representations, or warranties regarding profitability. Trading outcomes are dependent on market conditions, execution quality, and individual trading decisions. No assurances of profit or income are expressed or implied.
+									</p>
+								</div>
+								<div>
+									<h3 className="font-semibold text-[#0b0b0f] mb-1">Risk of Loss</h3>
+									<p className="leading-relaxed text-sm">
+										Trading leveraged financial instruments involves a high degree of risk and may result in the loss of all trading capital provided. Participants should only engage in trading activities if they fully understand the risks involved and are financially capable of bearing such losses.
+									</p>
+								</div>
+								<div>
+									<h3 className="font-semibold text-[#0b0b0f] mb-1">Past Performance Disclaimer</h3>
+									<p className="leading-relaxed text-sm">
+										Any historical performance, simulated results, or examples shown on the FXGENZ website or platform are not indicative of future results. Market conditions vary and past success does not guarantee future profitability.
+									</p>
+								</div>
+								<div>
+									<h3 className="font-semibold text-[#0b0b0f] mb-1">Market Conditions & Execution Risk</h3>
+									<p className="leading-relaxed text-sm">
+										Trading performance may be adversely affected by factors including, but not limited to, market volatility, liquidity constraints, slippage, pricing delays, and execution latency. FXGENZ is not responsible for losses resulting from such conditions.
+									</p>
+								</div>
+								<div>
+									<h3 className="font-semibold text-[#0b0b0f] mb-1">Limitation of Liability</h3>
+									<p className="leading-relaxed text-sm">
+										To the maximum extent permitted by applicable law, FXGENZ shall not be liable for any indirect, incidental, consequential, special, or third-party damages, including loss of profits, revenue, business opportunity, or anticipated earnings, arising from the use of FXGENZ services.
+									</p>
+								</div>
+								<div>
+									<h3 className="font-semibold text-[#0b0b0f] mb-1">No Investment Advice</h3>
+									<p className="leading-relaxed text-sm">
+										FXGENZ does not provide investment, financial, legal, or tax advice. All trading decisions are made independently by the trader and at their own discretion.
+									</p>
+								</div>
+								<div>
+									<h3 className="font-semibold text-[#0b0b0f] mb-1">Voluntary Participation Acknowledgment</h3>
+									<p className="leading-relaxed text-sm">
+										By accessing FXGENZ services, traders acknowledge that participation is voluntary, undertaken at their own risk, and not based on any expectation of guaranteed financial returns.
+									</p>
+								</div>
+							</div>
 						</section>
 					</div>
 
@@ -150,7 +215,7 @@ export default function TermsPage() {
 						</p>
 						<a
 							href="/contact"
-							className="inline-block rounded-full bg-[#7c3aed] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#6d28d9]"
+							className="inline-block rounded-full bg-[#0ea5e9] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#0891d1]"
 						>
 							Contact Legal Team
 						</a>

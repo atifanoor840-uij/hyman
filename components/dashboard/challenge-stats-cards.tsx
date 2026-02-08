@@ -10,7 +10,7 @@ import {
   Target,
   type LucideIcon,
 } from "lucide-react"
-
+import type { PerformanceResponse } from "@/lib/api/performance"
 
 type StatCard = {
   label: string
@@ -20,19 +20,41 @@ type StatCard = {
   teal?: boolean
 }
 
-const topRow: StatCard[] = [
-  { label: "Balance", value: "$105,694.90", icon: Banknote, highlighted: true },
-  { label: "Equity Curve", value: "$93,210.32", icon: TrendingUp },
-  { label: "Win Rate", value: "40%", icon: Trophy },
-]
+function formatUsd(n: number) {
+  return `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+}
+function formatPct(n: number) {
+  return `${n.toFixed(2)}%`
+}
 
-const bottomRow: StatCard[] = [
-  { label: "Highest Profit", value: "80.49%", icon: ArrowUpRight, teal: true },
-  { label: "Lowest Equity", value: "$105,694.90", icon: ArrowDownRight, teal: true },
-  { label: "Profit Target", value: "$3,897.98", icon: Target, teal: true },
-]
+export interface ChallengeStatsCardsProps {
+  stats?: PerformanceResponse | null
+}
 
-export function ChallengeStatsCards() {
+export function ChallengeStatsCards(props: ChallengeStatsCardsProps) {
+  const { stats = null } = props
+  const accountInfo = stats?.account_info
+  const accountStats = stats?.statistics?.account_stats
+  const adv = stats?.statistics?.advanced_statistics
+  const balance = accountInfo?.balance ?? accountStats?.balance ?? 0
+  const equity = accountInfo?.equity ?? accountStats?.equity ?? balance
+  const winRate = adv?.win_rate ?? 0
+  const twrPercent = accountStats?.twr_percent ?? 0
+  const peakBalance = accountStats?.peak_balance ?? balance
+  const deposits = accountStats?.total_deposits ?? balance
+  const profitTarget = deposits * 0.08
+
+  const topRow: StatCard[] = [
+    { label: "Balance", value: stats ? formatUsd(balance) : "$105,694.90", icon: Banknote, highlighted: true },
+    { label: "Equity", value: stats ? formatUsd(equity) : "$93,210.32", icon: TrendingUp },
+    { label: "Win Rate", value: stats ? `${winRate}%` : "40%", icon: Trophy },
+  ]
+  const bottomRow: StatCard[] = [
+    { label: "TWR %", value: stats ? formatPct(twrPercent) : "80.49%", icon: ArrowUpRight, teal: true },
+    { label: "Peak Balance", value: stats ? formatUsd(peakBalance) : "$105,694.90", icon: ArrowDownRight, teal: true },
+    { label: "Profit Target", value: stats ? formatUsd(profitTarget) : "$3,897.98", icon: Target, teal: true },
+  ]
+
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-3 animate-slide-in-up min-w-0" style={{ animationDelay: "450ms" }}>
       {topRow.map((stat) => (

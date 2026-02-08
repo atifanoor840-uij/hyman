@@ -9,7 +9,7 @@ export default function HelpPage() {
       <Sidebar />
 
       <main className="flex-1 flex flex-col p-4 lg:p-6 lg:ml-64">
-        <Header title="Help & Support" description="Get help with using Forex Pro and find answers to common questions." />
+        <Header title="Help & Support" description="Get help with using FxGenz and find answers to common questions." />
 
         <div className="mt-6 flex-1">
           <HelpContent />
