@@ -24,39 +24,6 @@ export const buildApiUrl = (endpoint: string): string => {
 }
 
 /**
- * Secure API endpoints using Next.js API routes
- * These hide the actual backend URLs from client-side dev tools
- */
-export const API_ENDPOINTS = {
-  // Auth endpoints (go through /api/auth/[...path])
-  REGISTER: '/auth/register',
-  LOGIN: '/auth/login',
-  VERIFY_EMAIL: '/auth/verify-mail',
-  RESEND_VERIFICATION: '/auth/resend-verification',
-  FORGOT_PASSWORD: '/auth/forgot-pass',
-  RESET_PASSWORD: '/auth/reset-pass',
-  USER_PROFILE: '/auth/user/profile',
-  
-  // Partner auth endpoints (go through /api/partner/[...path])
-  PARTNER_REGISTER: '/partner/auth/register',
-  PARTNER_LOGIN: '/partner/auth/login',
-  
-  // Order endpoints (go through /api/orders/[...path])
-  CREATE_ORDER: '/orders/create',
-  MY_ORDERS: '/orders/my-account',
-
-  // Admin utilities
-  ADMIN_SEND_PROMO_EMAIL: '/auth/admin/send-promotional-email',
-} as const
-
-/**
- * Helper to get full secure API URL for an endpoint
- */
-export const getApiUrl = (endpoint: keyof typeof API_ENDPOINTS): string => {
-  return buildApiUrl(API_ENDPOINTS[endpoint])
-}
-
-/**
  * Get access token from localStorage
  * Prioritizes 'access_token' (what login stores) but falls back to 'authToken' for compatibility
  */
@@ -83,10 +50,14 @@ export const getAuthHeaders = (additionalHeaders: Record<string, string> = {}): 
 }
 
 /**
- * FormData API request helper (for file uploads etc.)
- * Re-exported from lib/api/client for admin/certificates and other callers.
+ * Admin API helpers - re-exported so imports from '@/lib/api' resolve for admin pages.
  */
-export { apiRequestFormData as formDataApiRequest } from './api/client'
+export { apiRequest, apiRequestFormData as formDataApiRequest } from './api/client'
+export {
+  API_ENDPOINTS,
+  authenticatedApiRequest,
+  handleApiSuccess,
+} from './api/index'
 
 /**
  * Additional security utilities
