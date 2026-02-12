@@ -83,6 +83,12 @@ export const getAuthHeaders = (additionalHeaders: Record<string, string> = {}): 
 }
 
 /**
+ * FormData API request helper (for file uploads etc.)
+ * Re-exported from lib/api/client for admin/certificates and other callers.
+ */
+export { apiRequestFormData as formDataApiRequest } from './api/client'
+
+/**
  * Additional security utilities
  */
 export const API_SECURITY = {
