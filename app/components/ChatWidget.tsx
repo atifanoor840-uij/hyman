@@ -1,6 +1,12 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
+
 export default function ChatWidget() {
+	const pathname = usePathname();
+	// Hide on admin pages (user requested removal)
+	if (pathname?.startsWith('/admin')) return null;
+
 	return (
 		<>
 			{/* WhatsApp Floating button */}

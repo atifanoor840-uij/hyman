@@ -1,155 +1,141 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function WhyFxGenz() {
 	return (
 		<section id="why" className="relative overflow-hidden bg-black">
-			<div className="mx-auto max-w-7xl px-6 py-18 md:px-10 md:py-24 font-display">
-				<header className="mb-12">
-					<h2 className="mw-m-b-0 mw-jumbotron__title mw-display-2 text-white">
+			<div className="mx-auto max-w-7xl px-6 py-16 md:px-10 md:py-24 font-display">
+				{/* Section heading at top (red circle area) - subheading + main heading */}
+				<header className="mb-10 lg:mb-12">
+					<p className="text-sm text-white/60 mb-1">/ Why FxGenz?</p>
+					<h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
 						Why People Choose FxGenz
 					</h2>
 				</header>
 
-				{/* Large Banner Card */}
-				<div
-					className="mb-8 relative overflow-hidden rounded-2xl border-2 border-white/10 bg-cover bg-center bg-no-repeat"
-					style={{
-						backgroundImage:
-							"url('https://res.cloudinary.com/dejjuhzug/image/upload/v1766053584/resized_banner_pvdrfo.png')",
-					}}
-				>
-					<div className="absolute inset-0 bg-black/40" />
-					<div className="relative flex min-h-[260px] flex-col justify-between p-6 md:min-h-[320px] md:flex-row md:items-center md:p-10">
-						<div className="mb-6 max-w-xl md:mb-0">
-							<div className="mw-jumbotron__title mw-display-2 mw-m-b-0 text-white">More Power, Less Risk</div>
-							<div className="mt-2 text-base text-white/80 md:text-lg">Up to $200K simulated capital</div>
-						</div>
-						{/* Laptop Image on Right */}
-						<div className="absolute right-6 md:right-10 top-1/2 -translate-y-1/2 w-64 h-64 md:w-96 md:h-96 opacity-80 mix-blend-lighten pointer-events-none">
+				<div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-stretch">
+					{/* Left: image with heading/subheading overlay + CTAs below */}
+					<div className="lg:col-span-5 flex flex-col">
+						<div className="relative w-full aspect-[4/3] overflow-hidden rounded-lg mb-6">
 							<Image
 								src="/lap.WEBP"
-								alt="Laptop"
+								alt="FxGenz trading"
 								fill
-								className="object-contain drop-shadow-2xl"
+								className="object-cover"
 								unoptimized
 							/>
 						</div>
+						<div className="flex flex-wrap gap-6 mt-auto">
+							<Link
+								href="/dashboard/buys"
+								className="text-purple-400 font-semibold hover:underline inline-flex items-center gap-1"
+							>
+								Start trading &gt;
+							</Link>
+							<Link
+								href="/pricing"
+								className="text-purple-400 font-semibold hover:underline inline-flex items-center gap-1"
+							>
+								View pricing &gt;
+							</Link>
+						</div>
 					</div>
-				</div>
 
-				{/* Four Feature Cards */}
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-					<Pillar
-						icon={<SpeedIcon />}
-						title="Fast payouts"
-						desc="Same-day processing. Cards & crypto."
-					/>
-					<Pillar
-						icon={<ShieldIcon />}
-						title="Fair rules"
-						desc="Realistic targets. Transparent policies."
-					/>
-					<Pillar
-						icon={<ToolsIcon />}
-						title="Pro infrastructure"
-						desc="MT5, cTrader. Low latency, institutional liquidity."
-					/>
-					<Pillar
-						icon={<ScaleIcon />}
-						title="Scale up"
-						desc="Clear path to larger accounts."
-					/>
+					{/* Right: four benefits with horizontal dividers (exact like reference image) */}
+					<div className="lg:col-span-7 border-l border-white/10 pl-8 lg:pl-10 flex flex-col">
+						<BenefitRow
+							icon={<ScalePriceIcon />}
+							title="Competitive pricing"
+							desc="Experience quality without breaking the bank—we offer fair and competitive pricing."
+						/>
+						<div className="border-t border-white/10 my-5" />
+						<BenefitRow
+							icon={<FinancingIcon />}
+							title="Easy financing"
+							desc={
+								<>
+									Don&apos;t let budget constraints stop you—explore our hassle-free <span className="text-purple-400 font-semibold">Financing</span> options.
+								</>
+							}
+						/>
+						<div className="border-t border-white/10 my-5" />
+						<BenefitRow
+							icon={<CertifiedIcon />}
+							title="Certified experts"
+							desc="Choose FxGenz for proven excellence backed by certified professionals and pro infrastructure."
+						/>
+						<div className="border-t border-white/10 my-5" />
+						<BenefitRow
+							icon={<SatisfactionIcon />}
+							title="100% Satisfaction"
+							desc={
+								<>
+									Don&apos;t just take our word for it—<span className="text-purple-400 font-semibold">see</span> what traders say about FxGenz.
+								</>
+							}
+						/>
+					</div>
 				</div>
 			</div>
 		</section>
 	);
 }
 
-function Pillar({ icon, title, desc, image }: { icon: React.ReactNode; title: string; desc: string; image?: string }) {
+function BenefitRow({
+	icon,
+	title,
+	desc,
+}: {
+	icon: React.ReactNode;
+	title: string;
+	desc: React.ReactNode;
+}) {
 	return (
-		<div className={`group relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] p-5 transition-all duration-200 hover:border-white/20 hover:bg-white/[0.06] font-display ${image ? 'md:col-span-2 lg:col-span-1' : ''}`}>
-			<div className={`flex ${image ? 'flex-row items-center gap-6' : 'flex-col'}`}>
-				<div className={image ? 'flex-1' : ''}>
-					<div className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-white/90">
-						{icon}
-					</div>
-					<h3 className="text-base font-semibold tracking-tight text-white">{title}</h3>
-					<p className="mt-1.5 text-xs font-medium text-white/60 leading-snug tracking-wide">{desc}</p>
-				</div>
-				{image && (
-					<div className="relative h-40 w-40 flex-shrink-0 rounded-lg overflow-hidden border border-white/10 bg-white/5">
-						<Image
-							src={image}
-							alt={title}
-							fill
-							className="object-contain"
-							unoptimized
-						/>
-					</div>
-				)}
+		<div className="flex gap-4">
+			<div className="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-lg bg-purple-500/20 text-purple-400">
+				{icon}
+			</div>
+			<div>
+				<h3 className="text-lg font-bold text-white">{title}</h3>
+				<p className="mt-1 text-white/70 text-sm leading-relaxed">{desc}</p>
 			</div>
 		</div>
 	);
 }
 
-function Stat({ value, label }: { value: string; label: string }) {
+function ScalePriceIcon() {
 	return (
-		<div className="rounded-xl border border-[#e6e9ef] bg-white px-4 py-3">
-			<div className="font-sans text-2xl font-semibold tracking-tight text-[#0b0b0f]">{value}</div>
-			<div className="text-xs text-[#2e2e35]/70">{label}</div>
-		</div>
-	);
-}
-
-function SpeedIcon() {
-	return (
-		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-			<path d="M12 3a9 9 0 109 9h-2a7 7 0 11-7-7V3z" fill="currentColor" className="text-white" />
-			<path d="M13 12l4-4" stroke="currentColor" strokeWidth="2" className="text-white" />
+		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+			<path d="M12 5v14M5 9l2 2-2 2M19 9l-2 2 2 2M8 9h1a1 1 0 011 1v2a1 1 0 01-1 1H8M16 9h1a1 1 0 011 1v2a1 1 0 01-1 1h-1" />
 		</svg>
 	);
 }
 
-function ShieldIcon() {
+function FinancingIcon() {
 	return (
-		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-			<path d="M12 3l8 4v5c0 5-3.4 7.8-8 9-4.6-1.2-8-4-8-9V7l8-4z" stroke="currentColor" strokeWidth="2" className="text-white" />
+		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+			<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+			<path d="M14 2v6h6M12 13h4M12 17h2" />
+			<circle cx="17" cy="18" r="2" />
 		</svg>
 	);
 }
 
-function ToolsIcon() {
+function CertifiedIcon() {
 	return (
-		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-			<path d="M4 4h7v7H4V4zm9 9h7v7h-7v-7zM4 15h7v3H4v-3zm12-6h3v3h-3V9z" fill="currentColor" className="text-white" />
+		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+			<path d="M12 2l2.5 5.5L20 8l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5L12 2z" />
 		</svg>
 	);
 }
 
-function ScaleIcon() {
+function SatisfactionIcon() {
 	return (
-		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-			<path d="M3 17h4v4H3v-4zm7-7h4v11h-4V10zm7-6h4v17h-4V4z" fill="currentColor" className="text-white" />
+		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+			<circle cx="8" cy="9" r="2.5" />
+			<circle cx="16" cy="9" r="2.5" />
+			<path d="M6 15c.5-1.5 2-2.5 3.5-2.5s3 1 3.5 2.5M13 15c.5-1.5 2-2.5 3.5-2.5s3 1 3.5 2.5" />
+			<path d="M12 19l1.5 2 3-4-4.5 2z" />
 		</svg>
 	);
 }
-
-function PriceIcon() {
-	return (
-		<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-			<path d="M4 6h16v12H4z" stroke="currentColor" strokeWidth="1.8" className="text-[#0b0b0f]" />
-			<path d="M7 10h10M7 14h6" stroke="currentColor" strokeWidth="1.8" className="text-[#0b0b0f]" />
-		</svg>
-	);
-}
-
-function SecurityIcon() {
-	return (
-		<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-			<path d="M12 3l8 4v5c0 5-3.4 7.8-8 9-4.6-1.2-8-4-8-9V7l8-4z" stroke="currentColor" strokeWidth="1.8" className="text-[#0b0b0f]" />
-			<path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="1.8" />
-		</svg>
-	);
-}
-
-

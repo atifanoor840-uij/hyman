@@ -13,9 +13,12 @@ export default function Hero() {
 			</div>
 			<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_10%,transparent_0%,transparent_50%,rgba(0,0,0,0.25)_100%)]" />
 
-			<div className="relative mx-auto max-w-7xl px-6 py-20 md:px-10 lg:py-28">
+			{/* Navbar full width - attached to top and sides */}
+			<div className="w-full left-0 right-0 top-0 px-0">
 				<Navbar variant="hero" />
+			</div>
 
+			<div className="relative mx-auto max-w-7xl px-6 py-12 md:px-10 lg:py-20">
 				{/* Left: heading + subheading + payment icons + Start trading | Right: platform + vertical press logos */}
 				<div className="mt-16 flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
 					{/* Left: heading, subheading, payment icons below subheading */}

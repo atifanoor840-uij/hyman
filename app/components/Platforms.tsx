@@ -22,49 +22,30 @@ const platforms = [
 
 export default function Platforms() {
 	return (
-		<section className="relative overflow-hidden bg-slate-50/80">
-			<div className="mx-auto max-w-7xl px-6 py-20 md:px-10 md:py-24">
-				{/* Heading and Subheading */}
-				<div className="mb-16 text-center">
-					<h2 className="font-sans text-4xl font-bold tracking-tight text-black md:text-5xl lg:text-6xl mb-4">
-						We Support Major Platforms
-					</h2>
-					<p className="mx-auto max-w-3xl text-lg font-semibold text-black/70 md:text-xl">
-						At FxGenz, we want to give you options. That's why we offer the flexibility to tailor your experience and choose between MT4, MT5, and DXtrade. Pick the professional trading platform that suits you best.
-					</p>
-				</div>
+		<section className="relative overflow-hidden bg-black">
+			<div className="mx-auto max-w-7xl px-6 py-16 md:px-10 md:py-20">
+				<h2 className="text-center font-sans text-3xl font-bold tracking-tight text-white md:text-4xl lg:text-5xl mb-12 md:mb-14">
+					We Support Major Platforms
+				</h2>
 
-				{/* Platform Logos in One Row */}
-				<div className="flex flex-wrap items-center justify-center gap-8 md:gap-12 lg:gap-16">
+				<div className="flex flex-wrap items-center justify-center gap-12 md:gap-16 lg:gap-20">
 					{platforms.map((platform) => (
 						<div
 							key={platform.name}
-							className="group flex flex-col items-center justify-center transition hover:scale-105"
+							className="group flex flex-col items-center gap-3 transition duration-200 hover:opacity-90"
 						>
-							<div className="flex h-24 w-24 items-center justify-center md:h-32 md:w-32">
+							<div className="flex h-20 w-20 items-center justify-center rounded-xl border border-white/10 bg-white/5 p-4 md:h-28 md:w-28 md:p-5">
 								<Image
 									src={platform.image}
 									alt={platform.name}
-									width={128}
-									height={128}
+									width={112}
+									height={112}
 									className="object-contain"
 								/>
 							</div>
-							<div className="mt-4 text-center">
-								<h3 className="text-sm font-bold text-black md:text-base">
-									{platform.label === 'MetaTrader 4' ? (
-										<>
-											MetaTrader <span className="text-orange-500">4</span>
-										</>
-									) : platform.label === 'MetaTrader 5' ? (
-										<>
-											MetaTrader <span className="text-orange-500">5</span>
-										</>
-									) : (
-										platform.label
-									)}
-								</h3>
-							</div>
+							<span className="text-xs font-medium uppercase tracking-wider text-white/60 md:text-sm">
+								{platform.label === 'MetaTrader 4' ? 'MT4' : platform.label === 'MetaTrader 5' ? 'MT5' : platform.label}
+							</span>
 						</div>
 					))}
 				</div>

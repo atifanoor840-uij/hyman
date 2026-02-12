@@ -167,7 +167,7 @@ const featuresByType: Record<string, any[]> = {
     },
     {
       name: "Refundable Fee",
-      values: { "4k": "$31", "10k": "$60", "20k": "$112", "50k": "$260", "100k": "$520" },
+      values: { "4k": "$27", "10k": "$52", "20k": "$98", "50k": "$225", "100k": "$450" },
     },
   ],
   sigma: [
@@ -237,11 +237,11 @@ const pricingByType: Record<string, Record<string, { original: string; amount: n
     "100k": { original: "$750", amount: 520 },
   },
   beta: {
-    "4k": { original: "$45", amount: 31 },
-    "10k": { original: "$85", amount: 60 },
-    "20k": { original: "$160", amount: 112 },
-    "50k": { original: "$375", amount: 260 },
-    "100k": { original: "$750", amount: 520 },
+    "4k": { original: "$39", amount: 27 },
+    "10k": { original: "$75", amount: 52 },
+    "20k": { original: "$140", amount: 98 },
+    "50k": { original: "$325", amount: 225 },
+    "100k": { original: "$650", amount: 450 },
   },
   sigma: {
     "5k": { original: "$55", amount: 38 },
@@ -385,7 +385,7 @@ export function BuysContent() {
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-8">
           {/* Back to Dashboard */}
           <Link
-            href="/"
+            href="/dashboard"
             className="inline-flex items-center text-white/80 hover:text-white transition-colors text-sm font-medium gap-1 mb-8"
           >
             <ChevronLeft className="w-4 h-4" />

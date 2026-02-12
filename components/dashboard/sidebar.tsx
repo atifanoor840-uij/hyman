@@ -8,13 +8,10 @@ import {
   Newspaper,
   ChartLineUp,
   Trophy,
-  UsersThree,
   IdentificationCard,
   Wallet,
   Ticket,
   Scroll,
-  Gear,
-  Question,
   SignOut,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
@@ -38,7 +35,6 @@ const section2 = [
 
 const section3 = [
   { icon: Trophy, label: "Achievements", href: "/dashboard/achievement" },
-  { icon: UsersThree, label: "Traders", href: "/dashboard/team" },
   { icon: IdentificationCard, label: "KYC", href: "/dashboard/kyc" },
   { icon: Wallet, label: "Withdrawal", href: "/dashboard/withdrawal" },
   { icon: Ticket, label: "Coupon codes", href: "/dashboard/coupons" },
@@ -46,8 +42,6 @@ const section3 = [
 ]
 
 const generalItems = [
-  { icon: Gear, label: "Settings", href: "/dashboard/settings" },
-  { icon: Question, label: "Help", href: "/dashboard/help" },
   { icon: SignOut, label: "Logout", href: "/dashboard/logout" },
 ]
 
