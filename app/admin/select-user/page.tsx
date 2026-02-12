@@ -25,7 +25,7 @@ export default function SelectUserPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   
   // Use cached users data
-  const { data: usersData, isLoading } = useAdminCache<User[]>({
+  const { data: usersData, isLoading } = useAdminCache<User>({
     endpoint: `${getApiBaseUrl()}/auth/members`,
     storageKey: 'admin_cache_users',
     transformData: (data) => Array.isArray(data) ? data : [],

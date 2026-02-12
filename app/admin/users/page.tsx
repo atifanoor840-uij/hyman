@@ -26,7 +26,7 @@ export default function AdminUsersPage() {
   const [dateFilter, setDateFilter] = useState<string>("")
   
   // Use cached users data
-  const { data: usersData, isLoading, error: fetchError, updateData } = useAdminCache<User[]>({
+  const { data: usersData, isLoading, error: fetchError, updateData } = useAdminCache<User>({
     endpoint: `${getApiBaseUrl()}/auth/members`,
     storageKey: 'admin_cache_users',
     transformData: (data) => Array.isArray(data) ? data : [],

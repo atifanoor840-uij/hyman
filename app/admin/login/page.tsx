@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react"
+import { Suspense, useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { getApiBaseUrl } from "@/lib/api"
 import { Button } from "@/components/ui/button"
@@ -15,7 +15,7 @@ interface LoginData {
   two_factor_code: string
 }
 
-export default function AdminLoginPage() {
+function AdminLoginContent() {
   const [step, setStep] = useState<1 | 2>(1) // Step 1: Email/Password, Step 2: 2FA
   const [loginData, setLoginData] = useState<LoginData>({
     email: "",
@@ -135,32 +135,39 @@ export default function AdminLoginPage() {
         throw new Error(msg)
       }
 
+      const errMsg = (v: unknown) => (typeof v === 'string' ? v : undefined)
       if (!response.ok) {
         // Handle different error scenarios
         if (response.status === 401) {
-          throw new Error(data.message || data.error || 'Invalid credentials or 2FA code')
+          throw new Error(errMsg(data.message) || errMsg(data.error) || 'Invalid credentials or 2FA code')
         } else if (response.status === 400) {
-          throw new Error(data.message || data.error || 'Invalid request format')
+          throw new Error(errMsg(data.message) || errMsg(data.error) || 'Invalid request format')
         } else if (response.status === 403) {
-          throw new Error(data.message || data.error || 'Access forbidden')
+          throw new Error(errMsg(data.message) || errMsg(data.error) || 'Access forbidden')
         } else if (response.status === 429) {
           setIsRateLimited(true)
           setCooldownTime(300) // 5 minutes cooldown
           startCooldownTimer()
           throw new Error('Too many login attempts. Please wait 5 minutes before trying again.')
         } else {
-          throw new Error(data.message || data.error || `Server error: ${response.status}`)
+          throw new Error(errMsg(data.message) || errMsg(data.error) || `Server error: ${response.status}`)
         }
       }
 
       // Store admin auth data
       if (data.access_token && data.admin_data) {
-        localStorage.setItem("admin_access_token", data.access_token)
+        const token = typeof data.access_token === 'string' ? data.access_token : String(data.access_token)
+        const adminData = data.admin_data as Record<string, unknown>
+        localStorage.setItem("admin_access_token", token)
         localStorage.setItem("admin_user", JSON.stringify(data.admin_data))
         
+        const name = typeof adminData.full_name === 'string' ? adminData.full_name
+          : typeof adminData.username === 'string' ? adminData.username
+          : typeof adminData.email === 'string' ? adminData.email
+          : 'Admin'
         toast({
           title: "Login successful",
-          description: `Welcome back, ${data.admin_data.full_name || data.admin_data.username || data.admin_data.email}!`
+          description: `Welcome back, ${name}!`
         })
         
         // Preload all admin data in the background
@@ -188,12 +195,15 @@ export default function AdminLoginPage() {
         }
       } else if (data.token && data.user) {
         // Handle alternative response format
-        localStorage.setItem("admin_access_token", data.token)
+        const altToken = typeof data.token === 'string' ? data.token : String(data.token)
+        const user = data.user as Record<string, unknown>
+        localStorage.setItem("admin_access_token", altToken)
         localStorage.setItem("admin_user", JSON.stringify(data.user))
         
+        const userName = typeof user.name === 'string' ? user.name : typeof user.email === 'string' ? user.email : 'Admin'
         toast({
           title: "Login successful",
-          description: `Welcome back, ${data.user.name || data.user.email}!`
+          description: `Welcome back, ${userName}!`
         })
         
         // Preload all admin data in the background
@@ -417,5 +427,17 @@ export default function AdminLoginPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    }>
+      <AdminLoginContent />
+    </Suspense>
   )
 }

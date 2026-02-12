@@ -133,7 +133,8 @@ export default function AdminOrdersLivePage() {
     endpoint: `${getApiBaseUrl()}/orders/list/live`,
     storageKey: 'admin_orders_live',
     transformData: (data) => {
-      const allOrders = Array.isArray(data) ? data : (data?.orders && Array.isArray(data.orders) ? data.orders : [])
+      const d = data as unknown
+      const allOrders = Array.isArray(d) ? d : (d && typeof d === 'object' && 'orders' in d && Array.isArray((d as { orders: unknown }).orders) ? (d as { orders: unknown[] }).orders : [])
       return allOrders
     },
     mergeStrategy: 'replace',
@@ -218,7 +219,7 @@ export default function AdminOrdersLivePage() {
           server: data.server || accountData?.server || order.server || '',
           login: data.platform_login || accountData?.platform_login || order.platform_login || '',
           password: data.platform_password || accountData?.platform_password || order.platform_password || '',
-          profitTarget: data.profit_target?.toString() || accountData?.profit_target?.toString() || order.profit_target?.toString() || '',
+          profitTarget: data.profit_target?.toString() || (accountData && 'profit_target' in accountData ? accountData.profit_target?.toString() : accountData && 'profit_share' in accountData ? (accountData as { profit_share: number }).profit_share?.toString() : undefined) || order.profit_target?.toString() || '',
           accountType: order.is_live ? 'live' : order.is_stage2 ? 'stage2' : '',
           reason: '',
           date: '',
@@ -234,7 +235,7 @@ export default function AdminOrdersLivePage() {
           server: accountData?.server || order.server || '',
           login: accountData?.platform_login || order.platform_login || '',
           password: accountData?.platform_password || order.platform_password || '',
-          profitTarget: accountData?.profit_target?.toString() || order.profit_target?.toString() || '',
+          profitTarget: (accountData && 'profit_target' in accountData ? accountData.profit_target?.toString() : accountData && 'profit_share' in accountData ? (accountData as { profit_share: number }).profit_share?.toString() : undefined) || order.profit_target?.toString() || '',
           accountType: order.is_live ? 'live' : order.is_stage2 ? 'stage2' : '',
           reason: '',
           date: '',
@@ -252,7 +253,7 @@ export default function AdminOrdersLivePage() {
         server: accountData?.server || order.server || '',
         login: accountData?.platform_login || order.platform_login || '',
         password: accountData?.platform_password || order.platform_password || '',
-        profitTarget: accountData?.profit_target?.toString() || order.profit_target?.toString() || '',
+        profitTarget: (accountData && 'profit_target' in accountData ? accountData.profit_target?.toString() : accountData && 'profit_share' in accountData ? (accountData as { profit_share: number }).profit_share?.toString() : undefined) || order.profit_target?.toString() || '',
         accountType: order.is_live ? 'live' : order.is_stage2 ? 'stage2' : '',
         reason: '',
         date: '',
@@ -387,8 +388,8 @@ export default function AdminOrdersLivePage() {
         }
         
         // Invalidate relevant caches based on status change
-        const oldStatus = editingOrder.status
-        const newStatus = editForm.status
+        const oldStatus = editingOrder.status ?? ''
+        const newStatus = editForm.status ?? ''
         invalidateCachesForStatusChange(oldStatus, newStatus)
         
         // Broadcast invalidation to other tabs/pages

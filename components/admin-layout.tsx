@@ -72,8 +72,8 @@ export default function AdminLayout({
             email: authState.user?.email || "",
             username: authState.user?.username || "",
             full_name: authState.user?.full_name || "",
-            admin_code: authState.user?.admin_code || "",
-            profile_picture_url: (authState.user as any)?.profile_picture_url || "",
+            admin_code: (authState.user as Record<string, unknown>)?.admin_code as string || "",
+            profile_picture_url: (authState.user as Record<string, unknown>)?.profile_picture_url as string || "",
           })
         } else {
           // Clear profile if not authenticated

@@ -424,8 +424,8 @@ export function PricingSection() {
                         <img
                           src={method.icon}
                           alt={method.name}
-                          className={`object-contain max-h-12 max-w-full w-auto group-hover:scale-110 transition-transform ${method.isBlackText ? '' : ''}`}
-                          style={method.isBlackText ? { filter: 'none' } : {}}
+                          className={`object-contain max-h-12 max-w-full w-auto group-hover:scale-110 transition-transform ${(method as { isBlackText?: boolean }).isBlackText ? '' : ''}`}
+                          style={(method as { isBlackText?: boolean }).isBlackText ? { filter: 'none' } : {}}
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.style.display = 'none';
@@ -439,7 +439,7 @@ export function PricingSection() {
                     ) : (
                       <div 
                         className="w-full h-full rounded-lg flex items-center justify-center p-2"
-                        style={{ backgroundColor: method.bgColor }}
+                        style={{ backgroundColor: (method as { bgColor?: string }).bgColor ?? '#fff' }}
                       >
                         <img
                           src={method.icon}

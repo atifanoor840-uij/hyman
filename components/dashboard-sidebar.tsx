@@ -3,7 +3,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { authenticatedFetch } from "@/utils/api"
+import { getAuthHeaders } from "@/lib/api"
 import { 
   HomeIcon,
   ChartBarIcon,
@@ -82,7 +82,7 @@ export default function DashboardSidebar({ onClose }: DashboardSidebarProps) {
     setIsCheckingEligibility(true)
     
     try {
-      const response = await authenticatedFetch(WITHDRAWAL_ELIGIBLE_URL, { method: "GET" })
+      const response = await fetch(WITHDRAWAL_ELIGIBLE_URL, { method: "GET", headers: getAuthHeaders() })
       
       console.log('📡 Eligibility API Response Status:', response.status)
       

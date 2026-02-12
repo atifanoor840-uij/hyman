@@ -333,8 +333,8 @@ export default function AdminOrdersPendingPage() {
         }
         
         // Invalidate relevant caches based on status change
-        const oldStatus = editingOrder.status
-        const newStatus = editForm.status
+        const oldStatus = editingOrder.status ?? ''
+        const newStatus = editForm.status ?? ''
         invalidateCachesForStatusChange(oldStatus, newStatus)
         
         // Broadcast invalidation to other tabs/pages

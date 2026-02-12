@@ -51,15 +51,16 @@ export default function AdminLiveChatPage() {
   const [statusFilter, setStatusFilter] = useState("all")
   
   // Use cached chat sessions data
-  const { data: cachedSessions, isLoading: cacheLoading, error: cacheError, updateData, refresh } = useAdminCache<ChatSession[]>({
+  const { data: cachedSessions, isLoading: cacheLoading, error: cacheError, updateData, refresh } = useAdminCache<ChatSession>({
     endpoint: `${getApiBaseUrl()}/support/admin/tickets`,
     storageKey: 'admin_cache_live_chat',
     transformData: (data) => Array.isArray(data) ? data : [],
   })
 
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([])
+  const [operationError, setOperationError] = useState<string | null>(null)
   const isLoading = cacheLoading
-  const error = cacheError
+  const error = cacheError || operationError
   const [selectedSession, setSelectedSession] = useState<ChatSession | null>(null)
   const [replyMessage, setReplyMessage] = useState("")
   const [isReplying, setIsReplying] = useState(false)
@@ -502,10 +503,11 @@ export default function AdminLiveChatPage() {
     if (!selectedSession || !replyMessage.trim()) return
     
     setIsReplying(true)
+    setOperationError(null)
     try {
       const token = typeof window !== "undefined" ? localStorage.getItem("admin_access_token") : null
       if (!token) {
-        setError("Admin access token not found. Please login again.")
+        setOperationError("Admin access token not found. Please login again.")
         return
       }
 
@@ -523,11 +525,11 @@ export default function AdminLiveChatPage() {
 
       if (!response.ok) {
         if (response.status === 401) {
-          setError("Unauthorized. Please login again.")
+          setOperationError("Unauthorized. Please login again.")
         } else if (response.status === 403) {
-          setError("Access forbidden. Insufficient permissions.")
+          setOperationError("Access forbidden. Insufficient permissions.")
         } else {
-          setError(`Failed to send reply: ${response.status} ${response.statusText}`)
+          setOperationError(`Failed to send reply: ${response.status} ${response.statusText}`)
         }
         return
       }
@@ -558,7 +560,7 @@ export default function AdminLiveChatPage() {
       await refreshTickets()
     } catch (error: any) {
       console.error("Failed to send reply:", error)
-      setError(`Network error: ${error.message}`)
+      setOperationError(`Network error: ${error.message}`)
     } finally {
       setIsReplying(false)
     }

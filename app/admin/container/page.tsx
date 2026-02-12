@@ -57,8 +57,8 @@ export default function AdminContainerPage() {
   const [platformFilter, setPlatformFilter] = useState("all")
   const [currentPage, setCurrentPage] = useState(1)
   
-  // Use cached containers data
-  const { data: cachedContainers, isLoading, error: fetchError, updateData } = useAdminCache<Container[]>({
+  // Use cached containers data (T = Container so data is Container[])
+  const { data: cachedContainers, isLoading, error: fetchError, updateData } = useAdminCache<Container>({
     endpoint: `${getApiBaseUrl()}/accounts/credentials`,
     storageKey: 'admin_cache_containers',
     transformData: (data) => {
@@ -74,7 +74,8 @@ export default function AdminContainerPage() {
   })
 
   const containers = cachedContainers || []
-  const error = fetchError
+  const [operationError, setOperationError] = useState<string | null>(null)
+  const error = fetchError || operationError
   const [selectedContainer, setSelectedContainer] = useState<Container | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -225,7 +226,7 @@ export default function AdminContainerPage() {
               const dateB = b.created_at ? new Date(b.created_at).getTime() : b.id
               return dateB - dateA // Descending order (newest first)
             })
-            setContainers(sortedContainers)
+            updateData(sortedContainers)
           }
         } catch (error) {
           console.error("Failed to reload containers:", error)
@@ -256,12 +257,12 @@ export default function AdminContainerPage() {
 
   const handleDeleteAccount = async (credentialId: number) => {
     setIsDeleting(true)
-    setError(null)
+    setOperationError(null)
 
     try {
       const token = getAdminToken()
       if (!token) {
-        setError("No access token found. Please log in again.")
+        setOperationError("No access token found. Please log in again.")
         setIsDeleting(false)
         return
       }
@@ -277,7 +278,7 @@ export default function AdminContainerPage() {
 
       if (!response.ok) {
         const errorText = await response.text()
-        setError(`Failed to delete account: ${response.status} ${response.statusText} - ${errorText}`)
+        setOperationError(`Failed to delete account: ${response.status} ${response.statusText} - ${errorText}`)
         setIsDeleting(false)
         setDeleteConfirmId(null)
         return
@@ -303,7 +304,7 @@ export default function AdminContainerPage() {
               const dateB = b.created_at ? new Date(b.created_at).getTime() : b.id
               return dateB - dateA // Descending order (newest first)
             })
-            setContainers(sortedContainers)
+            updateData(sortedContainers)
           }
         } catch (error) {
           console.error("Failed to reload containers:", error)
@@ -314,7 +315,7 @@ export default function AdminContainerPage() {
       setDeleteConfirmId(null)
     } catch (error: any) {
       console.error("Failed to delete account:", error)
-      setError(`Network error: ${error.message}`)
+      setOperationError(`Network error: ${error.message}`)
     } finally {
       setIsDeleting(false)
     }
@@ -383,7 +384,7 @@ export default function AdminContainerPage() {
               const dateB = b.created_at ? new Date(b.created_at).getTime() : b.id
               return dateB - dateA // Descending order (newest first)
             })
-            setContainers(sortedContainers)
+            updateData(sortedContainers)
           }
         } catch (error) {
           console.error("Failed to reload containers:", error)

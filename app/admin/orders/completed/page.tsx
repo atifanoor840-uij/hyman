@@ -35,6 +35,7 @@ interface Order {
   account_size: string
   platform: string
   payment_method: string | null
+  payment_intent_id?: string | null
   txid: string | null
   checkout_session_url: string | null
   image: {
@@ -124,9 +125,10 @@ export default function AdminOrdersCompletedPage() {
             ordersList = data as Order[]
           }
         } else {
-          for (const key of Object.keys(data)) {
+          const dataObj = data as Record<string, unknown>
+          for (const key of Object.keys(dataObj)) {
             if (key !== 'total_active_accounts') {
-              const ordersData = data[key]
+              const ordersData = dataObj[key]
               if (Array.isArray(ordersData)) {
                 if (ordersData.length > 0 && Array.isArray(ordersData[0])) {
                   ordersList = ordersData[0] as Order[]
@@ -605,8 +607,8 @@ export default function AdminOrdersCompletedPage() {
         }
         
         // Invalidate relevant caches based on status change
-        const oldStatus = editingOrder.status
-        const newStatus = editForm.status
+        const oldStatus = editingOrder.status ?? ''
+        const newStatus = editForm.status ?? ''
         invalidateCachesForStatusChange(oldStatus, newStatus)
         
         // Broadcast invalidation to other tabs/pages

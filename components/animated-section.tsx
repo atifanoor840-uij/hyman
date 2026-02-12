@@ -1,30 +1,33 @@
 "use client"
 
 import { motion } from "framer-motion"
-import type { HTMLAttributes, ReactNode } from "react"
+import type { ReactNode } from "react"
 
-interface AnimatedSectionProps extends HTMLAttributes<HTMLDivElement> {
+interface AnimatedSectionProps {
   children: ReactNode
+  className?: string
+  style?: React.CSSProperties
   delay?: number
+  id?: string
 }
 
-export function AnimatedSection({ children, className, delay = 0, ...props }: AnimatedSectionProps) {
+export function AnimatedSection({ children, className, style, delay = 0, id }: AnimatedSectionProps) {
   return (
     <motion.div
+      id={id}
       initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-30px" }}
-      transition={{ 
-        duration: 0.25, // Reduced from 0.3s to 0.25s for faster animations
-        ease: [0.25, 0.1, 0.25, 1], 
-        delay: delay * 0.2 // Further reduced delay multiplier
+      transition={{
+        duration: 0.25,
+        ease: [0.25, 0.1, 0.25, 1],
+        delay: delay * 0.2
       }}
       className={className}
-      style={{ 
+      style={{
         willChange: 'transform, opacity',
-        ...props.style 
+        ...style
       }}
-      {...props}
     >
       {children}
     </motion.div>

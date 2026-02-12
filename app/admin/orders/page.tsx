@@ -888,8 +888,8 @@ export default function AdminOrdersPage() {
     
     // Store original order for rollback in case of error
     const originalOrder = { ...editingOrder }
-    const oldStatus = editingOrder.status
-    const newStatus = editForm.status
+    const oldStatus = editingOrder.status ?? ''
+    const newStatus = editForm.status ?? ''
     
     // Optimistically update only this order in local state (shift pending→delivered, etc.)
     // Do not remove from list; data stays until new data comes from backend (refresh).

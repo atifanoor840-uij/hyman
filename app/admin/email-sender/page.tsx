@@ -50,8 +50,8 @@ export default function AdminEmailSenderPage() {
     currentBatchEmails: string[]
   } | null>(null)
 
-  // Fetch users from backend
-  const { data: usersData, isLoading } = useAdminCache<User[]>({
+  // Fetch users from backend (T = User so data is User[])
+  const { data: usersData, isLoading } = useAdminCache<User>({
     endpoint: `${getApiBaseUrl()}/auth/members`,
     storageKey: 'admin_cache_users',
     transformData: (data) => Array.isArray(data) ? data : [],

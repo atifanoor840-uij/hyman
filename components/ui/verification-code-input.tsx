@@ -53,7 +53,7 @@ export const VerificationCodeInput: React.FC<VerificationCodeInputProps> = ({
       
       // Focus the last input after paste
       if (inputRefs.current[length - 1]) {
-        inputRefs.current[length - 1].focus()
+        inputRefs.current[length - 1]?.focus()
       }
       
       // Call onComplete if we have all digits
@@ -95,7 +95,7 @@ export const VerificationCodeInput: React.FC<VerificationCodeInputProps> = ({
       
       // Focus the last input after paste
       if (inputRefs.current[length - 1]) {
-        inputRefs.current[length - 1].focus()
+        inputRefs.current[length - 1]?.focus()
       }
       
       // Call onComplete if we have all digits
@@ -143,7 +143,7 @@ export const VerificationCodeInput: React.FC<VerificationCodeInputProps> = ({
       {Array.from({ length }, (_, index) => (
         <input
           key={index}
-          ref={(el) => (inputRefs.current[index] = el)}
+          ref={(el) => { inputRefs.current[index] = el }}
           type="text"
           inputMode="numeric"
           pattern="[0-9]"

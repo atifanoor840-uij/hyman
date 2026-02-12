@@ -711,12 +711,12 @@ export default function PerformancePage() {
             {/* Targets & Violations - below graphs */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 min-w-0">
               <TargetsCard
-                stats={stats}
+                stats={stats ?? null}
                 dailyPerf={dailyPerf}
                 profitTarget={creds?.profit_target ? Number(creds.profit_target) : undefined}
                 initialBalance={stats?.total_deposits ?? 50000}
               />
-              <ViolationsCard stats={stats} dailyPerf={dailyPerf} />
+              <ViolationsCard stats={stats ?? null} dailyPerf={dailyPerf} />
             </div>
 
             {/* Trade history — as returned by backend (recent_trades_duration) */}
@@ -738,7 +738,7 @@ export default function PerformancePage() {
                     </TableHeader>
                     <TableBody>
                       {trades.map((t, idx) => {
-                        const rec = t as Record<string, unknown>
+                        const rec = t as unknown as Record<string, unknown>
                         const ticket = t.ticket ?? rec.ticket
                         const symbol = t.symbol ?? rec.symbol
                         const volume = t.volume ?? rec.volume
