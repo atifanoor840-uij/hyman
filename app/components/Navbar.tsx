@@ -267,7 +267,7 @@ export default function Navbar({ variant = "sticky" }: { variant?: NavbarVariant
             Sign in
           </Link>
           <Link href="/signup" className="px-5 py-2 text-sm font-semibold text-black bg-white rounded-full hover:bg-white/95 transition-colors">
-            Get funded
+            Start evaluation
           </Link>
         </div>
 
@@ -299,7 +299,7 @@ export default function Navbar({ variant = "sticky" }: { variant?: NavbarVariant
               <Link href="/dashboard" className="py-2.5 text-sm font-semibold text-center text-white border border-white/30 rounded-full hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
               <div className="flex gap-2">
                 <Link href="/login" className="flex-1 py-2.5 text-sm font-semibold text-center text-white border border-white/30 rounded-full hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>Sign in</Link>
-                <Link href="/signup" className="flex-1 py-2.5 text-sm font-semibold text-center text-black bg-white rounded-full hover:bg-white/95" onClick={() => setMobileMenuOpen(false)}>Get funded</Link>
+                <Link href="/signup" className="flex-1 py-2.5 text-sm font-semibold text-center text-black bg-white rounded-full hover:bg-white/95" onClick={() => setMobileMenuOpen(false)}>Start evaluation</Link>
               </div>
             </div>
           </nav>

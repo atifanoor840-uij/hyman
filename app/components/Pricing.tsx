@@ -40,10 +40,10 @@ export default function Pricing() {
 				{/* Header */}
 				<header className="text-center mb-10">
 					<h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
-						Simple, transparent pricing
+						Trader Development Plans — Transparent Pricing
 					</h2>
 					<p className="mt-2 text-base text-slate-500">
-						No contracts. No surprise fees.
+						Skills assessment programs on simulated accounts. Refundable fees per terms. No surprise charges.
 					</p>
 				</header>
 

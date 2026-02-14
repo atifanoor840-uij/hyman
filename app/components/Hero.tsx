@@ -23,13 +23,13 @@ export default function Hero() {
 				<div className="mt-16 flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
 					{/* Left: heading, subheading, payment icons below subheading */}
 					<div className="flex flex-1 flex-col items-start justify-center text-left pl-4 md:pl-8 lg:pl-12">
-						<h2 className="whitespace-nowrap font-sans text-5xl font-bold leading-tight tracking-tight text-white md:text-6xl lg:text-7xl">
-							<span className="text-[#7270ff]">GENZ</span> Don&apos;t Wait ,They Win.
-						</h2>
+						<h1 className="whitespace-nowrap font-sans text-5xl font-bold leading-tight tracking-tight text-white md:text-6xl lg:text-7xl">
+							<span className="text-[#7270ff]">Fx Genz</span> — Trader Development Programs
+						</h1>
 						<p className="mt-4 font-sans text-lg leading-relaxed text-white/90 md:text-xl">
-							No delays. No limits. Just funded trading.
+							Trader development programs and skills assessments.
 							<br className="hidden sm:block" />
-							FXgenz is the forex firm for rule-breakers.
+							Educational evaluations on simulated accounts. Demonstrate your trading discipline.
 						</p>
 						{/* Payment icons + platform icons below subheading (horizontal) */}
 						<div className="mt-4 flex flex-wrap items-center gap-3">
@@ -60,10 +60,10 @@ export default function Hero() {
 						</div>
 						{/* Start trading button below heading block */}
 						<Link
-							href="/dashboard/buys"
+							href="/signup"
 							className="mt-6 font-sans inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-gray-100 focus:outline-none md:text-base"
 						>
-							Start trading
+							Start your skills assessment
 						</Link>
 					</div>
 

@@ -25,7 +25,7 @@ export default function Platforms() {
 		<section className="relative overflow-hidden bg-black">
 			<div className="mx-auto max-w-7xl px-6 py-16 md:px-10 md:py-20">
 				<h2 className="text-center font-sans text-3xl font-bold tracking-tight text-white md:text-4xl lg:text-5xl mb-12 md:mb-14">
-					We Support Major Platforms
+					Trading Platforms for Our Evaluation Programs
 				</h2>
 
 				<div className="flex flex-wrap items-center justify-center gap-12 md:gap-16 lg:gap-20">

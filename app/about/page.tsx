@@ -23,13 +23,13 @@ export default function AboutPage() {
 					<Navbar variant="hero" />
 					<div className="mx-auto max-w-4xl space-y-6 text-left mt-16 lg:mt-20">
 						<h1 className={`${display.className} text-4xl font-semibold leading-[1.1] tracking-[-0.02em] text-white md:text-5xl lg:text-6xl`}>
-							About Us
+							About Fx Genz — Prop Firm Trading Evaluations
 						</h1>
 						<p className="text-lg text-white/80 md:text-xl max-w-3xl leading-relaxed">
-							FXGENZ is built for traders who want real capital without nonsense. We fund disciplined traders with clear rules, fast payouts, and scalable accounts—no gimmicks, no fake challenges, no hidden traps.
+							Fx Genz offers trader development programs and skills assessments. Our forex evaluation program is designed for disciplined traders — educational evaluations on simulated accounts.
 						</p>
 						<p className="text-lg text-white/70 md:text-xl max-w-3xl leading-relaxed">
-							If you can trade responsibly, manage risk, and stay consistent, FXGENZ gives you the capital and lets you work.
+							Clear rules, transparent conditions. Verifiable assessments — no profit promises. Educational purposes for serious traders.
 						</p>
 					</div>
 				</div>
@@ -42,7 +42,7 @@ export default function AboutPage() {
 				{/* Tagline */}
 				<section className="mx-auto max-w-7xl px-6 py-12 md:px-10 md:py-16">
 					<p className={`${display.className} text-2xl md:text-3xl font-semibold text-[#0b0b0f] text-center max-w-4xl mx-auto leading-snug`}>
-						Trade real funds. Keep most of the profits. Scale without limits.
+						Trader development programs. Skills assessments on simulated accounts. Verifiable results — educational purposes only.
 					</p>
 				</section>
 
@@ -58,19 +58,19 @@ export default function AboutPage() {
 							</div>
 							<div className="space-y-4 text-[#37353E]/90 leading-relaxed">
 								<p>
-									At FXGENZ, we created the firm we wished existed when we were traders ourselves.
+									At Fx Genz, we created the evaluation program we wished existed when we were traders ourselves.
 								</p>
 								<p>
-									Too many prop firms complicate trading with unclear rules, sudden restrictions, and payout uncertainty. FXGENZ was built differently—clear risk limits, transparent conditions, and a trader-first structure.
+									Too many prop firms complicate trading with unclear rules and payout uncertainty. Fx Genz was built differently—clear risk limits, transparent conditions, and a trader-first structure for our skill-based programs.
 								</p>
 								<p>
-									Our focus is long-term sustainability. We don&apos;t reward gambling. We reward discipline, consistency, and professional risk management.
+									Our focus is long-term sustainability. We don&apos;t reward gambling. We reward discipline, consistency, and professional risk management in our trading evaluations.
 								</p>
 								<p>
-									If you respect capital and trade with intent, FXGENZ is designed to grow with you.
+									If you respect capital and trade with intent, Fx Genz is designed to grow with you.
 								</p>
 								<p className="italic text-[#0b0b0f] pt-2">
-									— Founder, FXGENZ
+									— Founder, Fx Genz
 								</p>
 							</div>
 						</div>
@@ -83,18 +83,18 @@ export default function AboutPage() {
 						<div className="flex items-center gap-3 mb-8">
 							<span className="text-2xl" aria-hidden>⚡</span>
 							<h2 className={`${display.className} text-2xl md:text-3xl font-semibold text-[#0b0b0f]`}>
-								Why FXGENZ?
+								Why Fx Genz?
 							</h2>
 						</div>
 						<div className="space-y-4 text-[#37353E]/90 leading-relaxed">
 							<p>
-								FXGENZ is designed to remove the unnecessary barriers that exist at traditional prop firms.
+								Fx Genz is designed to remove unnecessary barriers in trading evaluations.
 							</p>
 							<p>
-								While most firms rely on complex multi-phase challenges, FXGENZ offers instant funding, allowing qualified traders to access capital immediately without artificial obstacles.
+								Our skill-based programs offer flexible evaluation paths, allowing qualified traders to progress through simulated account challenges with clear objectives.
 							</p>
 							<p>
-								Unlike firms with vague or shifting risk rules, FXGENZ operates with fully transparent risk parameters.
+								Unlike firms with vague or shifting risk rules, Fx Genz operates with fully transparent evaluation parameters.
 							</p>
 							<p>
 								All drawdown limits, lot size rules, and trading conditions are clearly defined from day one. There are no hidden restrictions, no surprise violations, and no retroactive rule changes.
@@ -111,12 +111,12 @@ export default function AboutPage() {
 								Built for Professionals
 							</h2>
 							<p className="text-[#37353E]/90 leading-relaxed">
-								FXGENZ focuses on real trading behavior, not artificial obstacles.
+								Fx Genz focuses on trading discipline and skill development, not artificial obstacles.
 								<br />
-								If you trade clean, manage risk, and stay consistent, we fund you—and we pay you.
+								Complete our skills assessment to demonstrate readiness. Program terms and eligibility are disclosed in full — no profit guarantees.
 							</p>
 							<p className={`${display.className} text-xl md:text-2xl font-semibold text-[#0b0b0f] pt-4`}>
-								Stop proving yourself. Start trading with capital that respects your skill.
+								Start your trader development program today.
 							</p>
 							<div className="pt-6">
 								<Link

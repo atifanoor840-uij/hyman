@@ -75,11 +75,11 @@ const resources = [
 
 const webinars = [
 	{
-		title: 'Live Trading Session',
+		title: 'Trading Evaluation Workshop',
 		date: 'December 20, 2024',
 		time: '2:00 PM GMT',
 		host: 'Sarah Johnson',
-		topic: 'Real-time market analysis and trade execution',
+		topic: 'Market analysis and evaluation strategies',
 	},
 	{
 		title: 'Risk Management Workshop',

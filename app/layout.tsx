@@ -20,9 +20,27 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "FxGenz — Premium Prop Trading & Fintech Funding",
+  title: {
+    default: "Fx Genz — Trader Development & Skills Assessment Programs",
+    template: "%s | Fx Genz",
+  },
   description:
-    "Trade with confidence. FxGenz provides elite funding, transparent payouts, and a luxury fintech experience built for performance.",
+    "Fx Genz offers trader development programs and skills assessments. Educational trading evaluations on simulated accounts. Complete our forex evaluation program to demonstrate your trading discipline. No profit promises — verifiable, skill-based assessments.",
+  keywords: [
+    "trading challenge",
+    "prop firm evaluation",
+    "trader development program",
+    "forex evaluation program",
+    "skills assessment",
+    "simulated accounts",
+    "trading evaluations",
+    "fx genz",
+    "prop firm",
+  ],
+  openGraph: {
+    title: "Fx Genz — Trader Development & Evaluation Programs",
+    description: "Educational trader development programs and skills assessments. Simulated account evaluations for serious traders. Verifiable, skill-based — no profit promises.",
+  },
 };
 
 export default function RootLayout({

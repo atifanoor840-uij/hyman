@@ -11,10 +11,10 @@ export default function Payouts() {
 						Fast payouts
 					</div>
 					<h2 className="font-sans mt-4 text-3xl font-bold tracking-tight text-[#0b0b0f] md:text-5xl">
-						Institutional‑Grade Payout Infrastructure
+						Payout Options for Program Graduates
 					</h2>
 					<p className="mx-auto mt-3 max-w-3xl text-[#2e2e35]/75">
-						Enterprise‑level payment processing with multiple global rails, transparent fees, and predictable settlement times. Built for traders who demand reliability and speed.
+						Eligible participants who complete our skills assessment may receive payouts per program terms. Processing timelines and methods are disclosed upfront. Educational trader development programs.
 					</p>
 					<div className="mt-6 flex flex-wrap items-center justify-center gap-2 text-xs">
 						<span className="rounded-full border border-[#0b0b0f]/10 bg-white px-3 py-1">USDC</span>
@@ -28,7 +28,7 @@ export default function Payouts() {
 				<div className="grid grid-cols-1 gap-6 md:grid-cols-3">
 					<Card>
 						<div className="rounded-2xl border border-[#dadfea] bg-gradient-to-b from-[#0d1326] to-[#0a0f22] p-6 text-white shadow-[inset_0_0_1px_rgba(255,255,255,0.06)]">
-							<div className="text-[10px] uppercase tracking-wider text-white/60">Withdrawable profits</div>
+							<div className="text-[10px] uppercase tracking-wider text-white/60">Eligible balance</div>
 							<div className="font-sans mt-2 text-3xl font-bold tracking-tight">$2,800.00</div>
 							<button className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#0096ff] to-[#00d99f] px-4 py-2.5 text-sm font-semibold text-[#0b0b0f] transition hover:opacity-90">
 								Request Payout
@@ -123,7 +123,7 @@ export default function Payouts() {
 				<div className="mt-12 overflow-hidden rounded-2xl border border-black/20 bg-black">
 					<div className="grid grid-cols-1 items-center gap-6 py-8 text-center sm:grid-cols-3">
 						<BandStat value="4h" label="Average Processing Time" />
-						<BandStat value="100%" label="Profit Split Retention" />
+						<BandStat value="Full" label="Upfront Disclosure" />
 						<BandStat value="24/7" label="Support Availability" />
 					</div>
 				</div>

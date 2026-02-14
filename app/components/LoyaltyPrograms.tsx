@@ -45,7 +45,7 @@ const loyaltyCards = [
 	},
 	{
 		title: "Free Challenges",
-		desc: "Use accumulated tokens to access evaluation challenges at no cost. Start new funding opportunities.",
+		desc: "Use accumulated tokens to access evaluation challenges at no cost. Start new trading evaluations.",
 		icon: <ChallengeIcon />,
 		art: <ChallengeArt />,
 		imageSrc: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766055812/free_challenge_200x110_x2pizn.png",
@@ -53,7 +53,7 @@ const loyaltyCards = [
 	},
 	{
 		title: "Payout Boost",
-		desc: "Enhance your profit splits and payout speeds by applying token-based boosts. Maximize your earnings.",
+		desc: "Apply token-based boosts per program terms. Payout eligibility and processing depend on program rules — see terms for details.",
 		icon: <BoostIcon />,
 		art: <BoostArt />,
 		imageSrc: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766055812/topup_200x110_cruheq.png",
@@ -94,7 +94,7 @@ export default function LoyaltyPrograms() {
 					</div>
 					<div className="hidden gap-3 sm:flex">
 						<a href="#pricing" className="inline-flex items-center justify-center rounded-full bg-[#0ea5e9] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0891d1]">
-							Get funded →
+							Start evaluation →
 						</a>
 						<a href="#" className="inline-flex items-center justify-center rounded-full border border-[#0b0b0f]/15 bg-white px-5 py-2.5 text-sm font-semibold text-[#0b0b0f] hover:bg-[#f6f7fb]">
 							Learn more

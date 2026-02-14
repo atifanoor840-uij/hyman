@@ -16,14 +16,14 @@ const faqCategories: FAQCategory[] = [
     title: "General Information",
     items: [
       {
-        question: "Are you a broker?",
+        question: "What type of firm is Fx Genz?",
         answer:
-          "No. Dragon Funded is a proprietary trading firm, not a broker. We provide access to simulated trading accounts via our partnered brokers.",
+          "Fx Genz offers trader development programs and skills assessments. We provide educational evaluations on simulated accounts. Programs are for educational purposes — no profit guarantees.",
       },
       {
-        question: "Which broker do you use?",
+        question: "What platforms are used for evaluations?",
         answer:
-          "We work with trusted partner brokers. If your account becomes invalid, a fresh broker account will be issued. Balances cannot be transferred between brokers.",
+          "We work with trusted platform providers. Simulated accounts are provided for our trading evaluation programs. Each evaluation uses our defined program parameters.",
       },
       {
         question: "What trading platforms are available?",
@@ -35,19 +35,19 @@ const faqCategories: FAQCategory[] = [
         answer: "No. Payments must come directly from the account holder.",
       },
       {
-        question: "Am I trading with real funds?",
+        question: "Are these simulated or real accounts?",
         answer:
-          "No. You trade on simulated accounts that mirror real market conditions. Successful traders earn payouts based on their performance.",
+          "Our programs use simulated accounts for skills assessments. Participants complete trader development evaluations. Eligibility for further program stages and payout terms are disclosed in full — no profit guarantees.",
       },
       {
         question: "Who can I contact for technical support?",
         answer:
-          "Our support team is available via email and live chat through the Dragon Funded website.",
+          "Our support team is available via email and live chat through the Fx Genz website.",
       },
       {
         question: "How should I handle taxes?",
         answer:
-          "Traders are responsible for declaring and paying taxes according to their local regulations. Dragon Funded does not provide tax advice.",
+          "Traders are responsible for declaring and paying taxes according to their local regulations. Fx Genz does not provide tax advice.",
       },
     ],
   },
@@ -178,7 +178,7 @@ const faqCategories: FAQCategory[] = [
       {
         question: "What happens if my account becomes invalid?",
         answer:
-          "You’ll be issued a new funded account. However, balances cannot be transferred.",
+          "You’ll be able to re-enroll in the skills assessment per program terms. Balances cannot be transferred between evaluation accounts.",
       },
     ],
   },

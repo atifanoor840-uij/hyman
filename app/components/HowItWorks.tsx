@@ -4,22 +4,22 @@ import { ArrowRight } from "lucide-react";
 const STEPS = [
 	{
 		id: "01",
-		title: "Pick your program",
-		body: "Choose Evaluation, Instant, or Swing funding tailored to your trading style and preferred platform.",
+		title: "Choose your evaluation",
+		body: "Select from our trading evaluation programs tailored to your style. Simulated accounts on MT4, MT5, or DXtrade.",
 		icon: ProgramIcon,
 		image: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766126666/concept_step_1_revised_jupeym.png",
 	},
 	{
 		id: "02",
-		title: "Trade with clarity",
-		body: "Follow crystal-clear profit targets and drawdown limits. Track progress live in your dashboard.",
+		title: "Complete the skills assessment",
+		body: "Follow clear evaluation targets and risk parameters. Track progress in your dashboard. Educational purposes only — verifiable, skill-based.",
 		icon: ChartIcon,
 		image: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766126666/concept_level_2_revised_ox73fq.png",
 	},
 	{
 		id: "03",
-		title: "Scale & withdraw",
-		body: "Hit targets, request payouts in card or crypto, and unlock higher account sizes automatically.",
+		title: "Complete the program",
+		body: "Meet evaluation targets to demonstrate readiness. Eligible participants may progress to higher-tier programs. Results are verifiable — no profit guarantees.",
 		icon: PayoutIcon,
 		image: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766126669/concept_funded_account_1_tueypf.png",
 	},
@@ -35,10 +35,10 @@ export default function HowItWorks() {
 						Process
 					</span>
 					<h2 className="font-sans text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl mb-4">
-						How funding with FxGenz works
+						How Our Skills Assessment Works
 					</h2>
 					<p className="mx-auto max-w-3xl text-lg font-semibold text-white/70 md:text-xl">
-						From sign-up to payout, every step is designed for professional traders who want speed, clarity, and scale.
+						Trader development programs for serious learners. Educational evaluations on simulated accounts — clear targets, verifiable results.
 					</p>
 				</div>
 

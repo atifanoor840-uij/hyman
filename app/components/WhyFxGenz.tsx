@@ -7,9 +7,9 @@ export default function WhyFxGenz() {
 			<div className="mx-auto max-w-7xl px-6 py-16 md:px-10 md:py-24 font-display">
 				{/* Section heading at top (red circle area) - subheading + main heading */}
 				<header className="mb-10 lg:mb-12">
-					<p className="text-sm text-white/60 mb-1">/ Why FxGenz?</p>
+					<p className="text-sm text-white/60 mb-1">/ Why Fx Genz?</p>
 					<h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
-						Why People Choose FxGenz
+						Why Traders Choose Fx Genz Trader Development Programs
 					</h2>
 				</header>
 
@@ -27,10 +27,10 @@ export default function WhyFxGenz() {
 						</div>
 						<div className="flex flex-wrap gap-6 mt-auto">
 							<Link
-								href="/dashboard/buys"
+								href="/signup"
 								className="text-purple-400 font-semibold hover:underline inline-flex items-center gap-1"
 							>
-								Start trading &gt;
+								Start skills assessment &gt;
 							</Link>
 							<Link
 								href="/pricing"
@@ -67,7 +67,7 @@ export default function WhyFxGenz() {
 						<div className="border-t border-white/10 my-5" />
 						<BenefitRow
 							icon={<SatisfactionIcon />}
-							title="100% Satisfaction"
+							title="Satisfaction Focus"
 							desc={
 								<>
 									Don&apos;t just take our word for it—<span className="text-purple-400 font-semibold">see</span> what traders say about FxGenz.

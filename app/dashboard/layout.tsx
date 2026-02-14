@@ -9,8 +9,8 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "FxGenz - Trading Dashboard",
-  description: "Monitor your Forex trading performance, analyze market trends, and manage your positions",
+  title: "Trading Dashboard",
+  description: "Manage your Fx Genz trading evaluations, track simulated account performance, and access your prop firm dashboard",
   generator: "v0.app",
   icons: {
     icon: [

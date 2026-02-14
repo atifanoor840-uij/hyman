@@ -31,7 +31,7 @@ export default function TradesPage() {
 					</div>
 					<div className="hidden items-center gap-2 text-xs font-medium text-[#64748b] md:flex">
 						<Activity className="h-3.5 w-3.5" />
-						Live trading overview
+						Trading activity overview
 					</div>
 				</div>
 
@@ -42,7 +42,7 @@ export default function TradesPage() {
 								Trading activity
 							</h1>
 							<p className="mt-2 text-sm text-[#4b5563]">
-								Review your latest executions, win rate, and P&L across all funded accounts.
+								Review your latest executions, win rate, and P&L across your evaluation accounts.
 							</p>
 						</div>
 						<div className="flex flex-wrap gap-3">

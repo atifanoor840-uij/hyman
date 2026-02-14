@@ -25,10 +25,10 @@ export default function PricingPage() {
 					<Navbar variant="hero" />
 					<div className="mx-auto max-w-4xl space-y-6 text-left mt-16 lg:mt-20">
 						<h1 className={`${display.className} text-4xl font-semibold leading-[1.1] tracking-[-0.02em] text-white md:text-5xl lg:text-6xl`}>
-							Pricing Plans
+							Trader Development Program Pricing
 						</h1>
 						<p className="text-lg text-white/70 md:text-xl max-w-2xl">
-							Choose the perfect funding plan for your trading journey. Transparent pricing with refundable fees.
+							Choose your skills assessment. Simulated account evaluations with transparent pricing and refundable fees per program terms.
 						</p>
 					</div>
 				</div>
