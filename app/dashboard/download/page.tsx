@@ -13,7 +13,7 @@ export default function DownloadPage() {
         <div className="mx-auto w-full max-w-[1200px] flex flex-col flex-1">
           <Header
             title="Downloads"
-            description="Download trading platforms and resources for your evaluation."
+            description="Download MetaTrader 5 (MT5) and MetaTrader 4 (MT4) for your evaluation."
           />
 
           <div className="mt-5 flex-1">

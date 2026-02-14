@@ -7,18 +7,6 @@ import { Download } from "lucide-react"
 
 const platforms = [
   {
-    name: "MetaTrader 4",
-    short: "MT4",
-    description: "Most popular forex platform. Download for Windows, Mac, iOS, or Android.",
-    image: "https://res.cloudinary.com/dejjuhzug/image/upload/v1764395131/d1b7332b-1650-4a91-a1a0-8d09b53936ec_ougmpe.png",
-    links: [
-      { label: "Windows", href: "https://www.metatrader4.com/en/download" },
-      { label: "Mac", href: "https://www.metatrader4.com/en/download" },
-      { label: "Android", href: "https://play.google.com/store/apps/details?id=net.metaquotes.metatrader4" },
-      { label: "iOS", href: "https://apps.apple.com/app/metatrader-4/id496212596" },
-    ],
-  },
-  {
     name: "MetaTrader 5",
     short: "MT5",
     description: "Advanced multi-asset platform. Download for Windows, Mac, iOS, or Android.",
@@ -31,13 +19,15 @@ const platforms = [
     ],
   },
   {
-    name: "DXtrade",
-    short: "DXtrade",
-    description: "Professional trading platform. Web and desktop available.",
-    image: "https://res.cloudinary.com/dqzibxdtn/image/upload/v1769771735/dxtrade_s7srnv.png",
+    name: "MetaTrader 4",
+    short: "MT4",
+    description: "Most popular forex platform. Download for Windows, Mac, iOS, or Android.",
+    image: "https://res.cloudinary.com/dejjuhzug/image/upload/v1764395131/d1b7332b-1650-4a91-a1a0-8d09b53936ec_ougmpe.png",
     links: [
-      { label: "Web Platform", href: "https://dxtrade.com/" },
-      { label: "Desktop", href: "https://dxtrade.com/" },
+      { label: "Windows", href: "https://www.metatrader4.com/en/download" },
+      { label: "Mac", href: "https://www.metatrader4.com/en/download" },
+      { label: "Android", href: "https://play.google.com/store/apps/details?id=net.metaquotes.metatrader4" },
+      { label: "iOS", href: "https://apps.apple.com/app/metatrader-4/id496212596" },
     ],
   },
 ]
@@ -47,9 +37,9 @@ export function DownloadContent() {
     <div className="space-y-6 animate-fade-in">
       <Card className="border border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="text-base font-semibold">Trading Platforms</CardTitle>
+          <CardTitle className="text-base font-semibold">MT5 & MT4 Downloads</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Download the platform you need for your evaluation. Choose your device below.
+            Download MetaTrader 5 or MetaTrader 4 for your evaluation. Choose your device below.
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
