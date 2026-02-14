@@ -10,7 +10,7 @@ import SuccessPopup from '../components/SuccessPopup';
 const brandFont = Syne({ subsets: ['latin'], weight: ['700', '800'] });
 const bodyFont = Inter({ subsets: ['latin'], weight: ['400', '500', '600'] });
 
-const CODE_LENGTH = 6;
+const CODE_LENGTH = 4;
 const CURRENT_YEAR = new Date().getFullYear();
 
 function VerifyEmailContent() {
@@ -115,7 +115,7 @@ function VerifyEmailContent() {
 		event.preventDefault();
 
 		if (!isCodeComplete) {
-			setError('Please enter the complete 6-digit verification code.');
+			setError('Please enter the complete 4-digit verification code.');
 			return;
 		}
 
@@ -134,8 +134,8 @@ function VerifyEmailContent() {
 			// Simulate API call
 			await new Promise((resolve) => setTimeout(resolve, 2000));
 			
-			// For demo: accept any 6-digit code
-			const isValid = mergedCode.length === 6;
+			// For demo: accept any 4-digit code
+			const isValid = mergedCode.length === 4;
 			
 			if (!isValid) {
 				throw new Error('Invalid verification code');
@@ -224,7 +224,7 @@ function VerifyEmailContent() {
 								Check your email
 							</h1>
 							<p className="mt-6 text-lg text-gray-300 leading-relaxed">
-								We've sent a 6-digit verification code to:
+								We've sent a 4-digit verification code to:
 							</p>
 							<p className="mt-2 text-xl font-semibold text-white">
 								{email}
@@ -292,7 +292,7 @@ function VerifyEmailContent() {
 											Enter verification code
 										</h2>
 										<p className="mt-2 text-sm text-zinc-600">
-											Enter the 6-digit code sent to your email
+											Enter the 4-digit code sent to your email
 										</p>
 									</div>
 								</div>
@@ -467,7 +467,7 @@ function VerifyEmailPageSkeleton() {
 							<div className="h-6 w-48 bg-gray-200 rounded animate-pulse mb-4"></div>
 							<div className="h-4 w-64 bg-gray-200 rounded animate-pulse mb-8"></div>
 							<div className="flex justify-center gap-3 mb-8">
-								{[...Array(6)].map((_, i) => (
+								{[...Array(4)].map((_, i) => (
 									<div key={i} className="h-14 w-12 rounded-xl bg-gray-200 animate-pulse sm:h-16 sm:w-14"></div>
 								))}
 							</div>

@@ -37,7 +37,7 @@ const initialFormState = {
 };
 
 const generateVerificationCode = () =>
-	Math.floor(100000 + Math.random() * 900000).toString();
+	Math.floor(1000 + Math.random() * 9000).toString();
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -48,7 +48,7 @@ export default function SignupPage() {
 	const [formErrors, setFormErrors] = useState<Partial<typeof initialFormState>>({});
 	const [isLoading, setIsLoading] = useState(false);
 	const [generatedCode, setGeneratedCode] = useState('');
-	const [verificationDigits, setVerificationDigits] = useState<string[]>(Array(6).fill(''));
+	const [verificationDigits, setVerificationDigits] = useState<string[]>(Array(4).fill(''));
 	const [verificationError, setVerificationError] = useState('');
 	const [resendCooldown, setResendCooldown] = useState(0);
 	const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -227,7 +227,7 @@ export default function SignupPage() {
 	const handleVerificationPaste = (event: ClipboardEvent<HTMLInputElement>) => {
 		event.preventDefault();
 		const pasted = event.clipboardData.getData('text');
-		const digits = pasted.replace(/\D/g, '').slice(0, 6).split('');
+		const digits = pasted.replace(/\D/g, '').slice(0, 4).split('');
 		if (!digits.length) return;
 		setVerificationDigits((prev) => {
 			const next = [...prev];
@@ -244,8 +244,8 @@ export default function SignupPage() {
 	const handleVerificationSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		const code = verificationDigits.join('');
-		if (code.length < 6) {
-			setVerificationError('Enter the 6 digit code we just sent you.');
+		if (code.length < 4) {
+			setVerificationError('Enter the 4 digit code we just sent you.');
 			return;
 		}
 		if (code !== generatedCode) {
@@ -262,7 +262,7 @@ export default function SignupPage() {
 		if (resendCooldown > 0) return;
 		const code = generateVerificationCode();
 		setGeneratedCode(code);
-		setVerificationDigits(Array(6).fill(''));
+		setVerificationDigits(Array(4).fill(''));
 		setVerificationError('');
 		setResendCooldown(45);
 		verificationInputs.current[0]?.focus();
@@ -271,12 +271,12 @@ export default function SignupPage() {
 
 	const handleBackToDetails = () => {
 		setStep('details');
-		setVerificationDigits(Array(6).fill(''));
+		setVerificationDigits(Array(4).fill(''));
 		setVerificationError('');
 		setResendCooldown(0);
 	};
 
-	const verificationComplete = verificationDigits.join('').length === 6;
+	const verificationComplete = verificationDigits.join('').length === 4;
 
 	return (
 		<div className="min-h-screen flex flex-col bg-white text-black">
@@ -536,7 +536,7 @@ export default function SignupPage() {
 							</div>
 							<h1 className="text-2xl font-bold text-black tracking-tight">Verify email</h1>
 							<p className="text-sm text-zinc-500 mt-1 text-center">
-								We sent a 6-digit code to <span className="font-medium text-black">{formData.email}</span>
+								We sent a 4-digit code to <span className="font-medium text-black">{formData.email}</span>
 							</p>
 							<p className="mt-2 text-xs text-zinc-400">
 								Demo code: <span className="font-mono font-semibold text-black">{generatedCode || '------'}</span>
@@ -555,7 +555,7 @@ export default function SignupPage() {
 									{resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
 								</button>
 							</div>
-							<div className="grid grid-cols-6 gap-2">
+							<div className="grid grid-cols-4 gap-2">
 								{verificationDigits.map((digit, index) => (
 									<input
 										key={index}
