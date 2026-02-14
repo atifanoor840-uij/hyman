@@ -260,6 +260,9 @@ export default function Navbar({ variant = "sticky" }: { variant?: NavbarVariant
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
+          <Link href="/dashboard" className="px-4 py-2 text-sm font-semibold text-white border border-white/30 rounded-full hover:bg-white/10 transition-colors">
+            Dashboard
+          </Link>
           <Link href="/login" className="px-4 py-2 text-sm font-semibold text-white border border-white/30 rounded-full hover:bg-white/10 transition-colors">
             Sign in
           </Link>
@@ -292,9 +295,12 @@ export default function Navbar({ variant = "sticky" }: { variant?: NavbarVariant
                 <Link key={item.href} href={item.href} className="block px-4 py-2.5 text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-md" onClick={() => setMobileMenuOpen(false)}>{item.label}</Link>
               )
             ))}
-            <div className="pt-4 mt-4 border-t border-white/10 flex gap-2">
-              <Link href="/login" className="flex-1 py-2.5 text-sm font-semibold text-center text-white border border-white/30 rounded-full hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>Sign in</Link>
-              <Link href="/signup" className="flex-1 py-2.5 text-sm font-semibold text-center text-black bg-white rounded-full hover:bg-white/95" onClick={() => setMobileMenuOpen(false)}>Get funded</Link>
+            <div className="pt-4 mt-4 border-t border-white/10 flex flex-col gap-2">
+              <Link href="/dashboard" className="py-2.5 text-sm font-semibold text-center text-white border border-white/30 rounded-full hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
+              <div className="flex gap-2">
+                <Link href="/login" className="flex-1 py-2.5 text-sm font-semibold text-center text-white border border-white/30 rounded-full hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>Sign in</Link>
+                <Link href="/signup" className="flex-1 py-2.5 text-sm font-semibold text-center text-black bg-white rounded-full hover:bg-white/95" onClick={() => setMobileMenuOpen(false)}>Get funded</Link>
+              </div>
             </div>
           </nav>
         </div>
