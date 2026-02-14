@@ -4,7 +4,7 @@ import { ChangeEvent, FormEvent, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { User, Lock } from 'lucide-react';
+import { User, Lock, Eye, EyeOff } from 'lucide-react';
 import SuccessPopup from '../components/SuccessPopup';
 import Navbar from '../components/Navbar';
 import { login } from '../../lib/api/auth';
@@ -31,6 +31,7 @@ export default function LoginPage() {
 	const [toastMessage, setToastMessage] = useState<string | null>(null);
 	const [toastType, setToastType] = useState<'success' | 'error' | 'info' | 'loading'>('success');
 	const [toastTitle, setToastTitle] = useState<string | undefined>(undefined);
+	const [showPassword, setShowPassword] = useState(false);
 
 	const validateForm = () => {
 		const nextErrors: typeof formErrors = {};
@@ -256,7 +257,7 @@ export default function LoginPage() {
 								<Lock className="w-5 h-5 text-zinc-400 shrink-0" />
 								<input
 									id="password"
-									type="password"
+									type={showPassword ? 'text' : 'password'}
 									value={password}
 									onChange={handleFormChange('password')}
 									placeholder="Password"
@@ -264,6 +265,14 @@ export default function LoginPage() {
 										formErrors.password ? 'placeholder:text-red-400' : ''
 									}`}
 								/>
+								<button
+									type="button"
+									onClick={() => setShowPassword((p) => !p)}
+									className="text-zinc-400 hover:text-zinc-600 p-0.5"
+									aria-label={showPassword ? 'Hide password' : 'Show password'}
+								>
+									{showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+								</button>
 							</div>
 							{formErrors.password && (
 								<p className="text-xs text-red-500 mt-1">{formErrors.password}</p>

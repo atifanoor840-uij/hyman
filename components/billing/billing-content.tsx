@@ -137,9 +137,26 @@ export function BillingContent() {
                       <TableCell className="py-3">{getStatusBadge(order.status)}</TableCell>
                       <TableCell className="px-4 py-3">
                         {order.status === "Pending" ? (
-                          <Button variant="default" size="sm" className="h-7 text-xs px-3">
-                            Complete
-                          </Button>
+                          order.checkout_session_url ? (
+                            <Button
+                              variant="default"
+                              size="sm"
+                              className="h-7 text-xs px-3"
+                              asChild
+                            >
+                              <a
+                                href={order.checkout_session_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                Complete
+                              </a>
+                            </Button>
+                          ) : (
+                            <Button variant="default" size="sm" className="h-7 text-xs px-3" disabled>
+                              Complete
+                            </Button>
+                          )
                         ) : (
                           <Button variant="outline" size="sm" className="h-7 text-xs px-3">
                             Download
