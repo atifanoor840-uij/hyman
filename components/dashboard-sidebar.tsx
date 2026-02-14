@@ -32,15 +32,6 @@ const navigationGroups = [
     ]
   },
   {
-    title: "Trading",
-    items: [
-      { name: "Place Order", href: "/dashboard/place-order", icon: ChartBarIcon },
-      { name: "Stats", href: "/dashboard/stats", icon: PresentationChartLineIcon },
-      { name: "Economic Calendar", href: "/dashboard/economic-calendar", icon: CalendarDaysIcon },
-      { name: "Heat Map", href: "/dashboard/heatmap", icon: ChartBarSquareIcon },
-    ]
-  },
-  {
     title: "Account",
     items: [
       { name: "Profile", href: "/dashboard/profile", icon: UserIcon },
@@ -48,6 +39,15 @@ const navigationGroups = [
       { name: "Billing History", href: "/dashboard/billing-history", icon: CreditCardIcon },
       { name: "Reset Account", href: "/dashboard/reset-account", icon: ArrowPathIcon },
       { name: "Withdraw", href: "/withdraw", icon: CurrencyDollarIcon },
+    ]
+  },
+  {
+    title: "Market & Trading",
+    items: [
+      { name: "Place Order", href: "/dashboard/place-order", icon: ChartBarIcon },
+      { name: "Stats", href: "/dashboard/stats", icon: PresentationChartLineIcon },
+      { name: "Economic Calendar", href: "/dashboard/economic-calendar", icon: CalendarDaysIcon },
+      { name: "Heat Map", href: "/dashboard/heatmap", icon: ChartBarSquareIcon },
     ]
   },
   {

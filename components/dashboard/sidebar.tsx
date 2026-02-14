@@ -116,15 +116,15 @@ export function Sidebar() {
           pathname={pathname}
         />
         <NavSection
-          title="Market & Trading"
-          items={section2}
+          title="Account"
+          items={section3}
           hoveredItem={hoveredItem}
           setHoveredItem={setHoveredItem}
           pathname={pathname}
         />
         <NavSection
-          title="Account"
-          items={section3}
+          title="Market & Trading"
+          items={section2}
           hoveredItem={hoveredItem}
           setHoveredItem={setHoveredItem}
           pathname={pathname}
