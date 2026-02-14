@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { User, Lock } from 'lucide-react';
-import Toast from '../components/Toast';
+import SuccessPopup from '../components/SuccessPopup';
 import Navbar from '../components/Navbar';
 import { login } from '../../lib/api/auth';
 import { ApiClientError } from '../../lib/api/client';
@@ -359,16 +359,17 @@ export default function LoginPage() {
 				</p>
 			</div>
 
-			<Toast
-				message={toastMessage}
-				type={toastType}
-				title={toastTitle}
-				duration={toastType === 'success' ? 6000 : 5000}
-				onClose={() => {
-					setToastMessage(null);
-					setToastTitle(undefined);
-				}}
-			/>
+			{toastType === 'success' && toastMessage && (
+				<SuccessPopup
+					message={toastMessage}
+					title={toastTitle}
+					duration={5000}
+					onClose={() => {
+						setToastMessage(null);
+						setToastTitle(undefined);
+					}}
+				/>
+			)}
 					</main>
 		</div>
 	);

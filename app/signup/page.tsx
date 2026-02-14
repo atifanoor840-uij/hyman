@@ -12,7 +12,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { User, Lock, Mail, Eye, EyeOff } from 'lucide-react';
-import Toast from '../components/Toast';
+import SuccessPopup from '../components/SuccessPopup';
 import Navbar from '../components/Navbar';
 import CountrySelector from '../components/CountrySelector';
 import { signup } from '../../lib/api/auth';
@@ -253,6 +253,8 @@ export default function SignupPage() {
 			return;
 		}
 		setStep('complete');
+		setToastType('success');
+		setToastTitle('All Set!');
 		setToastMessage('Signup successful. You can now log in to your FxGenz dashboard.');
 	};
 
@@ -615,16 +617,17 @@ export default function SignupPage() {
 				</p>
 			</div>
 
-			<Toast
-				message={toastMessage}
-				type={toastType}
-				title={toastTitle}
-				duration={toastType === 'success' ? 6000 : 5000}
-				onClose={() => {
-					setToastMessage(null);
-					setToastTitle(undefined);
-				}}
-			/>
+			{toastType === 'success' && toastMessage && (
+				<SuccessPopup
+					message={toastMessage}
+					title={toastTitle}
+					duration={5000}
+					onClose={() => {
+						setToastMessage(null);
+						setToastTitle(undefined);
+					}}
+				/>
+			)}
 			</main>
 		</div>
 	);

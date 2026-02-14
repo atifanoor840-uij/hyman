@@ -21,6 +21,7 @@ import {
   OXAPAY_THANKS_MESSAGE,
 } from "@/lib/api/orders"
 import { ApiClientError } from "@/lib/api/client"
+import SuccessPopup from "@/app/components/SuccessPopup"
 
 const platformTypes = [
   { id: "mt4", label: "MT4", logo: "https://res.cloudinary.com/dufcjjaav/image/upload/v1769778769/images__1_-removebg-preview_pbysow.png" },
@@ -281,6 +282,7 @@ export function BuysContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [successPopup, setSuccessPopup] = useState<{ title: string; message: string } | null>(null)
 
   // Get dynamic data based on account type
   const accountSizes = accountSizesByType[activeAccountType] || accountSizesByType.alpha
@@ -360,9 +362,17 @@ export function BuysContent() {
       closeSidebar()
       const checkoutUrl = response?.checkout_session_url
       if (checkoutUrl && typeof checkoutUrl === "string" && checkoutUrl.trim() !== "") {
-        window.location.href = checkoutUrl
+        setSuccessPopup({
+          title: "Order Created!",
+          message: "Redirecting to checkout to complete your payment...",
+        })
+        setTimeout(() => { window.location.href = checkoutUrl }, 2500)
       } else {
-        router.push("/dashboard")
+        setSuccessPopup({
+          title: "Order Placed!",
+          message: "Your order has been placed successfully. Taking you to your dashboard...",
+        })
+        setTimeout(() => router.push("/dashboard"), 2500)
       }
     } catch (err) {
       const message = err instanceof ApiClientError ? err.message : "Failed to create order. Please try again."
@@ -790,6 +800,15 @@ export function BuysContent() {
           </div>
         </div>
       </div>
+
+      {successPopup && (
+        <SuccessPopup
+          message={successPopup.message}
+          title={successPopup.title}
+          duration={2500}
+          onClose={() => setSuccessPopup(null)}
+        />
+      )}
     </div>
   )
 }

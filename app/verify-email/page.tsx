@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Inter, Syne } from 'next/font/google';
 import { Mail, CheckCircle2, ArrowLeft, RefreshCw } from 'lucide-react';
-import Toast from '../components/Toast';
+import SuccessPopup from '../components/SuccessPopup';
 
 const brandFont = Syne({ subsets: ['latin'], weight: ['700', '800'] });
 const bodyFont = Inter({ subsets: ['latin'], weight: ['400', '500', '600'] });
@@ -413,16 +413,17 @@ function VerifyEmailContent() {
 				</section>
 			</div>
 
-			<Toast 
-				message={toastMessage} 
-				type={toastType}
-				title={toastTitle}
-				duration={toastType === 'success' ? 6000 : 5000}
-				onClose={() => {
-					setToastMessage(null);
-					setToastTitle(undefined);
-				}} 
-			/>
+			{toastType === 'success' && toastMessage && (
+				<SuccessPopup
+					message={toastMessage}
+					title={toastTitle}
+					duration={5000}
+					onClose={() => {
+						setToastMessage(null);
+						setToastTitle(undefined);
+					}}
+				/>
+			)}
 		</main>
 	);
 }
