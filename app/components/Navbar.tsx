@@ -159,7 +159,7 @@ export default function Navbar({ variant = "sticky" }: { variant?: NavbarVariant
 
             <div className="hidden items-center gap-2 lg:flex">
               <Link
-                href="/dashboard/buys"
+                href="/dashboard"
                 className="px-5 py-2.5 text-sm font-bold text-white bg-black rounded-lg border-2 border-black hover:bg-zinc-800 hover:border-zinc-800 transition-colors"
               >
                 Dashboard
@@ -204,7 +204,7 @@ export default function Navbar({ variant = "sticky" }: { variant?: NavbarVariant
                   )
                 ))}
                 <div className="pt-4 mt-4 border-t border-zinc-200">
-                  <Link href="/dashboard/buys" className="block w-full py-2.5 text-sm font-bold text-center text-white bg-black rounded-lg" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/dashboard" className="block w-full py-2.5 text-sm font-bold text-center text-white bg-black rounded-lg" onClick={() => setMobileMenuOpen(false)}>
                     Dashboard
                   </Link>
                 </div>
