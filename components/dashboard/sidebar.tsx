@@ -7,6 +7,7 @@ import {
   CalendarBlank,
   Newspaper,
   ChartLineUp,
+  DownloadSimple,
   Trophy,
   IdentificationCard,
   Wallet,
@@ -31,6 +32,7 @@ const section2 = [
   { icon: CalendarBlank, label: "Economic Calendar", href: "/dashboard/calendar" },
   { icon: Newspaper, label: "News", href: "/dashboard/news" },
   { icon: ChartLineUp, label: "Trading", href: "/dashboard/trading" },
+  { icon: DownloadSimple, label: "Downloads", href: "/dashboard/download" },
 ]
 
 const section3 = [
