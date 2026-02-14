@@ -10,7 +10,7 @@ import { MT5PlatformCard } from "@/components/dashboard/mt5-platform-card"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { ShoppingCart, BarChart3 } from "lucide-react"
+import { ShoppingCart, BarChart3, Sparkles } from "lucide-react"
 import { getMyAccount, type Order } from "@/lib/api/auth"
 import { getShowMyTradesStats } from "@/lib/api/showmytrades"
 import type { PerformanceResponse } from "@/lib/api/performance"
@@ -22,6 +22,7 @@ const ACCOUNT_API_ERROR_MESSAGE =
 export default function DashboardPage() {
   const [selectedOrderId, setSelectedOrderId] = useState<string>("")
   const [orders, setOrders] = useState<Order[]>([])
+  const [ordersLoading, setOrdersLoading] = useState<boolean>(true)
   const [stats, setStats] = useState<PerformanceResponse | null>(null)
   const [statsError, setStatsError] = useState<boolean>(false)
   const [statsLoading, setStatsLoading] = useState<boolean>(false)
@@ -29,17 +30,28 @@ export default function DashboardPage() {
 
   useEffect(() => {
     let cancelled = false
+    setOrdersLoading(true)
     setAccountApiError(false)
     getMyAccount()
-      .then((res) => { if (!cancelled) { setOrders(res.orders ?? []); setAccountApiError(false) } })
+      .then((res) => {
+        if (!cancelled) {
+          setOrders(res.orders ?? [])
+          setAccountApiError(false)
+        }
+      })
       .catch((e) => {
         if (cancelled) return
         setOrders([])
         const is401or404 = e instanceof ApiClientError && (e.status === 401 || e.status === 404)
         setAccountApiError(!!is401or404)
       })
+      .finally(() => {
+        if (!cancelled) setOrdersLoading(false)
+      })
     return () => { cancelled = true }
   }, [])
+
+  const hasActiveOrder = orders.some((o) => o.status !== "Pending")
 
   useEffect(() => {
     if (!selectedOrderId || orders.length === 0) {
@@ -67,9 +79,11 @@ export default function DashboardPage() {
     return () => { cancelled = true }
   }, [selectedOrderId, orders])
 
-  // Only blur when backend has not returned data; if we have stats, show cards clear
+  // Blur when: no active order, or stats loading/error
+  const noActiveOrderBlur = !ordersLoading && !hasActiveOrder
+  const statsBlur = (accountApiError || statsError || statsLoading) && !stats
   const blurClass =
-    (accountApiError || statsError || statsLoading) && !stats
+    noActiveOrderBlur || statsBlur
       ? "pointer-events-none select-none blur-sm"
       : ""
 
@@ -114,6 +128,34 @@ export default function DashboardPage() {
           {accountApiError && (
             <div className="rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-sm text-foreground">
               {ACCOUNT_API_ERROR_MESSAGE}
+            </div>
+          )}
+
+          {/* No active order overlay */}
+          {noActiveOrderBlur && (
+            <div className="fixed inset-0 z-40 flex items-center justify-center p-4 lg:left-64">
+              <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px]" aria-hidden />
+              <div className="relative z-10 mx-auto max-w-md rounded-2xl border border-border bg-card/95 p-8 shadow-xl shadow-black/10 backdrop-blur-sm animate-in fade-in zoom-in-95 duration-300">
+                <div className="flex flex-col items-center text-center gap-6">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+                    <Sparkles className="h-7 w-7 text-primary" />
+                  </div>
+                  <div className="space-y-2">
+                    <h2 className="text-xl font-bold tracking-tight text-foreground">
+                      Get Started Professionally
+                    </h2>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      You haven&apos;t bought any challenge yet. Buy a challenge and get started with your capital professionally with FxGenz.
+                    </p>
+                  </div>
+                  <Button asChild size="lg" className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg">
+                    <Link href="/buys">
+                      <ShoppingCart className="h-5 w-5" />
+                      Buy Challenge
+                    </Link>
+                  </Button>
+                </div>
+              </div>
             </div>
           )}
 
