@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { MagnifyingGlass, Export } from "@phosphor-icons/react"
+import { Search, Download } from "lucide-react"
 
 export type OrderRow = {
   id: string
@@ -38,11 +38,11 @@ export function OrdersTable({ title, orders, placeholder = "Search orders..." }:
           <CardTitle className="text-lg font-bold tracking-tight">{title}</CardTitle>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" className="gap-2">
-              <Export size={16} weight="duotone" />
+              <Download className="h-4 w-4" />
               Export
             </Button>
             <div className="relative w-full sm:w-48">
-              <MagnifyingGlass className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" size={16} weight="duotone" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input placeholder={placeholder} className="pl-9 h-9 text-sm" />
             </div>
           </div>

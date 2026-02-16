@@ -108,38 +108,45 @@ export default function AdminLayout({
     <div className="min-h-screen bg-white relative">
       
       <div className="relative w-full h-screen overflow-hidden">
-        {/* Mobile Sidebar Overlay */}
+        {/* Sidebar overlay: page stays in place, sidebar slides on top */}
         {sidebarOpen && (
           <div
-            className="fixed inset-0 bg-black/50 z-40 md:hidden"
-            onClick={() => setSidebarOpen(false)}
+            className="fixed inset-0 bg-black/40 z-40"
+            onClick={() => {
+              setSidebarOpen(false)
+              if (typeof window !== "undefined") {
+                localStorage.setItem("admin_sidebar_open", "false")
+              }
+            }}
+            aria-hidden="true"
           />
         )}
 
-        {/* Sidebar: hidden by default; only shown when toggle is clicked */}
+        {/* Sidebar: overlay only — does not shift page content */}
         <div
           className={`
             fixed inset-y-0 left-0 z-50
             transform transition-transform duration-300 ease-in-out
-            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+            ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
           `}
         >
-          <AdminSidebar 
+          <AdminSidebar
             onClose={() => {
               setSidebarOpen(false)
               if (typeof window !== "undefined") {
                 localStorage.setItem("admin_sidebar_open", "false")
               }
-            }} 
+            }}
             isCollapsed={isSidebarCollapsed}
             onToggleCollapse={handleToggleSidebarCollapse}
           />
         </div>
 
-        <main className={`admin-light-content overflow-y-auto overflow-x-auto w-full min-w-0 ${sidebarOpen ? (isSidebarCollapsed ? 'ml-10 w-[calc(100%-2.5rem)]' : 'ml-32 w-[calc(100%-8rem)]') : 'ml-0 w-full'} h-full transition-all duration-300`}>
-          {/* Top bar (exact copy of user dashboard header bar styles) */}
-          <div className="border-b border-gray-200 bg-white w-full sticky top-0 z-40">
-            <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-1 sm:py-2 flex items-center justify-between gap-2 sm:gap-3">
+        {/* Main content: always full width; never moves when sidebar opens */}
+        <main className="admin-light-content overflow-y-auto overflow-x-auto w-full min-w-0 ml-0 h-full">
+          {/* Top bar */}
+          <div className="border-b border-neutral-200 bg-white w-full sticky top-0 z-40 shadow-sm">
+            <div className="w-full px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
               {/* Left: Sidebar toggle (all screen sizes when admin) + Header Actions */}
               <div className="flex items-center gap-2 sm:gap-3">
                 {!hideSidebar && (
@@ -151,13 +158,13 @@ export default function AdminLayout({
                         localStorage.setItem("admin_sidebar_open", next ? "true" : "false")
                       }
                     }}
-                    className="p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                    className="p-2.5 rounded-xl text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
                     aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
                   >
                     {sidebarOpen ? (
-                      <XMarkIcon className="w-6 h-6" />
+                      <XMarkIcon className="w-5 h-5" />
                     ) : (
-                      <Bars3Icon className="w-6 h-6" />
+                      <Bars3Icon className="w-5 h-5" />
                     )}
                   </button>
                 )}
@@ -169,69 +176,59 @@ export default function AdminLayout({
                 )}
               </div>
 
-              {/* Center: Title/Sub (same typography as dashboard) */}
+              {/* Center: Title */}
               <div className="min-w-0 flex-1 text-center">
-                <h1 className="text-sm sm:text-lg md:text-xl font-bold text-gray-900 truncate">
-                  {title || "fxgenzy Admin"}
+                <h1 className="text-base sm:text-lg font-semibold text-neutral-900 truncate">
+                  {title || "FxGenz Admin"}
                 </h1>
                 {subtitle ? (
-                  <p className="text-xs text-gray-600 truncate hidden sm:block">{subtitle}</p>
+                  <p className="text-xs text-neutral-500 truncate hidden sm:block mt-0.5">{subtitle}</p>
                 ) : null}
               </div>
 
-              {/* Right: Admin badge + profile menu (styled like dashboard) */}
-              <div className="flex items-center gap-3 sm:gap-4 relative">
-                <button className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 hover:text-gray-900 hover:bg-gray-100 text-xs sm:text-sm">
+              {/* Right: Notifications + profile */}
+              <div className="flex items-center gap-2 sm:gap-3 relative">
+                <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-neutral-100 text-neutral-600 text-xs font-medium">
                   <BellIcon className="w-4 h-4" />
-                  <span className="font-semibold">Admin</span>
-                </button>
-
+                  Admin
+                </span>
                 {isAuthenticated && (
                   <>
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => setShowProfileMenu(v => !v)} aria-label="Open profile menu">
-                        <Avatar className="h-8 w-8">
+                    <button onClick={() => setShowProfileMenu((v) => !v)} aria-label="Open profile menu" className="rounded-full ring-2 ring-transparent hover:ring-neutral-200 transition-shadow">
+                      <Avatar className="h-9 w-9">
                           {profile.profile_picture_url ? (
                             <AvatarImage
                               src={profile.profile_picture_url}
                               alt={profile.full_name || profile.name || profile.username || "Admin"}
                             />
                           ) : null}
-                          <AvatarFallback>{initials}</AvatarFallback>
+                          <AvatarFallback className="bg-neutral-200 text-neutral-700 text-sm font-medium">{initials}</AvatarFallback>
                         </Avatar>
-                      </button>
-                    </div>
-
+                    </button>
                     {showProfileMenu && (
-                      <div className="absolute right-0 top-12 z-50 w-64 rounded-xl border border-gray-200 bg-white p-4 shadow-xl">
-                        <div className="flex items-center gap-3 mb-3">
-                          <Avatar className="h-8 w-8">
+                      <div className="absolute right-0 top-full mt-2 z-50 w-64 rounded-xl border border-neutral-200 bg-white p-4 shadow-lg">
+                        <div className="flex items-center gap-3 pb-3 border-b border-neutral-100">
+                          <Avatar className="h-10 w-10">
                             {profile.profile_picture_url ? (
                               <AvatarImage
                                 src={profile.profile_picture_url}
                                 alt={profile.full_name || profile.name || profile.username || "Admin"}
                               />
                             ) : null}
-                            <AvatarFallback>{initials}</AvatarFallback>
+                            <AvatarFallback className="bg-neutral-200 text-neutral-700 text-sm font-medium">{initials}</AvatarFallback>
                           </Avatar>
                           <div className="min-w-0">
-                            <div className="text-sm font-semibold text-gray-900 truncate">
+                            <div className="text-sm font-semibold text-neutral-900 truncate">
                               {profile.full_name || profile.name || profile.username || "Admin"}
                             </div>
-                            <div className="text-xs text-gray-600 truncate">{profile.email}</div>
+                            <div className="text-xs text-neutral-500 truncate">{profile.email}</div>
                           </div>
                         </div>
-                        <div className="flex justify-between gap-2">
-                          <a
-                            href="/admin/profile"
-                            className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-100 text-xs text-center"
-                          >
+                        <div className="flex gap-2 pt-3">
+                          <a href="/admin/profile" className="flex-1 px-3 py-2 rounded-lg border border-neutral-200 text-neutral-700 hover:bg-neutral-50 text-xs font-medium text-center transition-colors">
                             Profile
                           </a>
-                          <a
-                            href="/admin"
-                            className="flex-1 px-3 py-2 rounded-lg bg-slate-900 text-white text-xs font-semibold text-center hover:bg-slate-800"
-                          >
+                          <a href="/admin" className="flex-1 px-3 py-2 rounded-lg bg-neutral-900 text-white text-xs font-medium text-center hover:bg-neutral-800 transition-colors">
                             Dashboard
                           </a>
                         </div>
@@ -243,8 +240,8 @@ export default function AdminLayout({
             </div>
           </div>
 
-          {/* Content padding - overflow-x-auto allows horizontal scroll when sidebar narrows the area */}
-          <div className="w-full min-w-0 max-w-full overflow-x-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-10 bg-white min-h-[calc(100vh-56px)]">
+          {/* Content */}
+          <div className="w-full min-w-0 max-w-full overflow-x-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 bg-neutral-50 min-h-[calc(100vh-64px)]">
             {children}
           </div>
         </main>

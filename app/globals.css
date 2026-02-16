@@ -24,6 +24,18 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Dashboard: comfortable on mobile and all screens */
+@media (max-width: 1023px) {
+  .dashboard-main {
+    padding-left: 0.75rem;
+  }
+}
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Jumbotron display-2 style (e.g. "Meet money without borders" headline) */
@@ -61,6 +73,22 @@ body {
 
 .sidebar-scroll::-webkit-scrollbar-thumb {
   background-color: #3f3f46;
+  border-radius: 999px;
+}
+
+/* Admin sidebar scrollbar */
+.admin-sidebar-nav {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+.admin-sidebar-nav::-webkit-scrollbar {
+  width: 5px;
+}
+.admin-sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.admin-sidebar-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 999px;
 }
 
@@ -137,6 +165,19 @@ body {
 /* Optional staggered entrance delays */
 .delay-150 { transition-delay: 150ms; }
 .delay-300 { transition-delay: 300ms; }
+
+/* Crypto icons infinite scroll (Payouts) */
+@keyframes crypto-scroll {
+	0% { transform: translateX(0); }
+	100% { transform: translateX(-25%); }
+}
+.crypto-scroll-container {
+	mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+	-webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+.crypto-scroll-track {
+	animation: crypto-scroll 25s linear infinite;
+}
 
 /* Infinite scroll animation for Trade2Earn */
 @keyframes scroll {

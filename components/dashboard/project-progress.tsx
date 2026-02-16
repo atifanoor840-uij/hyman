@@ -11,7 +11,7 @@ export interface ProjectProgressProps {
 export function ProjectProgress(props: ProjectProgressProps) {
   const { stats = null } = props
   const winRateFromApi = stats?.statistics?.advanced_statistics?.win_rate ?? null
-  const targetProgress = winRateFromApi != null ? Math.round(winRateFromApi) : 68
+  const targetProgress = winRateFromApi != null ? Math.round(winRateFromApi) : 0
   const [progress, setProgress] = useState(winRateFromApi != null ? winRateFromApi : 0)
 
   useEffect(() => {
@@ -19,13 +19,8 @@ export function ProjectProgress(props: ProjectProgressProps) {
       setProgress(Math.round(winRateFromApi))
       return
     }
-    const timer = setTimeout(() => {
-      if (progress < targetProgress) {
-        setProgress((prev) => Math.min(prev + 1, targetProgress))
-      }
-    }, 30)
-    return () => clearTimeout(timer)
-  }, [winRateFromApi, progress, targetProgress])
+    setProgress(0)
+  }, [winRateFromApi])
 
   const circumference = 2 * Math.PI * 90
   const strokeDashoffset = circumference - (progress / 100) * circumference

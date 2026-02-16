@@ -1,19 +1,43 @@
 "use client"
 
+import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { ShieldCheck, Upload, CheckCircle2, Clock, FileText } from "lucide-react"
+import { ShieldCheck, ExternalLink, Loader2, CheckCircle2, Clock } from "lucide-react"
+import { createKycSession } from "@/lib/api/kyc"
+import { ApiClientError } from "@/lib/api/client"
 
-const steps = [
-  { id: "id", label: "Identity document", desc: "Passport, national ID, or driver's licence", status: "verified" as const },
-  { id: "address", label: "Proof of address", desc: "Utility bill or bank statement (within 3 months)", status: "verified" as const },
-  { id: "selfie", label: "Selfie with document", desc: "Photo holding your ID next to your face", status: "pending" as const },
-]
+export interface KycContentProps {
+  /** From eligibility: already submitted or current status */
+  hasKycSubmission?: boolean
+  kycStatus?: string | null
+}
 
-export function KycContent() {
+export function KycContent({ hasKycSubmission, kycStatus }: KycContentProps) {
+  const [starting, setStarting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleStartVerification = async () => {
+    setError(null)
+    setStarting(true)
+    try {
+      const res = await createKycSession()
+      if (res?.url) {
+        window.location.href = res.url
+        return
+      }
+      setError("No verification URL received.")
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "Failed to start verification. Please try again.")
+    } finally {
+      setStarting(false)
+    }
+  }
+
+  const statusLabel = kycStatus || (hasKycSubmission ? "In progress" : "Not started")
+  const isComplete = kycStatus?.toLowerCase() === "approved" || kycStatus?.toLowerCase() === "verified"
+
   return (
     <div className="space-y-6 animate-fade-in">
       <Card className="p-6 border-primary/20 bg-primary/5">
@@ -27,73 +51,51 @@ export function KycContent() {
               <p className="text-sm text-muted-foreground">Identity verification</p>
             </div>
           </div>
-          <Badge className="w-fit bg-amber-500/10 text-amber-600 border-amber-500/20 text-sm font-medium">
-            <Clock className="w-3.5 h-3.5 mr-1" />
-            In progress
+          <Badge
+            className={`w-fit text-sm font-medium ${
+              isComplete
+                ? "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20"
+                : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+            }`}
+          >
+            {isComplete ? (
+              <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
+            ) : (
+              <Clock className="w-3.5 h-3.5 mr-1" />
+            )}
+            {statusLabel}
           </Badge>
         </div>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {!isComplete && (
         <Card className="p-6">
-          <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-            <FileText className="w-5 h-5 text-primary" />
-            Verification steps
-          </h3>
-          <ul className="space-y-4">
-            {steps.map((s) => (
-              <li key={s.id} className="flex items-start gap-4">
-                <div
-                  className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
-                    s.status === "verified" ? "bg-black/10 dark:bg-white/10" : "bg-muted"
-                  }`}
-                >
-                  {s.status === "verified" ? (
-                    <CheckCircle2 className="w-5 h-5 text-black dark:text-foreground" />
-                  ) : (
-                    <Clock className="w-5 h-5 text-muted-foreground" />
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-foreground">{s.label}</p>
-                  <p className="text-sm text-muted-foreground mt-0.5">{s.desc}</p>
-                  {s.status === "pending" && (
-                    <Button size="sm" variant="outline" className="mt-2">
-                      <Upload className="w-4 h-4 mr-1.5" />
-                      Upload
-                    </Button>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
+          <p className="text-sm text-muted-foreground mb-4">
+            Complete identity verification at our secure partner. You will be redirected to the verification flow; we will update your status via webhook when done.
+          </p>
+          {error && (
+            <p className="text-sm text-destructive mb-4">{error}</p>
+          )}
+          <Button
+            type="button"
+            onClick={handleStartVerification}
+            disabled={starting}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 min-h-[44px] touch-manipulation"
+          >
+            {starting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Starting…
+              </>
+            ) : (
+              <>
+                <ExternalLink className="h-4 w-4" />
+                Start verification
+              </>
+            )}
+          </Button>
         </Card>
-
-        <Card className="p-6">
-          <h3 className="font-semibold text-foreground mb-4">Submit document</h3>
-          <form className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="kyc-type">Document type</Label>
-              <select
-                id="kyc-type"
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <option>Passport</option>
-                <option>National ID</option>
-                <option>Driver&apos;s licence</option>
-              </select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="kyc-file">Upload file</Label>
-              <Input id="kyc-file" type="file" accept="image/*,.pdf" className="cursor-pointer" />
-            </div>
-            <Button type="submit" className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90">
-              <Upload className="w-4 h-4 mr-2" />
-              Submit for verification
-            </Button>
-          </form>
-        </Card>
-      </div>
+      )}
     </div>
   )
 }

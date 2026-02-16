@@ -1,18 +1,18 @@
 "use client"
 
 import {
-  ChartLineUp,
+  LineChart,
   Users,
   ShoppingBag,
-  IdentificationCard,
+  ShieldCheck,
   Handshake,
   Ticket,
   Wallet,
-  PaperPlaneTilt,
-  Gear,
-  SignOut,
-  CaretDown,
-} from "@phosphor-icons/react"
+  Send,
+  Settings,
+  LogOut,
+  ChevronDown,
+} from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 import Link from "next/link"
@@ -34,18 +34,18 @@ const orderSubItems = [
 ]
 
 const mainItems = [
-  { icon: ChartLineUp, label: "Overview", href: "/adminportal" },
+  { icon: LineChart, label: "Overview", href: "/adminportal" },
   { icon: Users, label: "Users", href: "/adminportal/users" },
-  { icon: IdentificationCard, label: "KYC", href: "/adminportal/kyc" },
+  { icon: ShieldCheck, label: "KYC", href: "/adminportal/kyc" },
   { icon: Handshake, label: "Referral", href: "/adminportal/referral" },
   { icon: Ticket, label: "Coupon Codes", href: "/adminportal/coupons" },
   { icon: Wallet, label: "Withdrawal", href: "/adminportal/withdrawal" },
-  { icon: PaperPlaneTilt, label: "Email Sender", href: "/adminportal/email" },
+  { icon: Send, label: "Email Sender", href: "/adminportal/email" },
 ]
 
 const generalItems = [
-  { icon: Gear, label: "Settings", href: "/adminportal/settings" },
-  { icon: SignOut, label: "Exit Admin", href: "/dashboard" },
+  { icon: Settings, label: "Settings", href: "/adminportal/settings" },
+  { icon: LogOut, label: "Exit Admin", href: "/dashboard" },
 ]
 
 function NavSection({
@@ -56,7 +56,7 @@ function NavSection({
   pathname,
 }: {
   title: string
-  items: { icon: typeof ChartLineUp; label: string; href: string }[]
+  items: { icon: typeof LineChart; label: string; href: string }[]
   hoveredItem: string | null
   setHoveredItem: (v: string | null) => void
   pathname: string
@@ -83,7 +83,7 @@ function NavSection({
                 hoveredItem === item.label && !isActive && "translate-x-0.5",
               )}
             >
-              <item.icon className={cn(iconClass, "size-[18px]")} size={18} weight="duotone" />
+              <item.icon className={cn(iconClass, "h-[18px] w-[18px]")} />
               <span>{item.label}</span>
             </Link>
           )
@@ -133,7 +133,7 @@ export function AdminSidebar() {
               hoveredItem === "Overview" && pathname !== "/adminportal" && "translate-x-0.5",
             )}
           >
-            <ChartLineUp className={cn(iconClass, "size-[18px]")} size={18} weight="duotone" />
+            <LineChart className={cn(iconClass, "h-[18px] w-[18px]")} />
             <span>Overview</span>
           </Link>
           <Link
@@ -148,7 +148,7 @@ export function AdminSidebar() {
               hoveredItem === "Users" && pathname !== "/adminportal/users" && "translate-x-0.5",
             )}
           >
-            <Users className={cn(iconClass, "size-[18px]")} size={18} weight="duotone" />
+            <Users className={cn(iconClass, "h-[18px] w-[18px]")} />
             <span>Users</span>
           </Link>
 
@@ -168,11 +168,10 @@ export function AdminSidebar() {
                 hoveredItem === "Orders" && !pathname.startsWith("/adminportal/orders") && "translate-x-0.5",
               )}
             >
-              <ShoppingBag className={cn(iconClass, "size-[18px]")} size={18} weight="duotone" />
+              <ShoppingBag className={cn(iconClass, "h-[18px] w-[18px]")} />
               <span>Orders</span>
-              <CaretDown
-                className={cn("ml-auto size-4 shrink-0 transition-transform", isOrdersOpen && "rotate-180")}
-                weight="bold"
+              <ChevronDown
+                className={cn("ml-auto h-4 w-4 shrink-0 transition-transform", isOrdersOpen && "rotate-180")}
               />
             </CollapsibleTrigger>
             <CollapsibleContent>
@@ -214,7 +213,7 @@ export function AdminSidebar() {
                   hoveredItem === item.label && !isActive && "translate-x-0.5",
                 )}
               >
-                <item.icon className={cn(iconClass, "size-[18px]")} size={18} weight="duotone" />
+                <item.icon className={cn(iconClass, "h-[18px] w-[18px]")} />
                 <span>{item.label}</span>
               </Link>
             )

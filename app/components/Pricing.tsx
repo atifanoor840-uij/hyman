@@ -15,24 +15,65 @@ import {
 import SaleTimer from "./SaleTimer";
 
 const FEATURES = [
-	{ label: "All limited links", included: true },
-	{ label: "Own analytics platform", included: true },
-	{ label: "Chat support", included: true },
-	{ label: "Optimize hashtags", included: false },
-	{ label: "Unlimited users", included: false },
+	{ label: "Hedging and News Trading is Allowed", included: true },
+	{ label: "Layering not allowed", included: false },
+	{ label: "Minimum trading days 5", included: true },
+	{ label: "Daily drawdown 5%", included: true },
+	{ label: "Maximum drawdown 8%", included: true },
+	{ label: "Leverage 1:100", included: true },
 ];
 
-const PLANS = [
-	{ id: "intro", name: "Intro", priceMonthly: 19, priceYearly: 15 },
-	{ id: "base", name: "Base", priceMonthly: 39, priceYearly: 31 },
-	{ id: "popular", name: "Popular", priceMonthly: 99, priceYearly: 79 },
-	{ id: "enterprise", name: "Enterprise", priceMonthly: 119, priceYearly: 95 },
-];
+const TIERS = [
+	{
+		id: "Alpha",
+		label: "Alpha (Single Step)",
+		accounts: [
+			{ size: 4000, price: 45, discountedPrice: 31 },
+			{ size: 10000, price: 85, discountedPrice: 60 },
+			{ size: 20000, price: 160, discountedPrice: 112 },
+			{ size: 50000, price: 375, discountedPrice: 260 },
+			{ size: 100000, price: 750, discountedPrice: 520 },
+		],
+	},
+	{
+		id: "Beta",
+		label: "Beta (2 Step)",
+		accounts: [
+			{ size: 4000, price: 39, discountedPrice: 27 },
+			{ size: 10000, price: 75, discountedPrice: 52 },
+			{ size: 20000, price: 140, discountedPrice: 98 },
+			{ size: 50000, price: 325, discountedPrice: 225 },
+			{ size: 100000, price: 650, discountedPrice: 450 },
+		],
+	},
+	{
+		id: "Sigma",
+		label: "Sigma (Instant)",
+		accounts: [
+			{ size: 5000, price: 55, discountedPrice: 38 },
+			{ size: 10000, price: 85, discountedPrice: 60 },
+			{ size: 25000, price: 210, discountedPrice: 147 },
+			{ size: 50000, price: 375, discountedPrice: 260 },
+			{ size: 100000, price: 750, discountedPrice: 520 },
+		],
+	},
+] as const;
 
 export default function Pricing() {
-	const [billing, setBilling] = useState<'monthly' | 'yearly'>('monthly');
-	const [selectedPlan, setSelectedPlan] = useState<string>("intro");
+	const [selectedTierId, setSelectedTierId] = useState<string>("Alpha");
+	const [selectedAccount, setSelectedAccount] = useState<number>(4000);
 	const [acceptPrize, setAcceptPrize] = useState(true);
+
+	const currentTier = TIERS.find((t) => t.id === selectedTierId) ?? TIERS[0];
+	const accounts = currentTier.accounts;
+
+	const formatSizeK = (size: number) => (size >= 1000 ? `${size / 1000}K` : String(size));
+
+	const handleTierChange = (tierId: string) => {
+		setSelectedTierId(tierId);
+		const tier = TIERS.find((t) => t.id === tierId);
+		if (tier) setSelectedAccount(tier.accounts[0].size);
+	};
 
 	return (
 		<section id="pricing" className="bg-white py-16 md:py-24">
@@ -47,47 +88,51 @@ export default function Pricing() {
 					</p>
 				</header>
 
-				{/* Main card - two columns: left = toggle + features, right = vertical plan cards side by side */}
+				{/* Main card - two columns: compact left (toggle + features), larger cards right */}
 				<div className="rounded-2xl bg-zinc-100 border border-zinc-200 p-6 md:p-8">
-					<div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-8 lg:gap-10 items-start">
-						{/* Left column: toggle + feature list */}
-						<div className="space-y-6">
-							{/* Monthly / Yearly toggle */}
-							<div className="inline-flex rounded-full bg-zinc-200 p-1">
-								<button
-									onClick={() => setBilling('monthly')}
-									className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-										billing === 'monthly'
-											? 'bg-black text-white'
-											: 'text-zinc-500 hover:text-zinc-700'
-									}`}
-								>
-									Monthly
-								</button>
-								<button
-									onClick={() => setBilling('yearly')}
-									className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-										billing === 'yearly'
-											? 'bg-black text-white'
-											: 'text-zinc-500 hover:text-zinc-700'
-									}`}
-								>
-									Yearly
-								</button>
+					<div className="grid grid-cols-1 lg:grid-cols-[minmax(180px,200px)_1fr] gap-6 lg:gap-6 items-start">
+						{/* Left column: Alpha/Beta top, Sigma below + feature list */}
+						<div className="space-y-4 lg:max-w-[200px]">
+							{/* Alpha & Beta on top row */}
+							<div className="flex gap-1.5">
+								{TIERS.filter((t) => t.id !== "Sigma").map((tier) => (
+									<button
+										key={tier.id}
+										onClick={() => handleTierChange(tier.id)}
+										className={`flex-1 rounded-lg px-2.5 py-2 text-xs font-semibold transition-all ${
+											selectedTierId === tier.id
+												? "bg-[#0b0b0f] text-white shadow-md"
+												: "bg-white border border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50"
+										}`}
+									>
+										{tier.id}
+									</button>
+								))}
 							</div>
+							{/* Sigma below */}
+							<button
+								onClick={() => handleTierChange("Sigma")}
+								className={`w-full rounded-lg px-2.5 py-2 text-xs font-semibold transition-all ${
+									selectedTierId === "Sigma"
+										? "bg-[#0b0b0f] text-white shadow-md"
+										: "bg-white border border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50"
+								}`}
+							>
+								Sigma (Instant)
+							</button>
 
-							{/* Feature list */}
-							<ul className="space-y-4">
+							{/* Feature list - compact */}
+							<ul className="space-y-2.5">
 								{FEATURES.map(({ label, included }) => (
-									<li key={label} className="flex items-center justify-between gap-4 min-w-[200px]">
-										<span className="text-sm font-medium text-slate-800">{label}</span>
+									<li key={label} className="flex items-center justify-between gap-2">
+										<span className="text-xs font-medium text-slate-800 leading-tight">{label}</span>
 										{included ? (
-											<span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-black text-white">
-												<Check className="h-3.5 w-3.5" strokeWidth={3} />
+											<span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-black text-white">
+												<Check className="h-2.5 w-2.5" strokeWidth={3} />
 											</span>
 										) : (
-											<span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-zinc-300 text-zinc-500">
-												<Minus className="h-3.5 w-3.5" strokeWidth={2.5} />
+											<span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-300 text-zinc-500">
+												<Minus className="h-2.5 w-2.5" strokeWidth={2.5} />
 											</span>
 										)}
 									</li>
@@ -95,44 +140,53 @@ export default function Pricing() {
 							</ul>
 						</div>
 
-						{/* Right column: vertical plan cards side by side (each card is a vertical column) */}
-						<div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full min-h-[280px]">
-							{PLANS.map((plan) => {
-								const price = billing === 'monthly' ? plan.priceMonthly : plan.priceYearly;
-								const isSelected = selectedPlan === plan.id;
+						{/* Right column: Professional pricing cards */}
+						<div className="grid grid-cols-2 md:grid-cols-5 gap-4 lg:gap-5 w-full min-h-[240px]">
+							{accounts.map((account) => {
+								const displayPrice = acceptPrize ? account.discountedPrice : account.price;
+								const isSelected = selectedAccount === account.size;
+								const sizeLabel = formatSizeK(account.size);
 								return (
 									<button
-										key={plan.id}
+										key={account.size}
 										type="button"
-										onClick={() => setSelectedPlan(plan.id)}
-										className={`flex flex-col rounded-xl px-4 py-5 text-left transition-all min-h-[240px] ${
+										onClick={() => setSelectedAccount(account.size)}
+										className={`flex flex-col rounded-xl p-5 md:p-6 text-left transition-all duration-200 min-h-[220px] md:min-h-[240px] ${
 											isSelected
-												? 'bg-black text-white shadow-lg'
-												: 'bg-white border border-zinc-200 text-slate-800 hover:border-zinc-300 hover:shadow-sm'
+												? "bg-black text-white shadow-lg"
+												: "bg-white border border-zinc-200 text-slate-800 hover:border-zinc-300 hover:shadow-md"
 										}`}
 									>
-										<div className="flex flex-col flex-1">
+										{/* Selection indicator - top left */}
+										<div className="mb-4">
 											{isSelected ? (
-												<span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/20 text-white mb-3">
-													<Check className="h-3.5 w-3.5" strokeWidth={3} />
+												<span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/20">
+													<Check className="h-3.5 w-3.5" strokeWidth={2.5} />
 												</span>
 											) : (
-												<span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-zinc-300 mb-3" />
+												<span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-zinc-300" />
 											)}
-											<p className={`font-semibold text-base ${isSelected ? 'text-white' : 'text-slate-900'}`}>
-												{plan.name}
+										</div>
+										{/* Title */}
+										<p className={`font-semibold text-base md:text-lg ${isSelected ? "text-white" : "text-slate-900"}`}>
+											${sizeLabel} Account
+										</p>
+										{/* Save % */}
+										{acceptPrize && (
+											<p className={`text-xs mt-0.5 ${isSelected ? "text-white/80" : "text-rose-500"}`}>
+												Save {Math.round((1 - account.discountedPrice / account.price) * 100)}%
 											</p>
-											<p className={`text-xs mt-0.5 ${isSelected ? 'text-white/80' : 'text-rose-500'}`}>
-												Save 20%
-											</p>
-											<div className="mt-auto pt-6">
-												<span className={`text-2xl font-bold ${isSelected ? 'text-white' : 'text-slate-900'}`}>
-													${price}
+										)}
+										{/* Price */}
+										<div className="mt-auto pt-5">
+											{acceptPrize && (
+												<span className={`text-sm line-through block ${isSelected ? "text-white/60" : "text-slate-400"}`}>
+													${account.price}
 												</span>
-												<span className={`text-sm block ${isSelected ? 'text-white/80' : 'text-slate-500'}`}>
-													/Month
-												</span>
-											</div>
+											)}
+											<span className={`text-2xl md:text-3xl font-bold block ${isSelected ? "text-white" : "text-slate-900"}`}>
+												${displayPrice}
+											</span>
 										</div>
 									</button>
 								);
@@ -160,7 +214,7 @@ export default function Pricing() {
 							</button>
 							<div>
 								<p className="text-sm font-medium text-slate-800">Accept your prize.</p>
-								<p className="text-xs text-rose-500">Save 20%</p>
+								<p className="text-xs text-rose-500">Discounted pricing</p>
 							</div>
 						</div>
 						<Link

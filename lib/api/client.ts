@@ -1,5 +1,9 @@
+import { clearAuth } from '@/lib/auth-utils';
+
 // Use environment variable or fallback to production URL
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://genz-34f298f57a04.herokuapp.com';
+
+const LOGIN_PATH = '/login';
 
 export interface ApiError {
 	message: string;
@@ -47,6 +51,11 @@ async function handleResponse<T>(response: Response): Promise<T> {
 	}
 
 	if (!response.ok) {
+		// When access token is expired or invalid (401), clear auth and redirect to login
+		if (response.status === 401 && typeof window !== 'undefined') {
+			clearAuth();
+			window.location.href = LOGIN_PATH;
+		}
 		const errors = data?.errors ?? data?.detail ?? undefined;
 		let message = data?.message ?? data?.error ?? `Request failed with status ${response.status}`;
 		// 422 validation: surface detail or flatten errors so user sees what's wrong

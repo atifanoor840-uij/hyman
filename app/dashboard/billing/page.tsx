@@ -9,8 +9,8 @@ export default function BillingPage() {
       <div className="hidden lg:block">
         <Sidebar />
       </div>
-      <main className="min-w-0 flex-1 flex flex-col overflow-x-hidden p-3 md:p-4 lg:p-5 lg:ml-64 font-sans">
-        <div className="mx-auto w-full max-w-[1200px] flex flex-col flex-1">
+      <main className="min-w-0 flex-1 flex flex-col overflow-x-hidden p-3 sm:p-4 md:p-5 lg:ml-64 font-sans pb-8">
+        <div className="mx-auto w-full max-w-[1200px] flex flex-col flex-1 min-w-0">
           <Header
             title="Billing"
             description="View your account orders, payment history, and billing information."

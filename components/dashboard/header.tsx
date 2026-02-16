@@ -43,7 +43,7 @@ export function Header({ title, description, actions, useOrderIdSelect, selected
   const [orders, setOrders] = useState<Order[]>([])
   const [isLoadingOrders, setIsLoadingOrders] = useState(false)
   const [internalOrderId, setInternalOrderId] = useState<string>("")
-  const [userData, setUserData] = useState<{ name: string; email: string } | null>(null)
+  const [userData, setUserData] = useState<{ name: string; username: string; email: string; image?: string | null } | null>(null)
   const [credentialsOpen, setCredentialsOpen] = useState(false)
   const [copiedField, setCopiedField] = useState<string | null>(null)
   const isControlled = controlledOrderId !== undefined
@@ -51,16 +51,38 @@ export function Header({ title, description, actions, useOrderIdSelect, selected
   const setSelectedOrderId = isControlled && onOrderIdChange ? onOrderIdChange : (id: string) => { setInternalOrderId(id) }
   const ordersSource = ordersProp ?? orders
 
-  useEffect(() => {
-    const user = getUser()
-    if (user) {
-      setUserData({
-        name: user.name || user.username || 'User',
-        email: user.email || ''
+  // Prefer API user so we never show stale/fake stored data
+  const fetchCurrentUser = () => {
+    getMyAccount()
+      .then((res) => {
+        if (res?.user) {
+          setUserData({
+            name: res.user.name || res.user.username || 'User',
+            username: res.user.username || res.user.email || res.user.name || 'User',
+            email: res.user.email || '',
+            image: null,
+          })
+        }
       })
-    }
+      .catch(() => {
+        const user = getUser()
+        if (user) {
+          const username = (user as { username?: string }).username ?? user.email ?? ''
+          setUserData({
+            name: user.name || username || 'User',
+            username: username || user.name || 'User',
+            email: user.email || '',
+            image: (user as { image?: string | null }).image ?? (user as { avatar?: string }).avatar ?? (user as { profile_picture_url?: string }).profile_picture_url ?? null,
+          })
+        }
+      })
+  }
+
+  useEffect(() => {
     if (useOrderIdSelect && ordersProp === undefined) {
       fetchOrders()
+    } else {
+      fetchCurrentUser()
     }
   }, [useOrderIdSelect, ordersProp])
 
@@ -71,7 +93,14 @@ export function Header({ title, description, actions, useOrderIdSelect, selected
       const response = await getMyAccount()
       const all = response.orders || []
       setOrders(all)
-      // Only show non-pending: Completed, Stage 2, Live, etc.
+      if (response?.user) {
+        setUserData({
+          name: response.user.name || response.user.username || 'User',
+          username: response.user.username || response.user.email || response.user.name || 'User',
+          email: response.user.email || '',
+          image: null,
+        })
+      }
       const selectable = all.filter((o) => o.status !== "Pending")
       if (selectable.length > 0) {
         setSelectedOrderId(selectable[0].order_id)
@@ -79,6 +108,16 @@ export function Header({ title, description, actions, useOrderIdSelect, selected
     } catch (error) {
       console.error('Failed to fetch orders:', error)
       setOrders([])
+      const user = getUser()
+      if (user) {
+        const username = (user as { username?: string }).username ?? user.email ?? ''
+        setUserData({
+          name: user.name || username || 'User',
+          username: username || user.name || 'User',
+          email: user.email || '',
+          image: (user as { image?: string | null }).image ?? (user as { avatar?: string }).avatar ?? (user as { profile_picture_url?: string }).profile_picture_url ?? null,
+        })
+      }
     } finally {
       setIsLoadingOrders(false)
     }
@@ -147,23 +186,23 @@ export function Header({ title, description, actions, useOrderIdSelect, selected
   }
 
   return (
-    <header className="space-y-3 md:space-y-4 animate-slide-in-up">
+    <header className="space-y-3 md:space-y-4 animate-slide-in-up w-full min-w-0">
       <div className="relative -mx-3 -mt-3 overflow-hidden border-b border-border bg-primary py-2.5 md:-mx-4 md:-mt-4 lg:-mx-5 lg:-mt-5">
-        <div className="flex w-max animate-ticker whitespace-nowrap text-sm font-semibold text-primary-foreground">
+        <div className="flex w-max animate-ticker whitespace-nowrap text-xs sm:text-sm font-semibold text-primary-foreground">
           <span>{saleTickerText.repeat(6)}</span>
           <span aria-hidden="true">{saleTickerText.repeat(6)}</span>
         </div>
       </div>
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 flex-1">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 min-w-0">
+        <div className="flex items-center gap-2 flex-1 min-w-0 w-full sm:max-w-md">
           <MobileNav />
 
-          <div className="relative flex flex-1 max-w-md items-center gap-2">
+          <div className="relative flex flex-1 min-w-0 items-center gap-2">
             {useOrderIdSelect ? (
               <>
                 <div className="relative flex-1 min-w-0">
                   <Select value={selectedOrderId} onValueChange={setSelectedOrderId}>
-                    <SelectTrigger className="w-full h-9 text-sm font-bold bg-card border-border transition-all duration-300 focus:shadow-lg focus:shadow-primary/10 [&_[data-slot=select-value]]:font-bold" disabled={isLoadingOrders}>
+                    <SelectTrigger className="w-full min-h-[44px] sm:h-9 h-11 text-sm font-bold bg-card border-border transition-all duration-300 focus:shadow-lg focus:shadow-primary/10 [&_[data-slot=select-value]]:font-bold" disabled={isLoadingOrders}>
                       {isLoadingOrders ? (
                         <div className="flex items-center gap-2">
                           <Loader2 className="w-4 h-4 animate-spin" />
@@ -197,7 +236,7 @@ export function Header({ title, description, actions, useOrderIdSelect, selected
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="h-9 text-sm border-border gap-1.5 shrink-0"
+                  className="min-h-[44px] sm:h-9 h-11 px-3 text-sm border-border gap-1.5 shrink-0 touch-manipulation"
                   disabled={!selectedOrderId || !hasCredentials}
                   onClick={() => setCredentialsOpen(true)}
                 >
@@ -354,46 +393,50 @@ export function Header({ title, description, actions, useOrderIdSelect, selected
           </DialogContent>
         </Dialog>
 
-        <div className="flex items-center gap-1.5 md:gap-2">
+        <div className="flex items-center gap-1.5 md:gap-2 shrink-0 flex-shrink-0">
           <Button
             variant="ghost"
             size="icon"
-            className="relative hover:bg-secondary transition-all duration-300 hover:scale-110 h-8 w-8"
+            className="relative hover:bg-secondary transition-all duration-300 hover:scale-110 min-h-[44px] min-w-[44px] h-11 w-11 sm:h-8 sm:w-8 touch-manipulation"
           >
-            <Mail className="w-4 h-4" />
+            <Mail className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className="relative hover:bg-secondary transition-all duration-300 hover:scale-110 h-8 w-8"
+            className="relative hover:bg-secondary transition-all duration-300 hover:scale-110 min-h-[44px] min-w-[44px] h-11 w-11 sm:h-8 sm:w-8 touch-manipulation"
           >
-            <Bell className="w-4 h-4" />
+            <Bell className="h-4 w-4" />
             <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-destructive rounded-full animate-pulse" />
           </Button>
 
-          <div className="flex items-center gap-2 pl-2 md:pl-3 border-l border-border">
-            <Avatar className="w-7 h-7 md:w-8 md:h-8 ring-2 ring-primary/20 transition-all duration-300 hover:ring-primary/40">
-              <AvatarImage src="/profile.jpg" alt={userData?.name || 'User'} />
-              <AvatarFallback className="text-xs">{getUserInitials()}</AvatarFallback>
+          <div className="flex items-center gap-2 pl-2 md:pl-3 border-l border-border min-w-0">
+            <Avatar className="w-9 h-9 md:w-9 md:h-9 ring-2 ring-primary/20 transition-all duration-300 hover:ring-primary/40 shrink-0">
+              <AvatarImage src={userData?.image ?? undefined} alt={userData?.username || userData?.name || 'User'} />
+              <AvatarFallback className="text-xs bg-primary/10 text-primary font-semibold">{getUserInitials()}</AvatarFallback>
             </Avatar>
-            <div className="text-xs hidden sm:block">
-              <p className="font-semibold text-foreground">{userData?.name || 'User'}</p>
-              <p className="text-muted-foreground text-[10px]">{userData?.email || ''}</p>
+            <div className="min-w-0 flex flex-col justify-center">
+              <p className="text-sm font-semibold text-foreground truncate" title={userData?.username || userData?.name || 'User'}>
+                {userData?.username || userData?.name || 'User'}
+              </p>
+              <p className="text-xs text-muted-foreground truncate hidden sm:block" title={userData?.email || ''}>
+                {userData?.email || ''}
+              </p>
             </div>
           </div>
         </div>
       </div>
 
       {title != null && (
-        <div className="pl-10 md:pl-16 lg:pl-20">
-          <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground mb-1">{title}</h1>
+        <div className="px-0 pl-0 sm:pl-10 md:pl-16 lg:pl-20 min-w-0">
+          <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground mb-1 break-words">{title}</h1>
           {description != null && (
-            <p className="text-xs md:text-sm text-muted-foreground">{description}</p>
+            <p className="text-xs md:text-sm text-muted-foreground break-words">{description}</p>
           )}
         </div>
       )}
 
-      {actions && <div className="flex flex-col sm:flex-row gap-2">{actions}</div>}
+      {actions && <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto flex-wrap">{actions}</div>}
     </header>
   )
 }

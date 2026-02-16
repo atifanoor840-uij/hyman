@@ -4,27 +4,21 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useState, useMemo } from "react"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
-import { Play, Check } from "lucide-react"
 import type { PerformanceResponse } from "@/lib/api/performance"
 
-// Deterministic placeholder when no API stats (avoids hydration mismatch: no Math.random or locale dates)
-function getPlaceholderChartData(metric: string) {
+// Zero chart data when no API stats (no fake/placeholder data)
+function getZeroChartData() {
   const count = 24
   const data = []
-  const baseEquity = 38154
   for (let i = 0; i < count; i++) {
     const hour = 8 + (i % 12)
     const time = hour > 12 ? `${hour - 12}:00 PM` : `${hour}:00 AM`
-    const t = i / count
-    const equity = baseEquity + (t * 2000 - 500)
-    const profit = t * 1500 - 200
-    const drawDown = -t * 2
     data.push({
       time,
-      value: metric === "Equity" ? equity : metric === "Profit" ? profit : drawDown,
-      equity,
-      profit,
-      drawDown,
+      value: 0,
+      equity: 0,
+      profit: 0,
+      drawDown: 0,
       date: "—",
       fullTime: time,
     })
@@ -62,11 +56,12 @@ export function ProjectAnalytics(props: ProjectAnalyticsProps) {
   const { stats = null } = props
   const [selectedMetric, setSelectedMetric] = useState<(typeof metricOptions)[number]>("Equity")
   const chartDataFromApi = useMemo(() => buildChartDataFromStats(stats ?? null, selectedMetric), [stats, selectedMetric])
-  const chartData = chartDataFromApi ?? getPlaceholderChartData(selectedMetric)
-  const currentBalance = stats?.account_info?.equity ?? stats?.account_info?.balance ?? chartData[chartData.length - 1]?.equity ?? 38154
+  const chartData = chartDataFromApi ?? getZeroChartData()
+  const currentBalance = stats?.account_info?.equity ?? stats?.account_info?.balance ?? chartData[chartData.length - 1]?.equity ?? 0
   const values = chartData.map((d) => d.value)
-  const maxValue = Math.max(...values)
-  const minValue = Math.min(...values)
+  const maxValue = values.length ? Math.max(...values) : 0
+  const minValue = values.length ? Math.min(...values) : 0
+  const allZero = maxValue === 0 && minValue === 0
 
   const formatTooltipValue = (val: number) => {
     if (selectedMetric === "Draw Down") return `${val.toFixed(2)}%`
@@ -121,34 +116,19 @@ export function ProjectAnalytics(props: ProjectAnalyticsProps) {
       </div>
 
       {/* Header Section */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-            <span className="text-sm font-bold text-primary">B</span>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">{selectedMetric}</p>
-            <p className="text-lg font-bold text-foreground">
-              {selectedMetric === "Draw Down"
-                ? `${chartData[chartData.length - 1]?.value?.toFixed(2) ?? 0}%`
-                : selectedMetric === "Profit"
-                  ? `$${(chartData[chartData.length - 1]?.profit ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`
-                  : `$${currentBalance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`}
-            </p>
-          </div>
+      <div className="flex items-center gap-2 mb-3">
+        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+          <span className="text-sm font-bold text-primary">B</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <Button variant="ghost" size="icon" className="h-7 w-7">
-            <Play className="w-3.5 h-3.5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-7 w-7">
-            <Check className="w-3.5 h-3.5" />
-          </Button>
-          <select className="px-2.5 py-1 text-xs bg-muted border border-border rounded-md text-foreground">
-            <option>7 Days</option>
-            <option>30 Days</option>
-            <option>90 Days</option>
-          </select>
+        <div>
+          <p className="text-xs text-muted-foreground">{selectedMetric}</p>
+          <p className="text-lg font-bold text-foreground">
+            {selectedMetric === "Draw Down"
+              ? `${chartData[chartData.length - 1]?.value?.toFixed(2) ?? 0}%`
+              : selectedMetric === "Profit"
+                ? `$${(chartData[chartData.length - 1]?.profit ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`
+                : `$${currentBalance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`}
+          </p>
         </div>
       </div>
 
@@ -179,8 +159,8 @@ export function ProjectAnalytics(props: ProjectAnalyticsProps) {
               className="text-muted-foreground"
               domain={
                 selectedMetric === "Draw Down"
-                  ? [Math.floor(minValue) - 1, 1]
-                  : [Math.floor(minValue / 1000) * 1000, Math.ceil(maxValue / 1000) * 1000]
+                  ? allZero ? [-1, 1] : [Math.floor(minValue) - 1, 1]
+                  : allZero ? [0, 1000] : [Math.floor(minValue / 1000) * 1000, Math.ceil(maxValue / 1000) * 1000]
               }
               tickFormatter={formatYAxis}
               width={50}

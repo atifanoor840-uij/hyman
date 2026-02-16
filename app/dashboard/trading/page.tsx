@@ -12,8 +12,8 @@ export default function TradingPage() {
         <Sidebar />
       </div>
 
-      <main className="min-w-0 flex-1 flex flex-col overflow-x-hidden p-3 md:p-4 lg:p-5 lg:ml-64">
-        <div className="mx-auto w-full max-w-[1200px] flex flex-col flex-1">
+      <main className="min-w-0 flex-1 flex flex-col overflow-x-hidden p-3 sm:p-4 md:p-5 lg:ml-64 pb-8">
+        <div className="mx-auto w-full max-w-[1200px] flex flex-col flex-1 min-w-0">
           <Header
             title="Active Trades"
             description="Monitor and manage your open trading positions and pending orders."

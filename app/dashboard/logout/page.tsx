@@ -13,7 +13,8 @@ export default function LogoutPage() {
     <div className="flex min-h-screen bg-background">
       <Sidebar />
 
-      <main className="flex-1 p-4 lg:p-6 lg:ml-64">
+      <main className="min-w-0 flex-1 flex flex-col overflow-x-hidden p-3 sm:p-4 md:p-5 lg:ml-64 pb-8">
+        <div className="mx-auto w-full max-w-[1200px] flex flex-col flex-1 min-w-0">
         <Header />
 
         <div className="flex items-center justify-center min-h-[calc(100vh-100px)]">
@@ -36,6 +37,7 @@ export default function LogoutPage() {
               </Button>
             </div>
           </Card>
+        </div>
         </div>
       </main>
     </div>

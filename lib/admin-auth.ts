@@ -46,6 +46,16 @@ export function getAdminAuthState(): AdminAuthState {
   }
 }
 
+export function setAdminAuthState(token: string, user: AdminUser): void {
+  if (typeof window === "undefined") return
+  try {
+    localStorage.setItem(ADMIN_TOKEN_KEY, token)
+    localStorage.setItem(ADMIN_USER_KEY, JSON.stringify(user))
+  } catch (e) {
+    console.error("Failed to store admin auth", e)
+  }
+}
+
 export function clearAdminAuthState(): void {
   if (typeof window === "undefined") return
   localStorage.removeItem(ADMIN_TOKEN_KEY)

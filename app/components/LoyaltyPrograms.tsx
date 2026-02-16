@@ -1,12 +1,22 @@
 "use client";
 
 import Image from "next/image";
+import {
+	TrendingUp,
+	Coins,
+	CreditCard,
+	Layers,
+	Percent,
+	Trophy,
+	Zap,
+	Flame,
+} from "lucide-react";
 
 const loyaltyCards = [
 	{
 		title: "Trade",
 		desc: "Each trade, profitable or losing, yields tokens based on your activity. All phases participate.",
-		icon: <ChartIcon />,
+		icon: <TrendingUp className="h-6 w-6" />,
 		art: <ChartArt />,
 		imageSrc: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766055812/topup_200x110_cruheq.png",
 		bullets: ["Lots‑based accrual", "Eligible in all phases", "Daily streak bonus"],
@@ -14,7 +24,7 @@ const loyaltyCards = [
 	{
 		title: "Earn",
 		desc: "Tokens stack up in your wallet as you progress. Higher activity unlocks higher tiers.",
-		icon: <CoinsIcon />,
+		icon: <Coins className="h-6 w-6" />,
 		art: <CoinsArt />,
 		imageSrc: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766055814/earning_200x110_qsewzt.png",
 		bullets: ["Tiered multipliers", "Weekly snapshots", "Wallet overview"],
@@ -22,7 +32,7 @@ const loyaltyCards = [
 	{
 		title: "Spend",
 		desc: "Redeem tokens for free challenges, fee rebates, and payout boosts. Choose your perks.",
-		icon: <CardIcon />,
+		icon: <CreditCard className="h-6 w-6" />,
 		art: <CardArt />,
 		imageSrc: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766055813/spend_200x110_qdyodk.png",
 		bullets: ["Free tryouts", "Fee discounts", "Payout boosts"],
@@ -30,7 +40,7 @@ const loyaltyCards = [
 	{
 		title: "Tier Up",
 		desc: "Progress through multiple tiers as your trading activity increases. Higher tiers unlock enhanced multipliers.",
-		icon: <TierIcon />,
+		icon: <Layers className="h-6 w-6" />,
 		art: <TierArt />,
 		imageSrc: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766055812/topup_200x110_cruheq.png",
 		bullets: ["5 progressive tiers", "Tiered multipliers", "Auto upgrades"],
@@ -38,7 +48,7 @@ const loyaltyCards = [
 	{
 		title: "Fee Rebates",
 		desc: "Reduce your trading costs by redeeming tokens for fee discounts. The more you trade, the more you save.",
-		icon: <RebateIcon />,
+		icon: <Percent className="h-6 w-6" />,
 		art: <RebateArt />,
 		imageSrc: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766055812/fee_rebate_200x110_vohvxe.png",
 		bullets: ["Up to 50% reduction", "Flexible redemption", "Stack discounts"],
@@ -46,7 +56,7 @@ const loyaltyCards = [
 	{
 		title: "Free Challenges",
 		desc: "Use accumulated tokens to access evaluation challenges at no cost. Start new trading evaluations.",
-		icon: <ChallengeIcon />,
+		icon: <Trophy className="h-6 w-6" />,
 		art: <ChallengeArt />,
 		imageSrc: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766055812/free_challenge_200x110_x2pizn.png",
 		bullets: ["100% token-funded", "All challenge types", "No expiration"],
@@ -54,7 +64,7 @@ const loyaltyCards = [
 	{
 		title: "Payout Boost",
 		desc: "Apply token-based boosts per program terms. Payout eligibility and processing depend on program rules — see terms for details.",
-		icon: <BoostIcon />,
+		icon: <Zap className="h-6 w-6" />,
 		art: <BoostArt />,
 		imageSrc: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766055812/topup_200x110_cruheq.png",
 		bullets: ["Increased splits", "Faster processing", "Temporary boosts"],
@@ -62,7 +72,7 @@ const loyaltyCards = [
 	{
 		title: "Daily Streak",
 		desc: "Maintain consistent trading activity to unlock daily streak multipliers. Build momentum and maximize earnings.",
-		icon: <StreakIcon />,
+		icon: <Flame className="h-6 w-6" />,
 		art: <StreakArt />,
 		imageSrc: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766055814/earning_200x110_qsewzt.png",
 		bullets: ["Progressive bonuses", "Weekly resets", "Multiplier caps"],
@@ -75,24 +85,9 @@ export default function LoyaltyPrograms() {
 			<div className="absolute inset-0 -z-10 bg-slate-50/80" />
 
 			<div className="mx-auto max-w-7xl px-6 py-18 md:px-10 md:py-24">
-				<header className="mb-8 flex items-end justify-between gap-4">
-					<div>
-						<div className="inline-flex items-center gap-2 rounded-full border border-[#0b0b0f]/10 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[#2e2e35]/70">
-							Trade2Earn
-						</div>
-						<h2 className="font-sans mt-3 text-3xl font-bold tracking-tight text-[#0b0b0f] md:text-5xl">
-							Discover our Loyalty Program
-						</h2>
-						<p className="mt-3 max-w-3xl text-[#2e2e35]/75">
-							Get rewarded for consistent trading—regardless of daily outcome. Earn tokens and unlock perks.
-						</p>
-						<div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
-							<span className="rounded-full border border-[#0b0b0f]/10 bg-white px-3 py-1">Tokenized perks</span>
-							<span className="rounded-full border border-[#0b0b0f]/10 bg-white px-3 py-1">Fee rebates</span>
-							<span className="rounded-full border border-[#0b0b0f]/10 bg-white px-3 py-1">Free challenges</span>
-						</div>
-					</div>
-					<div className="hidden gap-3 sm:flex">
+				{/* Top row: right-aligned buttons */}
+				<div className="mb-6 flex justify-end">
+					<div className="flex gap-3">
 						<a href="#pricing" className="inline-flex items-center justify-center rounded-full bg-[#0ea5e9] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0891d1]">
 							Start evaluation →
 						</a>
@@ -100,7 +95,7 @@ export default function LoyaltyPrograms() {
 							Learn more
 						</a>
 					</div>
-				</header>
+				</div>
 
 				{/* Infinite Scrolling Carousel */}
 				<div className="relative overflow-hidden">
@@ -184,78 +179,6 @@ function LoyaltyCard({
 				</ul>
 			)}
 		</article>
-	);
-}
-
-// Icons
-function ChartIcon() {
-	return (
-		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-			<path d="M3 3v18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-			<path d="M7 16l4-4 4 4 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-		</svg>
-	);
-}
-
-function CoinsIcon() {
-	return (
-		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-			<circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-			<circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="1.5" />
-			<path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-		</svg>
-	);
-}
-
-function CardIcon() {
-	return (
-		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-			<rect x="3" y="6" width="18" height="12" rx="2" stroke="currentColor" strokeWidth="2" />
-			<path d="M3 10h18M7 14h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-		</svg>
-	);
-}
-
-function TierIcon() {
-	return (
-		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-			<path d="M3 21h18M5 21V7l6-4 6 4v14M9 21V12h6v9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-		</svg>
-	);
-}
-
-function RebateIcon() {
-	return (
-		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-			<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-		</svg>
-	);
-}
-
-function ChallengeIcon() {
-	return (
-		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-			<path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-			<path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-			<circle cx="12" cy="12" r="2" fill="currentColor" />
-		</svg>
-	);
-}
-
-function BoostIcon() {
-	return (
-		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-			<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-		</svg>
-	);
-}
-
-function StreakIcon() {
-	return (
-		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-			<path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-			<circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
-		</svg>
 	);
 }
 

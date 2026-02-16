@@ -45,14 +45,14 @@ export function ChallengeStatsCards(props: ChallengeStatsCardsProps) {
   const profitTarget = deposits * 0.08
 
   const topRow: StatCard[] = [
-    { label: "Balance", value: stats ? formatUsd(balance) : "$105,694.90", icon: Banknote, highlighted: true },
-    { label: "Equity", value: stats ? formatUsd(equity) : "$93,210.32", icon: TrendingUp },
-    { label: "Win Rate", value: stats ? `${winRate}%` : "40%", icon: Trophy },
+    { label: "Balance", value: formatUsd(balance), icon: Banknote, highlighted: true },
+    { label: "Equity", value: formatUsd(equity), icon: TrendingUp },
+    { label: "Win Rate", value: `${winRate}%`, icon: Trophy },
   ]
   const bottomRow: StatCard[] = [
-    { label: "TWR %", value: stats ? formatPct(twrPercent) : "80.49%", icon: ArrowUpRight, teal: true },
-    { label: "Peak Balance", value: stats ? formatUsd(peakBalance) : "$105,694.90", icon: ArrowDownRight, teal: true },
-    { label: "Profit Target", value: stats ? formatUsd(profitTarget) : "$3,897.98", icon: Target, teal: true },
+    { label: "TWR %", value: formatPct(twrPercent), icon: ArrowUpRight, teal: true },
+    { label: "Peak Balance", value: formatUsd(peakBalance), icon: ArrowDownRight, teal: true },
+    { label: "Profit Target", value: formatUsd(profitTarget), icon: Target, teal: true },
   ]
 
   return (

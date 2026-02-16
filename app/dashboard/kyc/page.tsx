@@ -5,20 +5,22 @@ import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
 import { KycContent } from "@/components/kyc/kyc-content"
 import { Footer } from "@/components/footer"
-import { getKycEligibility } from "@/lib/api/kyc"
+import { getKycEligibility, type KycEligibilityResponse } from "@/lib/api/kyc"
 import { ApiClientError } from "@/lib/api/client"
 import { Loader2, ShieldAlert } from "lucide-react"
 
 export default function KycPage() {
   const [eligible, setEligible] = useState<boolean | null>(null)
   const [message, setMessage] = useState<string>("")
+  const [eligibilityData, setEligibilityData] = useState<KycEligibilityResponse | null>(null)
 
   useEffect(() => {
     let cancelled = false
     getKycEligibility()
       .then((res) => {
         if (cancelled) return
-        setEligible(res.eligible)
+        setEligible(res.is_eligible)
+        setEligibilityData(res)
         setMessage(res.message || "You must have a live order or instant account with credentials delivered to submit KYC documents.")
       })
       .catch((err) => {
@@ -44,9 +46,9 @@ export default function KycPage() {
         <Sidebar />
       </div>
 
-      <main className="min-w-0 flex-1 flex flex-col overflow-x-hidden p-3 md:p-4 lg:p-5 lg:ml-64 relative">
+      <main className="min-w-0 flex-1 flex flex-col overflow-x-hidden p-3 sm:p-4 md:p-5 lg:ml-64 relative pb-8">
         <div
-          className={`mx-auto w-full max-w-[1200px] flex flex-col flex-1 transition-all duration-300 ${
+          className={`mx-auto w-full max-w-[1200px] flex flex-col flex-1 min-w-0 transition-all duration-300 ${
             showBlur ? "pointer-events-none select-none blur-sm" : ""
           }`}
         >
@@ -62,7 +64,10 @@ export default function KycPage() {
                 <p className="text-sm text-muted-foreground">Checking eligibility…</p>
               </div>
             ) : (
-              <KycContent />
+              <KycContent
+                hasKycSubmission={eligibilityData?.has_kyc_submission}
+                kycStatus={eligibilityData?.kyc_status ?? undefined}
+              />
             )}
           </div>
 

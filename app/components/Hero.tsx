@@ -23,8 +23,8 @@ export default function Hero() {
 				<div className="mt-16 flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
 					{/* Left: heading, subheading, payment icons below subheading */}
 					<div className="flex flex-1 flex-col items-start justify-center text-left pl-4 md:pl-8 lg:pl-12">
-						<h1 className="whitespace-nowrap font-sans text-5xl font-bold leading-tight tracking-tight text-white md:text-6xl lg:text-7xl">
-							<span className="text-[#7270ff]">Fx Genz</span> — Trader Development Programs
+						<h1 className="whitespace-nowrap font-sans text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">
+							No Mercy. Just Profit.
 						</h1>
 						<p className="mt-4 font-sans text-lg leading-relaxed text-white/90 md:text-xl">
 							Trader development programs and skills assessments.

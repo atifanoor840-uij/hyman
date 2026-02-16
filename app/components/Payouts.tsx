@@ -1,4 +1,37 @@
-import Image from "next/image";
+import {
+	SiBitcoin,
+	SiEthereum,
+	SiTether,
+	SiCircle,
+	SiLitecoin,
+	SiSolana,
+	SiDogecoin,
+	SiVisa,
+	SiMastercard,
+	SiChase,
+	SiBankofamerica,
+	SiWellsfargo,
+} from "react-icons/si";
+
+const BANK_ICONS = [
+	{ Icon: SiVisa, name: "Visa", color: "#1a1f71" },
+	{ Icon: SiMastercard, name: "Mastercard", color: "#eb001b" },
+	{ Icon: SiChase, name: "Chase", color: "#117aca" },
+	{ Icon: SiBankofamerica, name: "Bank of America", color: "#ed1c24" },
+	{ Icon: SiWellsfargo, name: "Wells Fargo", color: "#d71e28" },
+];
+
+const CRYPTO_ICONS = [
+	{ Icon: SiBitcoin, name: "Bitcoin", color: "#f7931a" },
+	{ Icon: SiEthereum, name: "Ethereum", color: "#627eea" },
+	{ Icon: SiTether, name: "USDT", color: "#26a17b" },
+	{ Icon: SiCircle, name: "USDC", color: "#2775ca" },
+	{ Icon: SiLitecoin, name: "Litecoin", color: "#345d9d" },
+	{ Icon: SiSolana, name: "Solana", color: "#14f195" },
+	{ Icon: SiDogecoin, name: "Dogecoin", color: "#c2a633" },
+];
+
+const CRYPTO_LOOP = [...CRYPTO_ICONS, ...CRYPTO_ICONS, ...CRYPTO_ICONS, ...CRYPTO_ICONS];
 
 export default function Payouts() {
 	return (
@@ -55,15 +88,17 @@ export default function Payouts() {
 					</Card>
 
 					<Card>
-						<div className="flex h-44 items-center justify-center overflow-hidden rounded-2xl border border-[#e6e9ef] bg-white">
-							<div className="relative h-full w-full">
-								<Image
-									src="https://res.cloudinary.com/dejjuhzug/image/upload/v1766055811/blue_crypto_coin_diamond_quik55.png"
-									alt="Crypto payouts"
-									fill
-									className="object-contain"
-									sizes="(max-width: 768px) 260px, 320px"
-								/>
+						<div className="crypto-scroll-container flex h-44 items-center overflow-hidden rounded-2xl border border-[#e6e9ef] bg-white">
+							<div className="crypto-scroll-track flex items-center gap-4 px-4">
+								{CRYPTO_LOOP.map(({ Icon, name, color }, i) => (
+									<div
+										key={`${name}-${i}`}
+										className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-[#e6e9ef] bg-slate-50/50 p-2.5"
+										title={name}
+									>
+										<Icon className="h-8 w-8" style={{ color }} aria-hidden />
+									</div>
+								))}
 							</div>
 						</div>
 						<h3 className="font-sans mt-5 text-lg font-semibold tracking-tight text-[#0b0b0f]">Cryptocurrency Payouts</h3>
@@ -87,16 +122,16 @@ export default function Payouts() {
 					</Card>
 
 					<Card>
-						<div className="flex h-44 items-center justify-center overflow-hidden rounded-2xl border border-[#e6e9ef] bg-white">
-							<div className="relative h-full w-full">
-								<Image
-									src="https://res.cloudinary.com/dejjuhzug/image/upload/v1766055813/currency_cards_200x110_gpjgyz.png"
-									alt="Traditional banking rails"
-									fill
-									className="object-contain"
-									sizes="(max-width: 768px) 260px, 320px"
-								/>
-							</div>
+						<div className="flex h-44 flex-wrap items-center justify-center gap-4 overflow-hidden rounded-2xl border border-[#e6e9ef] bg-white p-6">
+							{BANK_ICONS.map(({ Icon, name, color }) => (
+								<div
+									key={name}
+									className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-[#e6e9ef] bg-slate-50/50 p-2.5 transition hover:scale-105"
+									title={name}
+								>
+									<Icon className="h-8 w-8" style={{ color }} aria-hidden />
+								</div>
+							))}
 						</div>
 						<h3 className="font-sans mt-5 text-lg font-semibold tracking-tight text-[#0b0b0f]">Traditional Banking Rails</h3>
 						<p className="mt-2 text-sm leading-relaxed text-[#2e2e35]/75">
