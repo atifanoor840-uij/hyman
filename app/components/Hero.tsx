@@ -1,9 +1,16 @@
 import Link from "next/link";
+import Image from "next/image";
 import { SiVisa, SiMastercard, SiStripe, SiLinux, SiApple, SiAndroid } from "react-icons/si";
 import { TbBrandWindows } from "react-icons/tb";
 import HeroStats from "./HeroStats";
 import Hyperspeed from "./Hyperspeed";
 import Navbar from "./Navbar";
+
+const PRESS_LOGOS = [
+  { name: "Yahoo", href: "https://www.yahoo.com", src: "https://instantfunding.com/nitropack_static/ZUQLaUVQlrAfuQGzHfcxriUNmmesdFBw/assets/images/optimized/rev-f7e5ffc/instantfunding.com/wp-content/uploads/2024/06/yahoo-vector.svg" },
+  { name: "Business Insider", href: "https://www.businessinsider.com", src: "https://instantfunding.com/nitropack_static/ZUQLaUVQlrAfuQGzHfcxriUNmmesdFBw/assets/images/optimized/rev-f7e5ffc/instantfunding.com/wp-content/uploads/2024/06/business-insider-vector.svg" },
+  { name: "Bloomberg", href: "https://www.bloomberg.com", src: "https://instantfunding.com/nitropack_static/ZUQLaUVQlrAfuQGzHfcxriUNmmesdFBw/assets/images/optimized/rev-f7e5ffc/instantfunding.com/wp-content/uploads/2024/06/bloomberg-vector.svg" },
+];
 export default function Hero() {
 	return (
 		<section className="relative overflow-hidden">
@@ -72,15 +79,11 @@ export default function Hero() {
 						{/* Press logos: vertical stack, larger size */}
 						<div className="flex flex-col gap-2 border-t border-white/10 pt-4">
 							<div className="flex flex-col gap-3 opacity-90">
-								<a href="https://www.yahoo.com" target="_blank" rel="noopener noreferrer" className="flex h-12 items-center hover:opacity-100" aria-label="Yahoo">
-									<img src="https://instantfunding.com/nitropack_static/ZUQLaUVQlrAfuQGzHfcxriUNmmesdFBw/assets/images/optimized/rev-f7e5ffc/instantfunding.com/wp-content/uploads/2024/06/yahoo-vector.svg" alt="Yahoo" className="h-12 w-auto object-contain" />
-								</a>
-								<a href="https://www.businessinsider.com" target="_blank" rel="noopener noreferrer" className="flex h-12 items-center hover:opacity-100" aria-label="Business Insider">
-									<img src="https://instantfunding.com/nitropack_static/ZUQLaUVQlrAfuQGzHfcxriUNmmesdFBw/assets/images/optimized/rev-f7e5ffc/instantfunding.com/wp-content/uploads/2024/06/business-insider-vector.svg" alt="Business Insider" className="h-12 w-auto object-contain" />
-								</a>
-								<a href="https://www.bloomberg.com" target="_blank" rel="noopener noreferrer" className="flex h-12 items-center hover:opacity-100" aria-label="Bloomberg">
-									<img src="https://instantfunding.com/nitropack_static/ZUQLaUVQlrAfuQGzHfcxriUNmmesdFBw/assets/images/optimized/rev-f7e5ffc/instantfunding.com/wp-content/uploads/2024/06/bloomberg-vector.svg" alt="Bloomberg" className="h-12 w-auto object-contain" />
-								</a>
+								{PRESS_LOGOS.map((logo) => (
+									<a key={logo.name} href={logo.href} target="_blank" rel="noopener noreferrer" className="flex h-12 items-center hover:opacity-100" aria-label={logo.name}>
+										<Image src={logo.src} alt={logo.name} width={120} height={48} className="h-12 w-auto object-contain" unoptimized />
+									</a>
+								))}
 							</div>
 						</div>
 					</div>

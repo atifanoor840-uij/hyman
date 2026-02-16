@@ -5,14 +5,16 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "res.cloudinary.com",
+        pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "instantfunding.com",
+        pathname: "/**",
       },
     ],
-    // Load images directly from Cloudinary in the browser (no server-side optimization).
-    // Fixes images not loading when deployed on Heroku.
+    // Load images directly in the browser (no server-side optimization).
+    // Fixes images not loading when deployed (e.g. Heroku).
     unoptimized: true,
   },
 };
