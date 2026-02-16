@@ -7,9 +7,9 @@ import Hyperspeed from "./Hyperspeed";
 import Navbar from "./Navbar";
 
 const PRESS_LOGOS = [
-  { name: "Yahoo", href: "https://www.yahoo.com", src: "https://instantfunding.com/nitropack_static/ZUQLaUVQlrAfuQGzHfcxriUNmmesdFBw/assets/images/optimized/rev-f7e5ffc/instantfunding.com/wp-content/uploads/2024/06/yahoo-vector.svg" },
-  { name: "Business Insider", href: "https://www.businessinsider.com", src: "https://instantfunding.com/nitropack_static/ZUQLaUVQlrAfuQGzHfcxriUNmmesdFBw/assets/images/optimized/rev-f7e5ffc/instantfunding.com/wp-content/uploads/2024/06/business-insider-vector.svg" },
-  { name: "Bloomberg", href: "https://www.bloomberg.com", src: "https://instantfunding.com/nitropack_static/ZUQLaUVQlrAfuQGzHfcxriUNmmesdFBw/assets/images/optimized/rev-f7e5ffc/instantfunding.com/wp-content/uploads/2024/06/bloomberg-vector.svg" },
+  { name: "Yahoo", href: "https://www.yahoo.com", src: "/images/press/yahoo.svg" },
+  { name: "Business Insider", href: "https://www.businessinsider.com", src: "/images/press/business-insider.svg" },
+  { name: "Bloomberg", href: "https://www.bloomberg.com", src: "/images/press/bloomberg.svg" },
 ];
 export default function Hero() {
 	return (
