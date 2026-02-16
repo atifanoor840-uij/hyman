@@ -84,9 +84,17 @@ function formatDate(value: string | number | null | undefined): string {
   }
 }
 
-/** Get created time from order using common backend field names. */
+/** Get created time from order using common backend field names. Returns only string, number, null, or undefined for type safety. */
 function getOrderCreated(o: OrderRow): string | number | null | undefined {
-  return (o as Record<string, unknown>).created_at ?? (o as Record<string, unknown>).created ?? (o as Record<string, unknown>).order_created_at ?? (o as Record<string, unknown>).date ?? (o as Record<string, unknown>).timestamp ?? o.created_at
+  const raw = (o as Record<string, unknown>).created_at
+    ?? (o as Record<string, unknown>).created
+    ?? (o as Record<string, unknown>).order_created_at
+    ?? (o as Record<string, unknown>).date
+    ?? (o as Record<string, unknown>).timestamp
+    ?? o.created_at
+  if (raw === null || raw === undefined) return raw
+  if (typeof raw === "string" || typeof raw === "number") return raw
+  return undefined
 }
 
 function Field({ label, value, mono }: { label: string; value: ReactNode; mono?: boolean }) {
@@ -264,37 +272,37 @@ function ViewOrderDialog({
               {order.is_active != null && (
                 <div>
                   <span className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block mb-1">Active</span>
-                  <BoolBadge value={order.is_active} />
+                  <BoolBadge value={order.is_active === true} />
                 </div>
               )}
               {order.completed != null && (
                 <div>
                   <span className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block mb-1">Completed</span>
-                  <BoolBadge value={order.completed} />
+                  <BoolBadge value={order.completed === true} />
                 </div>
               )}
               {order.passed != null && (
                 <div>
                   <span className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block mb-1">Passed</span>
-                  <BoolBadge value={order.passed} />
+                  <BoolBadge value={order.passed === true} />
                 </div>
               )}
               {order.failed != null && (
                 <div>
                   <span className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block mb-1">Failed</span>
-                  <BoolBadge value={order.failed} />
+                  <BoolBadge value={order.failed === true} />
                 </div>
               )}
               {order.is_stage2 != null && (
                 <div>
                   <span className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block mb-1">Stage 2</span>
-                  <BoolBadge value={order.is_stage2} />
+                  <BoolBadge value={order.is_stage2 === true} />
                 </div>
               )}
               {order.is_live != null && (
                 <div>
                   <span className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block mb-1">Live</span>
-                  <BoolBadge value={order.is_live} />
+                  <BoolBadge value={order.is_live === true} />
                 </div>
               )}
               <Field label="Profit target" value={order.profit_target != null ? `${order.profit_target}%` : undefined} />
@@ -341,7 +349,7 @@ function ViewOrderDialog({
                 {order.has_account_credential != null && (
                   <div>
                     <span className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block mb-1">Has credential</span>
-                    <BoolBadge value={order.has_account_credential} />
+                    <BoolBadge value={order.has_account_credential === true} />
                   </div>
                 )}
               </div>

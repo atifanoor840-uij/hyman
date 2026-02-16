@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useState } from "react"
@@ -22,7 +23,14 @@ import {
   Squares2X2Icon,
 } from "@heroicons/react/24/outline"
 
-const navigationGroups = [
+type NavItem = {
+  name: string
+  href: string
+  icon: React.ComponentType<{ className?: string }>
+  subItems?: { name: string; href: string; icon: React.ComponentType<{ className?: string }> }[]
+}
+
+const navigationGroups: { title: string; items: NavItem[] }[] = [
   {
     title: "User Management",
     items: [
@@ -68,7 +76,7 @@ export default function AdminSidebar({ onClose, isCollapsed = false, onToggleCol
     setExpandedItems((prev) => (prev.includes(itemName) ? prev.filter((n) => n !== itemName) : [...prev, itemName]))
   }
 
-  const isItemActive = (item: (typeof navigationGroups)[0]["items"][0]) => {
+  const isItemActive = (item: NavItem) => {
     if (item.subItems) return item.subItems.some((s) => pathname === s.href) || pathname === item.href
     return pathname === item.href
   }
