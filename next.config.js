@@ -12,6 +12,11 @@ const nextConfig = {
         hostname: "instantfunding.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "www.instantfunding.com",
+        pathname: "/**",
+      },
     ],
     // Load images directly in the browser (no server-side optimization).
     // Fixes images not loading when deployed (e.g. Heroku).
