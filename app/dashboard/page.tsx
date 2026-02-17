@@ -98,6 +98,11 @@ export default function DashboardPage() {
 
   const hasActiveOrder = orders.some((o) => o.status !== "Pending")
   const noActiveAccount = !ordersLoading && !hasActiveOrder
+  const currentOrderForStatus: Order | null =
+    hasActiveOrder && orders.length > 0
+      ? (orders.find((o) => o.order_id === selectedOrderId) || orders.find((o) => o.status !== "Pending") || null)
+      : null
+  const statusLabel = getAccountStatusLabel(currentOrderForStatus)
   const statsBlur = (accountApiError || statsError || statsLoading) && !stats
   const analyticsBlur = noActiveAccount || statsBlur
   const blurClass =
@@ -120,25 +125,44 @@ export default function DashboardPage() {
             selectedOrderId={selectedOrderId}
             onOrderIdChange={setSelectedOrderId}
             orders={orders}
+            variant="dashboard-hero"
             actions={
-              <div className="flex w-full justify-end gap-2">
-                <Button
-                  asChild
-                  variant="outline"
-                  className="h-9 text-sm border-border hover:bg-muted gap-2"
-                  disabled={!hasActiveOrder || !selectedOrderId}
-                >
-                  <Link href={selectedOrderId && hasActiveOrder ? `/dashboard/performance/${selectedOrderId}` : "#"}>
-                    <BarChart3 className="h-4 w-4" />
-                    View Detail Performance
-                  </Link>
-                </Button>
-                <Button asChild className="h-9 text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 hover:shadow-md gap-2">
-                  <Link href="/buys">
-                    <ShoppingCart className="h-4 w-4" />
-                    Buy Challenge
-                  </Link>
-                </Button>
+              <div className="flex w-full flex-col items-end gap-2 md:w-auto">
+                {currentOrderForStatus && (
+                  <span
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${getAccountStatusVariant(
+                      statusLabel,
+                    )}`}
+                  >
+                    {(statusLabel === "Phase 1" || statusLabel === "Stage 2" || statusLabel === "Live") && (
+                      <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                    )}
+                    {statusLabel}
+                  </span>
+                )}
+
+                <div className="flex w-full flex-wrap items-center justify-end gap-2 md:w-auto md:gap-3">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="h-9 rounded-full border-border/70 bg-background/80 px-4 text-xs sm:text-sm font-semibold text-foreground shadow-sm hover:bg-background hover:border-border focus-visible:ring-2 focus-visible:ring-primary/40 gap-2"
+                    disabled={!hasActiveOrder || !selectedOrderId}
+                  >
+                    <Link href={selectedOrderId && hasActiveOrder ? `/dashboard/performance/${selectedOrderId}` : "#"}>
+                      <BarChart3 className="h-4 w-4" />
+                      View Detail Performance
+                    </Link>
+                  </Button>
+                  <Button
+                    asChild
+                    className="h-9 rounded-full bg-gradient-to-r from-primary to-primary/80 px-5 text-xs sm:text-sm font-semibold text-primary-foreground shadow-md shadow-primary/30 hover:from-primary/95 hover:to-primary/80 hover:shadow-lg hover:shadow-primary/40 transition-all duration-300 gap-2"
+                  >
+                    <Link href="/buys">
+                      <ShoppingCart className="h-4 w-4" />
+                      Buy Challenge
+                    </Link>
+                  </Button>
+                </div>
               </div>
             }
           />
@@ -155,55 +179,11 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {hasActiveOrder && orders.length > 0 && (() => {
-            const order = (orders.find((o) => o.order_id === selectedOrderId) || orders.find((o) => o.status !== "Pending")) ?? null
-            const statusLabel = getAccountStatusLabel(order)
-            return (
-              <Card className="mt-4 rounded-xl border border-border/80 bg-card shadow-sm p-3 md:p-4">
-                <div className="flex flex-wrap items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <Activity className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Account Status</p>
-                      <span className={`inline-flex items-center gap-1.5 mt-0.5 px-2 py-0.5 rounded-full text-xs font-semibold border ${getAccountStatusVariant(statusLabel)}`}>
-                        {(statusLabel === "Phase 1" || statusLabel === "Stage 2" || statusLabel === "Live") && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-current opacity-80" />
-                        )}
-                        {statusLabel}
-                      </span>
-                    </div>
-                  </div>
-                  {selectedOrderId && (
-                    <p className="text-xs text-muted-foreground md:ml-2">
-                      Order: <span className="font-medium text-foreground">{selectedOrderId}</span>
-                    </p>
-                  )}
-                </div>
-              </Card>
-            )
-          })()}
-
           <div className="mt-4 md:mt-5 space-y-3 md:space-y-4 flex-1 min-w-0">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4 min-w-0">
               <div className={`lg:col-span-2 space-y-3 md:space-y-4 min-w-0 transition-all duration-300 ${blurClass}`}>
                 <ProjectAnalytics {...({ stats } satisfies ProjectAnalyticsProps)} />
                 <ChallengeStatsCards {...({ stats } satisfies ChallengeStatsCardsProps)} />
-                <div className="flex justify-end">
-                  <Button
-                    asChild
-                    variant="outline"
-                    size="sm"
-                    className="gap-2 border-border"
-                    disabled={!hasActiveOrder || !selectedOrderId}
-                  >
-                    <Link href={selectedOrderId && hasActiveOrder ? `/dashboard/performance/${selectedOrderId}` : "#"}>
-                      <BarChart3 className="h-3.5 w-3.5" />
-                      View Detail Performance
-                    </Link>
-                  </Button>
-                </div>
               </div>
 
               <div className="space-y-3 md:space-y-4 min-w-0">

@@ -11,7 +11,7 @@ export default function ChatWidget() {
     { q: "What is Dragon Funded?", a: "An evaluation-based prop program offering simulated evaluations and funded accounts upon passing." },
     { q: "How does the evaluation work?", a: "Two phases with profit targets and risk rules. Pass both to receive a funded account." },
     { q: "When are payouts processed?", a: "Twice per month on the 1st and 15th, if eligibility requirements are met." },
-    { q: "What platforms are supported?", a: "cTrader, MT5, MT4, and TradeLocker (availability may vary by region)." },
+    { q: "What platforms are supported?", a: "We support MetaTrader 5 (MT5) and MetaTrader 4 (MT4)." },
     { q: "Main trading rules?", a: "5% daily loss, 10% max drawdown, news restrictions, and minimum trading days." },
   ]
 

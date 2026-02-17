@@ -17,7 +17,6 @@ const navLinks = [
     { href: "/pricing", label: "Pricing" },
   ]},
   { href: "/resources", label: "How It Works" },
-  { href: "/blog", label: "Reviews" },
   { href: "/contact", label: "Contacts" },
 ];
 
@@ -30,7 +29,6 @@ const heroNavLinks = [
     { href: "/rules", label: "Rules" },
   ]},
   { href: "/resources", label: "How It Works" },
-  { href: "/blog", label: "Reviews" },
   { href: "/contact", label: "Contacts" },
 ];
 
@@ -78,11 +76,11 @@ export default function Navbar({ variant = "sticky" }: { variant?: NavbarVariant
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Hero variant: two-bar layout, full width, attached to top and sides, black theme
+  // Hero variant: two-bar layout, full width, fixed at top of viewport
   if (variant === "hero") {
     const links = heroNavLinks;
     return (
-      <header className="sticky top-0 z-50 w-full left-0 right-0" style={{ fontFamily: 'var(--font-plus-jakarta-sans), var(--font-geist-sans), sans-serif' }}>
+      <header className="fixed top-0 left-0 right-0 z-50 w-full" style={{ fontFamily: 'var(--font-plus-jakarta-sans), var(--font-geist-sans), sans-serif' }}>
         {/* Top bar - light gray with black accents, full width, rounded bottom */}
         <div className="w-full bg-zinc-200 border-b border-zinc-300 rounded-b-lg">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-2.5 md:px-10">

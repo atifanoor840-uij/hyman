@@ -35,11 +35,22 @@ interface HeaderProps {
   onOrderIdChange?: (orderId: string) => void
   /** When provided, Header uses these orders instead of fetching */
   orders?: Order[]
+  /** Visual style for the title/description/actions section */
+  variant?: "default" | "dashboard-hero"
 }
 
 const saleTickerText = "🔥 Sale — 20% off challenges • Use code WELCOME20 • Limited time • "
 
-export function Header({ title, description, actions, useOrderIdSelect, selectedOrderId: controlledOrderId, onOrderIdChange, orders: ordersProp }: HeaderProps) {
+export function Header({
+  title,
+  description,
+  actions,
+  useOrderIdSelect,
+  selectedOrderId: controlledOrderId,
+  onOrderIdChange,
+  orders: ordersProp,
+  variant = "default",
+}: HeaderProps) {
   const [orders, setOrders] = useState<Order[]>([])
   const [isLoadingOrders, setIsLoadingOrders] = useState(false)
   const [internalOrderId, setInternalOrderId] = useState<string>("")
@@ -187,8 +198,8 @@ export function Header({ title, description, actions, useOrderIdSelect, selected
 
   return (
     <header className="space-y-3 md:space-y-4 animate-slide-in-up w-full min-w-0">
-      <div className="relative -mx-3 -mt-3 overflow-hidden border-b border-border bg-primary py-2.5 md:-mx-4 md:-mt-4 lg:-mx-5 lg:-mt-5">
-        <div className="flex w-max animate-ticker whitespace-nowrap text-xs sm:text-sm font-semibold text-primary-foreground">
+      <div className="relative -mx-3 -mt-3 overflow-hidden border-b border-border bg-muted/50 py-2.5 md:-mx-4 md:-mt-4 lg:-mx-5 lg:-mt-5">
+        <div className="flex w-max animate-ticker whitespace-nowrap text-xs sm:text-sm font-semibold text-muted-foreground">
           <span>{saleTickerText.repeat(6)}</span>
           <span aria-hidden="true">{saleTickerText.repeat(6)}</span>
         </div>
@@ -202,7 +213,7 @@ export function Header({ title, description, actions, useOrderIdSelect, selected
               <>
                 <div className="relative flex-1 min-w-0">
                   <Select value={selectedOrderId} onValueChange={setSelectedOrderId}>
-                    <SelectTrigger className="w-full min-h-[44px] sm:h-9 h-11 text-sm font-bold bg-card border-border transition-all duration-300 focus:shadow-lg focus:shadow-primary/10 [&_[data-slot=select-value]]:font-bold" disabled={isLoadingOrders}>
+                    <SelectTrigger className="w-full min-h-[44px] sm:h-9 h-11 text-sm font-bold bg-card border-border text-foreground rounded-xl transition-all duration-300 focus:ring-2 focus:ring-ring/50 [&_[data-slot=select-value]]:font-bold [&_[data-slot=select-value]]:text-foreground" disabled={isLoadingOrders}>
                       {isLoadingOrders ? (
                         <div className="flex items-center gap-2">
                           <Loader2 className="w-4 h-4 animate-spin" />
@@ -236,11 +247,11 @@ export function Header({ title, description, actions, useOrderIdSelect, selected
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="min-h-[44px] sm:h-9 h-11 px-3 text-sm border-border gap-1.5 shrink-0 touch-manipulation"
+                  className="min-h-[44px] sm:h-9 h-11 px-3 text-sm border-border bg-card text-foreground hover:bg-muted/60 gap-1.5 shrink-0 touch-manipulation rounded-xl"
                   disabled={!selectedOrderId || !hasCredentials}
                   onClick={() => setCredentialsOpen(true)}
                 >
-                  <KeyRound className="h-4 w-4" />
+                  <KeyRound className="h-4 w-4 text-muted-foreground" />
                   Credentials
                 </Button>
               </>
@@ -397,23 +408,23 @@ export function Header({ title, description, actions, useOrderIdSelect, selected
           <Button
             variant="ghost"
             size="icon"
-            className="relative hover:bg-secondary transition-all duration-300 hover:scale-110 min-h-[44px] min-w-[44px] h-11 w-11 sm:h-8 sm:w-8 touch-manipulation"
+            className="relative hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-all duration-300 min-h-[44px] min-w-[44px] h-11 w-11 sm:h-8 sm:w-8 touch-manipulation rounded-xl"
           >
             <Mail className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className="relative hover:bg-secondary transition-all duration-300 hover:scale-110 min-h-[44px] min-w-[44px] h-11 w-11 sm:h-8 sm:w-8 touch-manipulation"
+            className="relative hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-all duration-300 min-h-[44px] min-w-[44px] h-11 w-11 sm:h-8 sm:w-8 touch-manipulation rounded-xl"
           >
             <Bell className="h-4 w-4" />
             <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-destructive rounded-full animate-pulse" />
           </Button>
 
           <div className="flex items-center gap-2 pl-2 md:pl-3 border-l border-border min-w-0">
-            <Avatar className="w-9 h-9 md:w-9 md:h-9 ring-2 ring-primary/20 transition-all duration-300 hover:ring-primary/40 shrink-0">
+            <Avatar className="w-9 h-9 md:w-9 md:h-9 ring-2 ring-border transition-all duration-300 hover:ring-muted-foreground/30 shrink-0">
               <AvatarImage src={userData?.image ?? undefined} alt={userData?.username || userData?.name || 'User'} />
-              <AvatarFallback className="text-xs bg-primary/10 text-primary font-semibold">{getUserInitials()}</AvatarFallback>
+              <AvatarFallback className="text-xs bg-muted text-foreground font-semibold">{getUserInitials()}</AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex flex-col justify-center">
               <p className="text-sm font-semibold text-foreground truncate" title={userData?.username || userData?.name || 'User'}>
@@ -428,15 +439,54 @@ export function Header({ title, description, actions, useOrderIdSelect, selected
       </div>
 
       {title != null && (
-        <div className="px-0 pl-0 sm:pl-10 md:pl-16 lg:pl-20 min-w-0">
-          <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground mb-1 break-words">{title}</h1>
-          {description != null && (
-            <p className="text-xs md:text-sm text-muted-foreground break-words">{description}</p>
-          )}
-        </div>
-      )}
+        variant === "dashboard-hero" ? (
+          <div className="mt-1 rounded-2xl border border-border/80 bg-card px-4 py-4 md:px-6 md:py-5 shadow-sm">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-7">
+              <div className="space-y-2 min-w-0">
+                <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  <span className="inline-flex h-1.5 w-1.5 rounded-full bg-foreground/60 animate-pulse" />
+                  <span className="whitespace-nowrap">Live trading overview</span>
+                </div>
+                <div className="space-y-1">
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight text-foreground break-words">
+                    {title}
+                  </h1>
+                  {description != null && (
+                    <p className="text-sm leading-relaxed text-muted-foreground max-w-2xl break-words">
+                      {description}
+                    </p>
+                  )}
+                </div>
+              </div>
 
-      {actions && <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto flex-wrap">{actions}</div>}
+              {actions && (
+                <div className="flex w-full md:w-auto flex-wrap items-center justify-start md:justify-end gap-2 md:gap-3">
+                  {actions}
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="px-0 pl-0 sm:pl-10 md:pl-16 lg:pl-20 min-w-0">
+              <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground mb-1 break-words">
+                {title}
+              </h1>
+              {description != null && (
+                <p className="text-xs md:text-sm text-muted-foreground break-words">
+                  {description}
+                </p>
+              )}
+            </div>
+
+            {actions && (
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto flex-wrap">
+                {actions}
+              </div>
+            )}
+          </>
+        )
+      )}
     </header>
   )
 }

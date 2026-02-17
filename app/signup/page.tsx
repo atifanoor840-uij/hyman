@@ -358,39 +358,59 @@ export default function SignupPage() {
 							<p className="text-sm text-zinc-500 mt-1">Create your Fxgenz account</p>
 						</div>
 
-						<form onSubmit={handleDetailsSubmit} className="w-full max-w-md space-y-5">
-							<div className="space-y-1">
-								<div className="flex items-center gap-2 border-b border-zinc-300 focus-within:border-black transition-colors pb-2">
-									<User className="w-5 h-5 text-zinc-400 shrink-0" />
-									<input
-										id="name"
-										type="text"
-										value={formData.name}
-										onChange={handleFormChange('name')}
-										placeholder="Full name"
-										className={`flex-1 min-w-0 bg-transparent text-sm text-black placeholder:text-zinc-400 outline-none ${formErrors.name ? 'placeholder:text-red-400' : ''}`}
-									/>
+						<form onSubmit={handleDetailsSubmit} className="w-full max-w-md">
+							<div className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8 shadow-[0_1px_3px_rgba(0,0,0,0.06)] space-y-5">
+								{/* Full name */}
+								<div className="space-y-1.5">
+									<label htmlFor="name" className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+										Full name
+									</label>
+									<div
+										className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-4 py-3 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
+											formErrors.name ? 'border-red-300 bg-red-50/50 focus-within:border-red-400 focus-within:ring-red-500/10' : 'border-zinc-200 hover:border-zinc-300'
+										}`}
+									>
+										<User className={`w-5 h-5 shrink-0 ${formErrors.name ? 'text-red-400' : 'text-zinc-400'}`} />
+										<input
+											id="name"
+											type="text"
+											value={formData.name}
+											onChange={handleFormChange('name')}
+											placeholder="John Smith"
+											className="flex-1 min-w-0 bg-transparent text-sm font-medium text-zinc-900 placeholder:text-zinc-400 outline-none"
+										/>
+									</div>
+									{formErrors.name && <p className="text-xs font-medium text-red-600">{formErrors.name}</p>}
 								</div>
-								{formErrors.name && <p className="text-xs text-red-500 mt-1">{formErrors.name}</p>}
-							</div>
 
-							<div className="space-y-1">
-								<div className="flex items-center gap-2 border-b border-zinc-300 focus-within:border-black transition-colors pb-2">
-									<Mail className="w-5 h-5 text-zinc-400 shrink-0" />
-									<input
-										id="email"
-										type="email"
-										value={formData.email}
-										onChange={handleFormChange('email')}
-										placeholder="Email"
-										className={`flex-1 min-w-0 bg-transparent text-sm text-black placeholder:text-zinc-400 outline-none ${formErrors.email ? 'placeholder:text-red-400' : ''}`}
-									/>
+								{/* Email */}
+								<div className="space-y-1.5">
+									<label htmlFor="email" className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+										Email address
+									</label>
+									<div
+										className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-4 py-3 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
+											formErrors.email ? 'border-red-300 bg-red-50/50 focus-within:border-red-400 focus-within:ring-red-500/10' : 'border-zinc-200 hover:border-zinc-300'
+										}`}
+									>
+										<Mail className={`w-5 h-5 shrink-0 ${formErrors.email ? 'text-red-400' : 'text-zinc-400'}`} />
+										<input
+											id="email"
+											type="email"
+											value={formData.email}
+											onChange={handleFormChange('email')}
+											placeholder="name@company.com"
+											className="flex-1 min-w-0 bg-transparent text-sm font-medium text-zinc-900 placeholder:text-zinc-400 outline-none"
+										/>
+									</div>
+									{formErrors.email && <p className="text-xs font-medium text-red-600">{formErrors.email}</p>}
 								</div>
-								{formErrors.email && <p className="text-xs text-red-500 mt-1">{formErrors.email}</p>}
-							</div>
 
-							<div className="space-y-1">
-								<div className="border-b border-zinc-300 pb-2">
+								{/* Country */}
+								<div className="space-y-1.5">
+									<label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+										Country
+									</label>
 									<CountrySelector
 										value={formData.country}
 										onChange={(value) => {
@@ -400,108 +420,129 @@ export default function SignupPage() {
 										error={formErrors.country}
 										disabled={isLoading}
 									/>
+									{formErrors.country && <p className="text-xs font-medium text-red-600">{formErrors.country}</p>}
 								</div>
-								{formErrors.country && <p className="text-xs text-red-500 mt-1">{formErrors.country}</p>}
-							</div>
 
-							<div className="space-y-1">
-								<div className="flex items-center gap-2 border-b border-zinc-300 focus-within:border-black transition-colors pb-2">
-									<span className="text-zinc-400 text-sm w-5 text-center">#</span>
+								{/* Referral code (optional) */}
+								<div className="space-y-1.5">
+									<label htmlFor="referralCode" className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+										Referral code <span className="font-normal normal-case text-zinc-400">(optional)</span>
+									</label>
+									<div className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black hover:border-zinc-300">
+										<span className="text-zinc-400 text-sm font-medium w-5 text-center">#</span>
+										<input
+											id="referralCode"
+											type="text"
+											value={formData.referralCode}
+											onChange={handleFormChange('referralCode')}
+											placeholder="Enter code if you have one"
+											className="flex-1 min-w-0 bg-transparent text-sm font-medium text-zinc-900 placeholder:text-zinc-400 outline-none"
+										/>
+									</div>
+								</div>
+
+								{/* Password + Confirm */}
+								<div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+									<div className="space-y-1.5">
+										<label htmlFor="password" className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+											Password
+										</label>
+										<div
+											className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-4 py-3 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
+												formErrors.password ? 'border-red-300 bg-red-50/50 focus-within:border-red-400 focus-within:ring-red-500/10' : 'border-zinc-200 hover:border-zinc-300'
+											}`}
+										>
+											<Lock className={`w-5 h-5 shrink-0 ${formErrors.password ? 'text-red-400' : 'text-zinc-400'}`} />
+											<input
+												id="password"
+												type={showPassword ? 'text' : 'password'}
+												value={formData.password}
+												onChange={handleFormChange('password')}
+												placeholder="Min. 8 characters"
+												className="flex-1 min-w-0 bg-transparent text-sm font-medium text-zinc-900 placeholder:text-zinc-400 outline-none"
+											/>
+											<button
+												type="button"
+												onClick={() => setShowPassword((p) => !p)}
+												className="shrink-0 p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 hover:bg-zinc-200/60 transition-colors"
+												aria-label={showPassword ? 'Hide password' : 'Show password'}
+											>
+												{showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+											</button>
+										</div>
+										{formErrors.password && <p className="text-xs font-medium text-red-600">{formErrors.password}</p>}
+									</div>
+									<div className="space-y-1.5">
+										<label htmlFor="confirmPassword" className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+											Confirm password
+										</label>
+										<div
+											className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-4 py-3 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
+												formErrors.confirmPassword ? 'border-red-300 bg-red-50/50 focus-within:border-red-400 focus-within:ring-red-500/10' : 'border-zinc-200 hover:border-zinc-300'
+											}`}
+										>
+											<Lock className={`w-5 h-5 shrink-0 ${formErrors.confirmPassword ? 'text-red-400' : 'text-zinc-400'}`} />
+											<input
+												id="confirmPassword"
+												type={showConfirmPassword ? 'text' : 'password'}
+												value={formData.confirmPassword}
+												onChange={handleFormChange('confirmPassword')}
+												placeholder="Re-enter password"
+												className="flex-1 min-w-0 bg-transparent text-sm font-medium text-zinc-900 placeholder:text-zinc-400 outline-none"
+											/>
+											<button
+												type="button"
+												onClick={() => setShowConfirmPassword((p) => !p)}
+												className="shrink-0 p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 hover:bg-zinc-200/60 transition-colors"
+												aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+											>
+												{showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+											</button>
+										</div>
+										{formErrors.confirmPassword && <p className="text-xs font-medium text-red-600">{formErrors.confirmPassword}</p>}
+									</div>
+								</div>
+
+								{/* Terms */}
+								<label className="flex items-start gap-2.5 cursor-pointer group">
 									<input
-										id="referralCode"
-										type="text"
-										value={formData.referralCode}
-										onChange={handleFormChange('referralCode')}
-										placeholder="Referral code (optional)"
-										className="flex-1 min-w-0 bg-transparent text-sm text-black placeholder:text-zinc-400 outline-none"
+										type="checkbox"
+										required
+										className="mt-0.5 h-4 w-4 rounded border-zinc-300 text-black focus:ring-2 focus:ring-black/20 focus:ring-offset-0"
 									/>
-								</div>
+									<span className="text-sm text-zinc-600 group-hover:text-zinc-900 transition-colors">
+										I agree to the <Link href="/terms" className="font-medium text-black underline underline-offset-2 hover:no-underline">Terms</Link> and <Link href="/policy" className="font-medium text-black underline underline-offset-2 hover:no-underline">Privacy Policy</Link>.
+									</span>
+								</label>
+
+								<button
+									type="submit"
+									disabled={isLoading}
+									className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-black px-6 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+								>
+									{isLoading ? (
+										<>
+											<svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+												<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+												<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+											</svg>
+											Creating account…
+										</>
+									) : (
+										'Create account'
+									)}
+								</button>
 							</div>
 
-							<div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-								<div className="space-y-1">
-									<div className="flex items-center gap-2 border-b border-zinc-300 focus-within:border-black transition-colors pb-2">
-										<Lock className="w-5 h-5 text-zinc-400 shrink-0" />
-										<input
-											id="password"
-											type={showPassword ? 'text' : 'password'}
-											value={formData.password}
-											onChange={handleFormChange('password')}
-											placeholder="Password"
-											className={`flex-1 min-w-0 bg-transparent text-sm text-black placeholder:text-zinc-400 outline-none ${formErrors.password ? 'placeholder:text-red-400' : ''}`}
-										/>
-										<button
-											type="button"
-											onClick={() => setShowPassword((p) => !p)}
-											className="text-zinc-400 hover:text-zinc-600 p-0.5"
-											aria-label={showPassword ? 'Hide password' : 'Show password'}
-										>
-											{showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-										</button>
-									</div>
-									{formErrors.password && <p className="text-xs text-red-500 mt-1">{formErrors.password}</p>}
+							{/* Divider + Social */}
+							<div className="mt-6">
+								<div className="flex items-center gap-4">
+									<div className="flex-1 h-px bg-zinc-200" />
+									<span className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Or sign up with</span>
+									<div className="flex-1 h-px bg-zinc-200" />
 								</div>
-								<div className="space-y-1">
-									<div className="flex items-center gap-2 border-b border-zinc-300 focus-within:border-black transition-colors pb-2">
-										<Lock className="w-5 h-5 text-zinc-400 shrink-0" />
-										<input
-											id="confirmPassword"
-											type={showConfirmPassword ? 'text' : 'password'}
-											value={formData.confirmPassword}
-											onChange={handleFormChange('confirmPassword')}
-											placeholder="Confirm password"
-											className={`flex-1 min-w-0 bg-transparent text-sm text-black placeholder:text-zinc-400 outline-none ${formErrors.confirmPassword ? 'placeholder:text-red-400' : ''}`}
-										/>
-										<button
-											type="button"
-											onClick={() => setShowConfirmPassword((p) => !p)}
-											className="text-zinc-400 hover:text-zinc-600 p-0.5"
-											aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-										>
-											{showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-										</button>
-									</div>
-									{formErrors.confirmPassword && <p className="text-xs text-red-500 mt-1">{formErrors.confirmPassword}</p>}
-								</div>
-							</div>
-
-							<label className="flex items-start gap-2 cursor-pointer">
-								<input
-									type="checkbox"
-									required
-									className="mt-1 h-4 w-4 rounded border-zinc-300 text-black focus:ring-black/20"
-								/>
-								<span className="text-xs text-zinc-500">
-									I agree to the <Link href="/terms" className="text-black underline underline-offset-2">Terms</Link> and <Link href="/policy" className="text-black underline underline-offset-2">Privacy Policy</Link>.
-								</span>
-							</label>
-
-							<button
-								type="submit"
-								disabled={isLoading}
-								className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-black px-6 py-3 text-sm font-bold text-white shadow-md hover:bg-zinc-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-							>
-								{isLoading ? (
-									<>
-										<svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-											<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-											<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-										</svg>
-										Creating account…
-									</>
-								) : (
-									'Continue'
-								)}
-							</button>
-
-							<div className="pt-4">
-								<p className="text-sm text-zinc-500 text-center mb-3">Or sign up with</p>
-								<div className="flex items-center justify-center gap-4">
-									<button
-										type="button"
-										className="flex items-center justify-center w-12 h-12 rounded-xl border border-zinc-200 hover:bg-zinc-50 transition-colors"
-										aria-label="Sign up with Google"
-									>
+								<div className="flex items-center justify-center gap-3 mt-5">
+									<button type="button" className="flex items-center justify-center w-11 h-11 rounded-xl border border-zinc-200 bg-white text-zinc-600 shadow-sm hover:bg-zinc-50 hover:border-zinc-300 transition-colors" aria-label="Sign up with Google">
 										<svg className="w-5 h-5" viewBox="0 0 24 24">
 											<path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
 											<path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -509,11 +550,7 @@ export default function SignupPage() {
 											<path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
 										</svg>
 									</button>
-									<button
-										type="button"
-										className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#1877F2] text-white hover:bg-[#166fe5] transition-colors"
-										aria-label="Sign up with Facebook"
-									>
+									<button type="button" className="flex items-center justify-center w-11 h-11 rounded-xl border border-zinc-200 bg-[#1877F2] text-white shadow-sm hover:bg-[#166fe5] transition-colors" aria-label="Sign up with Facebook">
 										<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
 											<path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
 										</svg>
@@ -522,8 +559,8 @@ export default function SignupPage() {
 							</div>
 						</form>
 
-						<p className="mt-6 text-center text-sm text-zinc-500">
-							Already have an account? <Link href="/login" className="font-semibold text-black underline underline-offset-2">Log in</Link>
+						<p className="mt-6 text-center text-sm text-zinc-600">
+							Already have an account? <Link href="/login" className="font-semibold text-black underline underline-offset-2 hover:no-underline">Log in</Link>
 						</p>
 					</>
 				)}
@@ -544,18 +581,18 @@ export default function SignupPage() {
 						</div>
 
 						<form onSubmit={handleVerificationSubmit} className="space-y-6">
-							<div className="flex justify-between items-center text-xs">
-								<span className="text-zinc-500">Enter code</span>
+							<div className="flex justify-between items-center">
+								<label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Verification code</label>
 								<button
 									type="button"
 									onClick={handleResendCode}
 									disabled={resendCooldown > 0}
-									className="text-black font-medium hover:opacity-80 disabled:text-zinc-400"
+									className="text-xs font-medium text-black hover:text-zinc-600 disabled:text-zinc-400 transition-colors"
 								>
 									{resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
 								</button>
 							</div>
-							<div className="grid grid-cols-4 gap-2">
+							<div className="grid grid-cols-4 gap-3">
 								{verificationDigits.map((digit, index) => (
 									<input
 										key={index}
@@ -567,25 +604,25 @@ export default function SignupPage() {
 										onKeyDown={(e) => handleVerificationKeyDown(e, index)}
 										onPaste={index === 0 ? handleVerificationPaste : undefined}
 										ref={(el) => { if (el) verificationInputs.current[index] = el; }}
-										className="h-12 rounded-lg border border-zinc-200 bg-white text-center text-lg font-semibold tracking-widest text-black focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10"
+										className="h-14 rounded-xl border border-zinc-200 bg-zinc-50/80 text-center text-xl font-bold tracking-[0.35em] text-zinc-900 transition-all focus:border-black focus:bg-white focus:outline-none focus:ring-2 focus:ring-black/10"
 									/>
 								))}
 							</div>
 							{verificationError && (
-								<p className="text-xs text-red-500">{verificationError}</p>
+								<p className="text-xs font-medium text-red-600">{verificationError}</p>
 							)}
 							<div className="flex gap-3">
 								<button
 									type="button"
 									onClick={handleBackToDetails}
-									className="flex-1 py-2.5 rounded-xl border border-zinc-200 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+									className="flex-1 py-3 rounded-xl border border-zinc-200 text-sm font-medium text-zinc-700 bg-white hover:bg-zinc-50 hover:border-zinc-300 transition-colors"
 								>
 									Edit email
 								</button>
 								<button
 									type="submit"
 									disabled={!verificationComplete}
-									className="flex-1 py-2.5 rounded-xl bg-black text-sm font-bold text-white shadow-md hover:bg-zinc-800 disabled:opacity-60 disabled:cursor-not-allowed"
+									className="flex-1 py-3 rounded-xl bg-black text-sm font-bold text-white shadow-sm hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
 								>
 									Verify
 								</button>

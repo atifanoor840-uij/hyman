@@ -67,7 +67,6 @@ export default function Footer() {
 								<li><a href="/faq" className="text-gray-400 hover:text-white transition-colors font-medium">FAQ</a></li>
 								<li><a href="/support" className="text-gray-400 hover:text-white transition-colors font-medium">Support</a></li>
 								<li><a href="/resources" className="text-gray-400 hover:text-white transition-colors font-medium">Resources</a></li>
-								<li><a href="/blog" className="text-gray-400 hover:text-white transition-colors font-medium">News</a></li>
 							</ul>
 						</div>
 						<div className="space-y-4">
@@ -76,7 +75,6 @@ export default function Footer() {
 								<li><a href="/about" className="text-gray-400 hover:text-white transition-colors font-medium">About Us</a></li>
 								<li><a href="/partner" className="text-gray-400 hover:text-white transition-colors font-medium">Partners</a></li>
 								<li><a href="/contact" className="text-gray-400 hover:text-white transition-colors font-medium">Contact</a></li>
-								<li><a href="/blog" className="text-gray-400 hover:text-white transition-colors font-medium">Blog</a></li>
 							</ul>
 						</div>
 						<div className="space-y-4">

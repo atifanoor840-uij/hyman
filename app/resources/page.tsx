@@ -2,6 +2,7 @@
 
 import { Inter, Poppins } from 'next/font/google';
 import Navbar from '../components/Navbar';
+import { HEADER_IMAGE_2 } from '@/lib/header-image';
 
 const bodyFont = Inter({ subsets: ['latin'], weight: ['400', '500', '600'] });
 const display = Poppins({ subsets: ['latin'], weight: ['600', '700', '800'] });
@@ -113,13 +114,18 @@ export default function ResourcesPage() {
 				
 				<div className="relative mx-auto max-w-7xl px-6 py-20 md:px-10 lg:py-32">
 					<Navbar variant="hero" />
-					<div className="mx-auto max-w-4xl space-y-6 text-left mt-16 lg:mt-20">
-						<h1 className={`${display.className} text-4xl font-semibold leading-[1.1] tracking-[-0.02em] text-white md:text-5xl lg:text-6xl`}>
-							Trading Resources & Education
-						</h1>
-						<p className="text-lg text-white/70 md:text-xl max-w-2xl">
-							Enhance your trading skills with our comprehensive educational resources, courses, and webinars.
-						</p>
+					<div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10 lg:gap-12 mt-16 lg:mt-20">
+						<div className="max-w-4xl space-y-6 text-left">
+							<h1 className={`${display.className} text-4xl font-semibold leading-[1.1] tracking-[-0.02em] text-white md:text-5xl lg:text-6xl`}>
+								Trading Resources & Education
+							</h1>
+							<p className="text-lg text-white/70 md:text-xl max-w-2xl">
+								Enhance your trading skills with our comprehensive educational resources, courses, and webinars.
+							</p>
+						</div>
+						<div className="flex-shrink-0 lg:max-w-md xl:max-w-lg">
+							<img src={HEADER_IMAGE_2} alt="Fx Genz resources" className="w-full h-auto rounded-xl object-contain shadow-2xl" />
+						</div>
 					</div>
 				</div>
 				{/* Subtle divider curve */}

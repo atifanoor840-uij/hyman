@@ -16,11 +16,14 @@ import {
   Copy,
   Check,
   BarChart3,
+  BarChart2,
   ShoppingCart,
   Loader2,
   Wallet,
   Briefcase,
   Calendar,
+  CalendarDays,
+  Activity,
   Lock,
   ChevronDown,
   ChevronUp,
@@ -165,49 +168,76 @@ function CredentialsSection({ order }: { order: Order | null }) {
   )
 }
 
-// Semi-circular gauge — professional style
+// Semi-circular gauge with needle and 0/max labels (dashboard style like reference image)
 function Gauge({
   value,
+  max,
   label,
-  format = "percent",
+  maxLabel,
+  displayValue,
   color = "hsl(var(--primary))",
 }: {
   value: number
+  max: number
   label: string
-  format?: "percent" | "number"
+  maxLabel?: string
+  displayValue?: string
   color?: string
 }) {
-  const pct = format === "percent" ? Math.min(100, Math.max(0, value)) : Math.min(100, (value / (value > 2 ? 4 : 2)) * 50)
-  const display = format === "percent" ? `${Number(value).toFixed(2)}%` : String(Number(value).toFixed(1))
-  const circumference = Math.PI * 45
+  const clamped = Math.min(max, Math.max(0, value))
+  const pct = max > 0 ? (clamped / max) * 100 : 0
+  const angleDeg = 180 * (1 - pct / 100)
+  const angleRad = (angleDeg * Math.PI) / 180
+  const cx = 60
+  const cy = 52
+  const r = 42
+  const needleLength = 36
+  const needleX = cx + needleLength * Math.cos(angleRad)
+  const needleY = cy - needleLength * Math.sin(angleRad)
+  const circumference = Math.PI * r
   const strokeDashoffset = circumference - (pct / 100) * circumference
+
   return (
-    <div className="flex flex-col items-center p-3 rounded-xl bg-muted/30 border border-border/50 hover:bg-muted/50 transition-colors duration-200">
-      <div className="relative w-24 h-14 overflow-hidden">
-        <svg viewBox="0 0 100 55" className="w-full h-full" aria-hidden>
+    <div className="flex flex-col items-center p-3 rounded-xl bg-muted/20 border border-border/50 hover:bg-muted/40 transition-colors duration-200">
+      <p className="text-xs font-bold text-foreground mb-1 w-full text-center truncate">{label}</p>
+      <div className="relative w-full max-w-[120px] aspect-[120/72]">
+        <svg viewBox="0 0 120 72" className="w-full h-full" aria-hidden>
           <path
-            d="M 12 48 A 38 38 0 0 1 88 48"
+            d={`M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`}
             fill="none"
             stroke="currentColor"
-            strokeWidth="10"
-            className="text-muted/20"
+            strokeWidth="8"
+            className="text-muted/25"
+            strokeLinecap="round"
           />
           <path
-            d="M 12 48 A 38 38 0 0 1 88 48"
+            d={`M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`}
             fill="none"
             stroke={color}
-            strokeWidth="10"
+            strokeWidth="8"
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
             strokeLinecap="round"
-            className="transition-all duration-700 ease-out drop-shadow-sm"
+            className="transition-all duration-700 ease-out"
           />
+          <line
+            x1={cx}
+            y1={cy}
+            x2={needleX}
+            y2={needleY}
+            stroke="#1f2937"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            className="transition-all duration-700 ease-out"
+          />
+          <circle cx={cx} cy={cy} r="4" fill="#1f2937" />
         </svg>
-        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-sm font-bold tabular-nums tracking-tight text-foreground">
-          {display}
-                </span>
+        <span className="absolute bottom-0 left-0 text-[9px] font-medium text-muted-foreground">0</span>
+        <span className="absolute bottom-0 right-0 text-[9px] font-medium text-muted-foreground">{maxLabel ?? String(max)}</span>
       </div>
-      <p className="text-[11px] font-medium text-muted-foreground mt-2 uppercase tracking-wider">{label}</p>
+      <p className="text-sm font-bold tabular-nums text-foreground mt-1">
+        {displayValue ?? clamped.toFixed(1)}
+      </p>
     </div>
   )
 }
@@ -410,28 +440,10 @@ export default function PerformancePage() {
       <main className="min-w-0 flex-1 flex flex-col overflow-x-hidden p-3 sm:p-4 md:p-5 lg:ml-64 pb-8">
         <div className="mx-auto w-full max-w-[1400px] flex flex-col flex-1 min-w-0">
           <Header
-            title="View Detail Performance"
-            description="Account overview, performance metrics, objectives, and trade history."
             useOrderIdSelect
             selectedOrderId={selectedOrderId}
             onOrderIdChange={handleOrderChange}
             orders={orders}
-            actions={
-              <div className="flex w-full justify-end gap-2">
-                <Button asChild variant="outline" className="h-9 text-sm border-border hover:bg-muted gap-2">
-                  <Link href="/dashboard">
-                    <BarChart3 className="h-4 w-4" />
-                    Back to Dashboard
-                  </Link>
-                </Button>
-                <Button asChild className="h-9 text-sm bg-primary text-primary-foreground hover:bg-primary/90 gap-2">
-                  <Link href="/dashboard/buys">
-                    <ShoppingCart className="h-4 w-4" />
-                    Buy Challenge
-                  </Link>
-                </Button>
-              </div>
-            }
           />
 
           {error && (
@@ -544,146 +556,114 @@ export default function PerformancePage() {
             {/* Main: Left = Performance + Equity graph, Right = Objectives + Consistency + Rules */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 min-w-0">
               <div className="lg:col-span-2 space-y-4 min-w-0">
-                {/* Performance: gauges + Balance, Equity, Profit */}
-                <Card className="overflow-hidden rounded-xl border border-border/80 bg-card shadow-sm min-w-0">
-                  <div className="border-b border-border/80 bg-muted/20 px-4 sm:px-5 py-3 sm:py-3.5">
-                    <h3 className="text-sm font-semibold text-foreground tracking-tight">Performance</h3>
+                {/* Performance: key metrics — comfortable on dark bg */}
+                <Card className="overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm min-w-0">
+                  <div className="border-b border-border/80 bg-muted/30 px-5 sm:px-6 py-4">
+                    <h3 className="text-base font-semibold tracking-tight text-foreground">Performance</h3>
                     <p className="text-xs text-muted-foreground mt-0.5">Key metrics at a glance</p>
                   </div>
-                  <div className="p-4 sm:p-5">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-                      <Gauge value={winRate} label="Trade win %" color="hsl(262, 83%, 58%)" />
-                      <Gauge value={consistency.dayWinPct} label="Day win %" color="hsl(262, 83%, 58%)" />
-                      <Gauge value={profitFactor} label="Profit factor" format="number" color="hsl(199, 89%, 48%)" />
-                      <Gauge value={winLossRatio} label="Win/Loss ratio" format="number" color="hsl(221, 83%, 53%)" />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t border-border/80">
-                      <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/30 border border-border/50 hover:bg-muted/50 transition-colors">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                          <Wallet className="h-5 w-5" />
+                  <div className="p-0">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-border/80 [&>div]:border-border/80">
+                      <div className="flex flex-col p-5 sm:p-6 min-w-0">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted/60 text-muted-foreground">
+                          <Banknote className="h-4 w-4" strokeWidth={2} />
                         </div>
-                        <div className="min-w-0">
-                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Balance</p>
-                          <p className="text-lg font-bold tabular-nums text-foreground truncate">
-                            {accountInfo ? `$${accountInfo.balance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "—"}
-                          </p>
-                        </div>
+                        <p className="mt-4 text-xl font-semibold tabular-nums tracking-tight text-foreground truncate">
+                          {accountInfo ? `$${accountInfo.balance.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` : "—"}
+                        </p>
+                        <p className="mt-1.5 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">Balance</p>
                       </div>
-                      <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/30 border border-border/50 hover:bg-muted/50 transition-colors">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                          <TrendingUp className="h-5 w-5" />
+                      <div className="flex flex-col p-5 sm:p-6 min-w-0">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted/60 text-muted-foreground">
+                          <BarChart2 className="h-4 w-4" strokeWidth={2} />
                         </div>
-                        <div className="min-w-0">
-                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Equity</p>
-                          <p className="text-lg font-bold tabular-nums text-foreground truncate">
-                            {accountInfo ? `$${accountInfo.equity.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "—"}
-                          </p>
-                        </div>
+                        <p className={`mt-4 text-xl font-semibold tabular-nums tracking-tight truncate ${(stats?.profit ?? 0) >= 0 ? "text-foreground" : "text-destructive"}`}>
+                          {stats != null ? `$${stats.profit.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` : "—"}
+                        </p>
+                        <p className="mt-1.5 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">Profit/Loss</p>
                       </div>
-                      <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/30 border border-border/50 hover:bg-muted/50 transition-colors">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                          <Target className="h-5 w-5" />
-                </div>
-                        <div className="min-w-0">
-                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Profit</p>
-                          <p className={`text-lg font-bold tabular-nums truncate ${(stats?.profit ?? 0) >= 0 ? "text-foreground" : "text-destructive"}`}>
-                            {stats != null ? `$${stats.profit.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "—"}
-                          </p>
+                      <div className="flex flex-col p-5 sm:p-6 min-w-0">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted/60 text-muted-foreground">
+                          <Activity className="h-4 w-4" strokeWidth={2} />
                         </div>
+                        <p className="mt-4 text-xl font-semibold tabular-nums tracking-tight text-foreground truncate">
+                          {accountInfo ? `$${accountInfo.equity.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` : "—"}
+                        </p>
+                        <p className="mt-1.5 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">Equity</p>
+                      </div>
+                      <div className="flex flex-col p-5 sm:p-6 min-w-0">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted/60 text-muted-foreground">
+                          <CalendarDays className="h-4 w-4" strokeWidth={2} />
+                        </div>
+                        <p className="mt-4 text-xl font-semibold tabular-nums tracking-tight text-foreground">
+                          {consistency.totalDays}
+                        </p>
+                        <p className="mt-1.5 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">Trading Days</p>
                       </div>
                     </div>
                   </div>
-              </Card>
+                </Card>
 
-                {/* Same equity graph as dashboard */}
-                <ProjectAnalytics stats={perf} />
-              </div>
-
-              {/* Right: Single card — all targets & rules */}
-              <div className="space-y-4 min-w-0">
-                <Card className="overflow-hidden rounded-xl border border-border/80 bg-card shadow-sm" id="rules">
-                  <div className="border-b border-border/80 bg-muted/20 px-4 py-3">
+                {/* Objectives & Rules — below Performance, left side */}
+                <Card className="overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm min-w-0" id="rules">
+                  <div className="border-b border-border/80 bg-muted/20 px-4 sm:px-6 py-3.5">
                     <h3 className="text-sm font-semibold text-foreground tracking-tight">Objectives & Rules</h3>
                     <p className="text-xs text-muted-foreground mt-0.5">Targets and how much achieved</p>
                   </div>
-                  <div className="p-4 space-y-4">
-                    {/* Profit Target */}
-                    <div>
-                      <div className="flex justify-between items-baseline gap-2 mb-1">
-                        <span className="text-xs font-medium text-muted-foreground">Profit Target</span>
-                        <span className="text-sm font-bold tabular-nums text-foreground">
-                          ${(stats?.profit ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / ${profitTargetAmount.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                  <div className="p-4 sm:p-5 space-y-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <Gauge
+                        value={stats?.profit ?? 0}
+                        max={profitTargetAmount > 0 ? profitTargetAmount : 1}
+                        label="Profit target"
+                        maxLabel={`$${profitTargetAmount.toLocaleString("en-US", { maximumFractionDigits: 0 })}`}
+                        displayValue={`$${(stats?.profit ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                        color="#10b981"
+                      />
+                      <Gauge
+                        value={dailyDrawdownCurrent}
+                        max={DAILY_DRAWDOWN_LIMIT}
+                        label="Daily drawdown"
+                        maxLabel={`Max ${DAILY_DRAWDOWN_LIMIT}%`}
+                        displayValue={`${dailyDrawdownCurrent.toFixed(2)}%`}
+                        color={dailyDrawdownCurrent >= DAILY_DRAWDOWN_LIMIT ? "#dc2626" : "#f97316"}
+                      />
+                      <Gauge
+                        value={drawdownUsed}
+                        max={OVERALL_DRAWDOWN_LIMIT}
+                        label="Max drawdown"
+                        maxLabel={`Max ${OVERALL_DRAWDOWN_LIMIT}%`}
+                        displayValue={`${drawdownUsed.toFixed(2)}%`}
+                        color="#dc2626"
+                      />
+                    </div>
+                    <div className="space-y-2 pt-2 border-t border-border/60">
+                      <div className="flex justify-between items-center gap-2 py-2 border-b border-border/40">
+                        <span className="text-xs font-medium text-muted-foreground">Minimum Trading Days</span>
+                        <span className={`text-sm font-semibold tabular-nums ${minTradingDaysOk ? "text-emerald-600" : "text-foreground"}`}>
+                          {consistency.totalDays} of {MIN_TRADING_DAYS_REQUIRED}
                         </span>
+                        {minTradingDaysOk ? <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" /> : null}
                       </div>
-                      <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-                        <div className="h-full rounded-full bg-emerald-500 transition-all duration-500" style={{ width: `${Math.min(100, Math.max(0, profitPct))}%` }} />
+                      <div className="flex justify-between items-center gap-2 py-2 border-b border-border/40">
+                        <span className="text-xs font-medium text-muted-foreground">Weekend Holding</span>
+                        <span className="text-sm font-semibold text-emerald-600">Compliant</span>
                       </div>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">Equity Pass ${equityPassLevel.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })} · {Math.round(profitPct)}% of target</p>
-                    </div>
-
-                    {/* Daily Drawdown */}
-                    <div>
-                      <div className="flex justify-between items-baseline gap-2 mb-1">
-                        <span className="text-xs font-medium text-muted-foreground">Daily Drawdown</span>
-                        <span className="text-sm font-bold tabular-nums text-foreground">{dailyDrawdownCurrent.toFixed(2)}% / Max {DAILY_DRAWDOWN_LIMIT}%</span>
+                      <div className="flex justify-between items-center gap-2 py-2 border-b border-border/40">
+                        <span className="text-xs font-medium text-muted-foreground">Hedging</span>
+                        <span className="text-sm font-semibold text-emerald-600">Compliant</span>
                       </div>
-                      <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-all duration-500 ${dailyDrawdownCurrent >= DAILY_DRAWDOWN_LIMIT ? "bg-destructive" : "bg-amber-500/80"}`}
-                          style={{ width: `${Math.min(100, (dailyDrawdownCurrent / DAILY_DRAWDOWN_LIMIT) * 100)}%` }}
-                        />
+                      <div className="py-2 space-y-0.5">
+                        <div className="flex justify-between items-center gap-2">
+                          <span className="text-xs font-medium text-muted-foreground">Consistency Rule</span>
+                          <span className={`text-sm font-semibold tabular-nums ${consistencyOk ? "text-emerald-600" : "text-foreground"}`}>
+                            {consistency.consistencyPct.toFixed(0)}% (min {CONSISTENCY_REQUIRED_PCT}%)
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground">Profitable days {consistency.profitableDays} of {consistency.totalDays} · Highest day ${consistency.highestProfitableDay.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
                       </div>
                     </div>
-
-                    {/* Max Drawdown */}
-                    <div>
-                      <div className="flex justify-between items-baseline gap-2 mb-1">
-                        <span className="text-xs font-medium text-muted-foreground">Max Drawdown</span>
-                        <span className="text-sm font-bold tabular-nums text-foreground">
-                          ${currentDrawdownAmount.toFixed(2)} / ${maxDrawdownAmount.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                        </span>
-                      </div>
-                      <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-                        <div className="h-full rounded-full bg-destructive/90 transition-all duration-500" style={{ width: `${Math.min(100, drawdownPct)}%` }} />
-                      </div>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">Equity Breach ${equityBreachLevel.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
-                    </div>
-
-                    {/* Minimum trading days */}
-                    <div className="flex justify-between items-center gap-2 py-1.5 border-t border-border/50">
-                      <span className="text-xs font-medium text-muted-foreground">Minimum Trading Days</span>
-                      <span className={`text-sm font-semibold tabular-nums ${minTradingDaysOk ? "text-emerald-600" : "text-foreground"}`}>
-                        {consistency.totalDays} of {MIN_TRADING_DAYS_REQUIRED} required
-                      </span>
-                      {minTradingDaysOk ? <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" /> : null}
-                    </div>
-
-                    {/* Weekend holding */}
-                    <div className="flex justify-between items-center gap-2 py-1.5 border-t border-border/50">
-                      <span className="text-xs font-medium text-muted-foreground">Weekend Holding</span>
-                      <span className="text-xs text-muted-foreground">Not allowed</span>
-                      <span className="text-sm font-semibold text-emerald-600">Compliant</span>
-                    </div>
-
-                    {/* Hedging */}
-                    <div className="flex justify-between items-center gap-2 py-1.5 border-t border-border/50">
-                      <span className="text-xs font-medium text-muted-foreground">Hedging</span>
-                      <span className="text-xs text-muted-foreground">Not allowed</span>
-                      <span className="text-sm font-semibold text-emerald-600">Compliant</span>
-                    </div>
-
-                    {/* Consistency rule */}
-                    <div className="pt-1.5 border-t border-border/50 space-y-1">
-                      <div className="flex justify-between items-center gap-2">
-                        <span className="text-xs font-medium text-muted-foreground">Consistency Rule</span>
-                        <span className={`text-sm font-semibold tabular-nums ${consistencyOk ? "text-emerald-600" : "text-foreground"}`}>
-                          {consistency.consistencyPct.toFixed(0)}% (min {CONSISTENCY_REQUIRED_PCT}%)
-                        </span>
-                      </div>
-                      <p className="text-[10px] text-muted-foreground">Profitable days {consistency.profitableDays} of {consistency.totalDays} · Highest day ${consistency.highestProfitableDay.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
-                    </div>
-
-                    <Button asChild variant="outline" size="sm" className="w-full rounded-lg border-border/80 mt-1">
+                    <Button asChild variant="outline" size="sm" className="w-full rounded-lg border-border/80">
                       <Link href={`/dashboard/performance/${encodeURIComponent(selectedOrderId)}#violations`}>
                         View Details →
                       </Link>
@@ -691,34 +671,59 @@ export default function PerformancePage() {
                   </div>
                 </Card>
 
-                {/* Violations — only when there are any */}
-                {violationsWithDates.length > 0 && (
-                  <Card className="overflow-hidden rounded-xl border border-destructive/30 bg-destructive/5 shadow-sm" id="violations">
-                    <div className="border-b border-destructive/20 bg-destructive/10 px-4 py-3 flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />
-                      <h3 className="text-sm font-semibold text-destructive tracking-tight">Violations</h3>
+                {/* Equity graph */}
+                <ProjectAnalytics stats={perf} />
+              </div>
+
+              {/* Right: Violations card only — below Performance card */}
+              <div className="min-w-0">
+                <Card className="overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm" id="violations">
+                  <div className="border-b border-border/80 bg-muted/20 px-4 sm:px-5 py-3.5 flex items-center gap-2.5">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-destructive/10 border border-destructive/20">
+                      <AlertTriangle className="h-3.5 w-3.5 text-destructive" />
                     </div>
-                    <div className="p-4 space-y-3">
-                      {violationsWithDates.map((v, i) => (
-                        <div key={`${v.type}-${v.date}-${i}`} className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2.5">
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <XCircle className="h-4 w-4 shrink-0 text-destructive" />
-                            <div>
-                              <p className="text-xs font-semibold text-foreground">{v.type}</p>
-                              <p className="text-[10px] text-muted-foreground">{v.limit}</p>
+                    <div>
+                      <h3 className="text-sm font-semibold text-foreground tracking-tight">Violations</h3>
+                      <p className="text-[11px] text-muted-foreground">Rule breaches on record</p>
+                    </div>
+                  </div>
+                  <div className="p-0">
+                    {violationsWithDates.length > 0 ? (
+                      <div className="divide-y divide-border/60">
+                        {violationsWithDates.map((v, i) => (
+                          <div
+                            key={`${v.type}-${v.date}-${i}`}
+                            className="flex items-start justify-between gap-4 px-4 sm:px-5 py-3.5 min-w-0"
+                          >
+                            <div className="flex items-start gap-3 min-w-0">
+                              <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-destructive/30 bg-destructive/5">
+                                <XCircle className="h-3 w-3 text-destructive" />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-xs font-semibold text-foreground">{v.type}</p>
+                                <p className="text-[11px] text-muted-foreground mt-0.5">{v.limit}</p>
+                              </div>
+                            </div>
+                            <div className="shrink-0 text-right">
+                              <p className="text-sm font-semibold tabular-nums text-destructive">{v.value}</p>
+                              <p className="text-[11px] text-muted-foreground mt-0.5">
+                                {v.date === "Current" ? v.date : new Date(v.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                              </p>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <p className="text-sm font-bold tabular-nums text-destructive">{v.value}</p>
-                            <p className="text-[10px] text-muted-foreground font-medium">
-                              {v.date === "Current" ? v.date : new Date(v.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                            </p>
-                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="px-4 sm:px-5 py-8 text-center">
+                        <div className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-muted/60 border border-border/60">
+                          <AlertTriangle className="h-4 w-4 text-muted-foreground/70" />
                         </div>
-                      ))}
-              </div>
-                  </Card>
-                )}
+                        <p className="text-sm font-medium text-foreground">No violations</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">All rules within limit</p>
+                      </div>
+                    )}
+                  </div>
+                </Card>
               </div>
             </div>
 

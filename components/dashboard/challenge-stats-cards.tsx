@@ -56,43 +56,57 @@ export function ChallengeStatsCards(props: ChallengeStatsCardsProps) {
   ]
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-3 animate-slide-in-up min-w-0" style={{ animationDelay: "450ms" }}>
+    <div
+      className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 md:gap-3.5 animate-slide-in-up min-w-0"
+      style={{ animationDelay: "450ms" }}
+    >
       {topRow.map((stat) => (
         <Card
           key={stat.label}
-          className={`min-h-[88px] sm:min-h-[96px] p-3 md:p-4 flex flex-col gap-2 justify-center transition-shadow duration-200 hover:shadow-md min-w-0 ${
-            stat.highlighted
-              ? "bg-card border-primary/40 ring-1 ring-primary/20 border-border"
-              : "bg-card border-border"
+          className={`group relative min-h-[108px] sm:min-h-[112px] p-3.5 md:p-4 flex flex-col justify-between overflow-hidden rounded-2xl border transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_45px_rgba(15,23,42,0.12)] min-w-0 bg-gradient-to-br from-background via-muted/70 to-background ${
+            stat.highlighted ? "border-primary/50" : "border-border/70"
           }`}
         >
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
-              <stat.icon className="w-4 h-4 text-muted-foreground" />
+          <div className="absolute inset-x-4 -top-8 h-20 rounded-full bg-gradient-to-b from-white/40 to-transparent opacity-70 pointer-events-none" />
+
+          <div className="flex items-center gap-3 min-w-0">
+            <div
+              className={`flex h-9 w-9 items-center justify-center rounded-full border text-sm shrink-0 ${
+                stat.highlighted
+                  ? "border-primary/30 bg-primary/10 text-primary"
+                  : "border-muted bg-muted text-muted-foreground"
+              }`}
+            >
+              <stat.icon className="w-4 h-4" />
             </div>
-            <span className="text-xs text-muted-foreground font-medium truncate">
+            <span className="text-[11px] sm:text-xs text-muted-foreground font-medium truncate tracking-wide">
               {stat.label}
             </span>
           </div>
-          <p className="text-sm sm:text-base font-bold text-foreground truncate tabular-nums">
+
+          <p className="mt-3 text-base sm:text-lg font-semibold text-foreground truncate tabular-nums">
             {stat.value}
           </p>
         </Card>
       ))}
+
       {bottomRow.map((stat) => (
         <Card
           key={stat.label}
-          className="min-h-[80px] sm:min-h-[88px] p-3 md:p-4 flex flex-col gap-1.5 justify-center transition-shadow duration-200 hover:shadow-md bg-card border-border min-w-0"
+          className="group relative min-h-[104px] sm:min-h-[108px] p-3.5 md:p-4 flex flex-col justify-between overflow-hidden rounded-2xl border border-border/70 bg-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_45px_rgba(15,23,42,0.10)] min-w-0"
         >
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center shrink-0">
-              <stat.icon className="w-3.5 h-3.5 text-muted-foreground" />
+          <div className="absolute inset-x-4 -top-8 h-16 rounded-full bg-gradient-to-b from-muted/60 to-transparent opacity-80 pointer-events-none" />
+
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground shrink-0">
+              <stat.icon className="w-3.5 h-3.5" />
             </div>
-            <span className="text-[10px] sm:text-xs text-muted-foreground font-medium truncate">
+            <span className="text-[11px] sm:text-xs text-muted-foreground font-medium truncate tracking-wide">
               {stat.label}
             </span>
           </div>
-          <p className="text-sm font-bold text-primary truncate tabular-nums">
+
+          <p className="mt-3 text-sm sm:text-base font-semibold text-primary truncate tabular-nums">
             {stat.value}
           </p>
         </Card>

@@ -3,6 +3,7 @@
 import { Inter, Poppins } from 'next/font/google';
 import Navbar from '../components/Navbar';
 import Link from 'next/link';
+import { HEADER_IMAGE_2 } from '@/lib/header-image';
 
 const bodyFont = Inter({ subsets: ['latin'], weight: ['400', '500', '600'] });
 const display = Poppins({ subsets: ['latin'], weight: ['600', '700', '800'] });
@@ -10,8 +11,11 @@ const display = Poppins({ subsets: ['latin'], weight: ['600', '700', '800'] });
 export default function AboutPage() {
 	return (
 		<div className={`min-h-screen bg-white ${bodyFont.className}`}>
-			{/* Header Section with background */}
-			<section className="relative overflow-hidden bg-[#050406]">
+			{/* Navbar fixed at top */}
+			<Navbar variant="hero" />
+
+			{/* Header Section with background — pt offsets fixed navbar */}
+			<section className="relative overflow-hidden bg-[#050406] pt-[7.5rem] md:pt-32">
 				<div className="pointer-events-none absolute inset-0">
 					<div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[#5235ff]/20 blur-[120px]" />
 					<div className="absolute top-1/2 right-0 h-[480px] w-[480px] -translate-y-1/2 rounded-full bg-[#1cf1ff]/10 blur-[140px]" />
@@ -19,18 +23,23 @@ export default function AboutPage() {
 				</div>
 				<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_10%,transparent_0%,transparent_50%,rgba(0,0,0,0.2)_100%)]" />
 
-				<div className="relative mx-auto max-w-7xl px-6 py-20 md:px-10 lg:py-32">
-					<Navbar variant="hero" />
-					<div className="mx-auto max-w-4xl space-y-6 text-left mt-16 lg:mt-20">
-						<h1 className={`${display.className} text-4xl font-semibold leading-[1.1] tracking-[-0.02em] text-white md:text-5xl lg:text-6xl`}>
-							About Fx Genz — Prop Firm Trading Evaluations
-						</h1>
-						<p className="text-lg text-white/80 md:text-xl max-w-3xl leading-relaxed">
-							Fx Genz offers trader development programs and skills assessments. Our forex evaluation program is designed for disciplined traders — educational evaluations on simulated accounts.
-						</p>
-						<p className="text-lg text-white/70 md:text-xl max-w-3xl leading-relaxed">
-							Clear rules, transparent conditions. Verifiable assessments — no profit promises. Educational purposes for serious traders.
-						</p>
+				<div className="relative mx-auto max-w-7xl px-6 py-10 md:px-10 lg:py-14">
+					<div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10 lg:gap-12">
+						<div className="max-w-4xl space-y-4 text-left">
+							<h1 className={`${display.className} text-4xl font-semibold leading-[1.1] tracking-[-0.02em] text-white md:text-5xl lg:text-6xl`}>
+								About Fx Genz — Prop Firm Trading Evaluations
+							</h1>
+							<p className="text-lg text-white/80 md:text-xl max-w-2xl leading-relaxed">
+								Trader development programs and skills assessments. Clear rules, transparent conditions.
+							</p>
+						</div>
+						<div className="flex-shrink-0 lg:max-w-md xl:max-w-lg">
+							<img
+								src={HEADER_IMAGE_2}
+								alt="Fx Genz — trading evaluations"
+								className="w-full h-auto rounded-xl object-contain shadow-2xl"
+							/>
+						</div>
 					</div>
 				</div>
 				<div className="relative h-14 w-full">

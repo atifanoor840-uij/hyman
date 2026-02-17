@@ -75,6 +75,32 @@
   --sidebar-ring: oklch(0.92 0 0);
 }
 
+/* Authentic light-black theme for dashboard & performance */
+.dashboard-authentic {
+  --background: #0f0f0f;
+  --foreground: #fafafa;
+  --card: #18181b;
+  --card-foreground: #fafafa;
+  --popover: #18181b;
+  --popover-foreground: #fafafa;
+  --primary: #fafafa;
+  --primary-foreground: #0f0f0f;
+  --secondary: #27272a;
+  --secondary-foreground: #fafafa;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  --border: #3f3f46;
+  --input: #3f3f46;
+  --ring: #71717a;
+  --sidebar: #18181b;
+  --sidebar-foreground: #fafafa;
+  --sidebar-border: #3f3f46;
+  --sidebar-primary: #fafafa;
+  --sidebar-primary-foreground: #0f0f0f;
+  --sidebar-accent: #27272a;
+  --sidebar-accent-foreground: #fafafa;
+}
+
 @theme inline {
   /* optional: --font-sans, --font-serif, --font-mono if they are applied in the layout.tsx */
   --color-background: var(--background);

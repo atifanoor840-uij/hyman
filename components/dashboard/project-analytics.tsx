@@ -72,9 +72,9 @@ export function ProjectAnalytics(props: ProjectAnalyticsProps) {
     if (active && payload && payload.length) {
       const data = payload[0].payload
       return (
-        <div className="bg-foreground/95 backdrop-blur-sm text-background px-4 py-3 rounded-lg text-sm font-semibold shadow-xl border border-border/50">
+        <div className="bg-card border border-border shadow-xl px-4 py-3 rounded-lg text-sm font-semibold text-foreground">
           <p className="font-bold text-lg">{formatTooltipValue(data.value)}</p>
-          <p className="text-xs opacity-90 mt-1">{data.fullTime || data.date}</p>
+          <p className="text-xs text-muted-foreground mt-1">{data.fullTime || data.date}</p>
         </div>
       )
     }
@@ -87,13 +87,14 @@ export function ProjectAnalytics(props: ProjectAnalyticsProps) {
     return value.toString()
   }
 
-  const strokeColor = selectedMetric === "Draw Down" ? "#ef4444" : "#0a0a0a"
+  // Light stroke for Equity/Profit on dark bg; red for Draw Down
+  const strokeColor = selectedMetric === "Draw Down" ? "#ef4444" : "#d4d4d8"
   const gradientId = `chartGradient-${selectedMetric.replace(/\s/g, "")}`
   const isDrawDown = selectedMetric === "Draw Down"
 
   return (
     <Card
-      className="p-4 md:p-5 transition-shadow duration-200 hover:shadow-md animate-slide-in-up bg-card flex flex-col min-w-0"
+      className="p-4 md:p-5 transition-shadow duration-200 hover:shadow-md animate-slide-in-up bg-card border border-border/80 flex flex-col min-w-0"
       style={{ animationDelay: "400ms" }}
     >
       {/* Metric buttons on top */}
@@ -104,10 +105,10 @@ export function ProjectAnalytics(props: ProjectAnalyticsProps) {
             variant={selectedMetric === metric ? "default" : "outline"}
             size="sm"
             onClick={() => setSelectedMetric(metric)}
-            className={`text-xs h-6 px-2.5 ${
+            className={`text-xs h-6 px-2.5 rounded-lg ${
               selectedMetric === metric
-                ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                : "bg-transparent hover:bg-muted"
+                ? "bg-primary text-primary-foreground hover:bg-primary/90 border-0"
+                : "bg-transparent border-border/80 text-muted-foreground hover:bg-muted/60 hover:text-foreground"
             }`}
           >
             {metric}
@@ -117,8 +118,8 @@ export function ProjectAnalytics(props: ProjectAnalyticsProps) {
 
       {/* Header Section */}
       <div className="flex items-center gap-2 mb-3">
-        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-          <span className="text-sm font-bold text-primary">B</span>
+        <div className="w-8 h-8 rounded-full bg-muted/60 flex items-center justify-center">
+          <span className="text-sm font-bold text-foreground">B</span>
         </div>
         <div>
           <p className="text-xs text-muted-foreground">{selectedMetric}</p>
@@ -132,31 +133,29 @@ export function ProjectAnalytics(props: ProjectAnalyticsProps) {
         </div>
       </div>
 
-      {/* Chart Area - reduced height to match right column */}
-      <div className="h-52 relative">
+      {/* Chart Area - reduced height to match right column; text-muted-foreground for axes/grid on dark bg */}
+      <div className="h-52 relative text-muted-foreground">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
             <defs>
               <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={strokeColor} stopOpacity={isDrawDown ? 0.5 : 0.4} />
-                <stop offset="50%" stopColor={strokeColor} stopOpacity={isDrawDown ? 0.25 : 0.15} />
-                <stop offset="100%" stopColor={strokeColor} stopOpacity={isDrawDown ? 0.1 : 0.05} />
+                <stop offset="0%" stopColor={strokeColor} stopOpacity={isDrawDown ? 0.5 : 0.35} />
+                <stop offset="50%" stopColor={strokeColor} stopOpacity={isDrawDown ? 0.25 : 0.12} />
+                <stop offset="100%" stopColor={strokeColor} stopOpacity={isDrawDown ? 0.1 : 0.04} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="opacity-10" />
+            <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.2} />
             <XAxis
               dataKey="time"
               axisLine={false}
               tickLine={false}
               tick={{ fill: "currentColor", fontSize: 11 }}
-              className="text-muted-foreground"
               interval="preserveStartEnd"
             />
             <YAxis
               axisLine={false}
               tickLine={false}
               tick={{ fill: "currentColor", fontSize: 11 }}
-              className="text-muted-foreground"
               domain={
                 selectedMetric === "Draw Down"
                   ? allZero ? [-1, 1] : [Math.floor(minValue) - 1, 1]
@@ -176,7 +175,12 @@ export function ProjectAnalytics(props: ProjectAnalyticsProps) {
               strokeWidth={isDrawDown ? 3 : 2.5}
               fill={`url(#${gradientId})`}
               dot={false}
-              activeDot={{ r: 6, fill: strokeColor, stroke: "#fff", strokeWidth: 2, filter: `drop-shadow(0 0 4px ${strokeColor}80)` }}
+              activeDot={{
+                r: 6,
+                fill: strokeColor,
+                stroke: isDrawDown ? "#fff" : "rgba(15,15,15,0.6)",
+                strokeWidth: 2,
+              }}
             />
           </AreaChart>
         </ResponsiveContainer>

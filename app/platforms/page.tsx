@@ -2,6 +2,7 @@
 
 import { Inter, Poppins } from 'next/font/google';
 import Navbar from '../components/Navbar';
+import { HEADER_IMAGE_3 } from '@/lib/header-image';
 
 const bodyFont = Inter({ subsets: ['latin'], weight: ['400', '500', '600'] });
 const display = Poppins({ subsets: ['latin'], weight: ['600', '700', '800'] });
@@ -67,71 +68,6 @@ const platforms: Platform[] = [
 		description: 'The world\'s most popular forex trading platform with Expert Advisors (EAs), custom indicators, and automated trading capabilities.',
 		bestFor: ['Forex Traders', 'EA Trading', 'Beginners', 'Scalping'],
 	},
-	{
-		name: 'Trade Licker',
-		logo: (
-			<svg className="h-12 w-12" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<rect width="200" height="200" rx="20" fill="#FF6B35"/>
-				<circle cx="100" cy="100" r="60" fill="white" opacity="0.9"/>
-				<path d="M70 100L90 120L130 80" stroke="#FF6B35" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"/>
-			</svg>
-		),
-		specifications: {
-			execution: 'STP/ECN Execution',
-			spreads: 'From 0.3 pips',
-			instruments: 'Forex, Indices, Commodities',
-			leverage: 'Up to 1:200',
-			minimumDeposit: '$200',
-			platformType: 'Web-based',
-		},
-		countries: ['United Kingdom', 'Australia', 'New Zealand', 'South Africa', 'Singapore', 'Malaysia', 'Philippines', 'Indonesia', 'Thailand', 'Vietnam'],
-		description: 'A modern web-based trading platform with intuitive interface, advanced charting tools, and seamless execution.',
-		bestFor: ['Web Traders', 'Day Traders', 'Intermediate Traders', 'Quick Execution'],
-	},
-	{
-		name: 'DXTrade',
-		logo: (
-			<svg className="h-12 w-12" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<rect width="200" height="200" rx="20" fill="#0066CC"/>
-				<path d="M50 50L100 30L150 50L150 150L100 170L50 150Z" fill="white" opacity="0.9"/>
-				<path d="M70 70L100 60L130 70L130 130L100 140L70 130Z" fill="#0066CC"/>
-				<text x="100" y="105" textAnchor="middle" fill="white" fontSize="20" fontWeight="bold">DX</text>
-			</svg>
-		),
-		specifications: {
-			execution: 'ECN Execution',
-			spreads: 'From 0.0 pips',
-			instruments: 'Forex, Stocks, Indices, Commodities',
-			leverage: 'Up to 1:100',
-			minimumDeposit: '$100',
-			platformType: 'Web, Mobile',
-		},
-		countries: ['United States', 'United Kingdom', 'Switzerland', 'Luxembourg', 'Belgium', 'Austria', 'Ireland', 'Finland', 'Iceland', 'Liechtenstein'],
-		description: 'Professional-grade trading platform with advanced order management, depth of market, and institutional-level execution.',
-		bestFor: ['Professional Traders', 'Institutional Clients', 'ECN Trading', 'Advanced Order Types'],
-	},
-	{
-		name: 'cTrader',
-		logo: (
-			<svg className="h-12 w-12" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<rect width="200" height="200" rx="20" fill="#00D4FF"/>
-				<path d="M60 60L100 50L140 60L140 140L100 150L60 140Z" fill="white" opacity="0.9"/>
-				<path d="M80 80L100 75L120 80L120 120L100 125L80 120Z" fill="#00D4FF"/>
-				<text x="100" y="105" textAnchor="middle" fill="white" fontSize="18" fontWeight="bold">cT</text>
-			</svg>
-		),
-		specifications: {
-			execution: 'STP/ECN Execution',
-			spreads: 'From 0.0 pips',
-			instruments: 'Forex, Indices, Commodities, Stocks',
-			leverage: 'Up to 1:500',
-			minimumDeposit: '$100',
-			platformType: 'Desktop, Web, Mobile',
-		},
-		countries: ['United Kingdom', 'Cyprus', 'Malta', 'Bulgaria', 'Romania', 'Poland', 'Czech Republic', 'Hungary', 'Greece', 'Portugal', 'Spain', 'Italy'],
-		description: 'Next-generation trading platform with Level II pricing, advanced charting, and cBot algorithmic trading capabilities.',
-		bestFor: ['Advanced Traders', 'Algorithmic Trading', 'Level II Pricing', 'Professional Analysis'],
-	},
 ];
 
 export default function PlatformsPage() {
@@ -150,13 +86,22 @@ export default function PlatformsPage() {
 				
 				<div className="relative mx-auto max-w-7xl px-6 py-20 md:px-10 lg:py-32">
 					<Navbar variant="hero" />
-					<div className="mx-auto max-w-4xl space-y-6 text-left mt-16 lg:mt-20">
-						<h1 className={`${display.className} text-4xl font-semibold leading-[1.1] tracking-[-0.02em] text-white md:text-5xl lg:text-6xl`}>
-							Trading Platforms
-						</h1>
-						<p className="text-lg text-white/70 md:text-xl max-w-2xl">
-							Choose from our selection of professional trading platforms, each optimized for different trading styles and regions.
-						</p>
+					<div className="mt-16 lg:mt-20 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10 lg:gap-12">
+						<div className="max-w-4xl space-y-6 text-left">
+							<h1 className={`${display.className} text-4xl font-semibold leading-[1.1] tracking-[-0.02em] text-white md:text-5xl lg:text-6xl`}>
+								Trading Platforms
+							</h1>
+							<p className="text-lg text-white/70 md:text-xl max-w-2xl">
+								Trade on MetaTrader 5 (MT5) or MetaTrader 4 (MT4) — professional platforms for our evaluation programs.
+							</p>
+						</div>
+						<div className="flex-shrink-0 lg:max-w-md xl:max-w-lg">
+							<img
+								src={HEADER_IMAGE_3}
+								alt="Trading platform interface"
+								className="w-full h-auto rounded-xl object-contain shadow-2xl"
+							/>
+						</div>
 					</div>
 				</div>
 				{/* Subtle divider curve */}

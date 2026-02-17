@@ -5,7 +5,7 @@ const STEPS = [
 	{
 		id: "01",
 		title: "Choose your evaluation",
-		body: "Select from our trading evaluation programs tailored to your style. Simulated accounts on MT4, MT5, or DXtrade.",
+		body: "Select from our trading evaluation programs tailored to your style. Simulated accounts on MT4 or MT5.",
 		icon: ProgramIcon,
 		image: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766126666/concept_step_1_revised_jupeym.png",
 	},
