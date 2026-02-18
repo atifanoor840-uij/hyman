@@ -42,6 +42,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { getMyAccount, type Order, type OrderCredentials } from "@/lib/api/auth"
 import { type PerformanceResponse } from "@/lib/api/performance"
 import { getShowMyTradesStats } from "@/lib/api/showmytrades"
@@ -298,6 +299,102 @@ function Gauge({
   )
 }
 
+// Circular consistency achievement gauge (dark ring, green fill, center %)
+function ConsistencyCircleGauge({
+  achievedPct,
+  maxDayPct,
+  limitPct,
+  periodLabel = "Period: Last 30 days",
+}: {
+  achievedPct: number
+  maxDayPct: number
+  limitPct: number
+  periodLabel?: string
+}) {
+  const isOverLimit = maxDayPct >= limitPct
+  // Ring fill: when over limit show exact max day % (capped at 100% for display); when under show achieved %
+  const displayPct = isOverLimit
+    ? Math.min(100, (maxDayPct / limitPct) * 100)
+    : Math.min(100, Math.max(0, achievedPct))
+  const circumference = 2 * Math.PI * 42
+  const strokeDashoffset = circumference - (displayPct / 100) * circumference
+  return (
+    <div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-4 flex flex-col items-center">
+      <p className="text-xs font-semibold text-foreground mb-1 w-full">Consistency Rule</p>
+      <p className="text-[10px] text-muted-foreground mb-3 w-full">{periodLabel}</p>
+      <div className="relative w-36 h-36">
+        <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+          {/* Dark outer ring (track) */}
+          <circle
+            cx="50"
+            cy="50"
+            r="42"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="10"
+            className="text-muted-foreground/40"
+          />
+          {/* Progress arc: green when under limit, red when over (shows exact result) */}
+          <circle
+            cx="50"
+            cy="50"
+            r="42"
+            fill="none"
+            stroke={isOverLimit ? "hsl(var(--destructive))" : "#22c55e"}
+            strokeWidth="10"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            className="transition-all duration-700 ease-out"
+          />
+          {/* Inner radial segments (gear-like) */}
+          {Array.from({ length: 12 }).map((_, i) => {
+            const a = (i * 30 * Math.PI) / 180
+            const x1 = 50 + 28 * Math.cos(a)
+            const y1 = 50 + 28 * Math.sin(a)
+            const x2 = 50 + 35 * Math.cos(a)
+            const y2 = 50 + 35 * Math.sin(a)
+            return (
+              <line
+                key={i}
+                x1={x1}
+                y1={y1}
+                x2={x2}
+                y2={y2}
+                stroke="currentColor"
+                strokeWidth="1.5"
+                className="text-muted-foreground/30"
+              />
+            )
+          })}
+          {/* Inner circle fill */}
+          <circle cx="50" cy="50" r="26" className="fill-muted/20" />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          {isOverLimit ? (
+            <>
+              <span className="text-2xl font-bold tabular-nums text-destructive">
+                {maxDayPct.toFixed(1)}%
+              </span>
+              <span className="text-[10px] text-muted-foreground mt-0.5">max day (limit {limitPct}%)</span>
+            </>
+          ) : (
+            <>
+              <span className="text-2xl font-bold tabular-nums text-emerald-500">
+                {Math.round(Math.min(100, Math.max(0, achievedPct)))}%
+              </span>
+              <span className="text-[10px] text-muted-foreground mt-0.5">achieved</span>
+            </>
+          )}
+        </div>
+      </div>
+      <p className="text-[10px] text-muted-foreground mt-2 text-center">
+        Max single day: {maxDayPct.toFixed(1)}% (limit {limitPct}%)
+      </p>
+    </div>
+  )
+}
+
 // Horizontal rule bar for compliance card (graph-style)
 function RuleBar({
   label,
@@ -416,6 +513,7 @@ export default function PerformancePage() {
   const [error, setError] = useState<string | null>(null)
   const [showCredentials, setShowCredentials] = useState(false)
   const [tradesPage, setTradesPage] = useState(1)
+  const [complianceDetailsOpen, setComplianceDetailsOpen] = useState<"minHolding" | "layering" | "weekend" | null>(null)
 
   useEffect(() => {
     if (decodedOrderId) setSelectedOrderId(decodedOrderId)
@@ -919,12 +1017,181 @@ export default function PerformancePage() {
                   </div>
                 </Card>
 
+                {/* Compliance & Rules — left side, just below Violations (second on left column) */}
+                <Card className="overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm min-w-0" id="compliance">
+                  <div className="border-b border-border/80 bg-muted/20 px-4 sm:px-6 py-3.5">
+                    <h3 className="text-sm font-semibold text-foreground tracking-tight">Compliance & Rules</h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">Holding time, layering, consistency, weekend</p>
+                  </div>
+                  <div className="p-4 sm:p-5 space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <ConsistencyCircleGauge
+                        achievedPct={Math.max(
+                          0,
+                          100 - (complianceMetrics.consistencyMaxDayPct / complianceMetrics.consistencyLimitPct) * 100
+                        )}
+                        maxDayPct={complianceMetrics.consistencyMaxDayPct}
+                        limitPct={complianceMetrics.consistencyLimitPct}
+                        periodLabel="No single day &gt;30% of total profit"
+                      />
+                      <div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-3 shadow-sm">
+                        <RuleBar
+                          label="Min Holding Time"
+                          description="Trades closed within 2 minutes 30 seconds are marked as non-compliant."
+                          valuePct={complianceMetrics.minHoldingCompliantPct}
+                          limitPct={100}
+                          valueLabel={
+                            complianceMetrics.totalTradesForHolding === 0
+                              ? "—"
+                              : complianceMetrics.minHoldingNonCompliant > 0
+                                ? `${complianceMetrics.minHoldingNonCompliant} non-compliant`
+                                : "Compliant"
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <RuleBar
+                        label="Layering"
+                        description="Flags if more than 2 positions on the same pair at the same direction are placed within 10 seconds."
+                        valueLabel={complianceMetrics.layeringFlagged ? "Flagged" : "Compliant"}
+                        status={complianceMetrics.layeringFlagged ? "flagged" : "compliant"}
+                      />
+                      <RuleBar
+                        label="Weekend Holding"
+                        description="Whether holding positions over the weekend is allowed for your account type."
+                        valueLabel={accountRules.weekendHolding}
+                        status={accountRules.weekendHolding === "Allowed" ? "allowed" : "not-allowed"}
+                      />
+                    </div>
+                    {(complianceMetrics.minHoldingViolations?.length ?? 0) > 0 && (
+                      <Collapsible
+                        open={complianceDetailsOpen === "minHolding"}
+                        onOpenChange={(open) => setComplianceDetailsOpen(open ? "minHolding" : null)}
+                      >
+                        <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 overflow-hidden">
+                          <div className="flex items-center justify-between gap-2 p-3">
+                            <div className="min-w-0">
+                              <p className="text-xs font-semibold text-foreground">Min Holding Time</p>
+                              <p className="text-[10px] text-muted-foreground mt-0.5">Closed within 2 min 30 sec · {complianceMetrics.minHoldingViolations.length} trade(s)</p>
+                            </div>
+                            <CollapsibleTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="shrink-0 h-8 px-3 text-xs text-foreground hover:bg-amber-500/10"
+                              >
+                                Details
+                                <ChevronDown className={`h-3.5 w-3.5 ml-1 transition-transform ${complianceDetailsOpen === "minHolding" ? "rotate-180" : ""}`} />
+                              </Button>
+                            </CollapsibleTrigger>
+                          </div>
+                          <CollapsibleContent>
+                            <div className="border-t border-amber-500/20 px-3 py-2 max-h-40 overflow-y-auto">
+                              <ul className="space-y-1.5">
+                                {complianceMetrics.minHoldingViolations.map((v, i) => (
+                                  <li key={`min-${v.ticket}-${v.open_time}-${i}`} className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs py-1 border-b border-border/30 last:border-0">
+                                    <span className="font-medium tabular-nums text-foreground">#{v.ticket}</span>
+                                    <span className="text-muted-foreground">{v.symbol}</span>
+                                    <span className="text-muted-foreground">{v.open_time ? new Date(v.open_time).toLocaleString() : "—"}</span>
+                                    <span className="text-amber-600 dark:text-amber-500 font-medium">({Math.floor(v.duration / 60)}m {v.duration % 60}s)</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </CollapsibleContent>
+                        </div>
+                      </Collapsible>
+                    )}
+                    {(complianceMetrics.layeringViolations?.length ?? 0) > 0 && (
+                      <Collapsible
+                        open={complianceDetailsOpen === "layering"}
+                        onOpenChange={(open) => setComplianceDetailsOpen(open ? "layering" : null)}
+                      >
+                        <div className="rounded-lg border border-destructive/30 bg-destructive/5 overflow-hidden">
+                          <div className="flex items-center justify-between gap-2 p-3">
+                            <div className="min-w-0">
+                              <p className="text-xs font-semibold text-foreground">Layering</p>
+                              <p className="text-[10px] text-muted-foreground mt-0.5">More than 2 positions on same pair within 10 sec · {complianceMetrics.layeringViolations.length} trade(s)</p>
+                            </div>
+                            <CollapsibleTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="shrink-0 h-8 px-3 text-xs text-foreground hover:bg-destructive/10"
+                              >
+                                Details
+                                <ChevronDown className={`h-3.5 w-3.5 ml-1 transition-transform ${complianceDetailsOpen === "layering" ? "rotate-180" : ""}`} />
+                              </Button>
+                            </CollapsibleTrigger>
+                          </div>
+                          <CollapsibleContent>
+                            <div className="border-t border-destructive/20 px-3 py-2 max-h-40 overflow-y-auto">
+                              <ul className="space-y-1.5">
+                                {complianceMetrics.layeringViolations.map((v, i) => (
+                                  <li key={`lay-${v.ticket}-${v.open_time}-${i}`} className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs py-1 border-b border-border/30 last:border-0">
+                                    <span className="font-medium tabular-nums text-foreground">#{v.ticket}</span>
+                                    <span className="text-muted-foreground">{v.symbol}</span>
+                                    <span className="text-muted-foreground">{v.open_time ? new Date(v.open_time).toLocaleString() : "—"}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </CollapsibleContent>
+                        </div>
+                      </Collapsible>
+                    )}
+                    {(complianceMetrics.weekendHoldingViolations?.length ?? 0) > 0 && (
+                      <Collapsible
+                        open={complianceDetailsOpen === "weekend"}
+                        onOpenChange={(open) => setComplianceDetailsOpen(open ? "weekend" : null)}
+                      >
+                        <div className="rounded-lg border border-destructive/30 bg-destructive/5 overflow-hidden">
+                          <div className="flex items-center justify-between gap-2 p-3">
+                            <div className="min-w-0">
+                              <p className="text-xs font-semibold text-foreground">Weekend Holding</p>
+                              <p className="text-[10px] text-muted-foreground mt-0.5">Position held over Saturday or Sunday · {complianceMetrics.weekendHoldingViolations.length} trade(s)</p>
+                            </div>
+                            <CollapsibleTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="shrink-0 h-8 px-3 text-xs text-foreground hover:bg-destructive/10"
+                              >
+                                Details
+                                <ChevronDown className={`h-3.5 w-3.5 ml-1 transition-transform ${complianceDetailsOpen === "weekend" ? "rotate-180" : ""}`} />
+                              </Button>
+                            </CollapsibleTrigger>
+                          </div>
+                          <CollapsibleContent>
+                            <div className="border-t border-destructive/20 px-3 py-2 max-h-40 overflow-y-auto">
+                              <ul className="space-y-1.5">
+                                {complianceMetrics.weekendHoldingViolations.map((v, i) => (
+                                  <li key={`week-${v.ticket}-${v.open_time}-${i}`} className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs py-1 border-b border-border/30 last:border-0">
+                                    <span className="font-medium tabular-nums text-foreground">#{v.ticket}</span>
+                                    <span className="text-muted-foreground">{v.symbol}</span>
+                                    <span className="text-muted-foreground">
+                                      {v.open_time ? new Date(v.open_time).toLocaleString() : "—"}
+                                      {" → "}
+                                      {v.close_time ? new Date(v.close_time).toLocaleString() : "—"}
+                                    </span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </CollapsibleContent>
+                        </div>
+                      </Collapsible>
+                    )}
+                  </div>
+                </Card>
+
                 {/* Equity graph */}
                 <ProjectAnalytics stats={perf} />
               </div>
 
-              {/* Right: Violations card only — below Performance card */}
-              <div className="min-w-0">
+              {/* Right: Violations, then Compliance & Rules below — sticky so it stays visible when scrolling */}
+              <div className="min-w-0 lg:sticky lg:top-6 lg:self-start">
                 <Card className="overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm" id="violations">
                   <div className="border-b border-border/80 bg-muted/20 px-4 sm:px-5 py-3.5 flex items-center gap-2.5">
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-destructive/10 border border-destructive/20">
