@@ -10,7 +10,7 @@ const platforms = [
     name: "MetaTrader 5",
     short: "MT5",
     description: "Advanced multi-asset platform. Download for Windows, Mac, iOS, or Android.",
-    image: "https://res.cloudinary.com/dejjuhzug/image/upload/v1764395181/f0bdc4ec-31ba-43db-af2d-990985a4827d_ezvlm9.png",
+    image: "https://res.cloudinary.com/dqzibxdtn/image/upload/v1771391692/images__2_-removebg-preview_ih4rc5.png",
     links: [
       { label: "Windows", href: "https://www.metatrader5.com/en/download" },
       { label: "Mac", href: "https://www.metatrader5.com/en/download" },
@@ -22,7 +22,7 @@ const platforms = [
     name: "MetaTrader 4",
     short: "MT4",
     description: "Most popular forex platform. Download for Windows, Mac, iOS, or Android.",
-    image: "https://res.cloudinary.com/dejjuhzug/image/upload/v1764395131/d1b7332b-1650-4a91-a1a0-8d09b53936ec_ougmpe.png",
+    image: "https://res.cloudinary.com/dqzibxdtn/image/upload/v1771391691/images__1_-removebg-preview_asoydh.png",
     links: [
       { label: "Windows", href: "https://www.metatrader4.com/en/download" },
       { label: "Mac", href: "https://www.metatrader4.com/en/download" },
@@ -46,21 +46,21 @@ export function DownloadContent() {
           {platforms.map((platform) => (
             <div
               key={platform.name}
-              className="flex flex-col sm:flex-row items-start gap-4 p-4 rounded-xl border border-border bg-card hover:bg-muted/30 transition-colors"
+              className="flex flex-col sm:flex-row items-start gap-5 p-5 rounded-xl border border-border bg-card hover:bg-muted/30 transition-colors"
             >
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-border bg-muted/50 p-2">
+              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border border-border bg-white p-2.5">
                 <Image
                   src={platform.image}
                   alt={platform.name}
-                  width={48}
-                  height={48}
+                  width={64}
+                  height={64}
                   className="object-contain"
                   unoptimized
                 />
               </div>
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 overflow-visible">
                 <h3 className="font-semibold text-foreground">{platform.name}</h3>
-                <p className="text-sm text-muted-foreground mt-0.5">{platform.description}</p>
+                <p className="text-sm text-muted-foreground mt-0.5 break-words leading-relaxed">{platform.description}</p>
                 <div className="flex flex-wrap gap-2 mt-3">
                   {platform.links.map((link) => (
                     <Button key={link.label} variant="outline" size="sm" asChild>

@@ -14,6 +14,10 @@ export default function BillingPage() {
           <Header
             title="Billing"
             description="View your account orders, payment history, and billing information."
+            variant="dashboard-hero"
+            backHref="/dashboard"
+            backLabel="Back"
+            badge="Billing"
           />
 
           <div className="mt-5 flex-1">

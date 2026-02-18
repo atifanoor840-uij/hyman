@@ -16,8 +16,12 @@ export default function CouponsPage() {
           <Header
             title="Coupon codes"
             description="Active discounts and promo codes. Redeem at checkout."
+            variant="dashboard-hero"
+            backHref="/dashboard"
+            backLabel="Back"
+            badge="Coupons"
             actions={
-              <Button className="w-full sm:w-auto h-9 text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 hover:shadow-md gap-2">
+              <Button className="w-full sm:w-auto h-9 rounded-lg text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 hover:shadow-md gap-2">
                 Browse challenges
               </Button>
             }

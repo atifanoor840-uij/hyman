@@ -53,6 +53,10 @@ export default function WithdrawalPage() {
           <Header
             title="Withdrawal"
             description="Request payouts and view your withdrawal history."
+            variant="dashboard-hero"
+            backHref="/dashboard"
+            backLabel="Back"
+            badge="Withdrawal"
           />
 
           <div className="mt-5 flex-1">

@@ -14,6 +14,10 @@ export default function DownloadPage() {
           <Header
             title="Downloads"
             description="Download MetaTrader 5 (MT5) and MetaTrader 4 (MT4) for your evaluation."
+            variant="dashboard-hero"
+            backHref="/dashboard"
+            backLabel="Back"
+            badge="Downloads"
           />
 
           <div className="mt-5 flex-1">

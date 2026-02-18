@@ -16,8 +16,12 @@ export default function CalendarPage() {
           <Header
             title="Economic Calendar"
             description="Track important economic events, news releases, and market announcements."
+            variant="dashboard-hero"
+            backHref="/dashboard"
+            backLabel="Back"
+            badge="Economic Calendar"
             actions={
-              <Button className="w-full sm:w-auto h-9 text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 hover:shadow-md gap-2">
+              <Button className="w-full sm:w-auto h-9 rounded-lg text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 hover:shadow-md gap-2">
                 + Add Alert
               </Button>
             }

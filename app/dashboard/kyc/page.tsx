@@ -55,6 +55,10 @@ export default function KycPage() {
           <Header
             title="KYC"
             description="Complete identity verification to enable withdrawals and full account access."
+            variant="dashboard-hero"
+            backHref="/dashboard"
+            backLabel="Back"
+            badge="KYC"
           />
 
           <div className="mt-5 flex-1">

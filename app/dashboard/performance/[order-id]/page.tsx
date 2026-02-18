@@ -27,9 +27,12 @@ import {
   Lock,
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
   AlertTriangle,
   CheckCircle2,
   XCircle,
+  Mail,
 } from "lucide-react"
 import {
   Table,
@@ -44,6 +47,7 @@ import { type PerformanceResponse } from "@/lib/api/performance"
 import { getShowMyTradesStats } from "@/lib/api/showmytrades"
 import { MOCK_PERFORMANCE_DATA } from "@/lib/api/performance-mock"
 import { ApiClientError } from "@/lib/api/client"
+import { getAccountRules } from "@/lib/rules-config"
 import { ProjectAnalytics } from "@/components/dashboard/project-analytics"
 
 const ACCOUNT_API_ERROR_MESSAGE =
@@ -52,8 +56,43 @@ const ACCOUNT_API_ERROR_MESSAGE =
 const DAILY_DRAWDOWN_LIMIT = 5
 const OVERALL_DRAWDOWN_LIMIT = 10
 const PROFIT_TARGET_PERCENT = 8
-const CONSISTENCY_REQUIRED_PCT = 50
 const MIN_TRADING_DAYS_REQUIRED = 5
+
+function DayResetCountdown() {
+  const [times, setTimes] = useState(() => getDayResetTimes())
+  useEffect(() => {
+    const t = setInterval(() => setTimes(getDayResetTimes()), 1000)
+    return () => clearInterval(t)
+  }, [])
+  const circumference = 2 * Math.PI * 45
+  const strokeDashoffset = circumference - (times.progress / 100) * circumference
+  return (
+    <Card className="overflow-hidden rounded-full border border-border/80 bg-card shadow-sm mt-4 w-44 h-44 flex items-center justify-center relative shrink-0">
+      <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="4" className="text-muted/30" />
+        <circle
+          cx="50"
+          cy="50"
+          r="45"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="4"
+          strokeLinecap="round"
+          className="text-foreground/80"
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          style={{ transition: "stroke-dashoffset 1s linear" }}
+        />
+      </svg>
+      <div className="relative flex flex-col items-center justify-center gap-0.5 text-center">
+        <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Elapsed Time</span>
+        <span className="text-sm font-medium text-foreground tabular-nums">{formatHMS(times.elapsed)}</span>
+        <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mt-0.5">Day Reset In</span>
+        <span className="text-xl font-bold text-foreground tabular-nums">{formatHMS(times.remaining)}</span>
+      </div>
+    </Card>
+  )
+}
 
 function getAccountStatusLabel(order: Order | null): string {
   if (!order) return "—"
@@ -70,6 +109,23 @@ function getAccountStatusVariant(status: string): string {
   if (status === "Stage 2") return "bg-primary/15 text-primary border-primary/20"
   if (status === "Phase 1") return "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
   return "bg-muted/80 text-foreground border-border"
+}
+
+function formatHMS(seconds: number): string {
+  const s = Math.max(0, Math.floor(seconds % 60))
+  const m = Math.max(0, Math.floor((seconds / 60) % 60))
+  const h = Math.max(0, Math.floor(seconds / 3600))
+  return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
+}
+
+function getDayResetTimes(): { elapsed: number; remaining: number; progress: number } {
+  const now = new Date()
+  const midnight = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+  const elapsedSec = (now.getTime() - midnight.getTime()) / 1000
+  const totalSec = 86400
+  const remainingSec = Math.max(0, totalSec - elapsedSec)
+  const progress = (elapsedSec / totalSec) * 100
+  return { elapsed: elapsedSec, remaining: remainingSec, progress }
 }
 
 function formatTradeDuration(sec: number): string {
@@ -242,6 +298,78 @@ function Gauge({
   )
 }
 
+// Horizontal rule bar for compliance card (graph-style)
+function RuleBar({
+  label,
+  description,
+  valuePct,
+  limitPct,
+  status,
+  valueLabel,
+}: {
+  label: string
+  description: string
+  valuePct?: number
+  limitPct?: number
+  status?: "allowed" | "not-allowed" | "compliant" | "flagged"
+  valueLabel?: string
+}) {
+  const isOk = status === "allowed" || status === "compliant"
+  const isBad = status === "flagged" || status === "not-allowed"
+  const pct = valuePct ?? 0
+  const limit = limitPct ?? 100
+  const showBar = valuePct != null && limitPct != null
+  return (
+    <div className="rounded-lg border border-border/50 bg-muted/20 p-3 space-y-1.5">
+      <div className="flex justify-between items-start gap-2">
+        <p className="text-xs font-semibold text-foreground">{label}</p>
+        {valueLabel != null && (
+          <span className={`text-xs font-bold tabular-nums shrink-0 ${isBad ? "text-destructive" : isOk ? "text-emerald-600" : "text-foreground"}`}>
+            {valueLabel}
+          </span>
+        )}
+      </div>
+      <p className="text-[10px] text-muted-foreground leading-snug">{description}</p>
+      {showBar && (
+        <div className="space-y-0.5">
+          <div className="h-2 w-full rounded-full bg-muted/50 overflow-hidden relative">
+            {limit > 0 && limit < 100 && (() => {
+              const maxVal = Math.max(limit, pct, 1)
+              const fillPct = (pct / maxVal) * 100
+              const limitLinePct = (limit / maxVal) * 100
+              return (
+                <>
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${fillPct}%`,
+                      backgroundColor: pct > limit ? "hsl(var(--destructive))" : "hsl(var(--primary))",
+                    }}
+                  />
+                  <div
+                    className="absolute top-0 bottom-0 w-0.5 bg-foreground/50"
+                    style={{ left: `${limitLinePct}%` }}
+                  />
+                </>
+              )
+            })()}
+            {limit >= 100 && (
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{
+                  width: `${Math.min(100, (pct / Math.max(limit, 1)) * 100)}%`,
+                  backgroundColor: pct > limit ? "hsl(var(--destructive))" : "hsl(var(--primary))",
+                }}
+              />
+            )}
+          </div>
+          <p className="text-[9px] text-muted-foreground">Limit: {limit}%</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // Consistency & daily stats from daily_performance
 function useConsistencyStats(perf: PerformanceResponse | null) {
   return useMemo(() => {
@@ -287,6 +415,7 @@ export default function PerformancePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showCredentials, setShowCredentials] = useState(false)
+  const [tradesPage, setTradesPage] = useState(1)
 
   useEffect(() => {
     if (decodedOrderId) setSelectedOrderId(decodedOrderId)
@@ -367,6 +496,10 @@ export default function PerformancePage() {
   const adv = perf?.statistics?.advanced_statistics
   const dailyPerf = perf?.statistics?.equity_curve?.daily_performance || []
   const consistency = useConsistencyStats(perf)
+  const accountRules = getAccountRules(currentOrder?.challenge_type)
+  const dailyDrawdownLimit = parseInt(accountRules.dailyDrawdown, 10) || DAILY_DRAWDOWN_LIMIT
+  const maxDrawdownLimit = parseInt(accountRules.maxDrawdown, 10) || OVERALL_DRAWDOWN_LIMIT
+  const minTradingDaysRequired = accountRules.minTradingDays > 0 ? accountRules.minTradingDays : MIN_TRADING_DAYS_REQUIRED
 
   const initialBalance = stats?.total_deposits ?? (accountInfo?.balance ? 50000 : 50000)
   const profitTargetAmount = creds?.profit_target != null ? Number(creds.profit_target) : (initialBalance * PROFIT_TARGET_PERCENT) / 100
@@ -383,32 +516,141 @@ export default function PerformancePage() {
     perf?.statistics?.advanced_statistics?.recent_trades_duration ??
     []
 
+  useEffect(() => {
+    setTradesPage(1)
+  }, [selectedOrderId, trades.length])
+
+  const TRADES_PER_PAGE = 10
+  const paginatedTrades = trades.slice((tradesPage - 1) * TRADES_PER_PAGE, tradesPage * TRADES_PER_PAGE)
+  const hasNextPage = trades.length > tradesPage * TRADES_PER_PAGE
+  const hasPrevPage = tradesPage > 1
+
+  const complianceMetrics = useMemo(() => {
+    const MIN_HOLDING_SEC = 150
+    type TradeRow = { duration?: number; open_time?: string; close_time?: string; symbol?: string; ticket?: string }
+    const tradeList = trades as TradeRow[]
+    const minHoldingViolations: { ticket: string; symbol: string; open_time: string; duration: number }[] = []
+    tradeList.forEach((t) => {
+      const dur = typeof t.duration === "number" ? t.duration : 0
+      if (dur > 0 && dur < MIN_HOLDING_SEC) {
+        minHoldingViolations.push({
+          ticket: String(t.ticket ?? "—"),
+          symbol: String(t.symbol ?? "—"),
+          open_time: String(t.open_time ?? ""),
+          duration: dur,
+        })
+      }
+    })
+    const layeringViolations: { ticket: string; symbol: string; open_time: string }[] = []
+    const bySymbol = new Map<string, Array<{ open_time: string; ticket: string; symbol: string }>>()
+    tradeList.forEach((t) => {
+      const sym = String(t.symbol ?? "")
+      if (!sym) return
+      if (!bySymbol.has(sym)) bySymbol.set(sym, [])
+      bySymbol.get(sym)!.push({
+        open_time: String(t.open_time ?? ""),
+        ticket: String(t.ticket ?? "—"),
+        symbol: sym,
+      })
+    })
+    bySymbol.forEach((arr) => {
+      arr.sort((a, b) => new Date(a.open_time).getTime() - new Date(b.open_time).getTime())
+      for (let i = 0; i < arr.length; i++) {
+        const t0 = new Date(arr[i]!.open_time).getTime()
+        const inWindow = arr.filter((x) => {
+          const t = new Date(x.open_time).getTime()
+          return t >= t0 && t <= t0 + 10 * 1000
+        })
+        if (inWindow.length > 2) {
+          inWindow.forEach((x) => {
+            if (!layeringViolations.some((v) => v.ticket === x.ticket && v.open_time === x.open_time)) {
+              layeringViolations.push({ ticket: x.ticket, symbol: x.symbol, open_time: x.open_time })
+            }
+          })
+        }
+      }
+    })
+    const weekendHoldingViolations: { ticket: string; symbol: string; open_time: string; close_time: string }[] = []
+    tradeList.forEach((t) => {
+      const openStr = t.open_time ? String(t.open_time) : ""
+      const closeStr = t.close_time ? String(t.close_time) : ""
+      if (!openStr || !closeStr) return
+      const openD = new Date(openStr)
+      const closeD = new Date(closeStr)
+      let d = new Date(openD)
+      d.setHours(0, 0, 0, 0)
+      const endD = new Date(closeD)
+      endD.setHours(0, 0, 0, 0)
+      while (d.getTime() <= endD.getTime()) {
+        const day = d.getDay()
+        if (day === 0 || day === 6) {
+          weekendHoldingViolations.push({
+            ticket: String(t.ticket ?? "—"),
+            symbol: String(t.symbol ?? "—"),
+            open_time: openStr,
+            close_time: closeStr,
+          })
+          break
+        }
+        d.setDate(d.getDate() + 1)
+      }
+    })
+    let totalProfit = 0
+    let maxSingleDayProfit = 0
+    const daily = dailyPerf
+    if (daily.length > 0) {
+      let prevCum = 0
+      for (const d of daily) {
+        const cum = d.cumulative_profit ?? d.cumulative_equity ?? 0
+        const dayProfit = cum - prevCum
+        totalProfit += dayProfit
+        if (dayProfit > maxSingleDayProfit) maxSingleDayProfit = dayProfit
+        prevCum = cum
+      }
+      if (totalProfit < 0) totalProfit = 0
+    }
+    const consistencyMaxDayPct = totalProfit > 0 ? (maxSingleDayProfit / totalProfit) * 100 : 0
+    const totalTrades = tradeList.length
+    const minHoldingNonCompliant = minHoldingViolations.length
+    const minHoldingCompliantPct = totalTrades > 0 ? ((totalTrades - minHoldingNonCompliant) / totalTrades) * 100 : 100
+    return {
+      minHoldingNonCompliant,
+      minHoldingCompliantPct,
+      totalTradesForHolding: totalTrades,
+      minHoldingViolations,
+      layeringFlagged: layeringViolations.length > 0,
+      layeringViolations,
+      weekendHoldingViolations,
+      consistencyMaxDayPct,
+      consistencyLimitPct: 30,
+    }
+  }, [trades, dailyPerf])
+
   const winRate = adv?.win_rate ?? 0
   const profitFactor = adv?.profit_factor ?? 0
   const winLossRatio = profitFactor >= 1 ? Math.min(2, profitFactor) : profitFactor
 
   const currentDrawdownAmount = stats?.drawdown_percent != null ? (initialBalance * Math.abs(stats.drawdown_percent)) / 100 : 0
   const dailyDrawdownCurrent = dailyPerf.length ? Math.abs(dailyPerf.reduce((w, d) => (Math.abs(d.drawdown) > Math.abs(w.drawdown) ? d : w))?.drawdown ?? 0) : 0
-  const minTradingDaysOk = consistency.totalDays >= MIN_TRADING_DAYS_REQUIRED
-  const consistencyOk = consistency.consistencyPct >= CONSISTENCY_REQUIRED_PCT
+  const minTradingDaysOk = consistency.totalDays >= minTradingDaysRequired
 
   const violationsWithDates = useMemo(() => {
     const list: { type: string; value: string; limit: string; date: string }[] = []
     dailyPerf.forEach((d) => {
-      if (Math.abs(d.drawdown) >= DAILY_DRAWDOWN_LIMIT) {
+      if (Math.abs(d.drawdown) >= dailyDrawdownLimit) {
         list.push({
           type: "Daily Drawdown",
           value: `${d.drawdown.toFixed(2)}%`,
-          limit: `Max ${DAILY_DRAWDOWN_LIMIT}%`,
+          limit: `Max ${dailyDrawdownLimit}%`,
           date: d.date,
         })
       }
     })
-    if (drawdownUsed >= OVERALL_DRAWDOWN_LIMIT) {
+    if (drawdownUsed >= maxDrawdownLimit) {
       list.push({
         type: "Overall Drawdown",
         value: stats != null ? `${(stats.drawdown_percent ?? 0).toFixed(2)}%` : "—",
-        limit: `Max ${OVERALL_DRAWDOWN_LIMIT}%`,
+        limit: `Max ${maxDrawdownLimit}%`,
         date: dailyPerf.length ? dailyPerf[dailyPerf.length - 1]!.date : "Current",
       })
     }
@@ -608,7 +850,9 @@ export default function PerformancePage() {
                 <Card className="overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm min-w-0" id="rules">
                   <div className="border-b border-border/80 bg-muted/20 px-4 sm:px-6 py-3.5">
                     <h3 className="text-sm font-semibold text-foreground tracking-tight">Objectives & Rules</h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">Targets and how much achieved</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {accountRules.label} · Targets and rules
+                    </p>
                   </div>
                   <div className="p-4 sm:p-5 space-y-5">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -622,52 +866,56 @@ export default function PerformancePage() {
                       />
                       <Gauge
                         value={dailyDrawdownCurrent}
-                        max={DAILY_DRAWDOWN_LIMIT}
+                        max={dailyDrawdownLimit}
                         label="Daily drawdown"
-                        maxLabel={`Max ${DAILY_DRAWDOWN_LIMIT}%`}
+                        maxLabel={`Max ${accountRules.dailyDrawdown}`}
                         displayValue={`${dailyDrawdownCurrent.toFixed(2)}%`}
-                        color={dailyDrawdownCurrent >= DAILY_DRAWDOWN_LIMIT ? "#dc2626" : "#f97316"}
+                        color={dailyDrawdownCurrent >= dailyDrawdownLimit ? "#dc2626" : "#f97316"}
                       />
                       <Gauge
                         value={drawdownUsed}
-                        max={OVERALL_DRAWDOWN_LIMIT}
+                        max={maxDrawdownLimit}
                         label="Max drawdown"
-                        maxLabel={`Max ${OVERALL_DRAWDOWN_LIMIT}%`}
+                        maxLabel={`Max ${accountRules.maxDrawdown}`}
                         displayValue={`${drawdownUsed.toFixed(2)}%`}
-                        color="#dc2626"
+                        color={drawdownUsed >= maxDrawdownLimit ? "#dc2626" : "#f97316"}
                       />
                     </div>
                     <div className="space-y-2 pt-2 border-t border-border/60">
-                      <div className="flex justify-between items-center gap-2 py-2 border-b border-border/40">
-                        <span className="text-xs font-medium text-muted-foreground">Minimum Trading Days</span>
-                        <span className={`text-sm font-semibold tabular-nums ${minTradingDaysOk ? "text-emerald-600" : "text-foreground"}`}>
-                          {consistency.totalDays} of {MIN_TRADING_DAYS_REQUIRED}
-                        </span>
-                        {minTradingDaysOk ? <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" /> : null}
-                      </div>
+                      {minTradingDaysRequired > 0 && (
+                        <div className="flex justify-between items-center gap-2 py-2 border-b border-border/40">
+                          <span className="text-xs font-medium text-muted-foreground">Minimum Trading Days</span>
+                          <span className={`text-sm font-semibold tabular-nums ${minTradingDaysOk ? "text-emerald-600" : "text-foreground"}`}>
+                            {consistency.totalDays} of {minTradingDaysRequired}
+                          </span>
+                          {minTradingDaysOk ? <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" /> : null}
+                        </div>
+                      )}
                       <div className="flex justify-between items-center gap-2 py-2 border-b border-border/40">
                         <span className="text-xs font-medium text-muted-foreground">Weekend Holding</span>
-                        <span className="text-sm font-semibold text-emerald-600">Compliant</span>
+                        <span className="text-sm font-semibold text-foreground">{accountRules.weekendHolding}</span>
+                      </div>
+                      <div className="flex justify-between items-center gap-2 py-2 border-b border-border/40">
+                        <span className="text-xs font-medium text-muted-foreground">Overnight Holding</span>
+                        <span className="text-sm font-semibold text-foreground">{accountRules.overnightHolding}</span>
                       </div>
                       <div className="flex justify-between items-center gap-2 py-2 border-b border-border/40">
                         <span className="text-xs font-medium text-muted-foreground">Hedging</span>
-                        <span className="text-sm font-semibold text-emerald-600">Compliant</span>
-                      </div>
-                      <div className="py-2 space-y-0.5">
-                        <div className="flex justify-between items-center gap-2">
-                          <span className="text-xs font-medium text-muted-foreground">Consistency Rule</span>
-                          <span className={`text-sm font-semibold tabular-nums ${consistencyOk ? "text-emerald-600" : "text-foreground"}`}>
-                            {consistency.consistencyPct.toFixed(0)}% (min {CONSISTENCY_REQUIRED_PCT}%)
-                          </span>
-                        </div>
-                        <p className="text-[10px] text-muted-foreground">Profitable days {consistency.profitableDays} of {consistency.totalDays} · Highest day ${consistency.highestProfitableDay.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
+                        <span className="text-sm font-semibold text-foreground">{accountRules.hedging}</span>
                       </div>
                     </div>
-                    <Button asChild variant="outline" size="sm" className="w-full rounded-lg border-border/80">
-                      <Link href={`/dashboard/performance/${encodeURIComponent(selectedOrderId)}#violations`}>
-                        View Details →
-                      </Link>
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button asChild variant="outline" size="sm" className="flex-1 rounded-lg border-border/80">
+                        <Link href={`/dashboard/performance/${encodeURIComponent(selectedOrderId)}#violations`}>
+                          View Violations →
+                        </Link>
+                      </Button>
+                      <Button asChild variant="outline" size="sm" className="flex-1 rounded-lg border-border/80">
+                        <Link href="/rules" target="_blank" rel="noopener noreferrer">
+                          Full Rules →
+                        </Link>
+                      </Button>
+                    </div>
                   </div>
                 </Card>
 
@@ -723,7 +971,30 @@ export default function PerformancePage() {
                       </div>
                     )}
                   </div>
+                  <div className="border-t border-border/80 px-4 sm:px-5 py-3 bg-muted/10">
+                    <p className="text-xs text-muted-foreground flex items-center justify-center gap-1.5">
+                      <Mail className="h-3.5 w-3.5" />
+                      Questions?{" "}
+                      <a href="mailto:support@fxgenz.com" className="text-primary hover:underline font-medium">
+                        support@fxgenz.com
+                      </a>
+                    </p>
+                  </div>
                 </Card>
+
+                <Card className="overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm mt-4">
+                  <div className="px-4 sm:px-5 py-3.5">
+                    <p className="text-sm">
+                      <span className="font-bold text-foreground">Market Close Time:</span>{" "}
+                      <span className="text-muted-foreground">Friday 22:00 GMT</span>
+                    </p>
+                  </div>
+                </Card>
+
+                <div className="mt-4 flex flex-col items-center">
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-2">Day Reset</p>
+                  <DayResetCountdown />
+                </div>
               </div>
             </div>
 
@@ -735,6 +1006,7 @@ export default function PerformancePage() {
               </div>
               <div className="p-4 sm:p-5 overflow-hidden">
               {trades.length > 0 ? (
+                  <>
                   <div className="overflow-x-auto -mx-1 px-1 rounded-lg border border-border/50 min-w-0" style={{ WebkitOverflowScrolling: "touch" }}>
                   <Table>
                     <TableHeader>
@@ -749,7 +1021,7 @@ export default function PerformancePage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {trades.map((t, idx) => {
+                      {paginatedTrades.map((t, idx) => {
                         const rec = t as unknown as Record<string, unknown>
                         const ticket = t.ticket ?? rec.ticket
                         const symbol = t.symbol ?? rec.symbol
@@ -782,6 +1054,36 @@ export default function PerformancePage() {
                     </TableBody>
                   </Table>
                 </div>
+                {(hasPrevPage || hasNextPage) && (
+                  <div className="flex items-center justify-between gap-4 mt-4 px-1">
+                    <span className="text-xs text-muted-foreground">
+                      Showing {((tradesPage - 1) * TRADES_PER_PAGE) + 1}–{Math.min(tradesPage * TRADES_PER_PAGE, trades.length)} of {trades.length}
+                    </span>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setTradesPage((p) => p - 1)}
+                        disabled={!hasPrevPage}
+                        className="rounded-lg gap-1.5"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                        Previous
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setTradesPage((p) => p + 1)}
+                        disabled={!hasNextPage}
+                        className="rounded-lg gap-1.5"
+                      >
+                        Next
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+                  </>
               ) : (
                   <div className="flex flex-col items-center justify-center py-12 px-4 rounded-lg border border-dashed border-border bg-muted/10">
                     <BarChart3 className="h-12 w-12 text-muted-foreground/50 mb-3" />

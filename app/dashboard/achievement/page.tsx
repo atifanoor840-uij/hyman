@@ -1,10 +1,8 @@
-import Link from "next/link"
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
 import { AchievementContent } from "@/components/achievement/achievement-content"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft } from "lucide-react"
 
 export default function AchievementPage() {
   return (
@@ -15,36 +13,26 @@ export default function AchievementPage() {
 
       <main className="min-w-0 flex-1 flex flex-col overflow-x-hidden p-3 sm:p-4 md:p-5 lg:ml-64 pb-8">
         <div className="mx-auto w-full max-w-[1200px] flex flex-col flex-1 min-w-0">
-          <Header />
+          <Header
+            title="Achievements"
+            description="Your certificates and achievements. View or download as PDF."
+            variant="dashboard-hero"
+            backHref="/dashboard"
+            backLabel="Back"
+            badge="Achievements"
+            actions={
+              <div className="flex items-center gap-2 shrink-0">
+                <Button variant="outline" size="sm" className="rounded-lg border-border h-9 px-4">
+                  Done
+                </Button>
+                <Button size="sm" className="rounded-lg bg-[#7c3aed] hover:bg-[#6d28d9] text-white h-9 px-4">
+                  Publish
+                </Button>
+              </div>
+            }
+          />
 
-          {/* Certificate-style title bar: Back, title, subtitle, actions */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            <div className="flex flex-col gap-1">
-              <Link
-                href="/dashboard"
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-fit"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                Back
-              </Link>
-              <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-                Achievements
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Your certificates and achievements. View or download as PDF.
-              </p>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <Button variant="outline" size="sm" className="border-border">
-                Done
-              </Button>
-              <Button size="sm" className="bg-[#7c3aed] hover:bg-[#6d28d9] text-white">
-                Publish
-              </Button>
-            </div>
-          </div>
-
-          <div className="flex-1">
+          <div className="flex-1 mt-5">
             <AchievementContent />
           </div>
 

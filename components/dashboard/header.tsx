@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Search, Mail, Bell, Loader2, KeyRound, Copy, Check, Wallet, TrendingUp } from "lucide-react"
+import Link from "next/link"
+import { Search, Mail, Bell, Loader2, KeyRound, Copy, Check, Wallet, TrendingUp, ChevronLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -37,6 +38,11 @@ interface HeaderProps {
   orders?: Order[]
   /** Visual style for the title/description/actions section */
   variant?: "default" | "dashboard-hero"
+  /** Back link for sub-pages (shown above hero when variant is dashboard-hero) */
+  backHref?: string
+  backLabel?: string
+  /** Badge text for dashboard-hero (e.g. "Live trading overview", "Achievements") */
+  badge?: string
 }
 
 const saleTickerText = "🔥 Sale — 20% off challenges • Use code WELCOME20 • Limited time • "
@@ -50,6 +56,9 @@ export function Header({
   onOrderIdChange,
   orders: ordersProp,
   variant = "default",
+  backHref,
+  backLabel = "Back",
+  badge,
 }: HeaderProps) {
   const [orders, setOrders] = useState<Order[]>([])
   const [isLoadingOrders, setIsLoadingOrders] = useState(false)
@@ -441,11 +450,20 @@ export function Header({
       {title != null && (
         variant === "dashboard-hero" ? (
           <div className="mt-1 rounded-2xl border border-border/80 bg-card px-4 py-4 md:px-6 md:py-5 shadow-sm">
+            {backHref && (
+              <Link
+                href={backHref}
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-fit mb-4"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                {backLabel}
+              </Link>
+            )}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-7">
               <div className="space-y-2 min-w-0">
                 <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                   <span className="inline-flex h-1.5 w-1.5 rounded-full bg-foreground/60 animate-pulse" />
-                  <span className="whitespace-nowrap">Live trading overview</span>
+                  <span className="whitespace-nowrap">{badge ?? "Live trading overview"}</span>
                 </div>
                 <div className="space-y-1">
                   <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight text-foreground break-words">

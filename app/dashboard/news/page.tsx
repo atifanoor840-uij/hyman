@@ -16,6 +16,10 @@ export default function NewsPage() {
           <Header
             title="Market News"
             description="Real-time trading and market news from TradingView."
+            variant="dashboard-hero"
+            backHref="/dashboard"
+            backLabel="Back"
+            badge="Market News"
           />
 
           <div className="mt-5 flex-1 min-h-0">

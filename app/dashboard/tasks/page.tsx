@@ -13,8 +13,12 @@ export default function TradingPage() {
         <Header
           title="Active Trades"
           description="Monitor and manage your open trading positions and pending orders."
+          variant="dashboard-hero"
+          backHref="/dashboard"
+          backLabel="Back"
+          badge="Active Trades"
           actions={
-            <Button className="w-full sm:w-auto h-9 text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 hover:scale-105">
+            <Button className="w-full sm:w-auto h-9 rounded-lg text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 hover:scale-105">
               + New Trade
             </Button>
           }
