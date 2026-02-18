@@ -417,29 +417,33 @@ export function AdminOrderStatisticsView({ order, data }: AdminOrderStatisticsVi
   const warningViolations = violations.filter((v) => v.severity === "warning")
 
   return (
-    <div className="space-y-3 text-left text-[10px]">
-      {/* Account info */}
-      <div>
-        <h3 className="text-[10px] font-semibold text-white/80 uppercase tracking-wider mb-1">Account info</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+    <div className="space-y-5 text-left">
+      {/* Account info - pastel violet card */}
+      <div className="rounded-xl border border-gray-200 bg-violet-50 shadow-sm overflow-hidden">
+        <div className="px-4 py-3 border-b border-gray-200 bg-white/60">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Account info</h3>
+        </div>
+        <div className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { label: "Balance", value: Number(accountInfo.balance ?? 0), fmt: (v: number) => formatCurrency(v) },
             { label: "Equity", value: Number(accountInfo.equity ?? 0), fmt: (v: number) => formatCurrency(v) },
             { label: "Profit", value: Number(accountInfo.profit ?? 0), fmt: (v: number) => formatCurrency(v) },
             { label: "Margin free", value: Number(accountInfo.margin_free ?? 0), fmt: (v: number) => formatCurrency(v) }
           ].map(({ label, value, fmt }) => (
-            <div key={label} className="bg-[#0f5132]/40 rounded p-1.5 border border-white/10">
-              <p className="text-white/60 text-[9px]">{label}</p>
-              <p className="text-white font-bold text-[10px]">{fmt(value)}</p>
+            <div key={label} className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
+              <p className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-0.5">{label}</p>
+              <p className="text-gray-900 font-bold text-sm">{fmt(value)}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Account stats */}
-      <div>
-        <h3 className="text-[10px] font-semibold text-white/80 uppercase tracking-wider mb-1">Account stats</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1.5">
+      {/* Account stats - pastel amber card */}
+      <div className="rounded-xl border border-gray-200 bg-amber-50 shadow-sm overflow-hidden">
+        <div className="px-4 py-3 border-b border-gray-200 bg-white/60">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Account stats</h3>
+        </div>
+        <div className="p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {[
             { label: "Balance", value: Number(stats.balance ?? 0), fmt: (v: number) => formatCurrency(v) },
             { label: "Equity", value: Number(stats.equity ?? 0), fmt: (v: number) => formatCurrency(v) },
@@ -453,18 +457,20 @@ export function AdminOrderStatisticsView({ order, data }: AdminOrderStatisticsVi
             { label: "Avg day %", value: Number(stats.avg_daily_return_percent ?? 0), fmt: (v: number) => `${v.toFixed(2)}%` },
             { label: "Avg mo %", value: Number(stats.avg_monthly_return_percent ?? 0), fmt: (v: number) => `${v.toFixed(2)}%` }
           ].map(({ label, value, fmt }) => (
-            <div key={label} className="bg-[#0f5132]/40 rounded p-1.5 border border-white/10">
-              <p className="text-white/60 text-[9px]">{label}</p>
-              <p className="text-white font-bold text-[10px]">{fmt(value)}</p>
+            <div key={label} className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
+              <p className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-0.5">{label}</p>
+              <p className="text-gray-900 font-bold text-sm">{fmt(value)}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Key statistics (Win rate, Total trades, etc.) */}
-      <div>
-        <h3 className="text-[10px] font-semibold text-white/80 uppercase tracking-wider mb-1">Key stats</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+      {/* Key statistics - pastel emerald card */}
+      <div className="rounded-xl border border-gray-200 bg-emerald-50 shadow-sm overflow-hidden">
+        <div className="px-4 py-3 border-b border-gray-200 bg-white/60">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Key stats</h3>
+        </div>
+        <div className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { label: "Win Rate", value: advStats.win_rate ?? 0, fmt: (v: number) => `${v}%` },
             { label: "Trades", value: advStats.total_trades ?? 0, fmt: (v: number) => String(v) },
@@ -475,115 +481,121 @@ export function AdminOrderStatisticsView({ order, data }: AdminOrderStatisticsVi
             { label: "Best", value: Number(advStats.best_trade_profit?.value ?? 0), fmt: (v: number) => formatCurrency(v) },
             { label: "Worst", value: Number(advStats.worst_trade_profit?.value ?? 0), fmt: (v: number) => formatCurrency(v) }
           ].map(({ label, value, fmt }) => (
-            <div key={label} className="bg-[#0f5132]/40 rounded p-1.5 border border-white/10">
-              <p className="text-white/60 text-[9px]">{label}</p>
-              <p className="text-white font-bold text-[10px]">{fmt(value)}</p>
+            <div key={label} className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
+              <p className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-0.5">{label}</p>
+              <p className="text-gray-900 font-bold text-sm">{fmt(value)}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Trading rules progress */}
-      <div>
-        <h3 className="text-[10px] font-semibold text-white/80 uppercase tracking-wider mb-1">Rules progress</h3>
-        <div className="space-y-1.5">
-          <div className="bg-[#0f5132]/40 rounded p-1.5 border border-white/10">
-            <div className="flex justify-between items-center mb-0.5">
-              <span className="text-white/90 text-[10px]">Min days</span>
-              <span className="text-white font-semibold text-[10px]">{achievements.tradingDaysAchieved} / {accountRules.minTradingDays}</span>
+      {/* Trading rules progress - white card */}
+      <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+        <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Rules progress</h3>
+        </div>
+        <div className="p-4 space-y-4">
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-gray-700 text-sm font-medium">Min days</span>
+              <span className="text-gray-900 font-semibold text-sm">{achievements.tradingDaysAchieved} / {accountRules.minTradingDays}</span>
             </div>
-            <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-              <div className="h-full bg-green-500 rounded-full" style={{ width: `${Math.min((achievements.tradingDaysAchieved / parseInt(accountRules.minTradingDays || "1")) * 100, 100)}%` }} />
+            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${Math.min((achievements.tradingDaysAchieved / parseInt(accountRules.minTradingDays || "1")) * 100, 100)}%` }} />
             </div>
           </div>
-          <div className="bg-[#0f5132]/40 rounded p-1.5 border border-white/10">
-            <div className="flex justify-between items-center mb-0.5">
-              <span className="text-white/90 text-[10px]">Drawdown</span>
-              <span className="text-white font-semibold text-[10px]">{achievements.drawdownAchieved.toFixed(2)}% / {accountRules.maxDrawdown}</span>
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-gray-700 text-sm font-medium">Drawdown</span>
+              <span className="text-gray-900 font-semibold text-sm">{achievements.drawdownAchieved.toFixed(2)}% / {accountRules.maxDrawdown}</span>
             </div>
-            <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-              <div className="h-full bg-amber-500 rounded-full" style={{ width: `${Math.min(achievements.drawdownAchieved / parseFloat(accountRules.maxDrawdown?.replace("%", "") || "10") * 100, 100)}%` }} />
+            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-full bg-amber-500 rounded-full transition-all" style={{ width: `${Math.min(achievements.drawdownAchieved / parseFloat(accountRules.maxDrawdown?.replace("%", "") || "10") * 100, 100)}%` }} />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Account rules (by order type) */}
-      <div>
-        <h3 className="text-[10px] font-semibold text-white/80 uppercase tracking-wider mb-1">Rules — {order.challenge_type || order.account_type || "N/A"}</h3>
-        <div className="bg-[#0f5132]/40 rounded border border-white/10 overflow-hidden">
-          <ul className="divide-y divide-white/10">
-            {Object.entries(fullAccountRules).map(([ruleName, value]) => (
-              <li key={ruleName} className="flex justify-between items-center py-1 px-2 text-[10px]">
-                <span className="text-white/80">{ruleName}</span>
-                <span className="text-white font-medium text-[10px]">{value}</span>
-              </li>
-            ))}
-          </ul>
+      {/* Account rules - white card */}
+      <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+        <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Rules — {order.challenge_type || order.account_type || "N/A"}</h3>
+        </div>
+        <div className="divide-y divide-gray-200">
+          {Object.entries(fullAccountRules).map(([ruleName, value]) => (
+            <div key={ruleName} className="flex justify-between items-center py-3 px-4 hover:bg-gray-50/50">
+              <span className="text-gray-700 text-sm">{ruleName}</span>
+              <span className="text-gray-900 font-medium text-sm">{value}</span>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Violations */}
       {(errorViolations.length > 0 || warningViolations.length > 0) && (
-        <div>
-          <h3 className="text-[10px] font-semibold text-red-400 uppercase tracking-wider mb-1">Violations</h3>
-          <div className="space-y-1">
+        <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+          <div className="px-4 py-3 border-b border-gray-200 bg-red-50">
+            <h3 className="text-xs font-semibold text-red-700 uppercase tracking-wider">Violations</h3>
+          </div>
+          <div className="p-4 space-y-3">
             {errorViolations.map((v, i) => (
-              <div key={`e-${i}`} className="p-1.5 rounded bg-red-500/10 border border-red-500/30">
-                <p className="font-semibold text-red-400 text-[10px]">{v.rule}</p>
-                <p className="text-white/90 text-[9px] mt-0.5">{v.description}</p>
-                <p className="text-white/70 text-[9px] mt-0.5">Req: {v.required} — Cur: {v.current}</p>
+              <div key={`e-${i}`} className="p-3 rounded-xl bg-red-50 border border-red-200">
+                <p className="font-semibold text-red-700 text-sm">{v.rule}</p>
+                <p className="text-gray-700 text-sm mt-1">{v.description}</p>
+                <p className="text-gray-500 text-xs mt-1">Req: {v.required} — Cur: {v.current}</p>
               </div>
             ))}
             {warningViolations.map((v, i) => (
-              <div key={`w-${i}`} className="p-1.5 rounded bg-amber-500/10 border border-amber-500/30">
-                <p className="font-semibold text-amber-400 text-[10px]">{v.rule}</p>
-                <p className="text-white/90 text-[9px] mt-0.5">{v.description}</p>
-                <p className="text-white/70 text-[9px] mt-0.5">Req: {v.required} — Cur: {v.current}</p>
+              <div key={`w-${i}`} className="p-3 rounded-xl bg-amber-50 border border-amber-200">
+                <p className="font-semibold text-amber-700 text-sm">{v.rule}</p>
+                <p className="text-gray-700 text-sm mt-1">{v.description}</p>
+                <p className="text-gray-500 text-xs mt-1">Req: {v.required} — Cur: {v.current}</p>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Equity chart */}
+      {/* Equity chart - white card with light chart */}
       {equityCurve.length > 0 && (
-        <div>
-          <h3 className="text-[10px] font-semibold text-white/80 uppercase tracking-wider mb-1">Equity curve</h3>
-          <div className="flex gap-1 mb-1">
-            {(["Growth", "Profit", "Drawdown"] as const).map((view) => (
-              <button
-                key={view}
-                onClick={() => setEquityChartView(view)}
-                className={`px-2 py-1 rounded text-[10px] font-medium transition-colors ${equityChartView === view ? "bg-[#0f5132] text-white" : "bg-white/10 text-white/80 hover:bg-white/20"}`}
-              >
-                {view}
-              </button>
-            ))}
+        <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+          <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Equity curve</h3>
+            <div className="flex gap-2">
+              {(["Growth", "Profit", "Drawdown"] as const).map((view) => (
+                <button
+                  key={view}
+                  onClick={() => setEquityChartView(view)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${equityChartView === view ? "bg-gray-900 text-white shadow-sm" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"}`}
+                >
+                  {view}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="bg-[#0f5132]/20 rounded p-2 border border-white/10 min-h-[180px]">
+          <div className="p-4 bg-gray-50/50 min-h-[200px]">
             <ReactApexChart
               type="area"
-              height={180}
+              height={200}
               options={{
                 chart: { type: "area", toolbar: { show: false }, zoom: { enabled: false } },
                 dataLabels: { enabled: false },
                 stroke: { curve: "smooth", width: 2 },
-                fill: { type: "gradient", gradient: { shadeIntensity: 1, opacityFrom: 0.5, opacityTo: 0.1 } },
+                fill: { type: "gradient", gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05 } },
                 colors: [equityChartView === "Drawdown" ? "#ef4444" : "#22c55e"],
-                xaxis: { categories: chartData.categories, labels: { style: { colors: "#94a3b8", fontSize: "9px" }, rotate: -45 } },
+                xaxis: { categories: chartData.categories, labels: { style: { colors: "#6b7280", fontSize: "10px" }, rotate: -45 } },
                 yaxis: {
                   labels: {
-                    style: { colors: "#94a3b8", fontSize: "9px" },
+                    style: { colors: "#6b7280", fontSize: "10px" },
                     formatter: (val: number) => equityChartView === "Drawdown" ? `${val.toFixed(2)}%` : formatCurrency(val)
                   }
                 },
                 tooltip: {
-                  theme: "dark",
-                  style: { fontSize: "10px" },
+                  theme: "light",
+                  style: { fontSize: "11px" },
                   y: { formatter: (val: number) => equityChartView === "Drawdown" ? `${val.toFixed(2)}%` : formatCurrency(val) }
                 },
-                grid: { borderColor: "rgba(255,255,255,0.1)", strokeDashArray: 4 }
+                grid: { borderColor: "#e5e7eb", strokeDashArray: 4 }
               }}
               series={[{ name: chartData.name, data: chartData.data }]}
             />

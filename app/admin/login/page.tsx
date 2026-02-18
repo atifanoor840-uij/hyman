@@ -1,172 +1,409 @@
 "use client"
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Eye, EyeOff, Loader2 } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 
-import { useState, FormEvent, ChangeEvent } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { useRouter } from "next/navigation"
-import { User, Lock, Eye, EyeOff } from "lucide-react"
-import { adminLogin } from "@/lib/api/admin-auth"
-import { setAdminAuthState } from "@/lib/admin-auth"
-import { preloadAdminData } from "@/lib/admin-data-preload"
-
-const CURRENT_YEAR = new Date().getFullYear()
+interface LoginData {
+  email: string
+  password: string
+  two_factor_code: string
+}
 
 export default function AdminLoginPage() {
-  const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [step, setStep] = useState<1 | 2>(1) // Step 1: Email/Password, Step 2: 2FA
+  const [loginData, setLoginData] = useState<LoginData>({
+    email: "",
+    password: "",
+    two_factor_code: ""
+  })
   const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [isRateLimited, setIsRateLimited] = useState(false)
+  const [cooldownTime, setCooldownTime] = useState(0)
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const { toast } = useToast()
+  
+  // Get section from URL params
+  const sectionParam = searchParams?.get('section')
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleInputChange = (field: keyof LoginData, value: string) => {
+    let processedValue = value
+    
+    // Format validation for 2FA code
+    if (field === 'two_factor_code') {
+      // Only allow digits and limit to 6 characters
+      processedValue = value.replace(/[^0-9]/g, '').slice(0, 6)
+    }
+    
+    setLoginData(prev => ({
+      ...prev,
+      [field]: processedValue
+    }))
+    // Clear error when user starts typing
+    if (error) setError(null)
+  }
+
+  const handleStep1Submit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError(null)
-    if (!email.trim() || !password) {
-      setError("Please enter email and password.")
+    
+    // Validate email and password
+    if (!loginData.email || !loginData.password) {
+      setError("Please enter both email and password")
       return
     }
+
+    // Basic email validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginData.email)) {
+      setError("Please enter a valid email address")
+      return
+    }
+
+    // If validation passes, move to step 2
+    setError(null)
+    setStep(2)
+  }
+
+  const handleBackToStep1 = () => {
+    setStep(1)
+    setError(null)
+    setLoginData(prev => ({
+      ...prev,
+      two_factor_code: ""
+    }))
+  }
+
+  const startCooldownTimer = () => {
+    const timer = setInterval(() => {
+      setCooldownTime((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer)
+          setIsRateLimited(false)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+  }
+
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60)
+    const remainingSeconds = seconds % 60
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+  }
+
+  const handleStep2Submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    // Validate 2FA code format
+    if (!/^\d{6}$/.test(loginData.two_factor_code)) {
+      setError("Please enter a valid 6-digit verification code")
+      return
+    }
+    
     setIsLoading(true)
+    setError(null)
+
     try {
-      const res = await adminLogin({ email: email.trim().toLowerCase(), password })
-      const token = res.token || res.access_token
-      const user = res.user
-      if (token && user) {
-        setAdminAuthState(token, user as Parameters<typeof setAdminAuthState>[1])
-        await preloadAdminData().catch(() => {})
-        router.push("/admin")
-        return
+      const response = await fetch('https://genz-34f298f57a04.herokuapp.com/admin/auth/signin-2fa', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(loginData)
+      })
+
+      let data
+      try {
+        data = await response.json()
+      } catch (parseError) {
+        // If response is not JSON, use status text
+        throw new Error(`Server error: ${response.status} ${response.statusText}`)
       }
-      setError("Invalid response from server. Please try again.")
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed. Please try again.")
+
+      if (!response.ok) {
+        // Handle different error scenarios
+        if (response.status === 401) {
+          throw new Error(data.message || data.error || 'Invalid credentials or 2FA code')
+        } else if (response.status === 400) {
+          throw new Error(data.message || data.error || 'Invalid request format')
+        } else if (response.status === 403) {
+          throw new Error(data.message || data.error || 'Access forbidden')
+        } else if (response.status === 429) {
+          setIsRateLimited(true)
+          setCooldownTime(300) // 5 minutes cooldown
+          startCooldownTimer()
+          throw new Error('Too many login attempts. Please wait 5 minutes before trying again.')
+        } else {
+          throw new Error(data.message || data.error || `Server error: ${response.status}`)
+        }
+      }
+
+      // Store admin auth data
+      if (data.access_token && data.admin_data) {
+        localStorage.setItem("admin_access_token", data.access_token)
+        localStorage.setItem("admin_user", JSON.stringify(data.admin_data))
+        
+        toast({
+          title: "Login successful",
+          description: `Welcome back, ${data.admin_data.full_name || data.admin_data.username || data.admin_data.email}!`
+        })
+        
+        // Preload all admin data in the background
+        import('@/lib/admin-data-preload').then(({ preloadAdminData }) => {
+          preloadAdminData().then((result) => {
+            console.log('Admin data preload completed:', result)
+            if (result.failed > 0) {
+              console.warn('Some admin data failed to preload:', result.errors)
+            }
+          }).catch((error) => {
+            console.error('Error preloading admin data:', error)
+          })
+        })
+        
+        // Redirect based on section
+        const section = sectionParam || localStorage.getItem('admin_selected_section')
+        if (section === 'email-marketing') {
+          router.push('/admin/email-sender')
+        } else if (section === 'container-management') {
+          router.push('/admin/container')
+        } else if (section === 'order-management') {
+          router.push('/admin/orders')
+        } else {
+          router.push("/admin")
+        }
+      } else if (data.token && data.user) {
+        // Handle alternative response format
+        localStorage.setItem("admin_access_token", data.token)
+        localStorage.setItem("admin_user", JSON.stringify(data.user))
+        
+        toast({
+          title: "Login successful",
+          description: `Welcome back, ${data.user.name || data.user.email}!`
+        })
+        
+        // Preload all admin data in the background
+        import('@/lib/admin-data-preload').then(({ preloadAdminData }) => {
+          preloadAdminData().then((result) => {
+            console.log('Admin data preload completed:', result)
+            if (result.failed > 0) {
+              console.warn('Some admin data failed to preload:', result.errors)
+            }
+          }).catch((error) => {
+            console.error('Error preloading admin data:', error)
+          })
+        })
+        
+        // Redirect based on section
+        const section = sectionParam || localStorage.getItem('admin_selected_section')
+        if (section === 'email-marketing') {
+          router.push('/admin/email-sender')
+        } else if (section === 'container-management') {
+          router.push('/admin/container')
+        } else if (section === 'order-management') {
+          router.push('/admin/orders')
+        } else {
+          router.push("/admin")
+        }
+      } else {
+        console.log('Response data:', data)
+        throw new Error('Invalid response format from server')
+      }
+    } catch (error: any) {
+      console.error('Login error:', error)
+      const errorMessage = error.message || 'An error occurred during login'
+      setError(errorMessage)
+      toast({
+        title: "Login failed",
+        description: errorMessage,
+        variant: "destructive"
+      })
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleChange = (field: "email" | "password") => (e: ChangeEvent<HTMLInputElement>) => {
-    if (field === "email") setEmail(e.target.value)
-    else setPassword(e.target.value)
-    setError(null)
-  }
+  const isStep1Valid = loginData.email && loginData.password && !isRateLimited
+  const isStep2Valid = /^\d{6}$/.test(loginData.two_factor_code) && !isRateLimited
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-black">
-      <main className="flex-1 flex min-h-0">
-        {/* Left panel - same as dashboard login: black geometric */}
-        <div className="hidden lg:flex lg:w-[38%] xl:w-[40%] relative overflow-hidden bg-black">
-          <div className="absolute top-0 left-0 right-0 h-20 bg-black/90 z-[1]" />
-          <div className="absolute inset-0 z-0">
-            <div className="absolute inset-0 bg-zinc-950" />
-            <div
-              className="absolute -left-[10%] bottom-[5%] w-[95%] h-[75%] bg-zinc-800 shadow-2xl"
-              style={{ clipPath: "polygon(0 15%, 92% 0, 100% 85%, 8% 100%)", transform: "skewY(-1deg)" }}
-            />
-            <div
-              className="absolute -left-[5%] top-[18%] w-[88%] h-[60%] bg-zinc-700 shadow-xl"
-              style={{ clipPath: "polygon(2% 0, 100% 12%, 98% 88%, 0 100%)", transform: "skewY(2deg)" }}
-            />
-            <div
-              className="absolute right-0 top-[35%] w-[70%] h-[50%] bg-zinc-600/90 shadow-lg"
-              style={{ clipPath: "polygon(25% 0, 100% 0, 100% 100%, 0 100%)" }}
-            />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0f5132] via-[#146c43] to-[#0f5132] p-4 relative overflow-hidden">
+      {/* Subtle background pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
+          backgroundSize: '40px 40px'
+        }}></div>
+      </div>
+      
+      <Card className="w-full max-w-md border-0 bg-white/95 backdrop-blur-sm shadow-2xl relative z-10 rounded-2xl overflow-hidden">
+        {/* Card accent line */}
+        <div className="h-1 bg-gradient-to-r from-[#0f5132] via-[#146c43] to-[#0f5132]"></div>
+        
+        <CardHeader className="text-center space-y-5 pb-8 pt-10 px-8">
+          <div className="space-y-3">
+            <CardTitle className="text-4xl font-bold text-gray-900 tracking-tight">
+              Admin Portal
+            </CardTitle>
+            <div className="mt-4 h-1 w-20 bg-gradient-to-r from-transparent via-[#0f5132] to-transparent mx-auto rounded-full"></div>
           </div>
-          <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-6 z-20 flex flex-col items-stretch min-w-[100px]">
-            <div className="bg-white rounded-l-2xl pl-6 pr-8 py-4 shadow-[4px_0_24px_rgba(0,0,0,0.12)]">
-              <span className="text-sm font-bold tracking-wide text-black">ADMIN LOGIN</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Right panel - form */}
-        <div className="flex-1 flex flex-col items-center justify-center min-h-screen px-6 py-12 lg:py-16">
-          <div className="lg:hidden flex rounded-full bg-zinc-100 p-1 gap-1 mb-8">
-            <span className="px-4 py-2 rounded-full bg-black text-white text-sm font-bold">ADMIN LOGIN</span>
-          </div>
-
-          <div className="flex flex-col items-center mb-8">
-            <div className="flex items-center justify-center gap-3 mb-2">
-              <Image
-                src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
-                alt="FxGenz"
-                width={48}
-                height={48}
-                className="object-contain"
-              />
-              <span className="text-2xl font-bold text-black tracking-tight">FxGenz Admin</span>
-            </div>
-            <h1 className="text-xl font-bold text-zinc-600 tracking-tight">ADMIN LOGIN</h1>
-          </div>
-
-          <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 border-b border-zinc-300 focus-within:border-black transition-colors pb-2">
-                  <User className="w-5 h-5 text-zinc-400 shrink-0" />
-                  <input
-                    id="admin-email"
-                    type="email"
-                    value={email}
-                    onChange={handleChange("email")}
-                    placeholder="Admin email"
-                    className="flex-1 min-w-0 bg-transparent text-sm text-black placeholder:text-zinc-400 outline-none"
-                    autoComplete="email"
-                  />
-                </div>
+          <CardDescription className="text-gray-600 text-base mt-6 font-normal">
+            {step === 1 
+              ? "Enter your admin credentials to continue" 
+              : "Enter your 2FA verification code"}
+          </CardDescription>
+          {step === 2 && (
+            <div className="mt-4">
+              <div className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#0f5132]/10 rounded-full">
+                <span className="text-[#0f5132] text-sm font-medium">Step 2 of 2 - Security Verification</span>
               </div>
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 border-b border-zinc-300 focus-within:border-black transition-colors pb-2">
-                  <Lock className="w-5 h-5 text-zinc-400 shrink-0" />
-                  <input
-                    id="admin-password"
+            </div>
+          )}
+        </CardHeader>
+        <CardContent className="px-8 pb-10">
+          {step === 1 ? (
+            <form onSubmit={handleStep1Submit} className="space-y-6">
+              {error && (
+                <div className="p-4 bg-red-50/80 border-l-4 border-red-500 rounded-r-lg backdrop-blur-sm">
+                  <p className="text-red-700 text-sm font-medium">{error}</p>
+                </div>
+              )}
+
+              <div className="space-y-2.5">
+                <Label htmlFor="email" className="text-sm font-semibold text-gray-800 tracking-wide">
+                  Email Address
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="admin@example.com"
+                  value={loginData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  required
+                  disabled={isLoading}
+                  className="bg-white border-gray-300 focus:border-[#0f5132] focus:ring-2 focus:ring-[#0f5132]/20 text-gray-900 placeholder:text-gray-400 h-12 text-base transition-all duration-200 shadow-sm hover:shadow-md"
+                  autoFocus
+                />
+              </div>
+
+              <div className="space-y-2.5">
+                <Label htmlFor="password" className="text-sm font-semibold text-gray-800 tracking-wide">
+                  Password
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="password"
                     type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={handleChange("password")}
-                    placeholder="Password"
-                    className="flex-1 min-w-0 bg-transparent text-sm text-black placeholder:text-zinc-400 outline-none"
-                    autoComplete="current-password"
+                    placeholder="Enter your password"
+                    value={loginData.password}
+                    onChange={(e) => handleInputChange('password', e.target.value)}
+                    required
+                    disabled={isLoading}
+                    className="bg-white border-gray-300 focus:border-[#0f5132] focus:ring-2 focus:ring-[#0f5132]/20 text-gray-900 placeholder:text-gray-400 pr-12 h-12 text-base transition-all duration-200 shadow-sm hover:shadow-md"
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword((p) => !p)}
-                    className="text-zinc-400 hover:text-zinc-600 p-0.5"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={isLoading}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#0f5132] disabled:opacity-50 transition-colors duration-200"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
               </div>
-            </div>
 
-            {error && (
-              <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{error}</p>
-            )}
+              <div className="pt-2">
+                <Button
+                  type="submit"
+                  disabled={!isStep1Valid || isLoading}
+                  className="w-full bg-gradient-to-r from-[#0f5132] to-[#146c43] hover:from-[#0d4628] hover:to-[#0f5132] text-white font-semibold h-12 text-base disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Processing...
+                    </>
+                  ) : isRateLimited ? (
+                    `Try again in ${formatTime(cooldownTime)}`
+                  ) : (
+                    "Continue"
+                  )}
+                </Button>
+              </div>
+            </form>
+          ) : (
+            <form onSubmit={handleStep2Submit} className="space-y-6">
+              {error && (
+                <div className="p-4 bg-red-50/80 border-l-4 border-red-500 rounded-r-lg backdrop-blur-sm">
+                  <p className="text-red-700 text-sm font-medium">{error}</p>
+                </div>
+              )}
 
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-8 py-3 text-sm font-bold text-white shadow-md hover:bg-zinc-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {isLoading ? (
-                  <>
-                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    Signing in…
-                  </>
-                ) : (
-                  "LOGIN"
-                )}
-              </button>
-            </div>
-          </form>
+              <div className="p-5 bg-gradient-to-r from-[#0f5132]/10 to-[#146c43]/10 border-l-4 border-[#0f5132] rounded-r-lg">
+                <p className="text-[#0f5132] text-sm font-semibold mb-1.5">
+                  Two-Factor Authentication
+                </p>
+                <p className="text-gray-700 text-sm leading-relaxed">
+                  Enter the 6-digit code from your authenticator app
+                </p>
+              </div>
 
-          <p className="mt-8 text-xs text-zinc-400">© {CURRENT_YEAR} FxGenz Admin. All rights reserved.</p>
-        </div>
-      </main>
+              <div className="space-y-2.5">
+                <Label htmlFor="two_factor_code" className="text-sm font-semibold text-gray-800 tracking-wide">
+                  2FA Verification Code
+                </Label>
+                <Input
+                  id="two_factor_code"
+                  type="text"
+                  placeholder="000000"
+                  value={loginData.two_factor_code}
+                  onChange={(e) => handleInputChange('two_factor_code', e.target.value)}
+                  required
+                  disabled={isLoading}
+                  maxLength={6}
+                  className="bg-white border-gray-300 focus:border-[#0f5132] focus:ring-2 focus:ring-[#0f5132]/20 text-gray-900 placeholder:text-gray-400 text-center text-3xl tracking-[0.5em] font-mono h-16 transition-all duration-200 shadow-sm hover:shadow-md"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex gap-4 pt-2">
+                <Button
+                  type="button"
+                  onClick={handleBackToStep1}
+                  disabled={isLoading}
+                  variant="outline"
+                  className="flex-1 border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50 text-gray-700 hover:text-gray-900 h-12 text-base font-semibold transition-all duration-200"
+                >
+                  Back
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={!isStep2Valid || isLoading}
+                  className="flex-1 bg-gradient-to-r from-[#0f5132] to-[#146c43] hover:from-[#0d4628] hover:to-[#0f5132] text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 h-12 text-base"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Signing in...
+                    </>
+                  ) : isRateLimited ? (
+                    `Try again in ${formatTime(cooldownTime)}`
+                  ) : (
+                    "Sign In"
+                  )}
+                </Button>
+              </div>
+            </form>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

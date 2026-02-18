@@ -5,7 +5,7 @@
  * Subsequent page loads will use cached data immediately while fetching fresh data in the background.
  */
 
-const BASE_URL = 'https://dragon-backend-79f329f4e8a8.herokuapp.com'
+const BASE_URL = 'https://genz-34f298f57a04.herokuapp.com'
 
 interface PreloadConfig {
   endpoint: string

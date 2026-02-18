@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "@/hooks/use-toast"
 import { getAdminToken } from "@/lib/admin-auth"
-import { getApiBaseUrl } from "@/lib/api"
 import { 
   ArrowRightOnRectangleIcon,
   LockClosedIcon
@@ -86,7 +85,7 @@ export default function AdminLoginAsUserModal({
       formData.append('username', prefilledEmail)
       formData.append('password', adminPassword)
 
-      const response = await fetch(`${getApiBaseUrl()}/auth/signin`, {
+      const response = await fetch('https://genz-34f298f57a04.herokuapp.com/auth/signin', {
         method: 'POST',
         body: formData
       })

@@ -1,26 +1,11 @@
 "use client"
+import { ReactNode } from "react"
 
-import { usePathname } from "next/navigation"
-import AdminAuthGuard from "@/components/admin-auth-guard"
-import AdminLayout from "@/components/admin-layout"
+interface AdminLayoutProps {
+  children: ReactNode
+}
 
-export default function AdminRootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  const pathname = usePathname()
-  const isLoginPage = pathname === "/admin/login" || pathname?.startsWith("/admin/login/")
-
-  if (isLoginPage) {
-    return <>{children}</>
-  }
-
-  return (
-    <AdminAuthGuard>
-      <AdminLayout hideSidebar={false}>
-        {children}
-      </AdminLayout>
-    </AdminAuthGuard>
-  )
+export default function AdminLayout({ children }: AdminLayoutProps) {
+  // No auth guard - all pages accessible without restrictions
+  return <>{children}</>
 }

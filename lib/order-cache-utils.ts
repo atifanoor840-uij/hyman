@@ -42,3 +42,16 @@ export function broadcastCacheInvalidation(_payload: {
     // Ignore
   }
 }
+
+const CACHE_INVALIDATE_EVENT = "admin-order-cache-invalidate"
+
+/**
+ * Subscribe to cache invalidation events (e.g. from other tabs or after status change).
+ * Returns a cleanup function to remove the listener.
+ */
+export function setupCacheInvalidationListener(onInvalidate: () => void): () => void {
+  if (typeof window === "undefined") return () => {}
+  const handler = () => onInvalidate()
+  window.addEventListener(CACHE_INVALIDATE_EVENT, handler)
+  return () => window.removeEventListener(CACHE_INVALIDATE_EVENT, handler)
+}
