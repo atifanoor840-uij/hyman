@@ -2,6 +2,7 @@
 
 import { Inter, Poppins } from 'next/font/google';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import Link from 'next/link';
 import { HEADER_IMAGE_2 } from '@/lib/header-image';
 
@@ -139,6 +140,7 @@ export default function AboutPage() {
 					</div>
 				</section>
 			</main>
+			<Footer />
 		</div>
 	);
 }

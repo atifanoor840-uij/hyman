@@ -2,6 +2,7 @@
 
 import { Inter, Poppins } from 'next/font/google';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import { HEADER_IMAGE_1 } from '@/lib/header-image';
 
 const bodyFont = Inter({ subsets: ['latin'], weight: ['400', '500', '600'] });
@@ -29,7 +30,7 @@ export default function TermsPage() {
 								Terms of Service
 							</h1>
 							<p className="text-lg text-white/70 md:text-xl max-w-2xl">
-								Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+								Last updated: February 2025
 							</p>
 						</div>
 						<div className="flex-shrink-0 lg:max-w-md xl:max-w-lg">
@@ -228,6 +229,7 @@ export default function TermsPage() {
 					</div>
 				</div>
 			</main>
+			<Footer />
 		</div>
 	);
 }

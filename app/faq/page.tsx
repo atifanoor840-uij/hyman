@@ -3,6 +3,7 @@
 import { useState, ReactNode } from 'react';
 import { Inter, Poppins } from 'next/font/google';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 
 const bodyFont = Inter({ subsets: ['latin'], weight: ['400', '500', '600'] });
 const display = Poppins({ subsets: ['latin'], weight: ['600', '700', '800'] });
@@ -690,6 +691,7 @@ export default function FAQPage() {
 					</div>
 				</div>
 			</main>
+			<Footer />
 		</div>
 	);
 }

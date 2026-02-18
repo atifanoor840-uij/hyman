@@ -9,7 +9,8 @@ import {
 	SiAmazon,
 } from "react-icons/si";
 
-const CURRENT_YEAR = new Date().getFullYear();
+// Fixed year to avoid SSR/client hydration mismatch (date can differ by timezone)
+const CURRENT_YEAR = 2025;
 
 function SolanaIcon({ className }: { className?: string }) {
 	return (

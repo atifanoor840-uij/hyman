@@ -2,6 +2,7 @@
 
 import { Inter, Poppins } from 'next/font/google';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import { HEADER_IMAGE_1 } from '@/lib/header-image';
 
 const bodyFont = Inter({ subsets: ['latin'], weight: ['400', '500', '600'] });
@@ -188,6 +189,7 @@ export default function SocialPage() {
 					</div>
 				</div>
 			</main>
+			<Footer />
 		</div>
 	);
 }

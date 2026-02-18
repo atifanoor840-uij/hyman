@@ -2,6 +2,7 @@
 
 import { Inter, Poppins } from 'next/font/google';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import Pricing from '../components/Pricing';
 import { HEADER_IMAGE_1 } from '@/lib/header-image';
 
@@ -48,6 +49,7 @@ export default function PricingPage() {
 			<main className="bg-white">
 				<Pricing />
 			</main>
+			<Footer />
 		</div>
 	);
 }

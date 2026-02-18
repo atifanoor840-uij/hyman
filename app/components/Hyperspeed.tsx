@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, FC } from 'react';
+import { useEffect, useRef, useState, FC } from 'react';
 import * as THREE from 'three';
 import { BloomEffect, EffectComposer, EffectPass, RenderPass, SMAAEffect, SMAAPreset } from 'postprocessing';
 
@@ -1219,6 +1219,7 @@ class App {
 }
 
 const Hyperspeed: FC<HyperspeedProps> = ({ effectOptions = {} }) => {
+  const [mounted, setMounted] = useState(false);
   const mergedOptions: HyperspeedOptions = {
     ...defaultOptions,
     ...effectOptions
@@ -1227,6 +1228,11 @@ const Hyperspeed: FC<HyperspeedProps> = ({ effectOptions = {} }) => {
   const appRef = useRef<App | null>(null);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     if (appRef.current) {
       appRef.current.dispose();
       const container = document.getElementById('lights');
@@ -1254,8 +1260,11 @@ const Hyperspeed: FC<HyperspeedProps> = ({ effectOptions = {} }) => {
         appRef.current.dispose();
       }
     };
-  }, [mergedOptions]);
+  }, [mounted, mergedOptions]);
 
+  if (!mounted) {
+    return <div className="w-full h-full" aria-hidden />;
+  }
   return <div id="lights" className="w-full h-full" ref={hyperspeed}></div>;
 };
 

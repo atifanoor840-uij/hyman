@@ -3,7 +3,6 @@ import Logos from "./components/Logos";
 import Metrics from "./components/Metrics";
 import CTA from "./components/CTA";
 import Footer from "./components/Footer";
-import InviteCard from "./components/InviteCard";
 import Pricing from "./components/Pricing";
 import PayoutCertificates from "./components/PayoutCertificates";
 import GlobalPresence from "./components/GlobalPresence";
@@ -25,7 +24,6 @@ export default function Home() {
       <PayoutsPro />
       <LoyaltyPrograms />
       <GlobalPresence />
-      <InviteCard />
       <PayoutCertificates />
       <PayoutVideos />
       <Community />

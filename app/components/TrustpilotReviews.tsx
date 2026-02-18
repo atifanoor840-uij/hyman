@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 type Review = {
 	name: string;
@@ -23,7 +23,12 @@ const REVIEWS: Review[] = [
 ];
 
 export default function TrustpilotReviews() {
-	const items = useMemo(() => [...REVIEWS].sort(() => Math.random() - 0.5).slice(0, 6), []);
+	// Use fixed order for SSR to avoid hydration mismatch; shuffle only on client after mount
+	const initialItems = useMemo(() => REVIEWS.slice(0, 6), []);
+	const [items, setItems] = useState(initialItems);
+	useEffect(() => {
+		setItems([...REVIEWS].sort(() => Math.random() - 0.5).slice(0, 6));
+	}, []);
 
 	return (
 		<section id="reviews" className="relative overflow-hidden bg-black">

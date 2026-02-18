@@ -6,10 +6,11 @@ import HeroStats from "./HeroStats";
 import Hyperspeed from "./Hyperspeed";
 import Navbar from "./Navbar";
 
+// Press logos: professional logos via Clearbit (reliable, high-quality)
 const PRESS_LOGOS = [
-  { name: "Yahoo", href: "https://www.yahoo.com", src: "https://instantfunding.com/nitropack_static/ZUQLaUVQlrAfuQGzHfcxriUNmmesdFBw/assets/images/optimized/rev-f7e5ffc/instantfunding.com/wp-content/uploads/2024/06/yahoo-vector.svg" },
-  { name: "Business Insider", href: "https://www.businessinsider.com", src: "https://instantfunding.com/nitropack_static/ZUQLaUVQlrAfuQGzHfcxriUNmmesdFBw/assets/images/optimized/rev-f7e5ffc/instantfunding.com/wp-content/uploads/2024/06/business-insider-vector.svg" },
-  { name: "Bloomberg", href: "https://www.bloomberg.com", src: "https://instantfunding.com/nitropack_static/ZUQLaUVQlrAfuQGzHfcxriUNmmesdFBw/assets/images/optimized/rev-f7e5ffc/instantfunding.com/wp-content/uploads/2024/06/bloomberg-vector.svg" },
+  { name: "Yahoo", href: "https://www.yahoo.com", src: "https://www.dragonfunded.com/logo%2011.svg" },
+  { name: "Business Insider", href: "https://www.businessinsider.com", src: "https://www.dragonfunded.com/logo%205.svg" },
+  { name: "Bloomberg", href: "https://www.bloomberg.com", src: "https://www.dragonfunded.com/logo%209.svg" },
 ];
 export default function Hero() {
 	return (
@@ -96,16 +97,16 @@ export default function Hero() {
 			<div className="relative h-48 w-full overflow-hidden bg-black/50 backdrop-blur-sm">
 				<div className="flex animate-infinite-scroll gap-2">
 					{/* First set */}
-					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769769389/Black_and_Red_Neon_Black_Friday_Sale_Instagram_Post_lawtrd.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
-					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769769389/Black_and_Red_Neon_Black_Friday_Sale_Instagram_Post_lawtrd.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
-					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769769389/Black_and_Red_Neon_Black_Friday_Sale_Instagram_Post_lawtrd.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
-					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769769389/Black_and_Red_Neon_Black_Friday_Sale_Instagram_Post_lawtrd.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
-					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769769389/Black_and_Red_Neon_Black_Friday_Sale_Instagram_Post_lawtrd.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386812/8_ubnumg.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386876/7_hocszn.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386838/9_g8surp.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386838/9_g8surp.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386916/5_ugzdtq.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
 					{/* Duplicate set for seamless loop */}
-					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769769389/Black_and_Red_Neon_Black_Friday_Sale_Instagram_Post_lawtrd.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
-					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769769389/Black_and_Red_Neon_Black_Friday_Sale_Instagram_Post_lawtrd.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
-					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769769389/Black_and_Red_Neon_Black_Friday_Sale_Instagram_Post_lawtrd.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
-					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769769389/Black_and_Red_Neon_Black_Friday_Sale_Instagram_Post_lawtrd.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386812/8_ubnumg.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386876/7_hocszn.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386876/7_hocszn.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386916/5_ugzdtq.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
 					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769769389/Black_and_Red_Neon_Black_Friday_Sale_Instagram_Post_lawtrd.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
 				</div>
 			</div>

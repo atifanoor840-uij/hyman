@@ -2,96 +2,78 @@
 
 import Image from "next/image";
 import {
-	TrendingUp,
-	Coins,
-	CreditCard,
-	Layers,
-	Percent,
-	Trophy,
+	RotateCcw,
 	Zap,
-	Flame,
+	MessageCircle,
+	DollarSign,
+	FileCheck,
+	ShieldCheck,
 } from "lucide-react";
 
 const loyaltyCards = [
 	{
-		title: "Trade",
-		desc: "Each trade, profitable or losing, yields tokens based on your activity. All phases participate.",
-		icon: <TrendingUp className="h-6 w-6" />,
-		art: <ChartArt />,
-		imageSrc: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766055812/topup_200x110_cruheq.png",
-		bullets: ["Lots‑based accrual", "Eligible in all phases", "Daily streak bonus"],
+		title: "Free Retry",
+		desc: "One free retry per evaluation phase. If you hit a rule, use your retry and continue — no extra fee.",
+		icon: <RotateCcw className="h-6 w-6" />,
+		art: <RetryArt />,
+		bullets: ["One retry per phase", "No additional cost", "Continue where you left off"],
 	},
 	{
-		title: "Earn",
-		desc: "Tokens stack up in your wallet as you progress. Higher activity unlocks higher tiers.",
-		icon: <Coins className="h-6 w-6" />,
-		art: <CoinsArt />,
-		imageSrc: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766055814/earning_200x110_qsewzt.png",
-		bullets: ["Tiered multipliers", "Weekly snapshots", "Wallet overview"],
-	},
-	{
-		title: "Spend",
-		desc: "Redeem tokens for free challenges, fee rebates, and payout boosts. Choose your perks.",
-		icon: <CreditCard className="h-6 w-6" />,
-		art: <CardArt />,
-		imageSrc: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766055813/spend_200x110_qdyodk.png",
-		bullets: ["Free tryouts", "Fee discounts", "Payout boosts"],
-	},
-	{
-		title: "Tier Up",
-		desc: "Progress through multiple tiers as your trading activity increases. Higher tiers unlock enhanced multipliers.",
-		icon: <Layers className="h-6 w-6" />,
-		art: <TierArt />,
-		imageSrc: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766055812/topup_200x110_cruheq.png",
-		bullets: ["5 progressive tiers", "Tiered multipliers", "Auto upgrades"],
-	},
-	{
-		title: "Fee Rebates",
-		desc: "Reduce your trading costs by redeeming tokens for fee discounts. The more you trade, the more you save.",
-		icon: <Percent className="h-6 w-6" />,
-		art: <RebateArt />,
-		imageSrc: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766055812/fee_rebate_200x110_vohvxe.png",
-		bullets: ["Up to 50% reduction", "Flexible redemption", "Stack discounts"],
-	},
-	{
-		title: "Free Challenges",
-		desc: "Use accumulated tokens to access evaluation challenges at no cost. Start new trading evaluations.",
-		icon: <Trophy className="h-6 w-6" />,
-		art: <ChallengeArt />,
-		imageSrc: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766055812/free_challenge_200x110_x2pizn.png",
-		bullets: ["100% token-funded", "All challenge types", "No expiration"],
-	},
-	{
-		title: "Payout Boost",
-		desc: "Apply token-based boosts per program terms. Payout eligibility and processing depend on program rules — see terms for details.",
+		title: "Account in 2 Seconds",
+		desc: "Get your funded account credentials instantly. No waiting — start trading within seconds of passing.",
 		icon: <Zap className="h-6 w-6" />,
-		art: <BoostArt />,
-		imageSrc: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766055812/topup_200x110_cruheq.png",
-		bullets: ["Increased splits", "Faster processing", "Temporary boosts"],
+		art: <InstantArt />,
+		bullets: ["Instant credentials", "Same-day access", "No approval delays"],
 	},
 	{
-		title: "Daily Streak",
-		desc: "Maintain consistent trading activity to unlock daily streak multipliers. Build momentum and maximize earnings.",
-		icon: <Flame className="h-6 w-6" />,
-		art: <StreakArt />,
-		imageSrc: "https://res.cloudinary.com/dejjuhzug/image/upload/v1766055814/earning_200x110_qsewzt.png",
-		bullets: ["Progressive bonuses", "Weekly resets", "Multiplier caps"],
+		title: "24/7 Live Chat Support",
+		desc: "Real humans, real-time. Get help anytime — our support team is available around the clock.",
+		icon: <MessageCircle className="h-6 w-6" />,
+		art: <SupportArt />,
+		bullets: ["Live chat 24/7", "Fast response times", "Dedicated support team"],
+	},
+	{
+		title: "Fast Payouts",
+		desc: "Request your profits and get paid quickly. Most payouts processed within 24–48 hours.",
+		icon: <DollarSign className="h-6 w-6" />,
+		art: <PayoutArt />,
+		bullets: ["24–48 hour processing", "Multiple payout methods", "No hidden fees"],
+	},
+	{
+		title: "Transparent Rules",
+		desc: "Clear trading rules, no surprises. Know exactly what you can and can't do before you trade.",
+		icon: <FileCheck className="h-6 w-6" />,
+		art: <RulesArt />,
+		bullets: ["Clear limits", "Fair conditions", "No grey areas"],
+	},
+	{
+		title: "Secure & Verified",
+		desc: "Your account and data are protected. We use industry-standard security for all traders.",
+		icon: <ShieldCheck className="h-6 w-6" />,
+		art: <SecureArt />,
+		bullets: ["Secure platform", "Verified payouts", "Trusted by traders"],
 	},
 ];
 
 export default function LoyaltyPrograms() {
 	return (
-		<section id="loyalty" className="relative overflow-hidden bg-slate-50/80">
-			<div className="absolute inset-0 -z-10 bg-slate-50/80" />
-
-			<div className="mx-auto max-w-7xl px-6 py-18 md:px-10 md:py-24">
-				{/* Top row: right-aligned buttons */}
-				<div className="mb-6 flex justify-end">
+		<section id="loyalty" className="relative overflow-hidden bg-[#f8fafc] py-20 md:py-28">
+			<div className="mx-auto max-w-7xl px-6 md:px-10">
+				{/* Header row */}
+				<div className="mb-10 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+					<div>
+						<h2 className="font-sans text-2xl font-bold tracking-tight text-[#0b0b0f] md:text-3xl">
+							Why Trade with FxGenz
+						</h2>
+						<p className="mt-1 text-sm text-[#64748b]">
+							Professional benefits for serious traders.
+						</p>
+					</div>
 					<div className="flex gap-3">
-						<a href="#pricing" className="inline-flex items-center justify-center rounded-full bg-[#0ea5e9] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0891d1]">
+						<a href="#pricing" className="inline-flex items-center justify-center rounded-full bg-[#0ea5e9] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0284c7] hover:shadow-md">
 							Start evaluation →
 						</a>
-						<a href="#" className="inline-flex items-center justify-center rounded-full border border-[#0b0b0f]/15 bg-white px-5 py-2.5 text-sm font-semibold text-[#0b0b0f] hover:bg-[#f6f7fb]">
+						<a href="#" className="inline-flex items-center justify-center rounded-full border border-[#e2e8f0] bg-white px-5 py-2.5 text-sm font-semibold text-[#0f172a] shadow-sm transition hover:border-[#cbd5e1] hover:bg-slate-50">
 							Learn more
 						</a>
 					</div>
@@ -99,7 +81,7 @@ export default function LoyaltyPrograms() {
 
 				{/* Infinite Scrolling Carousel */}
 				<div className="relative overflow-hidden">
-					<div className="flex animate-scroll gap-6">
+					<div className="flex animate-scroll gap-6 py-1">
 						{/* First set of cards */}
 						{loyaltyCards.map((card, index) => (
 							<LoyaltyCard
@@ -108,7 +90,6 @@ export default function LoyaltyPrograms() {
 								desc={card.desc}
 								icon={card.icon}
 								art={card.art}
-								imageSrc={card.imageSrc}
 								bullets={card.bullets}
 							/>
 						))}
@@ -120,7 +101,6 @@ export default function LoyaltyPrograms() {
 								desc={card.desc}
 								icon={card.icon}
 								art={card.art}
-								imageSrc={card.imageSrc}
 								bullets={card.bullets}
 							/>
 						))}
@@ -128,6 +108,14 @@ export default function LoyaltyPrograms() {
 				</div>
 			</div>
 		</section>
+	);
+}
+
+function CheckIcon() {
+	return (
+		<svg className="h-4 w-4 shrink-0 text-[#22c55e]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+			<path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+		</svg>
 	);
 }
 
@@ -147,15 +135,14 @@ function LoyaltyCard({
 	bullets?: string[];
 }) {
 	return (
-		<article className="group relative flex-shrink-0 w-[320px] overflow-hidden rounded-2xl border border-[#e6e9ef] bg-white p-5 shadow-[0_10px_30px_rgba(0,0,0,0.05)] transition hover:-translate-y-[2px] hover:shadow-[0_20px_60px_rgba(0,0,0,0.08)]">
-			<div className="absolute -inset-1 -z-10 rounded-2xl bg-[conic-gradient(from_180deg_at_50%_50%,rgba(14,165,233,0.1)_0deg,rgba(99,102,241,0.08)_120deg,rgba(20,184,166,0.08)_240deg,rgba(14,165,233,0.1)_360deg)] opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100" />
-			<div className="mb-3 flex items-center gap-3">
-				<div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#e6e9ef] bg-[#f7fbff] text-[#0ea5e9]">
+		<article className="group relative flex-shrink-0 w-[320px] overflow-hidden rounded-xl border border-[#e2e8f0] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-1 hover:border-[#cbd5e1] hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
+			<div className="mb-4 flex items-center gap-3">
+				<div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#0ea5e9]/10 text-[#0284c7]">
 					{icon}
 				</div>
-				<h3 className="font-sans text-lg font-semibold tracking-tight text-[#0b0b0f]">{title}</h3>
+				<h3 className="font-sans text-base font-semibold tracking-tight text-[#0f172a]">{title}</h3>
 			</div>
-			<div className="mb-4 flex h-32 items-center justify-center overflow-hidden rounded-2xl border border-[#e6e9ef] bg-[#f7fbff]">
+			<div className="mb-4 flex h-28 items-center justify-center overflow-hidden rounded-lg border border-[#f1f5f9] bg-[#f8fafc]">
 				{imageSrc ? (
 					<div className="relative h-full w-full">
 						<Image
@@ -170,11 +157,14 @@ function LoyaltyCard({
 					art
 				)}
 			</div>
-			<p className="mt-1 text-sm text-[#2e2e35]/75">{desc}</p>
+			<p className="mb-4 text-[13px] leading-relaxed text-[#64748b]">{desc}</p>
 			{bullets && (
-				<ul className="mt-3 space-y-1 text-xs text-[#2e2e35]/70">
+				<ul className="space-y-2.5">
 					{bullets.map((b) => (
-						<li key={b}>— {b}</li>
+						<li key={b} className="flex items-center gap-2.5 text-[13px] text-[#475569]">
+							<CheckIcon />
+							<span>{b}</span>
+						</li>
 					))}
 				</ul>
 			)}
@@ -182,86 +172,65 @@ function LoyaltyCard({
 	);
 }
 
-// Art Components
-function ChartArt() {
+// Art Components for benefit cards
+function RetryArt() {
 	return (
 		<svg width="200" height="110" viewBox="0 0 200 110" fill="none" aria-hidden="true">
-			<rect width="200" height="110" rx="12" fill="#0d1326" />
-			<path d="M25 80 L45 60 L65 70 L85 40 L105 55 L125 35 L145 60 L165 50" stroke="#00c2ff" strokeWidth="3" fill="none" />
+			<rect width="200" height="110" rx="12" fill="#f0f9ff" />
+			<path d="M100 35v25l15-15" stroke="#0ea5e9" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+			<path d="M85 55a20 20 0 1 1 30 0" stroke="#0ea5e9" strokeWidth="3" fill="none" strokeLinecap="round" />
 		</svg>
 	);
 }
 
-function CoinsArt() {
+function InstantArt() {
 	return (
 		<svg width="200" height="110" viewBox="0 0 200 110" fill="none" aria-hidden="true">
-			<circle cx="70" cy="55" r="26" fill="#0ea5e9" opacity="0.8" />
-			<circle cx="120" cy="50" r="18" fill="#0ea5e9" opacity="0.5" />
-			<circle cx="150" cy="65" r="12" fill="#0ea5e9" opacity="0.35" />
+			<rect width="200" height="110" rx="12" fill="#f0f9ff" />
+			<path d="M70 70l30-40 30 40" stroke="#0ea5e9" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+			<circle cx="100" cy="45" r="8" fill="#0ea5e9" />
 		</svg>
 	);
 }
 
-function CardArt() {
+function SupportArt() {
 	return (
 		<svg width="200" height="110" viewBox="0 0 200 110" fill="none" aria-hidden="true">
-			<rect x="40" y="30" width="120" height="60" rx="10" fill="#0d1326" />
-			<rect x="55" y="50" width="60" height="8" rx="4" fill="#00c2ff" />
-			<rect x="55" y="66" width="30" height="8" rx="4" fill="#3ee9bf" />
+			<rect width="200" height="110" rx="12" fill="#f0f9ff" />
+			<circle cx="100" cy="50" r="25" stroke="#0ea5e9" strokeWidth="3" fill="none" />
+			<path d="M85 45c0-8 7-15 15-15s15 7 15 15" stroke="#0ea5e9" strokeWidth="3" fill="none" strokeLinecap="round" />
+			<path d="M80 70c0 0 5 10 20 10s20-10 20-10" stroke="#0ea5e9" strokeWidth="3" fill="none" strokeLinecap="round" />
 		</svg>
 	);
 }
 
-function TierArt() {
+function PayoutArt() {
 	return (
 		<svg width="200" height="110" viewBox="0 0 200 110" fill="none" aria-hidden="true">
-			<rect width="200" height="110" rx="12" fill="#0d1326" />
-			<rect x="30" y="70" width="40" height="30" rx="4" fill="#0ea5e9" opacity="0.6" />
-			<rect x="80" y="50" width="40" height="50" rx="4" fill="#0ea5e9" opacity="0.8" />
-			<rect x="130" y="30" width="40" height="70" rx="4" fill="#0ea5e9" />
+			<rect width="200" height="110" rx="12" fill="#f0f9ff" />
+			<circle cx="100" cy="55" r="28" stroke="#22c55e" strokeWidth="3" fill="none" />
+			<path d="M85 55h20l-10-15 10 15-10 15" stroke="#22c55e" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
 		</svg>
 	);
 }
 
-function RebateArt() {
+function RulesArt() {
 	return (
 		<svg width="200" height="110" viewBox="0 0 200 110" fill="none" aria-hidden="true">
-			<rect width="200" height="110" rx="12" fill="#0d1326" />
-			<circle cx="100" cy="55" r="35" stroke="#3ee9bf" strokeWidth="3" fill="none" />
-			<path d="M85 55l8 8 22-22" stroke="#3ee9bf" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+			<rect width="200" height="110" rx="12" fill="#f0f9ff" />
+			<rect x="55" y="35" width="90" height="50" rx="6" stroke="#0ea5e9" strokeWidth="3" fill="none" />
+			<path d="M65 50h70M65 62h50M65 74h60" stroke="#0ea5e9" strokeWidth="2" strokeLinecap="round" opacity="0.7" />
+			<path d="M80 48l5 5 10-10" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
 		</svg>
 	);
 }
 
-function ChallengeArt() {
+function SecureArt() {
 	return (
 		<svg width="200" height="110" viewBox="0 0 200 110" fill="none" aria-hidden="true">
-			<rect width="200" height="110" rx="12" fill="#0d1326" />
-			<rect x="50" y="30" width="100" height="50" rx="8" fill="#6366f1" opacity="0.8" />
-			<path d="M70 55h60M90 40v30" stroke="#00c2ff" strokeWidth="2" strokeLinecap="round" />
-		</svg>
-	);
-}
-
-function BoostArt() {
-	return (
-		<svg width="200" height="110" viewBox="0 0 200 110" fill="none" aria-hidden="true">
-			<rect width="200" height="110" rx="12" fill="#0d1326" />
-			<path d="M60 80 L100 30 L140 80" stroke="#f59e0b" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-			<path d="M100 30v50" stroke="#f59e0b" strokeWidth="4" strokeLinecap="round" />
-		</svg>
-	);
-}
-
-function StreakArt() {
-	return (
-		<svg width="200" height="110" viewBox="0 0 200 110" fill="none" aria-hidden="true">
-			<rect width="200" height="110" rx="12" fill="#0d1326" />
-			<circle cx="50" cy="55" r="8" fill="#0ea5e9" />
-			<circle cx="80" cy="55" r="10" fill="#0ea5e9" opacity="0.8" />
-			<circle cx="110" cy="55" r="12" fill="#0ea5e9" opacity="0.6" />
-			<circle cx="140" cy="55" r="14" fill="#0ea5e9" opacity="0.4" />
-			<circle cx="170" cy="55" r="16" fill="#0ea5e9" opacity="0.3" />
+			<rect width="200" height="110" rx="12" fill="#f0f9ff" />
+			<path d="M100 30l-35 15v20c0 20 15 30 35 35 20-5 35-15 35-35V45l-35-15z" stroke="#0ea5e9" strokeWidth="3" fill="none" strokeLinejoin="round" />
+			<path d="M85 55l10 10 25-25" stroke="#22c55e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
 		</svg>
 	);
 }

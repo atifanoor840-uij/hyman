@@ -2,99 +2,33 @@
 
 import { Inter, Poppins } from 'next/font/google';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import { HEADER_IMAGE_2 } from '@/lib/header-image';
 
 const bodyFont = Inter({ subsets: ['latin'], weight: ['400', '500', '600'] });
 const display = Poppins({ subsets: ['latin'], weight: ['600', '700', '800'] });
 
-const resources = [
+const steps = [
 	{
-		title: 'Trading Basics Course',
-		description: 'Learn the fundamentals of trading, from market basics to order types and risk management.',
-		type: 'Course',
-		duration: '4 hours',
-		level: 'Beginner',
-		icon: '📚',
+		step: '1',
+		title: 'Buy Challenge',
+		description: 'Choose your account size and pay the evaluation fee. Get instant access to your trading account within seconds.',
+		cta: 'View Pricing',
+		href: '/pricing',
 	},
 	{
-		title: 'Advanced Chart Analysis',
-		description: 'Master technical analysis with advanced chart patterns, indicators, and trading strategies.',
-		type: 'Course',
-		duration: '6 hours',
-		level: 'Advanced',
-		icon: '📊',
+		step: '2',
+		title: 'Show Your Skill',
+		description: 'Trade on simulated accounts and meet profit targets while following our rules. Prove your trading discipline and risk management.',
+		cta: 'View Rules',
+		href: '/rules',
 	},
 	{
-		title: 'Risk Management Guide',
-		description: 'Comprehensive guide to managing risk, position sizing, and protecting your capital.',
-		type: 'Guide',
-		duration: '2 hours',
-		level: 'Intermediate',
-		icon: '🛡️',
-	},
-	{
-		title: 'MT4 Platform Tutorial',
-		description: 'Step-by-step tutorial on using MetaTrader 4, from installation to advanced features.',
-		type: 'Tutorial',
-		duration: '3 hours',
-		level: 'Beginner',
-		icon: '💻',
-	},
-	{
-		title: 'Psychology of Trading',
-		description: 'Understand the psychological aspects of trading and learn to control emotions.',
-		type: 'Course',
-		duration: '5 hours',
-		level: 'Intermediate',
-		icon: '🧠',
-	},
-	{
-		title: 'Algorithmic Trading Basics',
-		description: 'Introduction to algorithmic trading, Expert Advisors, and automated strategies.',
-		type: 'Course',
-		duration: '8 hours',
-		level: 'Advanced',
-		icon: '🤖',
-	},
-	{
-		title: 'Market Analysis Weekly',
-		description: 'Weekly market analysis reports covering major currency pairs and market trends.',
-		type: 'Report',
-		duration: 'Weekly',
-		level: 'All Levels',
-		icon: '📈',
-	},
-	{
-		title: 'Trading Strategies Library',
-		description: 'Collection of proven trading strategies with detailed explanations and examples.',
-		type: 'Library',
-		duration: 'Ongoing',
-		level: 'All Levels',
-		icon: '📖',
-	},
-];
-
-const webinars = [
-	{
-		title: 'Trading Evaluation Workshop',
-		date: 'December 20, 2024',
-		time: '2:00 PM GMT',
-		host: 'Sarah Johnson',
-		topic: 'Market analysis and evaluation strategies',
-	},
-	{
-		title: 'Risk Management Workshop',
-		date: 'December 22, 2024',
-		time: '3:00 PM GMT',
-		host: 'Marcus Rodriguez',
-		topic: 'Protecting your capital in volatile markets',
-	},
-	{
-		title: 'Platform Deep Dive: MT5',
-		date: 'December 25, 2024',
-		time: '1:00 PM GMT',
-		host: 'David Kim',
-		topic: 'Advanced features and trading tools',
+		step: '3',
+		title: 'Apply for Payout',
+		description: 'Pass your evaluation and receive funded account credentials. Request payouts when you hit profit targets — most processed within 24–48 hours.',
+		cta: 'Get Started',
+		href: '/signup',
 	},
 ];
 
@@ -117,10 +51,10 @@ export default function ResourcesPage() {
 					<div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10 lg:gap-12 mt-16 lg:mt-20">
 						<div className="max-w-4xl space-y-6 text-left">
 							<h1 className={`${display.className} text-4xl font-semibold leading-[1.1] tracking-[-0.02em] text-white md:text-5xl lg:text-6xl`}>
-								Trading Resources & Education
+								How It Works
 							</h1>
 							<p className="text-lg text-white/70 md:text-xl max-w-2xl">
-								Enhance your trading skills with our comprehensive educational resources, courses, and webinars.
+								Buy a challenge, show your skill, and apply for payout. Simple, transparent, and built for traders.
 							</p>
 						</div>
 						<div className="flex-shrink-0 lg:max-w-md xl:max-w-lg">
@@ -137,159 +71,55 @@ export default function ResourcesPage() {
 			{/* Main content with white background */}
 			<main className="bg-white">
 				<div className="mx-auto max-w-7xl px-6 py-16 md:px-10 md:py-24">
-					{/* Resources Grid */}
+					{/* How It Works - 3 Steps */}
 					<section className="mb-16">
-						<h2 className={`${display.className} text-2xl font-semibold text-[#0b0b0f] mb-8`}>
-							Educational Resources
-						</h2>
-						<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-							{resources.map((resource) => (
+						<div className="grid gap-8 md:grid-cols-3">
+							{steps.map((item, index) => (
 								<div
-									key={resource.title}
-									className="group overflow-hidden rounded-2xl border border-[#e5e5e5] bg-white p-6 shadow-sm transition-all hover:border-[#0ea5e9] hover:shadow-lg"
+									key={item.step}
+									className="group relative overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white p-8 shadow-sm transition-all hover:border-[#0ea5e9]/30 hover:shadow-lg"
 								>
-									<div className="mb-4 text-4xl">{resource.icon}</div>
-									<div className="mb-2 flex items-center gap-2">
-										<span className="rounded-full bg-[#f0f9ff] px-2 py-1 text-xs font-semibold text-[#0ea5e9]">
-											{resource.type}
-										</span>
-										<span className="rounded-full bg-[#f9f9f9] px-2 py-1 text-xs font-medium text-[#37353E]/70">
-											{resource.level}
-										</span>
+									<div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-[#0ea5e9]/10 text-lg font-bold text-[#0284c7]">
+										{item.step}
 									</div>
-									<h3 className="font-semibold text-[#0b0b0f] mb-2 group-hover:text-[#0ea5e9] transition-colors">
-										{resource.title}
+									<h3 className={`${display.className} text-xl font-semibold text-[#0b0b0f] mb-3`}>
+										{item.title}
 									</h3>
-									<p className="mb-4 text-sm text-[#37353E]/80 leading-relaxed">{resource.description}</p>
-									<div className="flex items-center justify-between">
-										<span className="text-xs text-[#37353E]/60">⏱️ {resource.duration}</span>
-										<a
-											href="#"
-											className="text-xs font-semibold text-[#0ea5e9] hover:underline"
-										>
-											View →
-										</a>
-									</div>
+									<p className="mb-6 text-[#64748b] leading-relaxed">
+										{item.description}
+									</p>
+									<a
+										href={item.href}
+										className="inline-flex items-center gap-2 rounded-full bg-[#0ea5e9] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#0284c7]"
+									>
+										{item.cta}
+										<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+										</svg>
+									</a>
 								</div>
 							))}
-						</div>
-					</section>
-
-					{/* Upcoming Webinars */}
-					<section className="mb-16">
-						<h2 className={`${display.className} text-2xl font-semibold text-[#0b0b0f] mb-8`}>
-							Upcoming Webinars
-						</h2>
-						<div className="grid gap-6 md:grid-cols-3">
-							{webinars.map((webinar) => (
-								<div
-									key={webinar.title}
-									className="rounded-2xl border border-[#e5e5e5] bg-white p-6 shadow-sm"
-								>
-									<div className="mb-4 flex items-center gap-3">
-										<div className="flex-shrink-0 rounded-full bg-[#f0f9ff] p-3">
-											<svg className="h-6 w-6 text-[#0ea5e9]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-											</svg>
-										</div>
-										<div>
-											<p className="text-xs font-medium text-[#37353E]/60">{webinar.date}</p>
-											<p className="text-xs text-[#37353E]/60">{webinar.time}</p>
-										</div>
-									</div>
-									<h3 className="font-semibold text-[#0b0b0f] mb-2">{webinar.title}</h3>
-									<p className="mb-4 text-sm text-[#37353E]/80">{webinar.topic}</p>
-									<div className="flex items-center justify-between">
-										<span className="text-xs text-[#37353E]/60">Host: {webinar.host}</span>
-										<button className="rounded-full bg-[#0ea5e9] px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-[#0891d1]">
-											Register
-										</button>
-									</div>
-								</div>
-							))}
-						</div>
-					</section>
-
-					{/* Learning Paths */}
-					<section className="mb-16">
-						<h2 className={`${display.className} text-2xl font-semibold text-[#0b0b0f] mb-8`}>
-							Learning Paths
-						</h2>
-						<div className="grid gap-6 md:grid-cols-3">
-							<div className="rounded-2xl border border-[#e5e5e5] bg-gradient-to-br from-[#f0f9ff] to-white p-8">
-								<div className="mb-4 text-4xl">🌱</div>
-								<h3 className="font-semibold text-[#0b0b0f] mb-2">Beginner Path</h3>
-								<p className="mb-4 text-sm text-[#37353E]/80">
-									Start your trading journey with fundamentals, basic strategies, and platform basics.
-								</p>
-								<ul className="mb-6 space-y-2 text-sm text-[#37353E]/70">
-									<li>✓ Trading Basics Course</li>
-									<li>✓ MT4 Platform Tutorial</li>
-									<li>✓ Risk Management Guide</li>
-								</ul>
-								<a
-									href="#"
-									className="inline-block rounded-full bg-[#0ea5e9] px-6 py-2 text-sm font-semibold text-white transition hover:bg-[#0891d1]"
-								>
-									Start Learning
-								</a>
-							</div>
-							<div className="rounded-2xl border border-[#e5e5e5] bg-gradient-to-br from-[#f0f9ff] to-white p-8">
-								<div className="mb-4 text-4xl">📈</div>
-								<h3 className="font-semibold text-[#0b0b0f] mb-2">Intermediate Path</h3>
-								<p className="mb-4 text-sm text-[#37353E]/80">
-									Advance your skills with technical analysis, strategy development, and psychology.
-								</p>
-								<ul className="mb-6 space-y-2 text-sm text-[#37353E]/70">
-									<li>✓ Advanced Chart Analysis</li>
-									<li>✓ Psychology of Trading</li>
-									<li>✓ Trading Strategies Library</li>
-								</ul>
-								<a
-									href="#"
-									className="inline-block rounded-full bg-[#0ea5e9] px-6 py-2 text-sm font-semibold text-white transition hover:bg-[#0891d1]"
-								>
-									Start Learning
-								</a>
-							</div>
-							<div className="rounded-2xl border border-[#e5e5e5] bg-gradient-to-br from-[#f0f9ff] to-white p-8">
-								<div className="mb-4 text-4xl">🚀</div>
-								<h3 className="font-semibold text-[#0b0b0f] mb-2">Advanced Path</h3>
-								<p className="mb-4 text-sm text-[#37353E]/80">
-									Master advanced techniques, algorithmic trading, and professional strategies.
-								</p>
-								<ul className="mb-6 space-y-2 text-sm text-[#37353E]/70">
-									<li>✓ Algorithmic Trading Basics</li>
-									<li>✓ Advanced Chart Analysis</li>
-									<li>✓ Market Analysis Weekly</li>
-								</ul>
-								<a
-									href="#"
-									className="inline-block rounded-full bg-[#0ea5e9] px-6 py-2 text-sm font-semibold text-white transition hover:bg-[#0891d1]"
-								>
-									Start Learning
-								</a>
-							</div>
 						</div>
 					</section>
 
 					{/* CTA */}
-					<div className="rounded-2xl border border-[#e5e5e5] bg-gradient-to-br from-[#f0f9ff] to-white p-8 text-center">
+					<div className="rounded-2xl border border-[#e2e8f0] bg-gradient-to-br from-[#f0f9ff] to-white p-10 text-center">
 						<h2 className={`${display.className} text-2xl font-semibold text-[#0b0b0f] mb-4`}>
-							Ready to Start Learning?
+							Ready to Get Funded?
 						</h2>
-						<p className="text-[#37353E]/80 mb-6 max-w-2xl mx-auto">
-							Access all our educational resources and start improving your trading skills today.
+						<p className="text-[#64748b] mb-6 max-w-2xl mx-auto">
+							Buy a challenge, prove your skill, and start earning payouts. Simple, transparent, and built for serious traders.
 						</p>
 						<a
 							href="/signup"
-							className="inline-block rounded-full bg-[#0ea5e9] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#0891d1]"
+							className="inline-block rounded-full bg-[#0ea5e9] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#0284c7]"
 						>
-							Get Started
+							Start Your Challenge
 						</a>
 					</div>
 				</div>
 			</main>
+			<Footer />
 		</div>
 	);
 }
