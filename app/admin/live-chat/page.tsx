@@ -58,7 +58,8 @@ export default function AdminLiveChatPage() {
 
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([])
   const isLoading = cacheLoading
-  const error = cacheError
+  const [actionError, setActionError] = useState<string | null>(null)
+  const error = actionError ?? (cacheError ? String(cacheError) : null)
   const [selectedSession, setSelectedSession] = useState<ChatSession | null>(null)
   const [replyMessage, setReplyMessage] = useState("")
   const [isReplying, setIsReplying] = useState(false)
@@ -501,10 +502,11 @@ export default function AdminLiveChatPage() {
     if (!selectedSession || !replyMessage.trim()) return
     
     setIsReplying(true)
+    setActionError(null)
     try {
       const token = typeof window !== "undefined" ? localStorage.getItem("admin_access_token") : null
       if (!token) {
-        setError("Admin access token not found. Please login again.")
+        setActionError("Admin access token not found. Please login again.")
         return
       }
 
@@ -522,11 +524,11 @@ export default function AdminLiveChatPage() {
 
       if (!response.ok) {
         if (response.status === 401) {
-          setError("Unauthorized. Please login again.")
+          setActionError("Unauthorized. Please login again.")
         } else if (response.status === 403) {
-          setError("Access forbidden. Insufficient permissions.")
+          setActionError("Access forbidden. Insufficient permissions.")
         } else {
-          setError(`Failed to send reply: ${response.status} ${response.statusText}`)
+          setActionError(`Failed to send reply: ${response.status} ${response.statusText}`)
         }
         return
       }
@@ -557,7 +559,7 @@ export default function AdminLiveChatPage() {
       await refreshTickets()
     } catch (error: any) {
       console.error("Failed to send reply:", error)
-      setError(`Network error: ${error.message}`)
+      setActionError(`Network error: ${error.message}`)
     } finally {
       setIsReplying(false)
     }

@@ -18,7 +18,7 @@ export function Toaster() {
     <ToastProvider>
       {toasts.map(function ({ id, title, description, action, variant, ...props }) {
         const isDestructive = variant === 'destructive'
-        const isSuccess = variant === 'success' || (!isDestructive && variant !== 'destructive')
+        const isSuccess = !isDestructive
         
         return (
           <Toast key={id} variant={variant} {...props}>

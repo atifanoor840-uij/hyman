@@ -134,10 +134,10 @@ export function PerformanceGraphPanel({ stats }: { stats?: PerformanceResponse |
               width={50}
             />
             <Tooltip
-              formatter={(value: number) =>
+              formatter={(value) =>
                 selectedMetric === "Draw Down"
-                  ? `${Number(value).toFixed(2)}%`
-                  : `$${Number(value).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                  ? `${Number(value ?? 0).toFixed(2)}%`
+                  : `$${Number(value ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
               }
               labelFormatter={(label) => String(label)}
               contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 10 }}
@@ -238,7 +238,7 @@ export function DetailedStatisticsCard({ stats }: { stats?: PerformanceResponse 
       icon: Activity,
       tone: "text-destructive",
     },
-  ] as const
+  ]
 
   return (
     <Card className="overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm mt-4">

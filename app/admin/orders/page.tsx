@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState, useMemo } from "react"
+import { useEffect, useState, useMemo, type ReactElement } from "react"
 import { toast } from "@/hooks/use-toast"
 import AdminLayout from "@/components/admin-layout"
 import SectionCard from "@/components/ui/section-card"
@@ -1018,7 +1018,7 @@ export default function AdminOrdersPage() {
     
     // Store original order for rollback in case of error
     const originalOrder = { ...editingOrder }
-    const oldStatus = editingOrder.status
+    const oldStatus = editingOrder.status ?? ''
     const newStatus = editForm.status
     
     // Optimistically update only this order in local state (shift pending→delivered, etc.)
@@ -2747,7 +2747,7 @@ export default function AdminOrdersPage() {
         )}
       </div>
                     )
-                    const cards: JSX.Element[] = []
+                    const cards: ReactElement[] = []
                     if (credentialsOrder.live_account) {
                       const acc = credentialsOrder.live_account
                       const fields = [

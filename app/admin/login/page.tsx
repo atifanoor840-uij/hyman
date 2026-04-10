@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react"
+import { Suspense, useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,7 +14,7 @@ interface LoginData {
   two_factor_code: string
 }
 
-export default function AdminLoginPage() {
+function AdminLoginContent() {
   const [step, setStep] = useState<1 | 2>(1) // Step 1: Email/Password, Step 2: 2FA
   const [loginData, setLoginData] = useState<LoginData>({
     email: "",
@@ -405,5 +405,13 @@ export default function AdminLoginPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <AdminLoginContent />
+    </Suspense>
   )
 }

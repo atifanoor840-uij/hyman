@@ -34,6 +34,7 @@ interface Order {
   account_size: string
   platform: string
   payment_method: string | null
+  payment_intent_id: string | null
   txid: string | null
   checkout_session_url: string | null
   image: {
@@ -604,7 +605,7 @@ export default function AdminOrdersCompletedPage() {
         }
         
         // Invalidate relevant caches based on status change
-        const oldStatus = editingOrder.status
+        const oldStatus = editingOrder.status ?? ''
         const newStatus = editForm.status
         invalidateCachesForStatusChange(oldStatus, newStatus)
         

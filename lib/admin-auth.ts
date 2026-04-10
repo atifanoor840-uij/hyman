@@ -72,8 +72,14 @@ export function clearAdminAuthState(): void {
 export function hasAdminPermission(permission: string): boolean {
   const { user } = getAdminAuthState()
   if (!user) return false
-  
-  return user.permissions.includes(permission) || user.role === 'super_admin'
+
+  const permissions = Array.isArray(user.permissions)
+    ? user.permissions
+    : typeof user.permissions === 'string'
+      ? [user.permissions]
+      : []
+
+  return permissions.includes(permission) || user.role === 'super_admin'
 }
 
 export function isAdminAuthenticated(): boolean {
