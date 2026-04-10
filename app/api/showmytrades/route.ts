@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const SHOWMYTRADES_BASE = 'https://showmytrades.com/api/statistics';
 
+/** Always hit origin fresh (dashboard selection changes slug) */
+export const dynamic = 'force-dynamic';
+
 /**
  * Proxy to ShowMyTrades API to avoid CORS when the dashboard calls from the browser.
  * GET /api/showmytrades?slug=mt5-11526060
@@ -15,7 +18,7 @@ export async function GET(request: NextRequest) {
     const res = await fetch(`${SHOWMYTRADES_BASE}/${slug}`, {
       method: 'GET',
       headers: { Accept: 'application/json' },
-      next: { revalidate: 60 },
+      cache: 'no-store',
     });
     const data = await res.json();
     if (!res.ok) {

@@ -143,6 +143,18 @@ export interface OrderCredentials {
 	status?: string;
 }
 
+/** New my-account shape: list of credentials (e.g. Stage 1 / Stage 2) */
+export interface CredentialWithStatus {
+	credential_id: number;
+	account_status?: string;
+	status_type?: string;
+	platform: string;
+	server: string;
+	platform_login: string;
+	platform_password: string;
+	profit_target?: number;
+}
+
 export interface Order {
 	order_id: string;
 	username: string;
@@ -165,6 +177,111 @@ export interface Order {
 	stage2_credentials?: OrderCredentials | null;
 	live_created_at?: string | null;
 	live_credentials?: OrderCredentials | null;
+	/** New API: credentials list with platform_login for ShowMyTrades */
+	credentials_with_status?: CredentialWithStatus[];
+	account_status?: string;
+	status_type?: string;
+}
+
+export type ResolvedOrderCredentials = {
+	platform: string;
+	platformLogin: string;
+	credential: OrderCredentials;
+};
+
+/** Normalize order_id from URL vs API (e.g. OX%2395730891 vs OX#95730891). */
+export function normalizeOrderIdForMatch(raw: string): string {
+	const t = String(raw ?? "").trim();
+	if (!t) return "";
+	try {
+		return decodeURIComponent(t);
+	} catch {
+		return t;
+	}
+}
+
+/** True when two order ids refer to the same order after decode/trim. */
+export function orderIdsMatch(a: string, b: string): boolean {
+	if (!a || !b) return false;
+	return normalizeOrderIdForMatch(a) === normalizeOrderIdForMatch(b);
+}
+
+/** Find an order when `selectedOrderId` may be URL-encoded differently than `order_id`. */
+export function findOrderById(orders: Order[], rawOrderId: string): Order | undefined {
+	if (!orders.length || !rawOrderId) return undefined;
+	const trimmed = rawOrderId.trim();
+	const direct = orders.find((o) => o.order_id === trimmed);
+	if (direct) return direct;
+	const q = normalizeOrderIdForMatch(trimmed);
+	const byDecoded = orders.find((o) => normalizeOrderIdForMatch(o.order_id) === q);
+	if (byDecoded) return byDecoded;
+	return orders.find((o) => orderIdsMatch(o.order_id, trimmed));
+}
+
+function pickPlatformLoginFromRow(
+	c: CredentialWithStatus & { platformLogin?: string }
+): string {
+	const v = c.platform_login ?? c.platformLogin;
+	if (v === null || v === undefined) return "";
+	return String(v).trim();
+}
+
+function credentialsListFromOrder(order: Order): CredentialWithStatus[] {
+	const extended = order as Order & { credentialsWithStatus?: CredentialWithStatus[] };
+	const raw = order.credentials_with_status ?? extended.credentialsWithStatus;
+	if (!raw) return [];
+	if (!Array.isArray(raw)) return [];
+	return raw;
+}
+
+/**
+ * Resolves MT login + platform for ShowMyTrades (`mt5-{platform_login}`).
+ * Prefers legacy `credentials` / `stage2_credentials` / `live_credentials`, then `credentials_with_status`
+ * (active account first, then first entry with platform_login).
+ */
+export function getOrderCredentialsForStats(
+	order: Order | null | undefined
+): ResolvedOrderCredentials | null {
+	if (!order) return null;
+	const legacy =
+		order.credentials ?? order.stage2_credentials ?? order.live_credentials;
+	const legacyLogin =
+		legacy?.platform_login != null ? String(legacy.platform_login).trim() : "";
+	if (legacyLogin.length > 0 && legacy) {
+		const platform = (order.platform ?? "mt5").toLowerCase().trim();
+		return {
+			platform,
+			platformLogin: legacyLogin,
+			credential: legacy,
+		};
+	}
+	const list = credentialsListFromOrder(order);
+	if (list.length === 0) return null;
+	const active = list.find(
+		(c) =>
+			String(c.account_status ?? "").toLowerCase().trim() === "active" &&
+			pickPlatformLoginFromRow(c as CredentialWithStatus & { platformLogin?: string })
+	);
+	const picked =
+		active ??
+		list.find((c) => pickPlatformLoginFromRow(c as CredentialWithStatus & { platformLogin?: string })) ??
+		null;
+	const pl = picked
+		? pickPlatformLoginFromRow(picked as CredentialWithStatus & { platformLogin?: string })
+		: "";
+	if (!pl) return null;
+	const platform = (picked!.platform ?? order.platform ?? "mt5").toLowerCase().trim();
+	return {
+		platform,
+		platformLogin: pl,
+		credential: {
+			credential_id: picked!.credential_id,
+			server: picked!.server,
+			platform_login: pl,
+			platform_password: picked!.platform_password,
+			profit_target: picked!.profit_target,
+		},
+	};
 }
 
 export interface MyAccountResponse {

@@ -1,8 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo, useRef } from "react"
 import Link from "next/link"
-import { Search, Mail, Bell, Loader2, KeyRound, Copy, Check, Wallet, TrendingUp, ChevronLeft } from "lucide-react"
+import { Search, Mail, Bell, Loader2, KeyRound, Copy, Check, Wallet, TrendingUp, ChevronLeft, Server, MonitorSmartphone, Activity } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -20,7 +21,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { MobileNav } from "./mobile-nav"
-import { getMyAccount, type Order, type OrderCredentials } from "@/lib/api/auth"
+import {
+  getMyAccount,
+  getOrderCredentialsForStats,
+  findOrderById,
+  orderIdsMatch,
+  type Order,
+  type OrderCredentials,
+} from "@/lib/api/auth"
 import { getUser } from "@/lib/auth-utils"
 import { getShowMyTradesStats } from "@/lib/api/showmytrades"
 import type { PerformanceResponse } from "@/lib/api/performance"
@@ -149,7 +157,7 @@ export function Header({
     if (!useOrderIdSelect || ordersSource.length === 0) return
     const selectable = ordersSource.filter((o) => o.status !== "Pending")
     if (selectable.length === 0) return
-    const isSelectable = selectable.some((o) => o.order_id === selectedOrderId)
+    const isSelectable = selectable.some((o) => orderIdsMatch(o.order_id, selectedOrderId))
     if (!isSelectable) {
       setSelectedOrderId(selectable[0].order_id)
     }
@@ -165,26 +173,79 @@ export function Header({
   }
 
   const currentOrder = ordersSource.find((o) => o.order_id === selectedOrderId)
-  const hasCredentials = !!(
-    currentOrder?.credentials ||
-    currentOrder?.stage2_credentials ||
-    currentOrder?.live_credentials
+  const resolvedForHeader = getOrderCredentialsForStats(currentOrder)
+
+  const stageFlow = useMemo(() => {
+    const raw = String(currentOrder?.status_type || currentOrder?.status || "").toLowerCase()
+    const current =
+      currentOrder?.live_credentials || raw.includes("live")
+        ? 2
+        : currentOrder?.stage2_credentials || raw.includes("stage 2") || raw.includes("phase 2")
+          ? 1
+          : currentOrder?.credentials || raw.includes("phase 1") || raw.includes("evaluation")
+            ? 0
+            : -1
+    return {
+      current,
+      steps: ["Phase 1", "Stage 2", "Live"],
+    }
+  }, [currentOrder])
+
+  const headerStatus =
+    currentOrder?.status_type ||
+    currentOrder?.status ||
+    (currentOrder?.live_credentials
+      ? "Live"
+      : currentOrder?.stage2_credentials
+        ? "Stage 2"
+        : currentOrder?.credentials
+          ? "Phase 1"
+          : "—")
+
+  /** Stable string so the credentials-dialog stats effect does not depend on `currentOrder` object identity */
+  const credentialStatsFetchKey = useMemo(() => {
+    const o = findOrderById(ordersSource, selectedOrderId ?? "")
+    if (!o) return ""
+    const r = getOrderCredentialsForStats(o)
+    return r ? `${o.order_id}|${r.platform}|${r.platformLogin}` : `${o.order_id}|nocreds`
+  }, [selectedOrderId, ordersSource])
+
+  /** Always read latest orders in the dialog-stats effect without listing `ordersSource` in deps (avoids unstable array identity). */
+  const ordersSourceRef = useRef(ordersSource)
+  ordersSourceRef.current = ordersSource
+
+  /** Single object dep so useEffect always has dependency array length === 1 (fixes React "changed size" / HMR issues). */
+  const dialogStatsDeps = useMemo(
+    () => ({
+      credentialsOpen,
+      selectedOrderId: selectedOrderId ?? "",
+      credentialStatsFetchKey,
+    }),
+    [credentialsOpen, selectedOrderId, credentialStatsFetchKey]
   )
 
   const [stage2Stats, setStage2Stats] = useState<PerformanceResponse | null>(null)
   const [stage2StatsLoading, setStage2StatsLoading] = useState(false)
   useEffect(() => {
-    if (!credentialsOpen || !currentOrder?.stage2_credentials || !currentOrder.platform) {
+    const { credentialsOpen: open, selectedOrderId: oid, credentialStatsFetchKey: key } = dialogStatsDeps
+    if (!open) {
+      setStage2Stats(null)
+      return
+    }
+    const order = findOrderById(ordersSourceRef.current, oid)
+    if (!order) {
+      setStage2Stats(null)
+      return
+    }
+    const resolved = getOrderCredentialsForStats(order)
+    if (!resolved || !key || key.endsWith("|nocreds")) {
       setStage2Stats(null)
       return
     }
     let cancelled = false
     setStage2StatsLoading(true)
     setStage2Stats(null)
-    getShowMyTradesStats(
-      currentOrder.platform,
-      currentOrder.stage2_credentials!.platform_login
-    )
+    getShowMyTradesStats(resolved.platform, resolved.platformLogin)
       .then((data) => {
         if (!cancelled) setStage2Stats(data)
       })
@@ -197,7 +258,7 @@ export function Header({
     return () => {
       cancelled = true
     }
-  }, [credentialsOpen, currentOrder?.order_id, currentOrder?.platform, currentOrder?.stage2_credentials?.platform_login])
+  }, [dialogStatsDeps])
 
   const copyToClipboard = (label: string, value: string) => {
     navigator.clipboard.writeText(value)
@@ -214,55 +275,70 @@ export function Header({
         </div>
       </div>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 min-w-0">
-        <div className="flex items-center gap-2 flex-1 min-w-0 w-full sm:max-w-md">
+        <div className={`flex items-center gap-2 flex-1 min-w-0 w-full ${useOrderIdSelect ? "" : "sm:max-w-md"}`}>
           <MobileNav />
 
           <div className="relative flex flex-1 min-w-0 items-center gap-2">
             {useOrderIdSelect ? (
               <>
-                <div className="relative flex-1 min-w-0">
-                  <Select value={selectedOrderId} onValueChange={setSelectedOrderId}>
-                    <SelectTrigger className="w-full min-h-[44px] sm:h-9 h-11 text-sm font-bold bg-card border-border text-foreground rounded-xl transition-all duration-300 focus:ring-2 focus:ring-ring/50 [&_[data-slot=select-value]]:font-bold [&_[data-slot=select-value]]:text-foreground" disabled={isLoadingOrders}>
-                      {isLoadingOrders ? (
-                        <div className="flex items-center gap-2">
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Loading orders...</span>
+                <div className="flex w-full min-w-0 items-center gap-2">
+                  <div className="relative min-w-0 flex-1">
+                    <Select value={selectedOrderId} onValueChange={setSelectedOrderId}>
+                      <SelectTrigger className="w-full min-h-[44px] sm:h-9 h-11 text-sm font-bold bg-card border-border text-foreground rounded-xl transition-all duration-300 focus:ring-2 focus:ring-ring/50 [&_[data-slot=select-value]]:font-bold [&_[data-slot=select-value]]:text-foreground" disabled={isLoadingOrders}>
+                        {isLoadingOrders ? (
+                          <div className="flex items-center gap-2">
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>Loading orders...</span>
+                          </div>
+                        ) : (
+                          <SelectValue placeholder={selectableOrders.length === 0 ? "No orders found" : "Select Order ID"} />
+                        )}
+                      </SelectTrigger>
+                      <SelectContent>
+                        {selectableOrders.length === 0 && !isLoadingOrders ? (
+                          <div className="px-3 py-2 text-sm text-muted-foreground text-center">
+                            No orders available
+                          </div>
+                        ) : (
+                          selectableOrders.map((order) => (
+                            <SelectItem key={order.order_id} value={order.order_id} className="font-bold">
+                              <div className="flex flex-col">
+                                <span>{order.order_id}</span>
+                                <span className="text-xs font-normal text-muted-foreground">
+                                  {order.challenge_type} • ${order.account_size}
+                                </span>
+                              </div>
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="hidden md:flex items-center gap-1.5 rounded-xl border border-border/60 bg-card/80 px-2 py-1.5 shrink-0">
+                    {stageFlow.steps.map((step, idx) => {
+                      const isDone = stageFlow.current >= idx
+                      const isCurrent = stageFlow.current === idx
+                      return (
+                        <div key={step} className="flex items-center gap-1.5">
+                          <span
+                            className={`rounded-md px-2 py-1 text-[11px] font-semibold whitespace-nowrap ${
+                              isDone
+                                ? isCurrent
+                                  ? "bg-primary/15 text-primary"
+                                  : "bg-emerald-500/15 text-emerald-600"
+                                : "bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            {step}
+                          </span>
+                          {idx < stageFlow.steps.length - 1 ? (
+                            <span className="text-xs text-muted-foreground/70">→</span>
+                          ) : null}
                         </div>
-                      ) : (
-                        <SelectValue placeholder={selectableOrders.length === 0 ? "No orders found" : "Select Order ID"} />
-                      )}
-                    </SelectTrigger>
-                    <SelectContent>
-                      {selectableOrders.length === 0 && !isLoadingOrders ? (
-                        <div className="px-3 py-2 text-sm text-muted-foreground text-center">
-                          No orders available
-                        </div>
-                      ) : (
-                        selectableOrders.map((order) => (
-                          <SelectItem key={order.order_id} value={order.order_id} className="font-bold">
-                            <div className="flex flex-col">
-                              <span>{order.order_id}</span>
-                              <span className="text-xs font-normal text-muted-foreground">
-                                {order.challenge_type} • ${order.account_size}
-                              </span>
-                            </div>
-                          </SelectItem>
-                        ))
-                      )}
-                    </SelectContent>
-                  </Select>
+                      )
+                    })}
+                  </div>
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="min-h-[44px] sm:h-9 h-11 px-3 text-sm border-border bg-card text-foreground hover:bg-muted/60 gap-1.5 shrink-0 touch-manipulation rounded-xl"
-                  disabled={!selectedOrderId || !hasCredentials}
-                  onClick={() => setCredentialsOpen(true)}
-                >
-                  <KeyRound className="h-4 w-4 text-muted-foreground" />
-                  Credentials
-                </Button>
               </>
             ) : (
               <>
@@ -284,7 +360,10 @@ export function Header({
             <DialogHeader>
               <DialogTitle>Account credentials</DialogTitle>
             </DialogHeader>
-            {currentOrder?.credentials || currentOrder?.stage2_credentials || currentOrder?.live_credentials ? (
+            {currentOrder?.credentials ||
+            currentOrder?.stage2_credentials ||
+            currentOrder?.live_credentials ||
+            (currentOrder?.credentials_with_status && currentOrder.credentials_with_status.length > 0) ? (
               <div className="space-y-5">
                 {/* Phase 1 / Completed credentials */}
                 {(currentOrder?.credentials || currentOrder?.live_credentials) && (() => {
@@ -406,6 +485,109 @@ export function Header({
                     </div>
                   )
                 })()}
+
+                {/* credentials_with_status (new my-account API) */}
+                {currentOrder?.credentials_with_status &&
+                  currentOrder.credentials_with_status.length > 0 &&
+                  !currentOrder.credentials &&
+                  !currentOrder.stage2_credentials &&
+                  !currentOrder.live_credentials &&
+                  currentOrder.credentials_with_status.map((c) => (
+                    <div key={c.credential_id} className="space-y-3">
+                      <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border pb-1.5">
+                        {c.status_type ?? "Trading account"}
+                      </h4>
+                      {[
+                        { label: "Login", value: String(c.platform_login), key: "cw-login" },
+                        { label: "Password", value: c.platform_password, key: "cw-password" },
+                        { label: "Server", value: c.server, key: "cw-server" },
+                        {
+                          label: "Profit target",
+                          value: c.profit_target != null ? String(c.profit_target) : "—",
+                          key: "cw-profit",
+                        },
+                        {
+                          label: "Status",
+                          value: c.account_status ?? "—",
+                          key: "cw-status",
+                        },
+                      ].map(({ label, value, key }) => (
+                        <div key={key} className="flex items-center justify-between gap-2">
+                          <span className="text-sm font-medium text-muted-foreground">{label}</span>
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <code className="text-xs font-mono bg-muted px-2 py-1.5 rounded truncate max-w-[200px]">
+                              {value}
+                            </code>
+                            {value !== "—" && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 shrink-0"
+                                onClick={() => copyToClipboard(`cw-${c.credential_id}-${label}`, value)}
+                              >
+                                {copiedField === `cw-${c.credential_id}-${label}` ? (
+                                  <Check className="h-4 w-4 text-green-600" />
+                                ) : (
+                                  <Copy className="h-4 w-4" />
+                                )}
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+
+                {currentOrder?.credentials_with_status &&
+                  !currentOrder.credentials &&
+                  !currentOrder.stage2_credentials &&
+                  !currentOrder.live_credentials && (
+                    <div className="rounded-lg border border-border bg-muted/30 p-3 mt-3">
+                      <p className="text-xs font-semibold text-muted-foreground mb-2">Account statistics (ShowMyTrades)</p>
+                      {stage2StatsLoading ? (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Loading…
+                        </div>
+                      ) : stage2Stats?.account_info ? (
+                        <div className="grid grid-cols-3 gap-2 text-sm">
+                          <div className="flex items-center gap-1.5">
+                            <Wallet className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-muted-foreground">Balance:</span>
+                            <span className="font-medium tabular-nums">
+                              ${(stage2Stats.account_info.balance ?? 0).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-muted-foreground">Equity:</span>
+                            <span className="font-medium tabular-nums">
+                              ${(stage2Stats.account_info.equity ?? 0).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
+                            </span>
+                          </div>
+                          <div className="col-span-1 flex items-center gap-1.5">
+                            <span className="text-muted-foreground">Profit:</span>
+                            <span
+                              className={`font-medium tabular-nums ${(stage2Stats.statistics?.account_stats?.profit ?? 0) >= 0 ? "text-foreground" : "text-destructive"}`}
+                            >
+                              ${(stage2Stats.statistics?.account_stats?.profit ?? 0).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">Stats unavailable</p>
+                      )}
+                    </div>
+                  )}
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">No credentials available for this order yet.</p>
@@ -461,19 +643,67 @@ export function Header({
             )}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-7">
               <div className="space-y-2 min-w-0">
-                <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  <span className="inline-flex h-1.5 w-1.5 rounded-full bg-foreground/60 animate-pulse" />
-                  <span className="whitespace-nowrap">{badge ?? "Live trading overview"}</span>
-                </div>
-                <div className="space-y-1">
-                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight text-foreground break-words">
-                    {title}
-                  </h1>
-                  {description != null && (
-                    <p className="text-sm leading-relaxed text-muted-foreground max-w-2xl break-words">
-                      {description}
-                    </p>
-                  )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 w-full max-w-5xl">
+                  {[
+                    {
+                      label: "Platform Login",
+                      value:
+                        resolvedForHeader?.credential?.platform_login != null
+                          ? String(resolvedForHeader.credential.platform_login)
+                          : "—",
+                      key: "hero-login",
+                      icon: MonitorSmartphone,
+                    },
+                    {
+                      label: "Password",
+                      value: resolvedForHeader?.credential?.platform_password || "—",
+                      key: "hero-password",
+                      icon: KeyRound,
+                    },
+                    {
+                      label: "Server",
+                      value: resolvedForHeader?.credential?.server || "—",
+                      key: "hero-server",
+                      icon: Server,
+                    },
+                    {
+                      label: "Status",
+                      value: headerStatus,
+                      key: "hero-status",
+                      icon: Activity,
+                    },
+                  ].map((item: { label: string; value: string; key: string; icon: LucideIcon }) => (
+                    <div
+                      key={item.key}
+                      className="group rounded-xl border border-border/70 bg-gradient-to-br from-muted/45 to-muted/20 px-3 py-2.5 min-w-0 shadow-sm"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                            <item.icon className="h-3.5 w-3.5" />
+                            {item.label}
+                          </p>
+                          <p className="text-sm font-semibold text-foreground truncate mt-1" title={item.value}>
+                            {item.value}
+                          </p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 shrink-0 rounded-lg border border-border/60 bg-background/40 hover:bg-background/70"
+                          onClick={() => item.value !== "—" && copyToClipboard(item.key, item.value)}
+                          disabled={item.value === "—"}
+                          aria-label={`Copy ${item.label}`}
+                        >
+                          {copiedField === item.key ? (
+                            <Check className="h-3.5 w-3.5 text-emerald-500" />
+                          ) : (
+                            <Copy className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 

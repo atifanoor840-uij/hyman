@@ -53,6 +53,21 @@ export interface RecentTrade {
   net_profit: number;
 }
 
+/** Open position row from MT5 / performance API */
+export interface OpenTrade {
+  symbol?: string;
+  ticket?: string | number;
+  volume?: number;
+  open_time?: string;
+  /** Floating P/L (unrealized) */
+  profit?: number;
+  type?: number | string;
+  price_open?: number;
+  price_current?: number;
+  swap?: number;
+  [key: string]: unknown;
+}
+
 export interface EquityCurve {
   daily_performance: DailyPerformance[];
   deposits_withdrawals?: { date: string; amount: number }[];
@@ -88,7 +103,7 @@ export interface PerformanceResponse {
     by_symbol?: Record<string, unknown>;
   };
   metadata?: { user_id: string; platform: string; last_updated: string };
-  open_trades?: { count: number; total: number; data: unknown[] };
+  open_trades?: { count: number; total: number; data: OpenTrade[] };
 }
 
 export async function getPerformanceData(orderId: string): Promise<PerformanceResponse> {

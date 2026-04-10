@@ -6,7 +6,7 @@ import SectionCard from "@/components/ui/section-card"
 import { formatDateKarachi, formatDateExact } from '@/lib/utils'
 import { useCachedOrders } from '@/hooks/use-cached-orders'
 import { invalidateCachesForStatusChange, broadcastCacheInvalidation } from '@/lib/order-cache-utils'
-import { 
+import {
   ClipboardDocumentListIcon,
   MagnifyingGlassIcon,
   EyeIcon,
@@ -792,7 +792,7 @@ export default function AdminOrdersPage() {
             const errJson = JSON.parse(errBody2)
             if (errJson.detail) errMessage = typeof errJson.detail === 'string' ? errJson.detail : errMessage
             if (errJson.message) errMessage = errJson.message
-          } catch {
+  } catch {
             if (errBody2) errMessage = errBody2.slice(0, 200)
           }
           throw new Error(errMessage)
@@ -1271,7 +1271,7 @@ export default function AdminOrdersPage() {
       {analyticsError && (
         <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           {analyticsError}
-        </div>
+            </div>
       )}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-6">
         {/* Total Users */}
@@ -1285,7 +1285,7 @@ export default function AdminOrdersPage() {
             </div>
             <div className="p-2.5 rounded-xl bg-violet-50">
               <UserGroupIcon className="w-5 h-5 text-violet-600" />
-            </div>
+          </div>
           </div>
         </div>
         {/* Orders */}
@@ -1374,9 +1374,9 @@ export default function AdminOrdersPage() {
                   <button onClick={() => setDateFilter("")} className="px-3 py-2 text-sm text-gray-500 hover:text-gray-900 transition-colors">
                     Clear
                   </button>
-                )}
-              </div>
-            </div>
+            )}
+          </div>
+        </div>
             <div className="flex flex-wrap gap-1.5 pt-1 border-t border-gray-100">
               <span className="text-xs text-gray-400 mr-1 self-center">Product:</span>
               {[
@@ -1406,8 +1406,8 @@ export default function AdminOrdersPage() {
         <SectionCard>
           <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
             <div className="text-red-700 text-sm font-medium">{error}</div>
-          </div>
-        </SectionCard>
+            </div>
+          </SectionCard>
       )}
 
       {/* Orders Table */}
@@ -1419,7 +1419,7 @@ export default function AdminOrdersPage() {
             <ClipboardDocumentListIcon className="w-12 h-12 text-red-500 mx-auto mb-4" />
             <p className="text-red-600 font-medium">Failed to load orders</p>
             <p className="text-gray-600 text-sm mt-2">{fetchError || error}</p>
-          </div>
+              </div>
         ) : filteredOrders.length > 0 ? (
           <>
             {/* Desktop Table View */}
@@ -1454,7 +1454,7 @@ export default function AdminOrdersPage() {
                           ) : null}
                           <div className="text-gray-900 font-bold text-sm truncate" title={order.order_id}>{order.order_id}</div>
                           <div className="text-gray-500 text-xs">ID: {order.id}</div>
-                        </div>
+                </div>
                       </td>
                       <td className="py-3 px-4 align-top overflow-hidden">
                         <div className="space-y-0.5 min-w-0">
@@ -1495,7 +1495,7 @@ export default function AdminOrdersPage() {
                               <span>Image</span>
                             </button>
                           )}
-                        </div>
+                </div>
                       </td>
                       <td className="py-3 px-4 align-top overflow-hidden">
                         <span className={`px-2 py-0.5 rounded-lg text-xs font-bold inline-block truncate max-w-full ${getStatusColor(order.status)}`} title={order.status || '—'}>
@@ -1562,40 +1562,40 @@ export default function AdminOrdersPage() {
                   </div>
                   
                   <div className="space-y-2.5">
-                    <div>
+                <div>
                       <div className="text-gray-500 text-xs mb-1">User</div>
                       <div className="text-gray-900 font-semibold text-base">{order.username}</div>
                       <div className="text-gray-600 text-xs truncate">{order.email}</div>
-                    </div>
+                </div>
                     
-                    <div>
+                <div>
                       <div className="text-gray-500 text-xs mb-1">Challenge</div>
                       <div className="text-gray-900 font-semibold text-base">{order.challenge_type}</div>
                       <div className="text-gray-600 text-xs">${order.account_size} • {order.platform}</div>
-                    </div>
+                </div>
                     
                     <div className="flex items-center justify-between">
-                      <div>
+                <div>
                         <div className="text-gray-500 text-xs mb-1">Amount</div>
                         <div className="text-gray-900 font-bold text-base">{formatAmount(order.amount)}</div>
-                      </div>
-                      <div>
+                </div>
+                <div>
                         <div className="text-gray-500 text-xs mb-1">Payment</div>
                         <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${getPaymentMethodColor(order.payment_method)}`}>
                           {order.payment_method || '—'}
                         </span>
-                      </div>
-                    </div>
+                </div>
+            </div>
                     
                     {(order.created_at || (order.timeline && order.timeline.length > 0)) && (
-                      <div>
+              <div>
                         <div className="text-gray-500 text-xs mb-1">Created At</div>
                         <div className="text-gray-700 text-sm">
                           {order.created_at 
                             ? formatDateExact(order.created_at)
                             : formatDateExact(order.timeline[0].event_date)
                           }
-                        </div>
+              </div>
                       </div>
                     )}
                       
@@ -1604,8 +1604,8 @@ export default function AdminOrdersPage() {
                         {order.payment_method === "CARD" && order.checkout_session_url && (
                           <a 
                             href={order.checkout_session_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                    target="_blank"
+                    rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors bg-blue-500/10 px-2 py-1 rounded border border-blue-500/20"
                           >
                             <ArrowTopRightOnSquareIcon className="w-3 h-3" />
@@ -1632,7 +1632,7 @@ export default function AdminOrdersPage() {
                             View Image
                           </button>
                         )}
-                      </div>
+                </div>
                     ) : null}
                   </div>
                   
@@ -1659,8 +1659,8 @@ export default function AdminOrdersPage() {
                         <button className="px-3 py-2 text-xs bg-emerald-100 text-emerald-700 rounded-xl hover:bg-emerald-200 transition-colors"><CheckIcon className="w-4 h-4" /></button>
                         <button className="px-3 py-2 text-xs bg-red-100 text-red-700 rounded-xl hover:bg-red-200 transition-colors"><XMarkIcon className="w-4 h-4" /></button>
                       </>
-                    )}
-                  </div>
+              )}
+            </div>
                 </div>
               ))}
             </div>
@@ -1694,19 +1694,19 @@ export default function AdminOrdersPage() {
                     Next
                   </button>
                 </div>
-              </div>
-            )}
+                  </div>
+                )}
           </>
         ) : (
           <div className="p-16 text-center">
             <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
               <ClipboardDocumentListIcon className="w-7 h-7 text-gray-400" />
-            </div>
+              </div>
             <p className="text-gray-600 font-medium">No orders found</p>
             <p className="text-sm text-gray-400 mt-1">Try adjusting your filters</p>
           </div>
         )}
-      </SectionCard>
+            </SectionCard>
 
       {/* Order Details Modal - Professional (matches credentials page style) */}
       <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
@@ -1775,16 +1775,16 @@ export default function AdminOrdersPage() {
               </div>
 
               {/* Challenge Details */}
-              <div>
+                <div>
                 <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Challenge Details</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <CurrencyDollarIcon className="w-5 h-5 text-amber-600" />
                       <span className="text-gray-700 font-medium">Challenge Type</span>
-                    </div>
+                </div>
                     <p className="text-gray-900 font-semibold">{selectedOrder.challenge_type}</p>
-                  </div>
+              </div>
                   <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <CreditCardIcon className="w-5 h-5 text-blue-600" />
@@ -1803,7 +1803,7 @@ export default function AdminOrdersPage() {
               </div>
 
               {/* Payment Information */}
-              <div>
+                <div>
                 <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Payment Information</h3>
                 <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-5 space-y-3">
                   <div className="flex justify-between items-center">
@@ -1811,11 +1811,11 @@ export default function AdminOrdersPage() {
                     <span className={`px-3 py-1 rounded-full text-sm font-bold ${getPaymentMethodColor(selectedOrder.payment_method)}`}>
                       {selectedOrder.payment_method}
                     </span>
-                  </div>
+                </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Transaction ID:</span>
                     <span className="text-gray-900 font-mono text-sm">{selectedOrder.txid}</span>
-                  </div>
+              </div>
                   {selectedOrder.payment_method === "CARD" && selectedOrder.checkout_session_url && (
                     <div className="pt-2">
                       <a 
@@ -1897,7 +1897,7 @@ export default function AdminOrdersPage() {
                           >
                             <ClipboardIcon className="w-4 h-4" />
                           </button>
-                        </div>
+              </div>
                       </div>
                     )}
                     {selectedOrder.live_account.platform_login && (
@@ -1913,8 +1913,8 @@ export default function AdminOrdersPage() {
                           >
                             <ClipboardIcon className="w-4 h-4" />
                           </button>
-                        </div>
-                      </div>
+        </div>
+          </div>
                     )}
                     {selectedOrder.live_account.platform_password && (
                       <div className="flex justify-between items-center gap-3">
@@ -1929,16 +1929,16 @@ export default function AdminOrdersPage() {
                           >
                             <ClipboardIcon className="w-4 h-4" />
                           </button>
-                        </div>
-                      </div>
+          </div>
+          </div>
                     )}
                     {selectedOrder.live_account.profit_share !== undefined && (
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600 text-sm">Profit Share:</span>
                         <span className="text-gray-900 font-bold">{selectedOrder.live_account.profit_share}%</span>
-                      </div>
+        </div>
                     )}
-                  </div>
+    </div>
                 </div>
               )}
 
@@ -1951,7 +1951,7 @@ export default function AdminOrdersPage() {
                       {(selectedOrder.stage2_account.account_status ?? selectedOrder.credentials_with_status?.find(c => c.account_type === 'stage2')?.account_status) && (
                         <span className="text-xs text-gray-600 capitalize">{selectedOrder.stage2_account.account_status ?? selectedOrder.credentials_with_status?.find(c => c.account_type === 'stage2')?.account_status}</span>
                       )}
-                    </div>
+            </div>
                     <button
                       type="button"
                       onClick={() => {
@@ -1968,7 +1968,7 @@ export default function AdminOrdersPage() {
                       <ClipboardIcon className="w-4 h-4" />
                       Copy
                     </button>
-                  </div>
+            </div>
                   <div className="p-4 space-y-3">
                     {selectedOrder.stage2_account.server && (
                       <div className="flex justify-between items-center gap-3">
@@ -1983,8 +1983,8 @@ export default function AdminOrdersPage() {
                           >
                             <ClipboardIcon className="w-4 h-4" />
                           </button>
-                        </div>
-                      </div>
+          </div>
+            </div>
                     )}
                     {selectedOrder.stage2_account.platform_login && (
                       <div className="flex justify-between items-center gap-3">
@@ -2015,7 +2015,7 @@ export default function AdminOrdersPage() {
                           >
                             <ClipboardIcon className="w-4 h-4" />
                           </button>
-                        </div>
+                    </div>
                       </div>
                     )}
                     {selectedOrder.stage2_account.profit_target !== undefined && (
@@ -2038,15 +2038,15 @@ export default function AdminOrdersPage() {
                         <span className="text-xs text-gray-600 capitalize">{selectedOrder.credentials_with_status.find(c => c.account_type === 'complete')?.account_status}</span>
                       )}
                     </div>
-                    <button
-                      type="button"
+                            <button
+                              type="button"
                       onClick={() => copyAccountCredentials(selectedOrder)}
                       className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors"
                       title="Copy Account Credentials"
-                    >
+                            >
                       <ClipboardIcon className="w-4 h-4" />
                       Copy
-                    </button>
+                            </button>
                   </div>
                   <div className="p-4 space-y-3">
                     {selectedOrder.server && (
@@ -2063,8 +2063,8 @@ export default function AdminOrdersPage() {
                             <ClipboardIcon className="w-4 h-4" />
                           </button>
                         </div>
-                      </div>
-                    )}
+                        </div>
+                      )}
                     {selectedOrder.platform_login && (
                       <div className="flex justify-between items-center gap-3">
                         <span className="text-gray-600 text-sm">Platform Login:</span>
@@ -2078,8 +2078,8 @@ export default function AdminOrdersPage() {
                           >
                             <ClipboardIcon className="w-4 h-4" />
                           </button>
-                        </div>
-                      </div>
+                    </div>
+                  </div>
                     )}
                     {selectedOrder.platform_password && (
                       <div className="flex justify-between items-center gap-3">
@@ -2095,13 +2095,13 @@ export default function AdminOrdersPage() {
                             <ClipboardIcon className="w-4 h-4" />
                           </button>
                         </div>
-                      </div>
-                    )}
+            </div>
+          )}
                     {selectedOrder.profit_target !== null && selectedOrder.profit_target !== undefined && (
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600 text-sm">Profit Target:</span>
                         <span className="text-gray-900 font-bold">${selectedOrder.profit_target.toLocaleString()}</span>
-                      </div>
+        </div>
                     )}
                   </div>
                 </div>
@@ -2166,17 +2166,17 @@ export default function AdminOrdersPage() {
               )}
             </div>
           )}
-        </DialogContent>
-      </Dialog>
+      </DialogContent>
+    </Dialog>
 
       {/* Payment Image Modal */}
       <Dialog open={!!showPaymentImage} onOpenChange={() => setShowPaymentImage(null)}>
         <DialogContent className="bg-gray-900 text-white border border-gray-700 max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
+        <DialogHeader>
             <DialogTitle className="text-xl font-bold text-white">
               Payment Proof
             </DialogTitle>
-          </DialogHeader>
+        </DialogHeader>
           
           {showPaymentImage && (
             <div className="space-y-4">
@@ -2185,8 +2185,8 @@ export default function AdminOrdersPage() {
                   src={showPaymentImage} 
                   alt="Payment Proof" 
                   className="max-w-full max-h-[70vh] object-contain rounded-lg border border-gray-700"
-                />
-              </div>
+            />
+          </div>
               <div className="flex justify-center">
                 <a 
                   href={showPaymentImage}
@@ -2197,11 +2197,11 @@ export default function AdminOrdersPage() {
                   <ArrowTopRightOnSquareIcon className="w-4 h-4" />
                   Open Full Size
                 </a>
-              </div>
-            </div>
+          </div>
+          </div>
           )}
-        </DialogContent>
-      </Dialog>
+      </DialogContent>
+    </Dialog>
 
       {/* Edit Order Modal - Professional (matches view/credentials style) */}
       <Dialog open={!!editingOrder} onOpenChange={() => setEditingOrder(null)}>
@@ -2250,7 +2250,7 @@ export default function AdminOrdersPage() {
                     <div className="flex items-center justify-center py-6">
                       <span className="h-5 w-5 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin" />
                       <span className="ml-2 text-gray-600 text-sm">Loading available accounts...</span>
-                    </div>
+        </div>
                   ) : availableContainers.length > 0 ? (
                     <select
                       value={selectedContainerId || ''}
@@ -2269,7 +2269,7 @@ export default function AdminOrdersPage() {
                       <p className="text-amber-800 text-sm font-medium">
                         No available accounts found matching account size ({editingOrder?.account_size}) and platform ({editingOrder?.platform})
                       </p>
-                    </div>
+      </div>
                   )}
                 </div>
               )}
@@ -2288,8 +2288,8 @@ export default function AdminOrdersPage() {
                         className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900"
                         placeholder="Enter server"
                       />
-                    </div>
-                    <div>
+            </div>
+            <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Platform Login</label>
                       <input
                         type="text"
@@ -2298,8 +2298,8 @@ export default function AdminOrdersPage() {
                         className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900"
                         placeholder="Enter platform login"
                       />
-                    </div>
-                  </div>
+            </div>
+          </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Platform Password</label>
@@ -2323,9 +2323,9 @@ export default function AdminOrdersPage() {
                             <EyeIcon className="w-5 h-5" />
                           )}
                         </button>
-                      </div>
-                    </div>
-                    <div>
+        </div>
+            </div>
+            <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Profit Target</label>
                       <input
                         type="text"
@@ -2334,9 +2334,9 @@ export default function AdminOrdersPage() {
                         className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900"
                         placeholder="Enter profit target"
                       />
-                    </div>
-                  </div>
-                </div>
+            </div>
+          </div>
+        </div>
               )}
 
               {(editForm.status === 'stage2' || editForm.status === 'live') && (
@@ -2352,8 +2352,8 @@ export default function AdminOrdersPage() {
                         className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900"
                         placeholder="Enter server"
                       />
-                    </div>
-                    <div>
+            </div>
+            <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Platform Login</label>
                       <input
                         type="text"
@@ -2362,8 +2362,8 @@ export default function AdminOrdersPage() {
                         className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900"
                         placeholder="Enter platform login"
                       />
-                    </div>
-                  </div>
+            </div>
+          </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Platform Password</label>
@@ -2387,9 +2387,9 @@ export default function AdminOrdersPage() {
                             <EyeIcon className="w-5 h-5" />
                           )}
                         </button>
-                      </div>
-                    </div>
-                    <div>
+        </div>
+            </div>
+            <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Session ID</label>
                       <input
                         type="text"
@@ -2398,8 +2398,8 @@ export default function AdminOrdersPage() {
                         className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900"
                         placeholder="Enter session ID"
                       />
-                    </div>
-                  </div>
+            </div>
+          </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Terminal ID</label>
@@ -2410,7 +2410,7 @@ export default function AdminOrdersPage() {
                         className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900"
                         placeholder="Enter terminal ID"
                       />
-                    </div>
+        </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Profit Target</label>
                       <input
@@ -2420,8 +2420,8 @@ export default function AdminOrdersPage() {
                         className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900"
                         placeholder="Enter profit target"
                       />
-                    </div>
-                  </div>
+      </div>
+          </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Account Type</label>
                     <select
@@ -2434,8 +2434,8 @@ export default function AdminOrdersPage() {
                       <option value="live">Live</option>
                     </select>
                   </div>
-                </div>
-              )}
+        </div>
+      )}
 
               {editForm.status === 'pass' && (
                 <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
@@ -2476,9 +2476,9 @@ export default function AdminOrdersPage() {
                       value={editForm.date}
                       onChange={(e) => setEditForm({...editForm, date: e.target.value})}
                       className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900"
-                    />
-                  </div>
-                </div>
+              />
+            </div>
+          </div>
               )}
 
               {/* Action Buttons */}
@@ -2507,7 +2507,7 @@ export default function AdminOrdersPage() {
                     </>
                   )}
                 </button>
-              </div>
+          </div>
               </>
               )}
             </div>
@@ -2537,8 +2537,8 @@ export default function AdminOrdersPage() {
                     Edit
                   </button>
                 )}
-              </div>
-            </div>
+          </div>
+                        </div>
           </DialogHeader>
           {credentialsOrder && (
             <div className="space-y-6 mt-6">
@@ -2551,7 +2551,7 @@ export default function AdminOrdersPage() {
                   </h3>
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
+                        <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Server</label>
                         <input
                           type="text"
@@ -2560,7 +2560,7 @@ export default function AdminOrdersPage() {
                           className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900"
                           placeholder="Enter server"
                         />
-                      </div>
+                        </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Platform Login</label>
                         <input
@@ -2684,14 +2684,14 @@ export default function AdminOrdersPage() {
                           <button onClick={onCopyAll} className="p-1.5 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-black/5 transition-colors" title="Copy all">
                             <BookmarkIcon className="w-5 h-5" />
                           </button>
-                        </div>
+                          </div>
                         <div className="flex-1">
                           <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-gray-900 text-white mb-2">
                             {title}
-                          </span>
+                              </span>
                           <p className="text-sm text-gray-600 mt-2">{bottomLabel}</p>
                           <p className="text-sm font-mono text-gray-900 truncate">{bottomValue}</p>
-                        </div>
+                          </div>
                         {showChangeStatus && selectedStatus !== undefined && onStatusChange && onUpdateStatus && (
                           <div className="mt-4 pt-4 border-t border-gray-300/50 space-y-2">
                             <span className="text-xs text-gray-600 uppercase font-medium">Change order status</span>
@@ -2715,7 +2715,7 @@ export default function AdminOrdersPage() {
                                 )}
                                 {changeStatusLoading ? 'Updating...' : 'Update status'}
                               </button>
-                            </div>
+                          </div>
                           </div>
                         )}
                         <div className="mt-4 flex justify-end">
@@ -2743,9 +2743,9 @@ export default function AdminOrdersPage() {
                                 </div>
                               </div>
                             ))}
-                          </div>
-                        )}
-                      </div>
+          </div>
+        )}
+      </div>
                     )
                     const cards: JSX.Element[] = []
                     if (credentialsOrder.live_account) {
@@ -2855,7 +2855,7 @@ export default function AdminOrdersPage() {
                           <ClipboardIcon className="w-14 h-14 text-gray-400 mx-auto mb-4" />
                           <p className="text-gray-600 font-medium text-lg">No credentials available</p>
                           <p className="text-gray-500 text-sm mt-1">Credentials will appear here once the order is completed</p>
-                        </div>
+    </div>
                       )
                     }
                     return <>{cards}</>

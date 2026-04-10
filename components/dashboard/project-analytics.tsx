@@ -1,52 +1,8 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { useState, useMemo } from "react"
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import { Banknote, BarChart2, TrendingDown, CalendarDays } from "lucide-react"
 import type { PerformanceResponse } from "@/lib/api/performance"
-
-// Zero chart data when no API stats (no fake/placeholder data)
-function getZeroChartData() {
-  const count = 24
-  const data = []
-  for (let i = 0; i < count; i++) {
-    const hour = 8 + (i % 12)
-    const time = hour > 12 ? `${hour - 12}:00 PM` : `${hour}:00 AM`
-    data.push({
-      time,
-      value: 0,
-      equity: 0,
-      profit: 0,
-      drawDown: 0,
-      date: "—",
-      fullTime: time,
-    })
-  }
-  return data
-}
-
-function buildChartDataFromStats(stats: PerformanceResponse | null, metric: string) {
-  const daily = stats?.statistics?.equity_curve?.daily_performance
-  if (!daily?.length) return null
-  return daily.map((d) => {
-    const dateStr = d.date
-    const equity = d.cumulative_equity ?? d.cumulative_balance ?? 0
-    const profit = d.cumulative_profit ?? 0
-    const drawDown = d.drawdown ?? 0
-    return {
-      time: dateStr,
-      value: metric === "Equity" ? equity : metric === "Profit" ? profit : drawDown,
-      equity,
-      profit,
-      drawDown,
-      date: dateStr,
-      fullTime: dateStr,
-    }
-  })
-}
-
-const metricOptions = ["Draw Down", "Profit", "Equity"] as const
 
 export interface ProjectAnalyticsProps {
   stats?: PerformanceResponse | null
@@ -54,136 +10,62 @@ export interface ProjectAnalyticsProps {
 
 export function ProjectAnalytics(props: ProjectAnalyticsProps) {
   const { stats = null } = props
-  const [selectedMetric, setSelectedMetric] = useState<(typeof metricOptions)[number]>("Equity")
-  const chartDataFromApi = useMemo(() => buildChartDataFromStats(stats ?? null, selectedMetric), [stats, selectedMetric])
-  const chartData = chartDataFromApi ?? getZeroChartData()
-  const currentBalance = stats?.account_info?.equity ?? stats?.account_info?.balance ?? chartData[chartData.length - 1]?.equity ?? 0
-  const values = chartData.map((d) => d.value)
-  const maxValue = values.length ? Math.max(...values) : 0
-  const minValue = values.length ? Math.min(...values) : 0
-  const allZero = maxValue === 0 && minValue === 0
-
-  const formatTooltipValue = (val: number) => {
-    if (selectedMetric === "Draw Down") return `${val.toFixed(2)}%`
-    return `$${val.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-  }
-
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload
-      return (
-        <div className="bg-card border border-border shadow-xl px-4 py-3 rounded-lg text-sm font-semibold text-foreground">
-          <p className="font-bold text-lg">{formatTooltipValue(data.value)}</p>
-          <p className="text-xs text-muted-foreground mt-1">{data.fullTime || data.date}</p>
-        </div>
-      )
-    }
-    return null
-  }
-
-  const formatYAxis = (value: number) => {
-    if (selectedMetric === "Draw Down") return `${value}%`
-    if (Math.abs(value) >= 1000) return `${(value / 1000).toFixed(0)}k`
-    return value.toString()
-  }
-
-  // Light stroke for Equity/Profit on dark bg; red for Draw Down
-  const strokeColor = selectedMetric === "Draw Down" ? "#ef4444" : "#d4d4d8"
-  const gradientId = `chartGradient-${selectedMetric.replace(/\s/g, "")}`
-  const isDrawDown = selectedMetric === "Draw Down"
+  const accountInfo = stats?.account_info
+  const accountStats = stats?.statistics?.account_stats
+  const tradingDays = stats?.statistics?.equity_curve?.daily_performance?.length ?? 0
+  const floatingLoss =
+    accountInfo != null ? Math.max(0, (accountInfo.balance ?? 0) - (accountInfo.equity ?? 0)) : null
 
   return (
     <Card
-      className="p-4 md:p-5 transition-shadow duration-200 hover:shadow-md animate-slide-in-up bg-card border border-border/80 flex flex-col min-w-0"
+      className="overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm min-w-0"
       style={{ animationDelay: "400ms" }}
     >
-      {/* Metric buttons on top */}
-      <div className="flex items-center gap-1.5 mb-4">
-        {metricOptions.map((metric) => (
-          <Button
-            key={metric}
-            variant={selectedMetric === metric ? "default" : "outline"}
-            size="sm"
-            onClick={() => setSelectedMetric(metric)}
-            className={`text-xs h-6 px-2.5 rounded-lg ${
-              selectedMetric === metric
-                ? "bg-primary text-primary-foreground hover:bg-primary/90 border-0"
-                : "bg-transparent border-border/80 text-muted-foreground hover:bg-muted/60 hover:text-foreground"
-            }`}
-          >
-            {metric}
-          </Button>
-        ))}
+      <div className="border-b border-border/80 bg-muted/30 px-5 sm:px-6 py-4">
+        <h3 className="text-base font-semibold tracking-tight text-foreground">Performance</h3>
+        <p className="text-xs text-muted-foreground mt-0.5">Key metrics at a glance</p>
       </div>
-
-      {/* Header Section */}
-      <div className="flex items-center gap-2 mb-3">
-        <div className="w-8 h-8 rounded-full bg-muted/60 flex items-center justify-center">
-          <span className="text-sm font-bold text-foreground">B</span>
+      <div className="p-0">
+        <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-border/80 [&>div]:border-border/80">
+          <div className="flex flex-col p-5 sm:p-6 min-w-0">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted/60 text-muted-foreground">
+              <Banknote className="h-4 w-4" strokeWidth={2} />
+            </div>
+            <p className="mt-4 text-xl font-semibold tabular-nums tracking-tight text-foreground truncate">
+              {accountInfo ? `$${accountInfo.balance.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` : "—"}
+            </p>
+            <p className="mt-1.5 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">Balance</p>
+          </div>
+          <div className="flex flex-col p-5 sm:p-6 min-w-0">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted/60 text-muted-foreground">
+              <BarChart2 className="h-4 w-4" strokeWidth={2} />
+            </div>
+            <p className={`mt-4 text-xl font-semibold tabular-nums tracking-tight truncate ${(accountStats?.profit ?? 0) >= 0 ? "text-foreground" : "text-destructive"}`}>
+              {accountStats != null ? `$${accountStats.profit.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` : "—"}
+            </p>
+            <p className="mt-1.5 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">Profit/Loss</p>
+          </div>
+          <div className="flex flex-col p-5 sm:p-6 min-w-0">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted/60 text-muted-foreground">
+              <TrendingDown className="h-4 w-4" strokeWidth={2} />
+            </div>
+            <p className={`mt-4 text-xl font-semibold tabular-nums tracking-tight truncate ${floatingLoss != null && floatingLoss > 0 ? "text-destructive" : "text-foreground"}`}>
+              {floatingLoss != null
+                ? `$${floatingLoss.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+                : "—"}
+            </p>
+            <p className="mt-1.5 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">Floating Loss</p>
+          </div>
+          <div className="flex flex-col p-5 sm:p-6 min-w-0">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted/60 text-muted-foreground">
+              <CalendarDays className="h-4 w-4" strokeWidth={2} />
+            </div>
+            <p className="mt-4 text-xl font-semibold tabular-nums tracking-tight text-foreground">
+              {tradingDays}
+            </p>
+            <p className="mt-1.5 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">Trading Days</p>
+          </div>
         </div>
-        <div>
-          <p className="text-xs text-muted-foreground">{selectedMetric}</p>
-          <p className="text-lg font-bold text-foreground">
-            {selectedMetric === "Draw Down"
-              ? `${chartData[chartData.length - 1]?.value?.toFixed(2) ?? 0}%`
-              : selectedMetric === "Profit"
-                ? `$${(chartData[chartData.length - 1]?.profit ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`
-                : `$${currentBalance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`}
-          </p>
-        </div>
-      </div>
-
-      {/* Chart Area - reduced height to match right column; text-muted-foreground for axes/grid on dark bg */}
-      <div className="h-52 relative text-muted-foreground">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
-            <defs>
-              <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={strokeColor} stopOpacity={isDrawDown ? 0.5 : 0.35} />
-                <stop offset="50%" stopColor={strokeColor} stopOpacity={isDrawDown ? 0.25 : 0.12} />
-                <stop offset="100%" stopColor={strokeColor} stopOpacity={isDrawDown ? 0.1 : 0.04} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.2} />
-            <XAxis
-              dataKey="time"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "currentColor", fontSize: 11 }}
-              interval="preserveStartEnd"
-            />
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "currentColor", fontSize: 11 }}
-              domain={
-                selectedMetric === "Draw Down"
-                  ? allZero ? [-1, 1] : [Math.floor(minValue) - 1, 1]
-                  : allZero ? [0, 1000] : [Math.floor(minValue / 1000) * 1000, Math.ceil(maxValue / 1000) * 1000]
-              }
-              tickFormatter={formatYAxis}
-              width={50}
-            />
-            <Tooltip
-              content={<CustomTooltip />}
-              cursor={{ stroke: strokeColor, strokeWidth: 1, strokeDasharray: "5 5" }}
-            />
-            <Area
-              type="monotone"
-              dataKey="value"
-              stroke={strokeColor}
-              strokeWidth={isDrawDown ? 3 : 2.5}
-              fill={`url(#${gradientId})`}
-              dot={false}
-              activeDot={{
-                r: 6,
-                fill: strokeColor,
-                stroke: isDrawDown ? "#fff" : "rgba(15,15,15,0.6)",
-                strokeWidth: 2,
-              }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
       </div>
     </Card>
   )

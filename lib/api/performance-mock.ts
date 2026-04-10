@@ -150,5 +150,30 @@ export const MOCK_PERFORMANCE_DATA: PerformanceResponse = {
     by_symbol: {},
   },
   metadata: { user_id: "818a8753-7c23-43f4-aca5-77aec8635fbe", platform: "mt5", last_updated: "2026-02-07T16:35:51.758Z" },
-  open_trades: { count: 0, total: 0, data: [] },
+  open_trades: {
+    count: 2,
+    total: 2,
+    data: [
+      {
+        symbol: "EURUSD+",
+        ticket: "640001234",
+        volume: 1.5,
+        open_time: "2026-02-17T10:00:00.000Z",
+        profit: -125.5,
+        type: 0,
+        price_open: 1.085,
+        price_current: 1.082,
+      },
+      {
+        symbol: "XAUUSD+",
+        ticket: "640001235",
+        volume: 0.2,
+        open_time: "2026-02-17T10:30:00.000Z",
+        profit: 42.3,
+        type: 1,
+        price_open: 2650.5,
+        price_current: 2652.6,
+      },
+    ],
+  },
 }
