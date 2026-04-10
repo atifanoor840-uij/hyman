@@ -34,11 +34,11 @@ export default function Footer() {
 						<div className="flex items-center mb-4 gap-3">
 							<img
 								src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
-								alt="FxGenz Logo"
+								alt="GenzProp Logo"
 								className="h-16 w-16 object-contain rounded-lg bg-white/5"
 								loading="lazy"
 							/>
-							<div className="text-3xl font-bold tracking-tight text-white">FxGenz</div>
+							<div className="text-3xl font-bold tracking-tight text-white">GenzProp</div>
 						</div>
 						<p className="text-base leading-relaxed text-gray-400 mb-6">
 							Professional trading funding platform. Trade across multiple platforms with transparent rules, competitive pricing, and lightning-fast payouts.
@@ -131,7 +131,7 @@ export default function Footer() {
 						
 						<div className="space-y-3 text-xs leading-relaxed text-gray-400">
 							<p>
-								<strong className="text-gray-300 font-semibold">General Disclaimer:</strong> FxGenz provides simulated trading evaluations and funding programs. All trading activities are conducted in a simulated environment and do not involve real money until you successfully pass the evaluation phase and receive funded account access. Trading involves substantial risk of loss and is not suitable for all investors.
+								<strong className="text-gray-300 font-semibold">General Disclaimer:</strong> GenzProp provides simulated trading evaluations and funding programs. All trading activities are conducted in a simulated environment and do not involve real money until you successfully pass the evaluation phase and receive funded account access. Trading involves substantial risk of loss and is not suitable for all investors.
 							</p>
 							
 							<p>
@@ -151,7 +151,7 @@ export default function Footer() {
 							</p>
 							
 							<p>
-								<strong className="text-gray-300 font-semibold">Regulatory Notice:</strong> FxGenz operates as a proprietary trading firm providing evaluation and funding services. We are not a broker-dealer, investment advisor, or financial institution. Our services are not regulated by financial authorities in all jurisdictions. Please ensure that our services are legal and appropriate in your jurisdiction before participating.
+								<strong className="text-gray-300 font-semibold">Regulatory Notice:</strong> GenzProp operates as a proprietary trading firm providing evaluation and funding services. We are not a broker-dealer, investment advisor, or financial institution. Our services are not regulated by financial authorities in all jurisdictions. Please ensure that our services are legal and appropriate in your jurisdiction before participating.
 							</p>
 							
 							<p>
@@ -180,7 +180,7 @@ export default function Footer() {
 				{/* Bottom Bar */}
 				<div className="flex flex-col items-start justify-between gap-4 border-t border-gray-800 pt-8 md:flex-row md:items-center">
 					<div className="text-sm text-gray-500">
-						© {CURRENT_YEAR} <span className="text-white font-semibold">FxGenz</span>. All rights reserved.
+						© {CURRENT_YEAR} <span className="text-white font-semibold">GenzProp</span>. All rights reserved.
 					</div>
 					<div className="flex items-center gap-6 text-sm">
 						<a href="/policy#cookies" className="text-gray-400 hover:text-white transition-colors font-medium">Cookie Settings</a>

@@ -74,7 +74,7 @@ const helpCategories = [
 const faqs = [
 	{
 		q: 'How do I contact support?',
-		a: 'You can reach our support team 24/7 through live chat on our platform, email at support@fxgenz.com, or through our contact form. Average response time is under 2 hours.',
+		a: 'You can reach our support team 24/7 through live chat on our platform, email at support@GenzProp.com, or through our contact form. Average response time is under 2 hours.',
 	},
 	{
 		q: 'What are your support hours?',
@@ -116,7 +116,7 @@ export default function SupportPage() {
 							</p>
 						</div>
 						<div className="flex-shrink-0 lg:max-w-md xl:max-w-lg">
-							<img src={HEADER_IMAGE_2} alt="Fx Genz support" className="w-full h-auto rounded-xl object-contain shadow-2xl" />
+							<img src={HEADER_IMAGE_2} alt="GenzProp support" className="w-full h-auto rounded-xl object-contain shadow-2xl" />
 						</div>
 					</div>
 				</div>

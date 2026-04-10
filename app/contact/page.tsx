@@ -64,7 +64,7 @@ export default function ContactPage() {
 							</p>
 						</div>
 						<div className="flex-shrink-0 lg:max-w-md xl:max-w-lg">
-							<img src={HEADER_IMAGE_2} alt="Fx Genz contact" className="w-full h-auto rounded-xl object-contain shadow-2xl" />
+							<img src={HEADER_IMAGE_2} alt="GenzProp contact" className="w-full h-auto rounded-xl object-contain shadow-2xl" />
 						</div>
 					</div>
 				</div>
@@ -96,8 +96,8 @@ export default function ContactPage() {
 									</div>
 									<div>
 										<h3 className="font-semibold text-[#0b0b0f] mb-1">Email</h3>
-										<a href="mailto:support@fxgenz.com" className="text-[#0ea5e9] hover:underline">
-											support@fxgenz.com
+										<a href="mailto:support@GenzProp.com" className="text-[#0ea5e9] hover:underline">
+											support@GenzProp.com
 										</a>
 										<p className="text-sm text-[#37353E]/70 mt-1">We respond within 24 hours</p>
 									</div>

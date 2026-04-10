@@ -43,7 +43,7 @@ export default function ForgotPasswordPage() {
 						<span className="text-2xl font-extrabold tracking-tight md:text-3xl">
 							<span className="bg-gradient-to-r from-white to-white bg-clip-text text-transparent">X</span>
 						</span>
-						<span className="ml-2 text-xl font-semibold tracking-wide text-white/90 md:text-2xl">FxGenz</span>
+						<span className="ml-2 text-xl font-semibold tracking-wide text-white/90 md:text-2xl">GenzProp</span>
 					</span>
 				</Link>
 

@@ -34,7 +34,7 @@ export default function PolicyPage() {
 							</p>
 						</div>
 						<div className="flex-shrink-0 lg:max-w-md xl:max-w-lg">
-							<img src={HEADER_IMAGE_1} alt="Fx Genz privacy" className="w-full h-auto rounded-xl object-contain shadow-2xl" />
+							<img src={HEADER_IMAGE_1} alt="GenzProp privacy" className="w-full h-auto rounded-xl object-contain shadow-2xl" />
 						</div>
 					</div>
 				</div>
@@ -52,7 +52,7 @@ export default function PolicyPage() {
 						<section>
 							<h2 className="text-2xl font-semibold text-[#0b0b0f] mb-4">1. Introduction</h2>
 							<p className="leading-relaxed">
-								FxGenz ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our trading platform and services. Please read this privacy policy carefully.
+								GenzProp ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our trading platform and services. Please read this privacy policy carefully.
 							</p>
 						</section>
 
@@ -168,9 +168,9 @@ export default function PolicyPage() {
 								If you have any questions about this Privacy Policy or our data practices, please contact us at:
 							</p>
 							<div className="mt-4 p-4 bg-[#f9f9f9] rounded-lg">
-								<p className="font-semibold text-[#0b0b0f]">FxGenz Privacy Team</p>
-								<p className="text-sm text-[#37353E]/80">Email: privacy@fxgenz.com</p>
-								<p className="text-sm text-[#37353E]/80">Support: support@fxgenz.com</p>
+								<p className="font-semibold text-[#0b0b0f]">GenzProp Privacy Team</p>
+								<p className="text-sm text-[#37353E]/80">Email: privacy@GenzProp.com</p>
+								<p className="text-sm text-[#37353E]/80">Support: support@GenzProp.com</p>
 							</div>
 						</section>
 					</div>

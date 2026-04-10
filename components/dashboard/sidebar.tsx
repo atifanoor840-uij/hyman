@@ -109,10 +109,10 @@ export function Sidebar() {
         <Link href="/dashboard" className="flex items-center gap-3 group">
           <img
             src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
-            alt="FxGenz"
+            alt="GenzProp"
             className="h-12 w-12 shrink-0 object-contain transition-transform duration-300 group-hover:scale-105"
           />
-          <span className="text-lg font-bold tracking-tight text-foreground">FxGenz</span>
+          <span className="text-lg font-bold tracking-tight text-foreground">GenzProp</span>
         </Link>
       </div>
 

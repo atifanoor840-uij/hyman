@@ -479,8 +479,8 @@ export default function DashboardPage() {
                     <p className="text-xs text-muted-foreground flex items-center justify-center gap-1.5">
                       <Mail className="h-3.5 w-3.5" />
                       Questions?{" "}
-                      <a href="mailto:support@fxgenz.com" className="text-primary hover:underline font-medium">
-                        support@fxgenz.com
+                      <a href="mailto:support@GenzProp.com" className="text-primary hover:underline font-medium">
+                        support@GenzProp.com
                       </a>
                     </p>
                   </div>

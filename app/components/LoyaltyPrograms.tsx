@@ -63,7 +63,7 @@ export default function LoyaltyPrograms() {
 				<div className="mb-10 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
 					<div>
 						<h2 className="font-sans text-2xl font-bold tracking-tight text-[#0b0b0f] md:text-3xl">
-							Why Trade with FxGenz
+							Why Trade with GenzProp
 						</h2>
 						<p className="mt-1 text-sm text-[#64748b]">
 							Professional benefits for serious traders.

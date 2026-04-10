@@ -79,7 +79,7 @@ export interface CreateOrderWithOxapayParams {
 
 /** Default description and thanks message for Oxapay orders */
 export const OXAPAY_ORDER_DESCRIPTION =
-	'FxGenz funded trading challenge — secure payment for your evaluation account. Complete your challenge and get funded.';
+	'GenzProp funded trading challenge — secure payment for your evaluation account. Complete your challenge and get funded.';
 export const OXAPAY_THANKS_MESSAGE =
 	'Thank you for your payment. Your order is being processed. You will receive your account credentials shortly.';
 

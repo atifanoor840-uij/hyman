@@ -4,7 +4,7 @@ import "./globals.css"
 
 export const metadata: Metadata = {
   title: "Trading Dashboard",
-  description: "Manage your Fx Genz trading evaluations, track simulated account performance, and access your prop firm dashboard",
+  description: "Manage your GenzProp trading evaluations, track simulated account performance, and access your prop firm dashboard",
   generator: "v0.app",
   icons: {
     icon: [

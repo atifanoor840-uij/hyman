@@ -35,7 +35,7 @@ export default function PricingPage() {
 							</p>
 						</div>
 						<div className="flex-shrink-0 lg:max-w-md xl:max-w-lg">
-							<img src={HEADER_IMAGE_1} alt="Fx Genz pricing" className="w-full h-auto rounded-xl object-contain shadow-2xl" />
+							<img src={HEADER_IMAGE_1} alt="GenzProp pricing" className="w-full h-auto rounded-xl object-contain shadow-2xl" />
 						</div>
 					</div>
 				</div>

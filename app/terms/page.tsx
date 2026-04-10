@@ -34,7 +34,7 @@ export default function TermsPage() {
 							</p>
 						</div>
 						<div className="flex-shrink-0 lg:max-w-md xl:max-w-lg">
-							<img src={HEADER_IMAGE_1} alt="Fx Genz terms" className="w-full h-auto rounded-xl object-contain shadow-2xl" />
+							<img src={HEADER_IMAGE_1} alt="GenzProp terms" className="w-full h-auto rounded-xl object-contain shadow-2xl" />
 						</div>
 					</div>
 				</div>
@@ -50,24 +50,24 @@ export default function TermsPage() {
 
 					<div className="prose prose-slate max-w-none space-y-10 text-[#37353E]">
 						<p className="leading-relaxed text-[#37353E]/90">
-							FXGENZ provides funded trading accounts to skilled traders. All participants are required to read and understand these legal terms before registering or trading on the platform.
+							GenzProp provides funded trading accounts to skilled traders. All participants are required to read and understand these legal terms before registering or trading on the platform.
 						</p>
 
 						<section>
 							<h2 className={`${display.className} text-xl font-semibold text-[#0b0b0f] mb-4`}>1️⃣ Service Nature</h2>
 							<ul className="list-disc pl-6 space-y-2 leading-relaxed">
-								<li>FXGENZ offers prop trading accounts that allow qualified traders to trade real capital provided by FXGENZ.</li>
-								<li>FXGENZ does not provide investment advice, manage personal funds, or offer financial planning services.</li>
-								<li>Participation in FXGENZ accounts is performance-based, meaning profits and losses depend entirely on the trader&apos;s skill and adherence to trading rules.</li>
-								<li>By using FXGENZ, traders acknowledge that past results do not guarantee future profits.</li>
+								<li>GenzProp offers prop trading accounts that allow qualified traders to trade real capital provided by GenzProp.</li>
+								<li>GenzProp does not provide investment advice, manage personal funds, or offer financial planning services.</li>
+								<li>Participation in GenzProp accounts is performance-based, meaning profits and losses depend entirely on the trader&apos;s skill and adherence to trading rules.</li>
+								<li>By using GenzProp, traders acknowledge that past results do not guarantee future profits.</li>
 							</ul>
 						</section>
 
 						<section>
 							<h2 className={`${display.className} text-xl font-semibold text-[#0b0b0f] mb-4`}>2️⃣ Independent Contractor Status</h2>
 							<ul className="list-disc pl-6 space-y-2 leading-relaxed">
-								<li>Traders are considered independent contractors, not employees, partners, or agents of FXGENZ.</li>
-								<li>FXGENZ does not provide salaries, benefits, or employment protections.</li>
+								<li>Traders are considered independent contractors, not employees, partners, or agents of GenzProp.</li>
+								<li>GenzProp does not provide salaries, benefits, or employment protections.</li>
 								<li>Traders are responsible for their own tax obligations, legal compliance, and reporting in their jurisdiction.</li>
 							</ul>
 						</section>
@@ -76,9 +76,9 @@ export default function TermsPage() {
 							<h2 className={`${display.className} text-xl font-semibold text-[#0b0b0f] mb-4`}>3️⃣ Risk & Liability</h2>
 							<ul className="list-disc pl-6 space-y-2 leading-relaxed">
 								<li>All trading carries risk of partial or total loss of the trading capital provided.</li>
-								<li>FXGENZ&apos;s liability is strictly limited to the funded trading account and does not cover indirect losses or damages.</li>
+								<li>GenzProp&apos;s liability is strictly limited to the funded trading account and does not cover indirect losses or damages.</li>
 								<li>Traders agree that they are solely responsible for following account rules including drawdown, lot size, and trade management.</li>
-								<li>FXGENZ does not guarantee profits, and participating in trading is entirely voluntary.</li>
+								<li>GenzProp does not guarantee profits, and participating in trading is entirely voluntary.</li>
 							</ul>
 						</section>
 
@@ -105,7 +105,7 @@ export default function TermsPage() {
 								<li>Traders retain up to 80% of profits, depending on the account and performance tier.</li>
 								<li>Minimum withdrawal requirement: 5% of account balance in profit.</li>
 								<li>Withdrawals are processed weekly, after verification and compliance checks.</li>
-								<li>FXGENZ reserves the right to delay or reject withdrawals in cases of suspected rule violations or fraud.</li>
+								<li>GenzProp reserves the right to delay or reject withdrawals in cases of suspected rule violations or fraud.</li>
 								<li>Large withdrawals may be subject to additional KYC verification for security purposes.</li>
 							</ul>
 						</section>
@@ -129,8 +129,8 @@ export default function TermsPage() {
 						<section>
 							<h2 className={`${display.className} text-xl font-semibold text-[#0b0b0f] mb-4`}>7️⃣ Intellectual Property</h2>
 							<ul className="list-disc pl-6 space-y-2 leading-relaxed">
-								<li>All FXGENZ branding, logos, software, and educational materials are the property of FXGENZ.</li>
-								<li>Traders are not permitted to reproduce, distribute, or resell FXGENZ intellectual property.</li>
+								<li>All GenzProp branding, logos, software, and educational materials are the property of GenzProp.</li>
+								<li>Traders are not permitted to reproduce, distribute, or resell GenzProp intellectual property.</li>
 								<li>Unauthorized use may result in legal action and account termination.</li>
 							</ul>
 						</section>
@@ -138,7 +138,7 @@ export default function TermsPage() {
 						<section>
 							<h2 className={`${display.className} text-xl font-semibold text-[#0b0b0f] mb-4`}>8️⃣ Termination Policy</h2>
 							<p className="leading-relaxed mb-3">
-								FXGENZ may terminate accounts at any time if rules are violated or if trading is deemed abusive. Termination does not automatically void earned profits, which may be paid after compliance review.
+								GenzProp may terminate accounts at any time if rules are violated or if trading is deemed abusive. Termination does not automatically void earned profits, which may be paid after compliance review.
 							</p>
 							<p className="leading-relaxed mb-2 font-medium text-[#0b0b0f]">Examples of account termination causes include:</p>
 							<ul className="list-disc pl-6 space-y-2 leading-relaxed">
@@ -160,7 +160,7 @@ export default function TermsPage() {
 						<section>
 							<h2 className={`${display.className} text-xl font-semibold text-[#0b0b0f] mb-4`}>🔟 Governing Law & Dispute Resolution</h2>
 							<ul className="list-disc pl-6 space-y-2 leading-relaxed">
-								<li>FXGENZ operations are governed by [Insert Jurisdiction] law.</li>
+								<li>GenzProp operations are governed by [Insert Jurisdiction] law.</li>
 								<li>Disputes are resolved primarily through internal review and arbitration.</li>
 								<li>By registering, traders agree to resolve disputes according to the laws and regulations of the governing jurisdiction.</li>
 							</ul>
@@ -172,7 +172,7 @@ export default function TermsPage() {
 								<div>
 									<h3 className="font-semibold text-[#0b0b0f] mb-1">No Guarantee of Profit</h3>
 									<p className="leading-relaxed text-sm">
-										FXGENZ does not provide any guarantees, representations, or warranties regarding profitability. Trading outcomes are dependent on market conditions, execution quality, and individual trading decisions. No assurances of profit or income are expressed or implied.
+										GenzProp does not provide any guarantees, representations, or warranties regarding profitability. Trading outcomes are dependent on market conditions, execution quality, and individual trading decisions. No assurances of profit or income are expressed or implied.
 									</p>
 								</div>
 								<div>
@@ -184,31 +184,31 @@ export default function TermsPage() {
 								<div>
 									<h3 className="font-semibold text-[#0b0b0f] mb-1">Past Performance Disclaimer</h3>
 									<p className="leading-relaxed text-sm">
-										Any historical performance, simulated results, or examples shown on the FXGENZ website or platform are not indicative of future results. Market conditions vary and past success does not guarantee future profitability.
+										Any historical performance, simulated results, or examples shown on the GenzProp website or platform are not indicative of future results. Market conditions vary and past success does not guarantee future profitability.
 									</p>
 								</div>
 								<div>
 									<h3 className="font-semibold text-[#0b0b0f] mb-1">Market Conditions & Execution Risk</h3>
 									<p className="leading-relaxed text-sm">
-										Trading performance may be adversely affected by factors including, but not limited to, market volatility, liquidity constraints, slippage, pricing delays, and execution latency. FXGENZ is not responsible for losses resulting from such conditions.
+										Trading performance may be adversely affected by factors including, but not limited to, market volatility, liquidity constraints, slippage, pricing delays, and execution latency. GenzProp is not responsible for losses resulting from such conditions.
 									</p>
 								</div>
 								<div>
 									<h3 className="font-semibold text-[#0b0b0f] mb-1">Limitation of Liability</h3>
 									<p className="leading-relaxed text-sm">
-										To the maximum extent permitted by applicable law, FXGENZ shall not be liable for any indirect, incidental, consequential, special, or third-party damages, including loss of profits, revenue, business opportunity, or anticipated earnings, arising from the use of FXGENZ services.
+										To the maximum extent permitted by applicable law, GenzProp shall not be liable for any indirect, incidental, consequential, special, or third-party damages, including loss of profits, revenue, business opportunity, or anticipated earnings, arising from the use of GenzProp services.
 									</p>
 								</div>
 								<div>
 									<h3 className="font-semibold text-[#0b0b0f] mb-1">No Investment Advice</h3>
 									<p className="leading-relaxed text-sm">
-										FXGENZ does not provide investment, financial, legal, or tax advice. All trading decisions are made independently by the trader and at their own discretion.
+										GenzProp does not provide investment, financial, legal, or tax advice. All trading decisions are made independently by the trader and at their own discretion.
 									</p>
 								</div>
 								<div>
 									<h3 className="font-semibold text-[#0b0b0f] mb-1">Voluntary Participation Acknowledgment</h3>
 									<p className="leading-relaxed text-sm">
-										By accessing FXGENZ services, traders acknowledge that participation is voluntary, undertaken at their own risk, and not based on any expectation of guaranteed financial returns.
+										By accessing GenzProp services, traders acknowledge that participation is voluntary, undertaken at their own risk, and not based on any expectation of guaranteed financial returns.
 									</p>
 								</div>
 							</div>

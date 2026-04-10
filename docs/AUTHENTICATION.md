@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the authentication system implemented for the FxGenz application, including security features and best practices.
+This document describes the authentication system implemented for the GenzProp application, including security features and best practices.
 
 ## Security Features
 
@@ -222,9 +222,9 @@ HTTPS encryption prevents MITM attacks. Ensure valid SSL certificates.
 ## Support
 
 For authentication issues or security concerns, contact:
-- Support: support@fxgenz.com
-- Security: security@fxgenz.com
+- Support: support@GenzProp.com
+- Security: security@GenzProp.com
 
 ## License
 
-Proprietary - FxGenz © 2026
+Proprietary - GenzProp © 2026

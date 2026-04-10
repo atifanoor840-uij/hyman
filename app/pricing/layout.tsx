@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Trading Challenge Pricing — Fx Genz",
+  title: "Trading Challenge Pricing — GenzProp",
   description:
-    "Transparent pricing for Fx Genz trader development programs. Choose your skills assessment — simulated account evaluations with refundable fees. Educational purposes only.",
+    "Transparent pricing for GenzProp trader development programs. Choose your skills assessment — simulated account evaluations with refundable fees. Educational purposes only.",
 };
 
 export default function PricingLayout({

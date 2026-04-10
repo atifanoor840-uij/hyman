@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	if (!cat) return { title: 'Not found' };
 	return {
 		title: `${cat.title} — Help`,
-		description: `Browse ${cat.articles.length} articles: ${cat.title} at Fx Genz.`,
+		description: `Browse ${cat.articles.length} articles: ${cat.title} at GenzProp.`,
 	};
 }
 

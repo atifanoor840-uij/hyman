@@ -53,12 +53,12 @@ export default function Navbar({ variant = "sticky" }: { variant?: NavbarVariant
             <Link href="/" className="flex items-center gap-2 shrink-0">
               <Image
                 src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
-                alt="Fxgenz"
+                alt="GenzProp"
                 width={40}
                 height={40}
                 className="object-contain"
               />
-              <span className="text-xl font-bold tracking-tight text-black">Fxgenz</span>
+              <span className="text-xl font-bold tracking-tight text-black">GenzProp</span>
             </Link>
 
             <nav className="hidden items-center gap-0.5 lg:flex lg:mx-auto">
@@ -170,10 +170,10 @@ export default function Navbar({ variant = "sticky" }: { variant?: NavbarVariant
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <img
             src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
-            alt="Fx Genz"
+            alt="GenzProp"
             className="h-9 w-9 md:h-10 md:w-10 object-contain"
           />
-          <span className="text-lg font-bold tracking-tight text-white md:text-xl">Fx Genz</span>
+          <span className="text-lg font-bold tracking-tight text-white md:text-xl">GenzProp</span>
         </Link>
 
         <nav className="hidden items-center gap-0.5 lg:flex lg:mx-auto">

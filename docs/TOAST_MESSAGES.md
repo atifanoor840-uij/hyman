@@ -24,14 +24,14 @@
 **When:** Form submission starts
 ```
 Title: "Creating Account"
-Message: "Please wait while we set up your FxGenz account..."
+Message: "Please wait while we set up your GenzProp account..."
 Type: Loading (spinning icon, no auto-dismiss)
 ```
 
 ### 2. Successful Registration
 **When:** Account created successfully
 ```
-Title: "Welcome to FxGenz!"
+Title: "Welcome to GenzProp!"
 Message: "Your account has been created successfully. You can now access your trading dashboard."
 Type: Success
 Duration: 6 seconds

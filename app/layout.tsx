@@ -21,11 +21,11 @@ const plusJakarta = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "Fx Genz — Trader Development & Skills Assessment Programs",
-    template: "%s | Fx Genz",
+    default: "GenzProp — Trader Development & Skills Assessment Programs",
+    template: "%s | GenzProp",
   },
   description:
-    "Fx Genz offers trader development programs and skills assessments. Educational trading evaluations on simulated accounts. Complete our forex evaluation program to demonstrate your trading discipline. No profit promises — verifiable, skill-based assessments.",
+    "GenzProp offers trader development programs and skills assessments. Educational trading evaluations on simulated accounts. Complete our forex evaluation program to demonstrate your trading discipline. No profit promises — verifiable, skill-based assessments.",
   keywords: [
     "trading challenge",
     "prop firm evaluation",
@@ -34,11 +34,11 @@ export const metadata: Metadata = {
     "skills assessment",
     "simulated accounts",
     "trading evaluations",
-    "fx genz",
+    "GenzProp",
     "prop firm",
   ],
   openGraph: {
-    title: "Fx Genz — Trader Development & Evaluation Programs",
+    title: "GenzProp — Trader Development & Evaluation Programs",
     description: "Educational trader development programs and skills assessments. Simulated account evaluations for serious traders. Verifiable, skill-based — no profit promises.",
   },
 };

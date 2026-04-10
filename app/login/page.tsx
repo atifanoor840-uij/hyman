@@ -39,7 +39,7 @@ export default function LoginPage() {
 		const sanitizedEmail = sanitizeInput(email);
 
 		if (!sanitizedEmail.trim()) {
-			nextErrors.email = 'Please enter the email linked to your FxGenz account.';
+			nextErrors.email = 'Please enter the email linked to your GenzProp account.';
 		} else if (!isValidEmail(sanitizedEmail)) {
 			nextErrors.email = 'Use a valid email address (e.g. name@domain.com).';
 		}
@@ -216,17 +216,17 @@ export default function LoginPage() {
 				</Link>
 			</div>
 
-				{/* Logo + Fxgenz name + LOGIN title */}
+				{/* Logo + GenzProp name + LOGIN title */}
 				<div className="flex flex-col items-center mb-8">
 					<div className="flex items-center justify-center gap-3 mb-2">
 						<Image
 							src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
-							alt="Fxgenz"
+							alt="GenzProp"
 							width={48}
 							height={48}
 							className="object-contain"
 						/>
-						<span className="text-2xl font-bold text-black tracking-tight">Fxgenz</span>
+						<span className="text-2xl font-bold text-black tracking-tight">GenzProp</span>
 					</div>
 					<h1 className="text-xl font-bold text-zinc-600 tracking-tight">LOGIN</h1>
 				</div>
@@ -341,7 +341,7 @@ export default function LoginPage() {
 				</form>
 
 				<p className="mt-8 text-xs text-zinc-400">
-					© {CURRENT_YEAR} FxGenz. All rights reserved.
+					© {CURRENT_YEAR} GenzProp. All rights reserved.
 				</p>
 			</div>
 

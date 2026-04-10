@@ -10,6 +10,7 @@ import {
 } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import Script from 'next/script';
 import { useRouter } from 'next/navigation';
 import { User, Lock, Mail, Eye, EyeOff } from 'lucide-react';
 import SuccessPopup from '../components/SuccessPopup';
@@ -139,7 +140,7 @@ export default function SignupPage() {
 		setFormErrors({});
 		setToastType('loading');
 		setToastTitle('Creating Account');
-		setToastMessage('Please wait while we set up your FxGenz account...');
+		setToastMessage('Please wait while we set up your GenzProp account...');
 
 		try {
 			const signupData = {
@@ -255,7 +256,7 @@ export default function SignupPage() {
 		setStep('complete');
 		setToastType('success');
 		setToastTitle('All Set!');
-		setToastMessage('Signup successful. You can now log in to your FxGenz dashboard.');
+		setToastMessage('Signup successful. You can now log in to your GenzProp dashboard.');
 	};
 
 	const handleResendCode = () => {
@@ -266,7 +267,7 @@ export default function SignupPage() {
 		setVerificationError('');
 		setResendCooldown(45);
 		verificationInputs.current[0]?.focus();
-		console.info('FxGenz demo verification code (resent):', code);
+		console.info('GenzProp demo verification code (resent):', code);
 	};
 
 	const handleBackToDetails = () => {
@@ -280,6 +281,34 @@ export default function SignupPage() {
 
 	return (
 		<div className="min-h-screen flex flex-col bg-white text-black">
+			<Script src="https://connect.facebook.net/en_US/fbevents.js" strategy="afterInteractive" />
+			<Script
+				id="meta-pixel-signup"
+				strategy="afterInteractive"
+				dangerouslySetInnerHTML={{
+					__html: `
+            !function(f,b,e,v,n,t,s)
+            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+            n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t,s)}(window, document,'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+            fbq('init', '2268324397003484');
+            fbq('track', 'PageView');
+          `,
+				}}
+			/>
+			<noscript>
+				<img
+					height="1"
+					width="1"
+					style={{ display: 'none' }}
+					src="https://www.facebook.com/tr?id=2268324397003484&ev=PageView&noscript=1"
+					alt=""
+				/>
+			</noscript>
 			<Navbar variant="sticky" />
 			<main className="flex-1 flex min-h-0">
 			{/* Left panel - professional geometric (folded planes / ribbons), black theme */}
@@ -347,15 +376,15 @@ export default function SignupPage() {
 							<div className="flex items-center justify-center gap-3 mb-2">
 								<Image
 									src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
-									alt="Fxgenz"
+									alt="GenzProp"
 									width={48}
 									height={48}
 									className="object-contain"
 								/>
-								<span className="text-2xl font-bold text-black tracking-tight">Fxgenz</span>
+								<span className="text-2xl font-bold text-black tracking-tight">GenzProp</span>
 							</div>
 							<h1 className="text-xl font-bold text-zinc-600 tracking-tight">SIGN UP</h1>
-							<p className="text-sm text-zinc-500 mt-1">Create your Fxgenz account</p>
+							<p className="text-sm text-zinc-500 mt-1">Create your GenzProp account</p>
 						</div>
 
 						<form onSubmit={handleDetailsSubmit} className="w-full max-w-md">
@@ -626,7 +655,7 @@ export default function SignupPage() {
 				)}
 
 				<p className="mt-8 text-xs text-zinc-400">
-					© {CURRENT_YEAR} FxGenz. All rights reserved.
+					© {CURRENT_YEAR} GenzProp. All rights reserved.
 				</p>
 			</div>
 

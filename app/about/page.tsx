@@ -28,7 +28,7 @@ export default function AboutPage() {
 					<div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10 lg:gap-12">
 						<div className="max-w-4xl space-y-4 text-left">
 							<h1 className={`${display.className} text-4xl font-semibold leading-[1.1] tracking-[-0.02em] text-white md:text-5xl lg:text-6xl`}>
-								About Fx Genz — Prop Firm Trading Evaluations
+								About GenzProp — Prop Firm Trading Evaluations
 							</h1>
 							<p className="text-lg text-white/80 md:text-xl max-w-2xl leading-relaxed">
 								Trader development programs and skills assessments. Clear rules, transparent conditions.
@@ -37,7 +37,7 @@ export default function AboutPage() {
 						<div className="flex-shrink-0 lg:max-w-md xl:max-w-lg">
 							<img
 								src={HEADER_IMAGE_2}
-								alt="Fx Genz — trading evaluations"
+								alt="GenzProp — trading evaluations"
 								className="w-full h-auto rounded-xl object-contain shadow-2xl"
 							/>
 						</div>
@@ -68,43 +68,43 @@ export default function AboutPage() {
 							</div>
 							<div className="space-y-4 text-[#37353E]/90 leading-relaxed">
 								<p>
-									At Fx Genz, we created the evaluation program we wished existed when we were traders ourselves.
+									At GenzProp, we created the evaluation program we wished existed when we were traders ourselves.
 								</p>
 								<p>
-									Too many prop firms complicate trading with unclear rules and payout uncertainty. Fx Genz was built differently—clear risk limits, transparent conditions, and a trader-first structure for our skill-based programs.
+									Too many prop firms complicate trading with unclear rules and payout uncertainty. GenzProp was built differently—clear risk limits, transparent conditions, and a trader-first structure for our skill-based programs.
 								</p>
 								<p>
 									Our focus is long-term sustainability. We don&apos;t reward gambling. We reward discipline, consistency, and professional risk management in our trading evaluations.
 								</p>
 								<p>
-									If you respect capital and trade with intent, Fx Genz is designed to grow with you.
+									If you respect capital and trade with intent, GenzProp is designed to grow with you.
 								</p>
 								<p className="italic text-[#0b0b0f] pt-2">
-									— Founder, Fx Genz
+									— Founder, GenzProp
 								</p>
 							</div>
 						</div>
 					</div>
 				</section>
 
-				{/* Why FXGENZ? */}
+				{/* Why GenzProp? */}
 				<section className="mx-auto max-w-7xl px-6 py-16 md:px-10 md:py-24">
 					<div className="mx-auto max-w-3xl">
 						<div className="flex items-center gap-3 mb-8">
 							<span className="text-2xl" aria-hidden>⚡</span>
 							<h2 className={`${display.className} text-2xl md:text-3xl font-semibold text-[#0b0b0f]`}>
-								Why Fx Genz?
+								Why GenzProp?
 							</h2>
 						</div>
 						<div className="space-y-4 text-[#37353E]/90 leading-relaxed">
 							<p>
-								Fx Genz is designed to remove unnecessary barriers in trading evaluations.
+								GenzProp is designed to remove unnecessary barriers in trading evaluations.
 							</p>
 							<p>
 								Our skill-based programs offer flexible evaluation paths, allowing qualified traders to progress through simulated account challenges with clear objectives.
 							</p>
 							<p>
-								Unlike firms with vague or shifting risk rules, Fx Genz operates with fully transparent evaluation parameters.
+								Unlike firms with vague or shifting risk rules, GenzProp operates with fully transparent evaluation parameters.
 							</p>
 							<p>
 								All drawdown limits, lot size rules, and trading conditions are clearly defined from day one. There are no hidden restrictions, no surprise violations, and no retroactive rule changes.
@@ -121,7 +121,7 @@ export default function AboutPage() {
 								Built for Professionals
 							</h2>
 							<p className="text-[#37353E]/90 leading-relaxed">
-								Fx Genz focuses on trading discipline and skill development, not artificial obstacles.
+								GenzProp focuses on trading discipline and skill development, not artificial obstacles.
 								<br />
 								Complete our skills assessment to demonstrate readiness. Program terms and eligibility are disclosed in full — no profit guarantees.
 							</p>

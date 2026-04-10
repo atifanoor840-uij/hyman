@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const data = getHelpArticle(category, article);
 	if (!data) return { title: 'Not found' };
 	return {
-		title: `${data.article.title} — Fx Genz`,
+		title: `${data.article.title} — GenzProp`,
 		description: data.article.title,
 	};
 }

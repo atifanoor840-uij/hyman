@@ -206,7 +206,7 @@ function VerifyEmailContent() {
 						<Link href="/" className="mb-16 inline-flex items-center gap-3 text-white transition hover:opacity-80">
 							<img
 								src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
-								alt="FxGenz Logo"
+								alt="GenzProp Logo"
 								className="h-12 w-12 object-contain rounded-lg"
 								loading="lazy"
 							/>
@@ -265,7 +265,7 @@ function VerifyEmailContent() {
 					</div>
 
 					<div className="mt-auto pt-10 text-xs text-gray-500">
-						© {CURRENT_YEAR} FxGenz. All rights reserved.
+						© {CURRENT_YEAR} GenzProp. All rights reserved.
 					</div>
 				</aside>
 
@@ -438,7 +438,7 @@ function VerifyEmailPageSkeleton() {
 						<Link href="/" className="mb-16 inline-flex items-center gap-3 text-white transition hover:opacity-80">
 							<img
 								src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
-								alt="FxGenz Logo"
+								alt="GenzProp Logo"
 								className="h-12 w-12 object-contain rounded-lg"
 								loading="lazy"
 							/>
@@ -456,7 +456,7 @@ function VerifyEmailPageSkeleton() {
 						</div>
 					</div>
 					<div className="mt-auto pt-10 text-xs text-gray-500">
-						© {CURRENT_YEAR} FxGenz. All rights reserved.
+						© {CURRENT_YEAR} GenzProp. All rights reserved.
 					</div>
 				</aside>
 				

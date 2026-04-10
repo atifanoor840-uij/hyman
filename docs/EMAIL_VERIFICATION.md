@@ -80,7 +80,7 @@ Signup → Email Sent → Verify Email Page → Enter Code → Login
 ┌─────────────────────────────────────────────────────┐
 │                  Left Sidebar (Dark)                │
 │                                                     │
-│  🏢 FxGenz Logo                                     │
+│  🏢 GenzProp Logo                                     │
 │                                                     │
 │  📧 Check your email                               │
 │                                                     │
@@ -481,7 +481,7 @@ For issues or questions:
 - Check spam folder first
 - Wait 2-3 minutes for email delivery
 - Use resend button if needed
-- Contact: support@fxgenz.com
+- Contact: support@GenzProp.com
 
 ---
 

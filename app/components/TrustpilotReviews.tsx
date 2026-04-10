@@ -42,7 +42,7 @@ export default function TrustpilotReviews() {
 						Real Experiences from Real Traders
 					</h2>
 					<p className="mx-auto max-w-3xl text-lg font-semibold text-white/70 md:text-xl">
-						Join thousands of traders who trust FxGenz for transparent rules, fast payouts, and professional support.
+						Join thousands of traders who trust GenzProp for transparent rules, fast payouts, and professional support.
 					</p>
 					
 					{/* Rating Summary */}

@@ -106,11 +106,11 @@ export function AdminSidebar() {
         <Link href="/adminportal" className="flex items-center gap-2.5 group">
           <img
             src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
-            alt="FxGenz"
+            alt="GenzProp"
             className="h-9 w-9 shrink-0 object-contain rounded-lg transition-all duration-300 group-hover:scale-105"
           />
           <div className="flex flex-col min-w-0">
-            <span className="text-base font-bold tracking-tight text-white">FxGenz</span>
+            <span className="text-base font-bold tracking-tight text-white">GenzProp</span>
             <span className="text-[10px] font-medium uppercase tracking-wider text-white/50">Admin</span>
           </div>
         </Link>

@@ -8,7 +8,7 @@ import PayoutCertificates from "./components/PayoutCertificates";
 import GlobalPresence from "./components/GlobalPresence";
 import PayoutVideos from "./components/PayoutVideos";
 import Community from "./components/Community";
-import WhyFxGenz from "./components/WhyFxGenz";
+import WhyGenzProp from "./components/WhyGenzProp";
 import PayoutsPro from "./components/Payouts";
 import LoyaltyPrograms from "./components/LoyaltyPrograms";
 import Platforms from "./components/Platforms";
@@ -19,7 +19,7 @@ export default function Home() {
       <Hero />
       <Pricing />
       <Logos />
-      <WhyFxGenz />
+      <WhyGenzProp />
       <Platforms />
       <PayoutsPro />
       <LoyaltyPrograms />

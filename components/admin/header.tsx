@@ -18,8 +18,8 @@ export function AdminHeader({ title, description, actions }: AdminHeaderProps) {
     <header className="space-y-3 md:space-y-4 animate-slide-in-up">
       <div className="relative -mx-3 -mt-3 overflow-hidden border-b border-border bg-primary py-2 md:-mx-4 md:-mt-4 lg:-mx-5 lg:-mt-5">
         <div className="flex w-max animate-ticker whitespace-nowrap text-xs font-semibold text-primary-foreground">
-          <span>Admin Portal — FxGenz • Manage users, orders, KYC, referrals • </span>
-          <span aria-hidden="true">Admin Portal — FxGenz • Manage users, orders, KYC, referrals • </span>
+          <span>Admin Portal — GenzProp • Manage users, orders, KYC, referrals • </span>
+          <span aria-hidden="true">Admin Portal — GenzProp • Manage users, orders, KYC, referrals • </span>
         </div>
       </div>
       <div className="flex items-center justify-between gap-3">
@@ -44,7 +44,7 @@ export function AdminHeader({ title, description, actions }: AdminHeaderProps) {
             </Avatar>
             <div className="text-xs hidden sm:block">
               <p className="font-bold text-foreground">Admin</p>
-              <p className="text-muted-foreground text-[10px] font-medium">admin@fxgenz.com</p>
+              <p className="text-muted-foreground text-[10px] font-medium">admin@GenzProp.com</p>
             </div>
           </div>
         </div>

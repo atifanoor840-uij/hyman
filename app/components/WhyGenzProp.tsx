@@ -1,15 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function WhyFxGenz() {
+export default function WhyGenzProp() {
 	return (
 		<section id="why" className="relative overflow-hidden bg-black">
 			<div className="mx-auto max-w-7xl px-6 py-16 md:px-10 md:py-24 font-display">
 				{/* Section heading at top (red circle area) - subheading + main heading */}
 				<header className="mb-10 lg:mb-12">
-					<p className="text-sm text-white/60 mb-1">/ Why Fx Genz?</p>
+					<p className="text-sm text-white/60 mb-1">/ Why GenzProp?</p>
 					<h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
-						Why Traders Choose Fx Genz Trader Development Programs
+						Why Traders Choose GenzProp Trader Development Programs
 					</h2>
 				</header>
 
@@ -19,7 +19,7 @@ export default function WhyFxGenz() {
 						<div className="relative w-full aspect-[4/3] overflow-hidden rounded-lg mb-6">
 							<Image
 								src="/lap.WEBP"
-								alt="FxGenz trading"
+								alt="GenzProp trading"
 								fill
 								className="object-cover"
 								unoptimized
@@ -62,7 +62,7 @@ export default function WhyFxGenz() {
 						<BenefitRow
 							icon={<CertifiedIcon />}
 							title="Certified experts"
-							desc="Choose FxGenz for proven excellence backed by certified professionals and pro infrastructure."
+							desc="Choose GenzProp for proven excellence backed by certified professionals and pro infrastructure."
 						/>
 						<div className="border-t border-white/10 my-5" />
 						<BenefitRow
@@ -70,7 +70,7 @@ export default function WhyFxGenz() {
 							title="Satisfaction Focus"
 							desc={
 								<>
-									Don&apos;t just take our word for it—<span className="text-purple-400 font-semibold">see</span> what traders say about FxGenz.
+									Don&apos;t just take our word for it—<span className="text-purple-400 font-semibold">see</span> what traders say about GenzProp.
 								</>
 							}
 						/>

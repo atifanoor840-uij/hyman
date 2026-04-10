@@ -116,11 +116,11 @@ export default function PartnerPage() {
 								Become a Partner
 							</h1>
 							<p className="text-lg text-white/70 md:text-xl max-w-2xl">
-								Join our partner program and earn competitive commissions by referring traders to FxGenz.
+								Join our partner program and earn competitive commissions by referring traders to GenzProp.
 							</p>
 						</div>
 						<div className="flex-shrink-0 lg:max-w-md xl:max-w-lg">
-							<img src={HEADER_IMAGE_2} alt="Fx Genz partner" className="w-full h-auto rounded-xl object-contain shadow-2xl" />
+							<img src={HEADER_IMAGE_2} alt="GenzProp partner" className="w-full h-auto rounded-xl object-contain shadow-2xl" />
 						</div>
 					</div>
 				</div>
@@ -139,7 +139,7 @@ export default function PartnerPage() {
 							Earn Competitive Commissions
 						</h2>
 						<p className="text-[#37353E]/80 mb-8 max-w-2xl mx-auto">
-							Partner with FxGenz and earn up to 30% commission on every trader you refer. Join thousands of successful partners worldwide.
+							Partner with GenzProp and earn up to 30% commission on every trader you refer. Join thousands of successful partners worldwide.
 						</p>
 						<a
 							href="#apply"

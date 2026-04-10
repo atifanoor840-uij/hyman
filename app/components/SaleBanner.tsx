@@ -98,7 +98,7 @@ export default function SaleBanner() {
 					</h4>
 					<p className="font-sans text-sm leading-relaxed text-white/85 md:max-w-xl">
 						Our main goal for 2026 is to{' '}
-						<strong className="text-white">make every FxGenz product and process as clear and reliable</strong>{' '}
+						<strong className="text-white">make every GenzProp product and process as clear and reliable</strong>{' '}
 						as possible by simplifying trading rules and explaining them better to our traders.{' '}
 						<strong className="text-white">Save 35%</strong> and get a 90% profit split add-on for free by using code{' '}
 						<strong className="text-[#00ff88]">TRADER2026</strong>

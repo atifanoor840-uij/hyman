@@ -16,9 +16,9 @@ const faqCategories: FAQCategory[] = [
     title: "General Information",
     items: [
       {
-        question: "What type of firm is Fx Genz?",
+        question: "What type of firm is GenzProp?",
         answer:
-          "Fx Genz offers trader development programs and skills assessments. We provide educational evaluations on simulated accounts. Programs are for educational purposes — no profit guarantees.",
+          "GenzProp offers trader development programs and skills assessments. We provide educational evaluations on simulated accounts. Programs are for educational purposes — no profit guarantees.",
       },
       {
         question: "What platforms are used for evaluations?",
@@ -42,12 +42,12 @@ const faqCategories: FAQCategory[] = [
       {
         question: "Who can I contact for technical support?",
         answer:
-          "Our support team is available via email and live chat through the Fx Genz website.",
+          "Our support team is available via email and live chat through the GenzProp website.",
       },
       {
         question: "How should I handle taxes?",
         answer:
-          "Traders are responsible for declaring and paying taxes according to their local regulations. Fx Genz does not provide tax advice.",
+          "Traders are responsible for declaring and paying taxes according to their local regulations. GenzProp does not provide tax advice.",
       },
     ],
   },
