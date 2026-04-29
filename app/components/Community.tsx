@@ -1,10 +1,9 @@
 'use client';
 
-import { FaTelegram, FaInstagram, FaWhatsapp, FaFacebook } from 'react-icons/fa';
+import { FaTelegram, FaInstagram, FaFacebook } from 'react-icons/fa';
 
 const socialLinks = [
 	{ name: 'Telegram', icon: FaTelegram, url: '#', color: '#0088cc' },
-	{ name: 'WhatsApp', icon: FaWhatsapp, url: 'https://wa.me/yourphonenumber', color: '#25D366' },
 	{ name: 'Facebook', icon: FaFacebook, url: 'https://facebook.com/yourpage', color: '#1877F2' },
 	{ name: 'Instagram', icon: FaInstagram, url: '#', color: '#E4405F' },
 ];

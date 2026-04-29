@@ -17,6 +17,7 @@ export default function CouponsPage() {
             title="Coupon codes"
             description="Active discounts and promo codes. Redeem at checkout."
             variant="dashboard-hero"
+            hideHeroInfoCards
             backHref="/dashboard"
             backLabel="Back"
             badge="Coupons"

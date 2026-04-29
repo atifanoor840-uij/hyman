@@ -5,12 +5,12 @@ import Image from 'next/image';
 const platforms = [
 	{ 
 		name: 'MetaTrader 5', 
-		image: 'https://res.cloudinary.com/dejjuhzug/image/upload/v1764395181/f0bdc4ec-31ba-43db-af2d-990985a4827d_ezvlm9.png',
+		image: '/MT5 (2).png',
 		label: 'MetaTrader 5'
 	},
 	{ 
 		name: 'MetaTrader 4', 
-		image: 'https://res.cloudinary.com/dejjuhzug/image/upload/v1764395131/d1b7332b-1650-4a91-a1a0-8d09b53936ec_ougmpe.png',
+		image: '/MT4.png',
 		label: 'MetaTrader 4'
 	},
 ];

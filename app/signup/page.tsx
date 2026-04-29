@@ -10,7 +10,6 @@ import {
 } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import Script from 'next/script';
 import { useRouter } from 'next/navigation';
 import { User, Lock, Mail, Eye, EyeOff } from 'lucide-react';
 import SuccessPopup from '../components/SuccessPopup';
@@ -280,35 +279,7 @@ export default function SignupPage() {
 	const verificationComplete = verificationDigits.join('').length === 4;
 
 	return (
-		<div className="min-h-screen flex flex-col bg-white text-black">
-			<Script src="https://connect.facebook.net/en_US/fbevents.js" strategy="afterInteractive" />
-			<Script
-				id="meta-pixel-signup"
-				strategy="afterInteractive"
-				dangerouslySetInnerHTML={{
-					__html: `
-            !function(f,b,e,v,n,t,s)
-            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-            n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t,s)}(window, document,'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '2268324397003484');
-            fbq('track', 'PageView');
-          `,
-				}}
-			/>
-			<noscript>
-				<img
-					height="1"
-					width="1"
-					style={{ display: 'none' }}
-					src="https://www.facebook.com/tr?id=2268324397003484&ev=PageView&noscript=1"
-					alt=""
-				/>
-			</noscript>
+		<div className="min-h-screen flex flex-col bg-gradient-to-br from-white via-white to-zinc-50 text-black">
 			<Navbar variant="sticky" />
 			<main className="flex-1 flex min-h-0">
 			{/* Left panel - professional geometric (folded planes / ribbons), black theme */}
@@ -361,7 +332,7 @@ export default function SignupPage() {
 			</div>
 
 			{/* Right panel - white form */}
-			<div className="flex-1 flex flex-col items-center justify-center min-h-screen px-6 py-12 lg:py-16 overflow-y-auto">
+			<div className="flex-1 flex flex-col items-center justify-center min-h-0 px-6 py-12 lg:py-16 overflow-y-auto">
 				{/* Mobile tabs */}
 				<div className="lg:hidden flex rounded-full bg-zinc-100 p-1 gap-1 mb-6">
 					<Link href="/login" className="px-4 py-2 rounded-full text-zinc-600 text-sm font-medium">
@@ -389,6 +360,13 @@ export default function SignupPage() {
 
 						<form onSubmit={handleDetailsSubmit} className="w-full max-w-md">
 							<div className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8 shadow-[0_1px_3px_rgba(0,0,0,0.06)] space-y-5">
+								{/* Pricing note */}
+								<div className="rounded-2xl border border-zinc-200/70 bg-white/80 backdrop-blur px-4 py-3">
+									<p className="text-xs font-semibold text-zinc-700">Secure signup</p>
+									<p className="mt-0.5 text-[11px] text-zinc-500">
+										Your details are encrypted in transit. Create your account in under a minute.
+									</p>
+								</div>
 								{/* Full name */}
 								<div className="space-y-1.5">
 									<label htmlFor="name" className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider">

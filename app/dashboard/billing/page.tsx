@@ -15,6 +15,7 @@ export default function BillingPage() {
             title="Billing"
             description="View your account orders, payment history, and billing information."
             variant="dashboard-hero"
+            hideHeroInfoCards
             backHref="/dashboard"
             backLabel="Back"
             badge="Billing"

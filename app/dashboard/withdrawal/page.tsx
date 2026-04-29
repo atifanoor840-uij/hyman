@@ -54,6 +54,7 @@ export default function WithdrawalPage() {
             title="Withdrawal"
             description="Request payouts and view your withdrawal history."
             variant="dashboard-hero"
+            hideHeroInfoCards
             backHref="/dashboard"
             backLabel="Back"
             badge="Withdrawal"

@@ -4,11 +4,13 @@ import Image from 'next/image';
 
 // Same certificate images as Hero section for consistent professional look
 const certificates = [
-	'https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386812/8_ubnumg.png',
-	'https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386876/7_hocszn.png',
-	'https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386838/9_g8surp.png',
-	'https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386916/5_ugzdtq.png',
-	'https://res.cloudinary.com/dqzibxdtn/image/upload/v1769769389/Black_and_Red_Neon_Black_Friday_Sale_Instagram_Post_lawtrd.png',
+	'/images/1.png',
+	'/images/2.png',
+	'/images/3.png',
+	'/images/4.png',
+	'/images/5.png',
+	'/images/6.png',
+	'/images/7.png',
 ];
 
 export default function PayoutCertificates() {
@@ -53,7 +55,7 @@ export default function PayoutCertificates() {
 										alt={`Payout Certificate ${index + 1}`}
 										width={380}
 										height={268}
-										className="w-full h-full object-cover"
+										className="w-full h-full object-contain bg-[#050406] p-2 md:p-3"
 										unoptimized
 									/>
 								</div>

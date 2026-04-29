@@ -30,13 +30,9 @@ export default async function HelpCategoryPage({ params }: Props) {
 
 	return (
 		<div className="flex min-h-screen flex-col font-sans">
-			<div className="border-b border-[#e8ecf1] bg-white">
-				<div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
-					<Navbar />
-				</div>
-			</div>
+			<Navbar variant="hero" />
 
-			<main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
+			<main className="mx-auto w-full max-w-3xl flex-1 px-4 pb-8 pt-28 sm:px-6 sm:pb-10 sm:pt-32">
 				<HelpBreadcrumbs
 					items={[
 						{ label: 'All collections', href: '/rules' },

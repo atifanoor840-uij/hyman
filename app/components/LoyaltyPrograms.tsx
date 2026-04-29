@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import {
 	RotateCcw,
 	Zap,
@@ -15,49 +14,49 @@ const loyaltyCards = [
 		title: "Free Retry",
 		desc: "One free retry per evaluation phase. If you hit a rule, use your retry and continue — no extra fee.",
 		icon: <RotateCcw className="h-6 w-6" />,
-		art: <RetryArt />,
 		bullets: ["One retry per phase", "No additional cost", "Continue where you left off"],
 	},
 	{
 		title: "Account in 2 Seconds",
 		desc: "Get your funded account credentials instantly. No waiting — start trading within seconds of passing.",
 		icon: <Zap className="h-6 w-6" />,
-		art: <InstantArt />,
 		bullets: ["Instant credentials", "Same-day access", "No approval delays"],
 	},
 	{
 		title: "24/7 Live Chat Support",
 		desc: "Real humans, real-time. Get help anytime — our support team is available around the clock.",
 		icon: <MessageCircle className="h-6 w-6" />,
-		art: <SupportArt />,
 		bullets: ["Live chat 24/7", "Fast response times", "Dedicated support team"],
 	},
 	{
 		title: "Fast Payouts",
 		desc: "Request your profits and get paid quickly. Most payouts processed within 24–48 hours.",
 		icon: <DollarSign className="h-6 w-6" />,
-		art: <PayoutArt />,
 		bullets: ["24–48 hour processing", "Multiple payout methods", "No hidden fees"],
 	},
 	{
 		title: "Transparent Rules",
 		desc: "Clear trading rules, no surprises. Know exactly what you can and can't do before you trade.",
 		icon: <FileCheck className="h-6 w-6" />,
-		art: <RulesArt />,
 		bullets: ["Clear limits", "Fair conditions", "No grey areas"],
 	},
 	{
 		title: "Secure & Verified",
 		desc: "Your account and data are protected. We use industry-standard security for all traders.",
 		icon: <ShieldCheck className="h-6 w-6" />,
-		art: <SecureArt />,
 		bullets: ["Secure platform", "Verified payouts", "Trusted by traders"],
 	},
 ];
 
 export default function LoyaltyPrograms() {
 	return (
-		<section id="loyalty" className="relative overflow-hidden bg-[#f8fafc] py-20 md:py-28">
+		<section id="loyalty" className="relative overflow-hidden bg-white py-20 md:py-28">
+			{/* Aura background */}
+			<div className="pointer-events-none absolute inset-0">
+				<div className="absolute -top-24 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_center,rgba(14,165,233,0.18),transparent_60%)] blur-2xl" />
+				<div className="absolute -bottom-28 -left-24 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.14),transparent_60%)] blur-2xl" />
+				<div className="absolute -bottom-24 -right-24 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.14),transparent_60%)] blur-2xl" />
+			</div>
 			<div className="mx-auto max-w-7xl px-6 md:px-10">
 				{/* Header row */}
 				<div className="mb-10 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
@@ -89,7 +88,6 @@ export default function LoyaltyPrograms() {
 								title={card.title}
 								desc={card.desc}
 								icon={card.icon}
-								art={card.art}
 								bullets={card.bullets}
 							/>
 						))}
@@ -100,7 +98,6 @@ export default function LoyaltyPrograms() {
 								title={card.title}
 								desc={card.desc}
 								icon={card.icon}
-								art={card.art}
 								bullets={card.bullets}
 							/>
 						))}
@@ -123,116 +120,40 @@ function LoyaltyCard({
 	title,
 	desc,
 	icon,
-	art,
-	imageSrc,
 	bullets,
 }: {
 	title: string;
 	desc: string;
 	icon: React.ReactNode;
-	art: React.ReactNode;
-	imageSrc?: string;
 	bullets?: string[];
 }) {
 	return (
-		<article className="group relative flex-shrink-0 w-[320px] overflow-hidden rounded-xl border border-[#e2e8f0] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-1 hover:border-[#cbd5e1] hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
-			<div className="mb-4 flex items-center gap-3">
-				<div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#0ea5e9]/10 text-[#0284c7]">
-					{icon}
-				</div>
-				<h3 className="font-sans text-base font-semibold tracking-tight text-[#0f172a]">{title}</h3>
+		<article className="group relative flex-shrink-0 w-[320px] overflow-hidden rounded-2xl border border-slate-200/70 bg-white/70 p-6 shadow-[0_10px_40px_rgba(15,23,42,0.08)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-slate-300/80 hover:shadow-[0_18px_60px_rgba(15,23,42,0.12)]">
+			{/* Aura */}
+			<div className="pointer-events-none absolute -inset-1 opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100">
+				<div className="absolute inset-0 rounded-[18px] bg-[conic-gradient(from_180deg_at_50%_50%,rgba(14,165,233,0.18)_0deg,rgba(99,102,241,0.14)_120deg,rgba(16,185,129,0.16)_240deg,rgba(14,165,233,0.18)_360deg)]" />
 			</div>
-			<div className="mb-4 flex h-28 items-center justify-center overflow-hidden rounded-lg border border-[#f1f5f9] bg-[#f8fafc]">
-				{imageSrc ? (
-					<div className="relative h-full w-full">
-						<Image
-							src={imageSrc}
-							alt={title}
-							fill
-							className="object-contain"
-							sizes="(max-width: 768px) 220px, 260px"
-						/>
+			<div className="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(80%_60%_at_30%_0%,rgba(14,165,233,0.10),transparent_60%)]" />
+			<div className="relative">
+				<div className="mb-4 flex items-center gap-3">
+					<div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200/70 bg-white/60 text-slate-900 shadow-sm">
+						<span className="text-sky-600">{icon}</span>
 					</div>
-				) : (
-					art
-				)}
-			</div>
-			<p className="mb-4 text-[13px] leading-relaxed text-[#64748b]">{desc}</p>
+					<h3 className="font-sans text-base font-semibold tracking-tight text-slate-900">{title}</h3>
+				</div>
+				<p className="mb-4 text-[13px] leading-relaxed text-slate-600">{desc}</p>
 			{bullets && (
 				<ul className="space-y-2.5">
 					{bullets.map((b) => (
-						<li key={b} className="flex items-center gap-2.5 text-[13px] text-[#475569]">
+						<li key={b} className="flex items-center gap-2.5 text-[13px] text-slate-700">
 							<CheckIcon />
 							<span>{b}</span>
 						</li>
 					))}
 				</ul>
 			)}
+				<div className="mt-5 h-px w-full bg-gradient-to-r from-slate-200/0 via-slate-200/80 to-slate-200/0" />
+			</div>
 		</article>
 	);
 }
-
-// Art Components for benefit cards
-function RetryArt() {
-	return (
-		<svg width="200" height="110" viewBox="0 0 200 110" fill="none" aria-hidden="true">
-			<rect width="200" height="110" rx="12" fill="#f0f9ff" />
-			<path d="M100 35v25l15-15" stroke="#0ea5e9" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-			<path d="M85 55a20 20 0 1 1 30 0" stroke="#0ea5e9" strokeWidth="3" fill="none" strokeLinecap="round" />
-		</svg>
-	);
-}
-
-function InstantArt() {
-	return (
-		<svg width="200" height="110" viewBox="0 0 200 110" fill="none" aria-hidden="true">
-			<rect width="200" height="110" rx="12" fill="#f0f9ff" />
-			<path d="M70 70l30-40 30 40" stroke="#0ea5e9" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-			<circle cx="100" cy="45" r="8" fill="#0ea5e9" />
-		</svg>
-	);
-}
-
-function SupportArt() {
-	return (
-		<svg width="200" height="110" viewBox="0 0 200 110" fill="none" aria-hidden="true">
-			<rect width="200" height="110" rx="12" fill="#f0f9ff" />
-			<circle cx="100" cy="50" r="25" stroke="#0ea5e9" strokeWidth="3" fill="none" />
-			<path d="M85 45c0-8 7-15 15-15s15 7 15 15" stroke="#0ea5e9" strokeWidth="3" fill="none" strokeLinecap="round" />
-			<path d="M80 70c0 0 5 10 20 10s20-10 20-10" stroke="#0ea5e9" strokeWidth="3" fill="none" strokeLinecap="round" />
-		</svg>
-	);
-}
-
-function PayoutArt() {
-	return (
-		<svg width="200" height="110" viewBox="0 0 200 110" fill="none" aria-hidden="true">
-			<rect width="200" height="110" rx="12" fill="#f0f9ff" />
-			<circle cx="100" cy="55" r="28" stroke="#22c55e" strokeWidth="3" fill="none" />
-			<path d="M85 55h20l-10-15 10 15-10 15" stroke="#22c55e" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-		</svg>
-	);
-}
-
-function RulesArt() {
-	return (
-		<svg width="200" height="110" viewBox="0 0 200 110" fill="none" aria-hidden="true">
-			<rect width="200" height="110" rx="12" fill="#f0f9ff" />
-			<rect x="55" y="35" width="90" height="50" rx="6" stroke="#0ea5e9" strokeWidth="3" fill="none" />
-			<path d="M65 50h70M65 62h50M65 74h60" stroke="#0ea5e9" strokeWidth="2" strokeLinecap="round" opacity="0.7" />
-			<path d="M80 48l5 5 10-10" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-		</svg>
-	);
-}
-
-function SecureArt() {
-	return (
-		<svg width="200" height="110" viewBox="0 0 200 110" fill="none" aria-hidden="true">
-			<rect width="200" height="110" rx="12" fill="#f0f9ff" />
-			<path d="M100 30l-35 15v20c0 20 15 30 35 35 20-5 35-15 35-35V45l-35-15z" stroke="#0ea5e9" strokeWidth="3" fill="none" strokeLinejoin="round" />
-			<path d="M85 55l10 10 25-25" stroke="#22c55e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-		</svg>
-	);
-}
-
-

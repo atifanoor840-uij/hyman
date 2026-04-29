@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { SiVisa, SiMastercard, SiStripe, SiLinux, SiApple, SiAndroid } from "react-icons/si";
+import { SiBitcoin, SiEthereum, SiTether, SiLinux, SiApple, SiAndroid } from "react-icons/si";
 import { TbBrandWindows } from "react-icons/tb";
 import HeroStats from "./HeroStats";
 import Hyperspeed from "./Hyperspeed";
@@ -8,9 +8,8 @@ import Navbar from "./Navbar";
 
 // Press logos: professional logos via Clearbit (reliable, high-quality)
 const PRESS_LOGOS = [
-  { name: "Yahoo", href: "https://www.yahoo.com", src: "https://www.dragonfunded.com/logo%2011.svg" },
-  { name: "Business Insider", href: "https://www.businessinsider.com", src: "https://www.dragonfunded.com/logo%205.svg" },
-  { name: "Bloomberg", href: "https://www.bloomberg.com", src: "https://www.dragonfunded.com/logo%209.svg" },
+  { name: "Yahoo", href: "https://www.yahoo.com", src: "/yahoo.png" },
+  { name: "Business Insider", href: "https://www.businessinsider.com", src: "/insider.png" },
 ];
 export default function Hero() {
 	return (
@@ -42,13 +41,13 @@ export default function Hero() {
 						{/* Payment icons + platform icons below subheading (horizontal) */}
 						<div className="mt-4 flex flex-wrap items-center gap-3">
 							<div className="flex h-9 w-9 items-center justify-center rounded-md border border-white/10 bg-white/5">
-								<SiVisa className="h-5 w-5 text-[#1a1f71]" />
+								<SiBitcoin className="h-5 w-5 text-[#f7931a]" />
 							</div>
 							<div className="flex h-9 w-9 items-center justify-center rounded-md border border-white/10 bg-white/5">
-								<SiMastercard className="h-5 w-5 text-[#eb001b]" />
+								<SiTether className="h-5 w-5 text-[#26a17b]" />
 							</div>
 							<div className="flex h-9 w-9 items-center justify-center rounded-md border border-white/10 bg-white/5">
-								<SiStripe className="h-5 w-5 text-[#635bff]" />
+								<SiEthereum className="h-5 w-5 text-[#627eea]" />
 							</div>
 							{/* Windows, Linux, Android, iOS — horizontal line */}
 							<div className="flex items-center gap-2">
@@ -97,17 +96,21 @@ export default function Hero() {
 			<div className="relative h-48 w-full overflow-hidden bg-black/50 backdrop-blur-sm">
 				<div className="flex animate-infinite-scroll gap-2">
 					{/* First set */}
-					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386812/8_ubnumg.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
-					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386876/7_hocszn.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
-					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386838/9_g8surp.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
-					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386838/9_g8surp.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
-					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386916/5_ugzdtq.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="/images/1.png" alt="Payout certificate" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="/images/2.png" alt="Payout certificate" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="/images/3.png" alt="Payout certificate" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="/images/4.png" alt="Payout certificate" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="/images/5.png" alt="Payout certificate" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="/images/6.png" alt="Payout certificate" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="/images/7.png" alt="Payout certificate" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
 					{/* Duplicate set for seamless loop */}
-					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386812/8_ubnumg.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
-					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386876/7_hocszn.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
-					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386876/7_hocszn.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
-					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1771386916/5_ugzdtq.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
-					<img src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769769389/Black_and_Red_Neon_Black_Friday_Sale_Instagram_Post_lawtrd.png" alt="Trading" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="/images/1.png" alt="Payout certificate" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="/images/2.png" alt="Payout certificate" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="/images/3.png" alt="Payout certificate" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="/images/4.png" alt="Payout certificate" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="/images/5.png" alt="Payout certificate" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="/images/6.png" alt="Payout certificate" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
+					<img src="/images/7.png" alt="Payout certificate" className="h-40 w-auto shrink-0 border-2 border-white/20 object-contain rounded-lg" />
 				</div>
 			</div>
 		</section>

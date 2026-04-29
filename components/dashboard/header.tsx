@@ -39,6 +39,8 @@ interface HeaderProps {
   description?: string
   actions?: ReactNode
   useOrderIdSelect?: boolean
+  /** Hide the hero mini-cards (Platform Login / Password / Server / Status) */
+  hideHeroInfoCards?: boolean
   /** Controlled order ID (when set, parent controls selection) */
   selectedOrderId?: string
   onOrderIdChange?: (orderId: string) => void
@@ -60,6 +62,7 @@ export function Header({
   description,
   actions,
   useOrderIdSelect,
+  hideHeroInfoCards = false,
   selectedOrderId: controlledOrderId,
   onOrderIdChange,
   orders: ordersProp,
@@ -152,6 +155,10 @@ export function Header({
   }
 
   const selectableOrders = ordersSource.filter((o) => o.status !== "Pending")
+  const selectedOrderMeta = useMemo(() => {
+    if (!selectedOrderId) return null
+    return selectableOrders.find((o) => orderIdsMatch(o.order_id, selectedOrderId)) ?? null
+  }, [selectableOrders, selectedOrderId])
 
   useEffect(() => {
     if (!useOrderIdSelect || ordersSource.length === 0) return
@@ -284,27 +291,54 @@ export function Header({
                 <div className="flex w-full min-w-0 items-center gap-2">
                   <div className="relative min-w-0 flex-1">
                     <Select value={selectedOrderId} onValueChange={setSelectedOrderId}>
-                      <SelectTrigger className="w-full min-h-[44px] sm:h-9 h-11 text-sm font-bold bg-card border-border text-foreground rounded-xl transition-all duration-300 focus:ring-2 focus:ring-ring/50 [&_[data-slot=select-value]]:font-bold [&_[data-slot=select-value]]:text-foreground" disabled={isLoadingOrders}>
+                      <SelectTrigger
+                        className="w-full min-h-[44px] sm:h-9 h-11 px-3 sm:px-3.5 rounded-2xl bg-gradient-to-b from-background/80 to-background/60 border border-border/70 shadow-sm backdrop-blur-md transition-all duration-200 hover:border-border focus:ring-2 focus:ring-primary/30 focus:ring-offset-0"
+                        disabled={isLoadingOrders}
+                        aria-label="Select order ID"
+                      >
                         {isLoadingOrders ? (
                           <div className="flex items-center gap-2">
                             <Loader2 className="w-4 h-4 animate-spin" />
                             <span>Loading orders...</span>
                           </div>
                         ) : (
-                          <SelectValue placeholder={selectableOrders.length === 0 ? "No orders found" : "Select Order ID"} />
+                          <div className="flex min-w-0 flex-col items-start text-left leading-tight">
+                            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                              Order ID
+                            </span>
+                            {selectedOrderMeta ? (
+                              <span className="mt-0.5 flex min-w-0 items-center gap-2">
+                                <span className="truncate text-sm font-bold text-foreground">
+                                  {selectedOrderMeta.order_id}
+                                </span>
+                                <span className="hidden sm:inline text-xs text-muted-foreground">
+                                  {selectedOrderMeta.challenge_type} • ${selectedOrderMeta.account_size}
+                                </span>
+                              </span>
+                            ) : (
+                              <span className="mt-0.5 text-sm font-bold text-foreground">
+                                {selectableOrders.length === 0 ? "No orders found" : "Select an order"}
+                              </span>
+                            )}
+                          </div>
                         )}
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="rounded-2xl border border-border/70 bg-background/95 backdrop-blur-md shadow-xl">
                         {selectableOrders.length === 0 && !isLoadingOrders ? (
                           <div className="px-3 py-2 text-sm text-muted-foreground text-center">
                             No orders available
                           </div>
                         ) : (
                           selectableOrders.map((order) => (
-                            <SelectItem key={order.order_id} value={order.order_id} className="font-bold">
+                            <SelectItem
+                              key={order.order_id}
+                              value={order.order_id}
+                              textValue={order.order_id}
+                              className="rounded-xl py-2.5 focus:bg-muted/60 data-[highlighted]:bg-muted/60"
+                            >
                               <div className="flex flex-col">
-                                <span>{order.order_id}</span>
-                                <span className="text-xs font-normal text-muted-foreground">
+                                <span className="text-sm font-semibold text-foreground">{order.order_id}</span>
+                                <span className="text-xs text-muted-foreground">
                                   {order.challenge_type} • ${order.account_size}
                                 </span>
                               </div>
@@ -643,68 +677,70 @@ export function Header({
             )}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-7">
               <div className="space-y-2 min-w-0">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 w-full max-w-5xl">
-                  {[
-                    {
-                      label: "Platform Login",
-                      value:
-                        resolvedForHeader?.credential?.platform_login != null
-                          ? String(resolvedForHeader.credential.platform_login)
-                          : "—",
-                      key: "hero-login",
-                      icon: MonitorSmartphone,
-                    },
-                    {
-                      label: "Password",
-                      value: resolvedForHeader?.credential?.platform_password || "—",
-                      key: "hero-password",
-                      icon: KeyRound,
-                    },
-                    {
-                      label: "Server",
-                      value: resolvedForHeader?.credential?.server || "—",
-                      key: "hero-server",
-                      icon: Server,
-                    },
-                    {
-                      label: "Status",
-                      value: headerStatus,
-                      key: "hero-status",
-                      icon: Activity,
-                    },
-                  ].map((item: { label: string; value: string; key: string; icon: LucideIcon }) => (
-                    <div
-                      key={item.key}
-                      className="group rounded-xl border border-border/70 bg-gradient-to-br from-muted/45 to-muted/20 px-3 py-2.5 min-w-0 shadow-sm"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                            <item.icon className="h-3.5 w-3.5" />
-                            {item.label}
-                          </p>
-                          <p className="text-sm font-semibold text-foreground truncate mt-1" title={item.value}>
-                            {item.value}
-                          </p>
+                {!hideHeroInfoCards && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 w-full max-w-5xl">
+                    {[
+                      {
+                        label: "Platform Login",
+                        value:
+                          resolvedForHeader?.credential?.platform_login != null
+                            ? String(resolvedForHeader.credential.platform_login)
+                            : "—",
+                        key: "hero-login",
+                        icon: MonitorSmartphone,
+                      },
+                      {
+                        label: "Password",
+                        value: resolvedForHeader?.credential?.platform_password || "—",
+                        key: "hero-password",
+                        icon: KeyRound,
+                      },
+                      {
+                        label: "Server",
+                        value: resolvedForHeader?.credential?.server || "—",
+                        key: "hero-server",
+                        icon: Server,
+                      },
+                      {
+                        label: "Status",
+                        value: headerStatus,
+                        key: "hero-status",
+                        icon: Activity,
+                      },
+                    ].map((item: { label: string; value: string; key: string; icon: LucideIcon }) => (
+                      <div
+                        key={item.key}
+                        className="group rounded-xl border border-border/70 bg-gradient-to-br from-muted/45 to-muted/20 px-3 py-2.5 min-w-0 shadow-sm"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                              <item.icon className="h-3.5 w-3.5" />
+                              {item.label}
+                            </p>
+                            <p className="text-sm font-semibold text-foreground truncate mt-1" title={item.value}>
+                              {item.value}
+                            </p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 shrink-0 rounded-lg border border-border/60 bg-background/40 hover:bg-background/70"
+                            onClick={() => item.value !== "—" && copyToClipboard(item.key, item.value)}
+                            disabled={item.value === "—"}
+                            aria-label={`Copy ${item.label}`}
+                          >
+                            {copiedField === item.key ? (
+                              <Check className="h-3.5 w-3.5 text-emerald-500" />
+                            ) : (
+                              <Copy className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
+                            )}
+                          </Button>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7 shrink-0 rounded-lg border border-border/60 bg-background/40 hover:bg-background/70"
-                          onClick={() => item.value !== "—" && copyToClipboard(item.key, item.value)}
-                          disabled={item.value === "—"}
-                          aria-label={`Copy ${item.label}`}
-                        >
-                          {copiedField === item.key ? (
-                            <Check className="h-3.5 w-3.5 text-emerald-500" />
-                          ) : (
-                            <Copy className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
-                          )}
-                        </Button>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {actions && (

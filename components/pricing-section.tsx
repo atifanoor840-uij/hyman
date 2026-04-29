@@ -147,56 +147,6 @@ export function PricingSection() {
       icon: "https://cryptologos.cc/logos/litecoin-ltc-logo.svg",
       isCrypto: true
     },
-    { 
-      name: "Tron", 
-      icon: "https://cryptologos.cc/logos/tron-trx-logo.svg",
-      isCrypto: true
-    },
-    { 
-      name: "Visa", 
-      icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png",
-      isCrypto: true
-    },
-    { 
-      name: "Mastercard", 
-      icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Mastercard_2019_logo.svg/2560px-Mastercard_2019_logo.svg.png",
-      isCrypto: true
-    },
-    { 
-      name: "American Express", 
-      icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/American_Express_logo_%282018%29.svg/2560px-American_Express_logo_%282018%29.svg.png",
-      isCrypto: true
-    },
-    { 
-      name: "Discover", 
-      icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Discover_Card_logo.svg/2560px-Discover_Card_logo.svg.png",
-      isCrypto: true
-    },
-    { 
-      name: "Apple Pay", 
-      icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Apple_Pay_logo.svg/2560px-Apple_Pay_logo.svg.png",
-      isCrypto: true
-    },
-    { 
-      name: "Google Pay", 
-      icon: "https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg",
-      isCrypto: true
-    },
-    { 
-      name: "Stripe", 
-      icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Stripe_Logo%2C_revised_2016.svg/2560px-Stripe_Logo%2C_revised_2016.svg.png",
-      isCrypto: true
-    },
-    { 
-      name: "Credit Card", 
-      icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Mastercard_2019_logo.svg/2560px-Mastercard_2019_logo.svg.png",
-      isCrypto: true
-    },
-    { 
-      name: "Debit Card", 
-      icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120' viewBox='0 0 200 120'%3E%3Crect width='200' height='120' rx='8' fill='%23fff' stroke='%23000' stroke-width='2'/%3E%3Crect x='10' y='20' width='180' height='80' rx='4' fill='%23f0f0f0'/%3E%3Crect x='10' y='20' width='60' height='20' rx='2' fill='%23000'/%3E%3Crect x='10' y='50' width='40' height='8' rx='2' fill='%23999'/%3E%3Crect x='10' y='65' width='30' height='8' rx='2' fill='%23999'/%3E%3Crect x='10' y='80' width='50' height='8' rx='2' fill='%23999'/%3E%3Ctext x='150' y='70' font-family='Arial' font-size='12' font-weight='bold' fill='%23000'%3EDEBIT%3C/text%3E%3C/svg%3E",
-      isCrypto: true
-    },
   ]
 
   // Duplicate payment methods for infinite scroll (need enough for seamless loop)

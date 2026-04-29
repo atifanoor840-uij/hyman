@@ -85,65 +85,14 @@ export function FooterSection() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-2">
               <h3 className="text-gray-900 text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Payment Methods</h3>
               <span className="hidden sm:inline text-gray-400 text-xs">•</span>
-              <p className="text-gray-500 text-[10px] sm:text-xs">Secured by Stripe</p>
+              <p className="text-gray-500 text-[10px] sm:text-xs">Pay with crypto</p>
             </div>
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              {/* Stripe Badge */}
-              <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-lg border border-gray-200 bg-gray-50 px-2 sm:px-3 py-1 sm:py-1.5">
-                <img src="https://cdn.simpleicons.org/stripe/4b5563" alt="Stripe" className="h-3 sm:h-3.5 w-auto" />
-                <span className="text-[9px] sm:text-[10px] text-gray-600">Stripe</span>
-              </div>
-              {/* Cards */}
-              <div className="h-6 w-10 sm:h-7 sm:w-12 rounded-md overflow-hidden bg-gray-50 border border-gray-200 flex items-center justify-center">
-                <img src="https://cdn.simpleicons.org/visa/4b5563" alt="Visa" className="h-3.5 sm:h-4 w-auto" />
-              </div>
-              <div className="h-6 w-10 sm:h-7 sm:w-12 rounded-md overflow-hidden bg-gray-50 border border-gray-200 flex items-center justify-center">
-                <img src="https://cdn.simpleicons.org/mastercard/4b5563" alt="Mastercard" className="h-3.5 sm:h-4 w-auto" />
-              </div>
-              <div className="h-6 w-10 sm:h-7 sm:w-12 rounded-md overflow-hidden bg-gray-50 border border-gray-200 flex items-center justify-center">
-                <img src="https://cdn.simpleicons.org/americanexpress/4b5563" alt="American Express" className="h-3.5 sm:h-4 w-auto" />
-              </div>
-              <div className="h-6 w-10 sm:h-7 sm:w-12 rounded-md overflow-hidden bg-gray-50 border border-gray-200 flex items-center justify-center">
-                <img src="https://cdn.simpleicons.org/discover/4b5563" alt="Discover" className="h-3.5 sm:h-4 w-auto" />
-              </div>
-              <div className="h-6 w-10 sm:h-7 sm:w-12 rounded-md overflow-hidden bg-gray-50 border border-gray-200 flex items-center justify-center">
-                <img src="https://cdn.simpleicons.org/dinersclub/4b5563" alt="Diners Club" className="h-3.5 sm:h-4 w-auto" />
-              </div>
-              <div className="h-6 w-10 sm:h-7 sm:w-12 rounded-md overflow-hidden bg-gray-50 border border-gray-200 flex items-center justify-center">
-                <img src="https://cdn.simpleicons.org/jcb/4b5563" alt="JCB" className="h-3.5 sm:h-4 w-auto" />
-              </div>
-              {/* Wallets */}
-              <div className="h-6 w-10 sm:h-7 sm:w-12 rounded-md overflow-hidden bg-gray-50 border border-gray-200 flex items-center justify-center">
-                <img src="https://cdn.simpleicons.org/applepay/4b5563" alt="Apple Pay" className="h-3.5 sm:h-4 w-auto" />
-              </div>
-              <div className="h-6 w-10 sm:h-7 sm:w-12 rounded-md overflow-hidden bg-gray-50 border border-gray-200 flex items-center justify-center">
-                <img src="https://cdn.simpleicons.org/googlepay/4b5563" alt="Google Pay" className="h-3.5 sm:h-4 w-auto" />
-              </div>
-              <div className="h-6 w-10 sm:h-7 sm:w-12 rounded-md overflow-hidden bg-gray-50 border border-gray-200 flex items-center justify-center">
-                <img src="https://cdn.simpleicons.org/cashapp/4b5563" alt="Cash App Pay" className="h-3.5 sm:h-4 w-auto" />
-              </div>
-              <div className="h-6 px-2 sm:h-7 sm:px-2.5 rounded-md bg-gray-50 border border-gray-200 text-[8px] sm:text-[9px] font-semibold text-gray-600 flex items-center gap-0.5 sm:gap-1">
-                <img src="https://cdn.simpleicons.org/stripe/4b5563" alt="Stripe" className="h-2 sm:h-2.5 w-auto" />
-                <span>Link</span>
-              </div>
-              <div className="h-6 w-10 sm:h-7 sm:w-12 rounded-md overflow-hidden bg-gray-50 border border-gray-200 flex items-center justify-center">
-                <img src="https://cdn.simpleicons.org/alipay/4b5563" alt="Alipay" className="h-3.5 sm:h-4 w-auto" />
-              </div>
-              <div className="h-6 w-10 sm:h-7 sm:w-12 rounded-md overflow-hidden bg-gray-50 border border-gray-200 flex items-center justify-center">
-                <img src="https://cdn.simpleicons.org/wechat/4b5563" alt="WeChat Pay" className="h-3.5 sm:h-4 w-auto" />
-              </div>
               {/* Crypto */}
               {[
                 { sym: 'btc', alt: 'BTC' },
-                { sym: 'eth', alt: 'ETH' },
                 { sym: 'usdt', alt: 'USDT' },
-                { sym: 'usdc', alt: 'USDC' },
-                { sym: 'bnb', alt: 'BNB' },
-                { sym: 'sol', alt: 'SOL' },
-                { sym: 'xrp', alt: 'XRP' },
-                { sym: 'trx', alt: 'TRX' },
-                { sym: 'doge', alt: 'DOGE' },
-                { sym: 'ltc', alt: 'LTC' }
+                { sym: 'eth', alt: 'ETH' },
               ].map((c) => (
                 <div key={c.sym} className="h-6 w-6 sm:h-7 sm:w-7 rounded-md overflow-hidden bg-gray-50 border border-gray-200 flex items-center justify-center">
                   <img

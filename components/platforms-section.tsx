@@ -15,12 +15,12 @@ export function PlatformsSection() {
     {
       name: "MetaTrader 5 (MT5)",
       short: "MT5",
-      logo: "https://res.cloudinary.com/dufcjjaav/image/upload/v1752130069/MT5-removebg-preview_1_lqagz7.png",
+      logo: "/MT5 (2).png",
     },
     {
       name: "MetaTrader 4 (MT4)",
       short: "MT4",
-      logo: "https://res.cloudinary.com/dufcjjaav/image/upload/v1752130069/512x512bb-removebg-preview_qnfrll.png",
+      logo: "/MT4.png",
     },
     {
       name: "cTrader",

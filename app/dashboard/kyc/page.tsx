@@ -56,6 +56,7 @@ export default function KycPage() {
             title="KYC"
             description="Complete identity verification to enable withdrawals and full account access."
             variant="dashboard-hero"
+            hideHeroInfoCards
             backHref="/dashboard"
             backLabel="Back"
             badge="KYC"

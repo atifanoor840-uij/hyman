@@ -5,10 +5,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 
-const MT5_LOGO =
-  "https://upload.wikimedia.org/wikipedia/commons/2/27/MetaTrader_5.png"
-const WHATSAPP_ICON =
-  "https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+const MT5_LOGO = "/MT5 (2).png"
 
 type MT5CardVariant = "default" | "timer" | "discord"
 
@@ -28,10 +25,10 @@ const variantConfig = {
     fontStyle: "font-semibold tracking-tight",
   },
   discord: {
-    heading: "Join on WhatsApp",
-    sub: "Chat & support",
-    cta: "Join WhatsApp",
-    href: "https://wa.me",
+    heading: "Support chat",
+    sub: "Questions? We’re here to help",
+    cta: "Open support",
+    href: "/support",
     fontStyle: "font-medium italic",
   },
 } as const
@@ -66,11 +63,25 @@ export function MT5PlatformCard({ variant = "default" }: { variant?: MT5CardVari
       return (
         <div className="relative w-full sm:w-48 h-32 sm:h-40 flex-shrink-0 flex items-center justify-center">
           <div className="w-40 h-40 rounded-full bg-primary/25 blur-[40px] absolute" aria-hidden />
-          <img
-            src={WHATSAPP_ICON}
-            alt="WhatsApp"
-            className="relative z-10 h-20 w-20 sm:h-28 sm:w-28 object-contain drop-shadow-lg"
-          />
+          <div className="relative z-10 flex h-20 w-20 sm:h-28 sm:w-28 items-center justify-center rounded-2xl border border-border bg-background/60 shadow-sm">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M7.5 19.5l-3 1 1-3a8 8 0 1 1 2 2Z"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-primary"
+              />
+              <path
+                d="M8.5 9.5h7M8.5 12h5"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                className="text-foreground"
+              />
+            </svg>
+          </div>
         </div>
       )
     }

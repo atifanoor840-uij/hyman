@@ -6,16 +6,12 @@ import {
 	SiLitecoin,
 	SiSolana,
 	SiDogecoin,
-	SiVisa,
-	SiMastercard,
 	SiChase,
 	SiBankofamerica,
 	SiWellsfargo,
 } from "react-icons/si";
 
 const BANK_ICONS = [
-	{ Icon: SiVisa, name: "Visa", color: "#1a1f71" },
-	{ Icon: SiMastercard, name: "Mastercard", color: "#eb001b" },
 	{ Icon: SiChase, name: "Chase", color: "#117aca" },
 	{ Icon: SiBankofamerica, name: "Bank of America", color: "#ed1c24" },
 	{ Icon: SiWellsfargo, name: "Wells Fargo", color: "#d71e28" },

@@ -2,6 +2,7 @@
 
 import {
   Home,
+  LayoutGrid,
   ShoppingCart,
   CreditCard,
   Calendar,
@@ -25,6 +26,7 @@ const iconClass = "shrink-0"
 
 const section1 = [
   { icon: Home, label: "Dashboard", href: "/dashboard" },
+  { icon: LayoutGrid, label: "Overview", href: "/dashboard/overview" },
   { icon: ShoppingCart, label: "Buys", href: "/dashboard/buys" },
   { icon: CreditCard, label: "Billing", href: "/dashboard/billing" },
 ]

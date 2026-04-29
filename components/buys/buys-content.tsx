@@ -24,232 +24,111 @@ import { ApiClientError } from "@/lib/api/client"
 import SuccessPopup from "@/app/components/SuccessPopup"
 
 const platformTypes = [
-  { id: "mt4", label: "MT4", logo: "https://res.cloudinary.com/dufcjjaav/image/upload/v1769778769/images__1_-removebg-preview_pbysow.png" },
-  { id: "mt5", label: "MT5", logo: "https://res.cloudinary.com/dufcjjaav/image/upload/v1769778769/images__2_-removebg-preview_wtt40m.png" },
+  { id: "mt4", label: "MT4", logo: "/MT4.png" },
+  { id: "mt5", label: "MT5", logo: "/MT5 (2).png" },
 ]
 
 const accountTypes = [
-  { id: "alpha", label: "Alpha" },
-  { id: "beta", label: "Beta" },
-  { id: "sigma", label: "Sigma" },
+  // Keep backend ids, update UI labels
+  { id: "alpha", label: "Step 1" },
+  { id: "beta", label: "Step 2" },
+  { id: "sigma", label: "Instant" },
 ]
 
 // Account sizes per account type
 const accountSizesByType: Record<string, Array<{ id: string; label: string; value: number }>> = {
   alpha: [
-    { id: "4k", label: "$4k", value: 4000 },
-    { id: "10k", label: "$10k", value: 10000 },
-    { id: "20k", label: "$20k", value: 20000 },
-    { id: "50k", label: "$50k", value: 50000 },
-    { id: "100k", label: "$100k", value: 100000 },
-  ],
-  beta: [
-    { id: "4k", label: "$4k", value: 4000 },
-    { id: "10k", label: "$10k", value: 10000 },
-    { id: "20k", label: "$20k", value: 20000 },
-    { id: "50k", label: "$50k", value: 50000 },
-    { id: "100k", label: "$100k", value: 100000 },
-  ],
-  sigma: [
+    { id: "3k", label: "$3k", value: 3000 },
     { id: "5k", label: "$5k", value: 5000 },
     { id: "10k", label: "$10k", value: 10000 },
-    { id: "25k", label: "$25k", value: 25000 },
     { id: "50k", label: "$50k", value: 50000 },
     { id: "100k", label: "$100k", value: 100000 },
+    { id: "200k", label: "$200k", value: 200000 },
+    { id: "500k", label: "$500k", value: 500000 },
+  ],
+  beta: [
+    { id: "3k", label: "$3k", value: 3000 },
+    { id: "5k", label: "$5k", value: 5000 },
+    { id: "10k", label: "$10k", value: 10000 },
+    { id: "50k", label: "$50k", value: 50000 },
+    { id: "100k", label: "$100k", value: 100000 },
+    { id: "200k", label: "$200k", value: 200000 },
+    { id: "500k", label: "$500k", value: 500000 },
+  ],
+  sigma: [
+    { id: "3k", label: "$3k", value: 3000 },
+    { id: "5k", label: "$5k", value: 5000 },
+    { id: "10k", label: "$10k", value: 10000 },
+    { id: "50k", label: "$50k", value: 50000 },
+    { id: "100k", label: "$100k", value: 100000 },
+    { id: "200k", label: "$200k", value: 200000 },
+    { id: "500k", label: "$500k", value: 500000 },
   ],
 }
 
-// Features per account type
-const featuresByType: Record<string, any[]> = {
-  alpha: [
-    {
-      name: "15% Performance Reward",
-      subtitle: "From Challenge Phase",
-      values: { "4k": "$78", "10k": "$195", "20k": "$390", "50k": "$975", "100k": "$1,950" },
-    },
-    {
-      name: "Phase 1 Profit Target",
-      values: { "4k": "8%", "10k": "8%", "20k": "8%", "50k": "8%", "100k": "8%" },
-    },
-    {
-      name: "Phase 2 Profit Target",
-      values: { "4k": "5%", "10k": "5%", "20k": "5%", "50k": "5%", "100k": "5%" },
-    },
-    {
-      name: "Maximum Loss Limit",
-      values: {
-        "4k": "10% ($400)",
-        "10k": "10% ($1,000)",
-        "20k": "10% ($2,000)",
-        "50k": "10% ($5,000)",
-        "100k": "10% ($10,000)",
-      },
-    },
-    {
-      name: "Daily Loss Limit",
-      values: {
-        "4k": "5% ($200)",
-        "10k": "5% ($500)",
-        "20k": "5% ($1,000)",
-        "50k": "5% ($2,500)",
-        "100k": "5% ($5,000)",
-      },
-    },
-    {
-      name: "News Trading",
-      values: { "4k": "check", "10k": "check", "20k": "check", "50k": "check", "100k": "check" },
-    },
-    {
-      name: "Performance Reward Upto",
-      values: { "4k": "95%", "10k": "95%", "20k": "95%", "50k": "95%", "100k": "95%" },
-    },
-    {
-      name: "Minimum Trading Days",
-      values: { "4k": "0 Days", "10k": "0 Days", "20k": "0 Days", "50k": "0 Days", "100k": "0 Days" },
-    },
-    {
-      name: "First Withdrawal",
-      values: { "4k": "21 Days", "10k": "21 Days", "20k": "21 Days", "50k": "21 Days", "100k": "21 Days" },
-    },
-    {
-      name: "Refundable Fee",
-      values: { "4k": "$31", "10k": "$60", "20k": "$112", "50k": "$260", "100k": "$520" },
-    },
-  ],
-  beta: [
-    {
-      name: "15% Performance Reward",
-      subtitle: "From Challenge Phase",
-      values: { "4k": "$78", "10k": "$195", "20k": "$390", "50k": "$975", "100k": "$1,950" },
-    },
-    {
-      name: "Phase 1 Profit Target",
-      values: { "4k": "8%", "10k": "8%", "20k": "8%", "50k": "8%", "100k": "8%" },
-    },
-    {
-      name: "Phase 2 Profit Target",
-      values: { "4k": "5%", "10k": "5%", "20k": "5%", "50k": "5%", "100k": "5%" },
-    },
-    {
-      name: "Maximum Loss Limit",
-      values: {
-        "4k": "10% ($400)",
-        "10k": "10% ($1,000)",
-        "20k": "10% ($2,000)",
-        "50k": "10% ($5,000)",
-        "100k": "10% ($10,000)",
-      },
-    },
-    {
-      name: "Daily Loss Limit",
-      values: {
-        "4k": "5% ($200)",
-        "10k": "5% ($500)",
-        "20k": "5% ($1,000)",
-        "50k": "5% ($2,500)",
-        "100k": "5% ($5,000)",
-      },
-    },
-    {
-      name: "News Trading",
-      values: { "4k": "check", "10k": "check", "20k": "check", "50k": "check", "100k": "check" },
-    },
-    {
-      name: "Performance Reward Upto",
-      values: { "4k": "95%", "10k": "95%", "20k": "95%", "50k": "95%", "100k": "95%" },
-    },
-    {
-      name: "Minimum Trading Days",
-      values: { "4k": "5 Days", "10k": "5 Days", "20k": "5 Days", "50k": "5 Days", "100k": "5 Days" },
-    },
-    {
-      name: "First Withdrawal",
-      values: { "4k": "21 Days", "10k": "21 Days", "20k": "21 Days", "50k": "21 Days", "100k": "21 Days" },
-    },
-    {
-      name: "Refundable Fee",
-      values: { "4k": "$27", "10k": "$52", "20k": "$98", "50k": "$225", "100k": "$450" },
-    },
-  ],
-  sigma: [
-    {
-      name: "15% Performance Reward",
-      subtitle: "From Challenge Phase",
-      values: { "5k": "$97.50", "10k": "$195", "25k": "$487.50", "50k": "$975", "100k": "$1,950" },
-    },
-    {
-      name: "Phase 1 Profit Target",
-      values: { "5k": "8%", "10k": "8%", "25k": "8%", "50k": "8%", "100k": "8%" },
-    },
-    {
-      name: "Phase 2 Profit Target",
-      values: { "5k": "5%", "10k": "5%", "25k": "5%", "50k": "5%", "100k": "5%" },
-    },
-    {
-      name: "Maximum Loss Limit",
-      values: {
-        "5k": "10% ($500)",
-        "10k": "10% ($1,000)",
-        "25k": "10% ($2,500)",
-        "50k": "10% ($5,000)",
-        "100k": "10% ($10,000)",
-      },
-    },
-    {
-      name: "Daily Loss Limit",
-      values: {
-        "5k": "5% ($250)",
-        "10k": "5% ($500)",
-        "25k": "5% ($1,250)",
-        "50k": "5% ($2,500)",
-        "100k": "5% ($5,000)",
-      },
-    },
-    {
-      name: "News Trading",
-      values: { "5k": "check", "10k": "check", "25k": "check", "50k": "check", "100k": "check" },
-    },
-    {
-      name: "Performance Reward Upto",
-      values: { "5k": "95%", "10k": "95%", "25k": "95%", "50k": "95%", "100k": "95%" },
-    },
-    {
-      name: "Minimum Trading Days",
-      values: { "5k": "0 Days", "10k": "0 Days", "25k": "0 Days", "50k": "0 Days", "100k": "0 Days" },
-    },
-    {
-      name: "First Withdrawal",
-      values: { "5k": "21 Days", "10k": "21 Days", "25k": "21 Days", "50k": "21 Days", "100k": "21 Days" },
-    },
-    {
-      name: "Refundable Fee",
-      values: { "5k": "$38", "10k": "$60", "25k": "$147", "50k": "$260", "100k": "$520" },
-    },
-  ],
+type FeatureRow = { name: string; subtitle?: string; values: Record<string, string> }
+
+function usd(n: number) {
+  return `$${n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+}
+
+function buildFeatures(accountTypeId: string, sizes: Array<{ id: string; value: number }>): FeatureRow[] {
+  const profitTarget1 = accountTypeId === "beta" ? "8%" : accountTypeId === "sigma" ? "—" : "8%"
+  const profitTarget2 = accountTypeId === "beta" ? "5%" : accountTypeId === "sigma" ? "—" : "5%"
+  const minDays = accountTypeId === "beta" ? "5 Days" : accountTypeId === "sigma" ? "0 Days" : "0 Days"
+
+  const maxLossPct = 10
+  const dailyLossPct = 5
+
+  const maxLossValues: Record<string, string> = {}
+  const dailyLossValues: Record<string, string> = {}
+  sizes.forEach((s) => {
+    maxLossValues[s.id] = `${maxLossPct}% (${usd(Math.round((s.value * maxLossPct) / 100))})`
+    dailyLossValues[s.id] = `${dailyLossPct}% (${usd(Math.round((s.value * dailyLossPct) / 100))})`
+  })
+
+  const fill = (v: string) => Object.fromEntries(sizes.map((s) => [s.id, v])) as Record<string, string>
+
+  return [
+    { name: "Phase 1 Profit Target", values: fill(profitTarget1) },
+    { name: "Phase 2 Profit Target", values: fill(profitTarget2) },
+    { name: "Maximum Loss Limit", values: maxLossValues },
+    { name: "Daily Loss Limit", values: dailyLossValues },
+    { name: "News Trading", values: fill("check") },
+    { name: "Performance Reward Upto", values: fill("95%") },
+    { name: "Minimum Trading Days", values: fill(minDays) },
+    { name: "First Withdrawal", values: fill("21 Days") },
+  ]
 }
 
 // Pricing per account type
 const pricingByType: Record<string, Record<string, { original: string; amount: number }>> = {
   alpha: {
-    "4k": { original: "$45", amount: 31 },
-    "10k": { original: "$85", amount: 60 },
-    "20k": { original: "$160", amount: 112 },
-    "50k": { original: "$375", amount: 260 },
-    "100k": { original: "$750", amount: 520 },
+    "3k": { original: "$14", amount: 14 },
+    "5k": { original: "$23", amount: 23 },
+    "10k": { original: "$32", amount: 32 },
+    "50k": { original: "$49", amount: 49 },
+    "100k": { original: "$103", amount: 103 },
+    "200k": { original: "$145", amount: 145 },
+    "500k": { original: "$240", amount: 240 },
   },
   beta: {
-    "4k": { original: "$39", amount: 27 },
-    "10k": { original: "$75", amount: 52 },
-    "20k": { original: "$140", amount: 98 },
-    "50k": { original: "$325", amount: 225 },
-    "100k": { original: "$650", amount: 450 },
+    "3k": { original: "$9", amount: 9 },
+    "5k": { original: "$14", amount: 14 },
+    "10k": { original: "$23", amount: 23 },
+    "50k": { original: "$42", amount: 42 },
+    "100k": { original: "$82", amount: 82 },
+    "200k": { original: "$123", amount: 123 },
+    "500k": { original: "$200", amount: 200 },
   },
   sigma: {
-    "5k": { original: "$55", amount: 38 },
-    "10k": { original: "$85", amount: 60 },
-    "25k": { original: "$210", amount: 147 },
-    "50k": { original: "$375", amount: 260 },
-    "100k": { original: "$750", amount: 520 },
+    "3k": { original: "$29", amount: 29 },
+    "5k": { original: "$38", amount: 38 },
+    "10k": { original: "$50", amount: 50 },
+    "50k": { original: "$91", amount: 91 },
+    "100k": { original: "$180", amount: 180 },
+    "200k": { original: "$323", amount: 323 },
+    "500k": { original: "$900", amount: 900 },
   },
 }
 
@@ -286,7 +165,7 @@ export function BuysContent() {
 
   // Get dynamic data based on account type
   const accountSizes = accountSizesByType[activeAccountType] || accountSizesByType.alpha
-  const features = featuresByType[activeAccountType] || featuresByType.alpha
+  const features = buildFeatures(activeAccountType, accountSizes)
   const pricing = pricingByType[activeAccountType] || pricingByType.alpha
 
   // Reset selected size if it doesn't exist in the new account type

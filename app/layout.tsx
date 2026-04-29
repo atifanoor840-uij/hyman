@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
-import ChatWidget from "./components/ChatWidget";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,7 +54,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${plusJakarta.variable} antialiased`}
       >
         {children}
-        <ChatWidget />
+        <Script
+          id="chatway"
+          src="https://cdn.chatway.app/widget.js?id=Hwp2KLWVNhLU"
+          strategy="afterInteractive"
+          async
+        />
       </body>
     </html>
   );

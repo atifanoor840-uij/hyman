@@ -154,7 +154,7 @@ export default function LoginPage() {
 	};
 
 	return (
-		<div className="min-h-screen flex flex-col bg-white text-black">
+		<div className="min-h-screen flex flex-col bg-gradient-to-br from-white via-white to-zinc-50 text-black">
 			<Navbar variant="sticky" />
 			<main className="flex-1 flex min-h-0">
 			{/* Left panel - professional geometric (folded planes / ribbons), black theme */}
@@ -207,12 +207,12 @@ export default function LoginPage() {
 			</div>
 
 			{/* Right panel - white login form */}
-			<div className="flex-1 flex flex-col items-center justify-center min-h-screen px-6 py-12 lg:py-16">
+			<div className="flex-1 flex flex-col items-center justify-center min-h-0 px-6 py-12 lg:py-16 overflow-y-auto">
 				{/* Mobile: LOGIN / SIGN IN tabs */}
 			<div className="lg:hidden flex rounded-full bg-zinc-100 p-1 gap-1 mb-8">
 				<span className="px-4 py-2 rounded-full bg-black text-white text-sm font-bold">LOGIN</span>
 				<Link href="/signup" className="px-4 py-2 rounded-full text-zinc-600 text-sm font-medium">
-					SIGN IN
+					SIGN UP
 				</Link>
 			</div>
 
@@ -233,7 +233,7 @@ export default function LoginPage() {
 
 				<form onSubmit={handleSubmit} className="w-full max-w-md">
 					{/* Form card */}
-					<div className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8 shadow-[0_1px_3px_rgba(0,0,0,0.06)] space-y-5">
+					<div className="rounded-3xl border border-zinc-200/70 bg-white/80 backdrop-blur-xl p-6 sm:p-8 shadow-[0_18px_60px_rgba(0,0,0,0.10)] space-y-5">
 						{/* Email */}
 						<div className="space-y-1.5">
 							<label htmlFor="email" className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider">

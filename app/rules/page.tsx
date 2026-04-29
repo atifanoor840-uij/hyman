@@ -82,13 +82,9 @@ export default function RulesPage() {
 
 	return (
 		<div className={`min-h-screen bg-[#f8fafc] ${bodyFont.className}`}>
-			<div className="border-b border-[#e8ecf1] bg-white">
-				<div className="mx-auto max-w-7xl px-6 py-5 md:px-10">
-					<Navbar />
-				</div>
-						</div>
+			<Navbar variant="hero" />
 
-			<main className="mx-auto max-w-3xl px-6 py-12 md:px-8 md:py-16">
+			<main className="mx-auto max-w-3xl px-6 pb-12 pt-28 md:px-8 md:pb-16 md:pt-32">
 				<h1
 					className={`${display.className} mb-10 text-center text-2xl font-semibold tracking-tight text-[#0b0b0f] md:text-left md:text-3xl`}
 				>
