@@ -247,7 +247,7 @@ export default function LoginPage() {
 				<div className="flex flex-col items-center mb-8">
 					<div className="flex items-center justify-center gap-3 mb-2">
 						<Image
-							src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
+							src="/logo.png"
 							alt="GenzProp"
 							width={48}
 							height={48}

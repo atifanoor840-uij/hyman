@@ -97,7 +97,7 @@ export function AdminSidebar() {
       <div className="shrink-0 border-b border-border/60 px-4 py-4">
         <Link href="/admin/overview" className="flex items-center gap-3 group">
           <img
-            src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
+            src="/logo.png"
             alt="GenzProp"
             className="h-12 w-12 shrink-0 object-contain transition-transform duration-300 group-hover:scale-105"
           />

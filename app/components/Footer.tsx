@@ -31,7 +31,7 @@ export default function Footer() {
 					<div className="max-w-md">
 						<div className="flex items-center mb-4 gap-3">
 							<img
-								src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
+								src="/logo.png"
 								alt="GenzProp Logo"
 								className="h-16 w-16 object-contain rounded-lg bg-white/5"
 								loading="lazy"

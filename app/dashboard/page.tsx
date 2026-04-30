@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef, useMemo } from "react"
+import { Suspense, useState, useEffect, useRef, useMemo } from "react"
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
 import { ProjectAnalytics, type ProjectAnalyticsProps } from "@/components/dashboard/project-analytics"
@@ -112,7 +112,7 @@ import { ApiClientError } from "@/lib/api/client"
 const ACCOUNT_API_ERROR_MESSAGE =
   "Your account is not showing any statistics due to technical issue. Contact support team to solve it."
 
-export default function DashboardPage() {
+function DashboardPageInner() {
   const searchParams = useSearchParams()
   const [selectedOrderId, setSelectedOrderId] = useState<string>("")
   const [orders, setOrders] = useState<Order[]>([])
@@ -580,6 +580,14 @@ export default function DashboardPage() {
         </div>
       </main>
     </div>
+  )
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={null}>
+      <DashboardPageInner />
+    </Suspense>
   )
 }
 

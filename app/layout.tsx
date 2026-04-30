@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
+import { Suspense } from "react";
 import Script from "next/script";
 import "./globals.css";
 import MetaPixel from "@/components/MetaPixel";
@@ -27,6 +28,10 @@ export const metadata: Metadata = {
   },
   description:
     "GenzProp offers trader development programs and skills assessments. Educational trading evaluations on simulated accounts. Complete our forex evaluation program to demonstrate your trading discipline. No profit promises — verifiable, skill-based assessments.",
+  icons: {
+    icon: [{ url: "/logo.png" }],
+    apple: "/logo.png",
+  },
   keywords: [
     "trading challenge",
     "prop firm evaluation",
@@ -58,7 +63,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${plusJakarta.variable} antialiased`}
       >
         {children}
-        <MetaPixel pixelId={metaPixelId} />
+        <Suspense fallback={null}>
+          <MetaPixel pixelId={metaPixelId} />
+        </Suspense>
         <noscript>
           <img
             height="1"

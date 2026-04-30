@@ -205,7 +205,7 @@ function VerifyEmailContent() {
 					<div>
 						<Link href="/" className="mb-16 inline-flex items-center gap-3 text-white transition hover:opacity-80">
 							<img
-								src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
+								src="/logo.png"
 								alt="GenzProp Logo"
 								className="h-12 w-12 object-contain rounded-lg"
 								loading="lazy"
@@ -437,7 +437,7 @@ function VerifyEmailPageSkeleton() {
 					<div>
 						<Link href="/" className="mb-16 inline-flex items-center gap-3 text-white transition hover:opacity-80">
 							<img
-								src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
+								src="/logo.png"
 								alt="GenzProp Logo"
 								className="h-12 w-12 object-contain rounded-lg"
 								loading="lazy"

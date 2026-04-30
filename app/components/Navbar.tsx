@@ -55,7 +55,7 @@ export default function Navbar({ variant = "sticky" }: { variant?: NavbarVariant
           <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3 md:px-10">
             <Link href="/" className="flex items-center gap-2 shrink-0">
               <Image
-                src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
+                src="/logo.png"
                 alt="GenzProp"
                 width={40}
                 height={40}
@@ -175,7 +175,7 @@ export default function Navbar({ variant = "sticky" }: { variant?: NavbarVariant
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:px-10">
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <img
-            src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
+            src="/logo.png"
             alt="GenzProp"
             className="h-9 w-9 md:h-10 md:w-10 object-contain"
           />
