@@ -302,10 +302,15 @@ export default function PerformancePage() {
       return
     }
     const { platform, platformLogin } = resolved
+    const graphLink =
+      (resolved as any)?.credential?.graph_link ??
+      (order as any)?.graph_link ??
+      (order as any)?.credentials_with_status?.[0]?.graph_link ??
+      null
     let cancelled = false
     setLoading(true)
     setError(null)
-    getShowMyTradesStats(platform, platformLogin)
+    getShowMyTradesStats(platform, platformLogin, graphLink)
       .then((data) => { if (!cancelled) { setPerf(data); setError(null) } })
       .catch((e) => {
         if (cancelled) return

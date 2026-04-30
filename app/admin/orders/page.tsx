@@ -36,6 +36,7 @@ import { ApiClientError } from "@/lib/api/client"
 import { formatDateKarachi } from "@/lib/utils"
 import { getShowMyTradesStats } from "@/lib/api/showmytrades"
 import type { PerformanceResponse } from "@/lib/api/performance"
+import { PerformanceGraphPanel, DetailedStatisticsCard } from "@/components/dashboard/performance-graph-stats"
 import { ExternalLink, Eye, EyeOff, Loader2, Pencil, RefreshCcw, ShieldAlert, ShoppingCart, LogIn, LineChart, PackageCheck } from "lucide-react"
 
 function paymentTone(status: string | null | undefined) {
@@ -104,6 +105,7 @@ export default function AdminOrdersPage() {
   const [credSaving, setCredSaving] = useState(false)
   const [credError, setCredError] = useState<string | null>(null)
   const [graphOrder, setGraphOrder] = useState<AdminOrder | null>(null)
+  const [graphStep, setGraphStep] = useState<"overview" | "details">("overview")
   const [graphLoading, setGraphLoading] = useState(false)
   const [graphError, setGraphError] = useState<string | null>(null)
   const [graphData, setGraphData] = useState<PerformanceResponse | null>(null)
@@ -315,16 +317,21 @@ export default function AdminOrdersPage() {
 
   const openGraph = async (o: AdminOrder) => {
     setGraphOrder(o)
+    setGraphStep("overview")
     setGraphLoading(true)
     setGraphError(null)
     setGraphData(null)
     try {
       const platform = String((o as any).platform ?? "mt5")
+      const graphLink =
+        (o as any).graph_link ??
+        (Array.isArray((o as any).credentials_with_status) ? (o as any).credentials_with_status[0]?.graph_link : null) ??
+        null
       const login = String((o as any).platform_login ?? (o as any).platformLogin ?? "").trim()
-      if (!login) {
-        throw new Error("Missing platform login for this order. Ensure the backend includes platform_login in admin orders.")
+      if (!login && !graphLink) {
+        throw new Error("Missing platform login / graph link for this order.")
       }
-      const data = await getShowMyTradesStats(platform, login)
+      const data = await getShowMyTradesStats(platform, login || "0", graphLink)
       setGraphData(data)
     } catch (e) {
       setGraphError(e instanceof Error ? e.message : "Failed to load graph data.")
@@ -709,6 +716,16 @@ export default function AdminOrdersPage() {
           </DialogHeader>
           {viewOrder ? (
             <div className="space-y-4">
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                <Button
+                  type="button"
+                  className="h-9 rounded-full border border-purple-400/30 bg-gradient-to-r from-purple-800 via-purple-950 to-purple-800 px-4 text-xs font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:from-purple-700 hover:via-purple-900 hover:to-purple-700"
+                  onClick={() => void openGraph(viewOrder)}
+                >
+                  <LineChart className="h-4 w-4 mr-2" />
+                  Performance
+                </Button>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <InfoRow label="Order ID" value={String(viewOrder.order_id ?? "—")} mono />
                 <InfoRow label="User" value={String(viewOrder.username ?? "—")} />
@@ -719,6 +736,117 @@ export default function AdminOrdersPage() {
                 <InfoRow label="Payment status" value={String(viewOrder.payment_status ?? "—")} />
                 <InfoRow label="Status" value={String(viewOrder.status_type || viewOrder.account_status || "—")} />
               </div>
+
+              <div className="rounded-3xl border border-border/70 bg-gradient-to-br from-card via-card to-muted/30 p-4">
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+                  Payment & tracking
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <InfoRow label="Payment method" value={String((viewOrder as any).payment_method ?? "—")} />
+                  <InfoRow label="Amount" value={`$${Number((viewOrder as any).amount ?? 0).toFixed(0)}`} mono />
+                  <InfoRow label="Oxapay status" value={String((viewOrder as any).oxapay_payment_status ?? "—")} />
+                  <InfoRow label="Payment intent" value={String((viewOrder as any).payment_intent_id ?? "—")} mono />
+                  <InfoRow label="TXID" value={String((viewOrder as any).txid ?? "—")} mono />
+                  <InfoRow label="Checkout session id" value={String((viewOrder as any).checkout_session_id ?? "—")} mono />
+                  <InfoRow label="Payment tracking id" value={String((viewOrder as any).payment_tracking_id ?? "—")} mono />
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-border/70 bg-gradient-to-br from-card via-card to-muted/30 p-4">
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+                  Fulfillment
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <InfoRow label="Completed" value={String(Boolean((viewOrder as any).completed))} />
+                  <InfoRow label="Completed at" value={String((viewOrder as any).completed_at ?? "—")} mono />
+                  <InfoRow label="Credential id" value={String((viewOrder as any).credential_id ?? "—")} mono />
+                  <InfoRow label="Account status" value={String((viewOrder as any).account_status ?? "—")} />
+                  <InfoRow label="Profit target" value={String((viewOrder as any).profit_target ?? "—")} mono />
+                  <InfoRow label="Graph link" value={(viewOrder as any).graph_link ? "Available" : "—"} />
+                  <InfoRow label="Passed" value={String(Boolean((viewOrder as any).passed))} />
+                  <InfoRow label="Failed" value={String(Boolean((viewOrder as any).failed))} />
+                  <InfoRow label="Is stage2" value={String(Boolean((viewOrder as any).is_stage2))} />
+                  <InfoRow label="Is live" value={String(Boolean((viewOrder as any).is_live))} />
+                  <InfoRow label="Has account credential" value={String(Boolean((viewOrder as any).has_account_credential))} />
+                </div>
+                {(viewOrder as any).graph_link ? (
+                  <a
+                    href={String((viewOrder as any).graph_link)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-foreground hover:underline"
+                  >
+                    Open graph <ExternalLink className="h-4 w-4" />
+                  </a>
+                ) : null}
+              </div>
+
+              {Array.isArray((viewOrder as any).timeline) && (viewOrder as any).timeline.length > 0 ? (
+                <div className="rounded-3xl border border-border/70 bg-gradient-to-br from-card via-card to-muted/30 p-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+                    Timeline
+                  </p>
+                  <div className="space-y-2">
+                    {(viewOrder as any).timeline.map((t: any, idx: number) => (
+                      <div key={`${t.event_type ?? "event"}-${idx}`} className="rounded-2xl border border-border/70 bg-muted/20 px-4 py-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-sm font-semibold text-foreground">{String(t.event_type ?? "—")}</p>
+                          <p className="text-xs text-muted-foreground tabular-nums">{String(t.event_date ?? "—")}</p>
+                        </div>
+                        {t.notes ? (
+                          <p className="mt-1 text-xs text-muted-foreground">{String(t.notes)}</p>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {Array.isArray((viewOrder as any).credentials_with_status) && (viewOrder as any).credentials_with_status.length > 0 ? (
+                <div className="space-y-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+                    Credentials with status
+                  </p>
+                  <div className="flex gap-3 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory">
+                    {(viewOrder as any).credentials_with_status.map((c: any) => (
+                      <div
+                        key={String(c.credential_id ?? c.platform_login ?? Math.random())}
+                        className="min-w-[360px] snap-start rounded-3xl border border-purple-400/20 bg-gradient-to-br from-purple-500/10 via-card to-muted/20 p-4"
+                      >
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <InfoRow label="Credential ID" value={String(c.credential_id ?? "—")} mono />
+                          <InfoRow label="Status type" value={String(c.status_type ?? "—")} />
+                          <InfoRow label="Account status" value={String(c.account_status ?? "—")} />
+                          <InfoRow label="Platform" value={String(c.platform ?? "—")} />
+                          <InfoRow label="Server" value={String(c.server ?? "—")} />
+                          <InfoRow label="Login" value={String(c.platform_login ?? "—")} mono />
+                          <InfoRow label="Profit target" value={c.profit_target != null ? String(c.profit_target) : "—"} mono />
+                          <InfoRow label="Graph" value={c.graph_link ? "Available" : "—"} />
+                        </div>
+                        {showSensitive ? (
+                          <div className="mt-3 rounded-2xl border border-purple-400/15 bg-purple-500/5 p-4">
+                            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Password</p>
+                            <p className="mt-1 font-mono text-sm text-foreground break-all">
+                              {c.platform_password ? String(c.platform_password) : "—"}
+                            </p>
+                          </div>
+                        ) : null}
+                        {c.graph_link ? (
+                          <a
+                            href={String(c.graph_link)}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-foreground hover:underline"
+                          >
+                            Open graph <ExternalLink className="h-4 w-4" />
+                          </a>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
               {showSensitive ? (
                 <div className="rounded-2xl border border-border/70 bg-muted/20 px-4 py-3">
                   <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Admin pass</p>
@@ -1158,10 +1286,10 @@ export default function AdminOrdersPage() {
       </Dialog>
 
       {/* Graph modal */}
-      <Dialog open={graphOrder != null} onOpenChange={(o) => { if (!o) { setGraphOrder(null); setGraphData(null); setGraphError(null) } }}>
-        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
+      <Dialog open={graphOrder != null} onOpenChange={(o) => { if (!o) { setGraphOrder(null); setGraphData(null); setGraphError(null); setGraphStep("overview") } }}>
+        <DialogContent className="sm:max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>ShowMyTrades graph</DialogTitle>
+            <DialogTitle>{graphStep === "overview" ? "Performance overview" : "Detailed performance"}</DialogTitle>
           </DialogHeader>
           {graphLoading ? (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -1173,7 +1301,45 @@ export default function AdminOrdersPage() {
               {graphError}
             </div>
           ) : graphData ? (
-            <GraphPanel data={graphData} />
+            <div className="space-y-4">
+              {graphStep === "overview" ? (
+                <>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="text-sm text-muted-foreground">
+                      Source: ShowMyTrades • {graphOrder?.order_id}
+                    </div>
+                    <Button
+                      type="button"
+                      className="h-9 rounded-full border border-purple-400/30 bg-gradient-to-r from-purple-800 via-purple-950 to-purple-800 px-4 text-xs font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:from-purple-700 hover:via-purple-900 hover:to-purple-700"
+                      onClick={() => setGraphStep("details")}
+                    >
+                      Detail performance
+                    </Button>
+                  </div>
+                  <PerformanceOverviewCards data={graphData} />
+                  <GraphPanel data={graphData} />
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between gap-2">
+                    <Button
+                      type="button"
+                      className="h-9 rounded-full border border-purple-400/30 bg-gradient-to-r from-purple-800 via-purple-950 to-purple-800 px-4 text-xs font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:from-purple-700 hover:via-purple-900 hover:to-purple-700"
+                      onClick={() => setGraphStep("overview")}
+                    >
+                      ← Back
+                    </Button>
+                    <div className="text-sm text-muted-foreground">
+                      {graphOrder?.order_id}
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <PerformanceGraphPanel stats={graphData} />
+                    <DetailedStatisticsCard stats={graphData} />
+                  </div>
+                </>
+              )}
+            </div>
           ) : (
             <div className="text-sm text-muted-foreground">No data.</div>
           )}
@@ -1246,14 +1412,37 @@ function GraphPanel({ data }: { data: PerformanceResponse }) {
   )
 }
 
+function PerformanceOverviewCards({ data }: { data: PerformanceResponse }) {
+  const stats = data?.statistics?.account_stats
+  const adv = data?.statistics?.advanced_statistics
+  const equity = Number(stats?.equity ?? NaN)
+  const balance = Number(stats?.balance ?? NaN)
+  const profit = Number(stats?.profit ?? NaN)
+  const dd = Number(stats?.drawdown_percent ?? NaN)
+  const winRate = Number((adv as any)?.win_rate ?? NaN)
+  const totalTrades = Number((adv as any)?.total_trades ?? NaN)
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+      <StatChip label="Balance" value={Number.isFinite(balance) ? balance : 0} tone="muted" format="money" />
+      <StatChip label="Equity" value={Number.isFinite(equity) ? equity : 0} tone="primary" format="money" />
+      <StatChip label="Profit" value={Number.isFinite(profit) ? profit : 0} tone={Number.isFinite(profit) && profit < 0 ? "danger" : "success"} format="money" />
+      <StatChip label="Drawdown" value={Number.isFinite(dd) ? dd : 0} tone="warning" format="percent" />
+      <StatChip label="Win rate" value={Number.isFinite(winRate) ? winRate : 0} tone="muted" format="percent" />
+      <StatChip label="Trades" value={Number.isFinite(totalTrades) ? totalTrades : 0} tone="muted" />
+    </div>
+  )
+}
+
 function StatChip({
   label,
   value,
   tone,
+  format,
 }: {
   label: string
   value: number
   tone: "success" | "warning" | "danger" | "primary" | "muted"
+  format?: "money" | "percent"
 }) {
   const classes =
     tone === "success"
@@ -1268,7 +1457,13 @@ function StatChip({
   return (
     <div className={`rounded-2xl border p-3 ${classes}`}>
       <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/80">{label}</p>
-      <p className="mt-1 text-lg font-bold tabular-nums text-foreground">{value}</p>
+      <p className="mt-1 text-lg font-bold tabular-nums text-foreground">
+        {format === "money"
+          ? `$${Number(value ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+          : format === "percent"
+            ? `${Number(value ?? 0).toFixed(2)}%`
+            : value}
+      </p>
     </div>
   )
 }

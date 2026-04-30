@@ -35,6 +35,14 @@ const accountTypes = [
   { id: "sigma", label: "Instant" },
 ]
 
+function normalizeChallengeType(input: string): "alpha" | "beta" | "sigma" {
+  const v = String(input || "").trim().toLowerCase()
+  if (v === "alpha" || v === "step1" || v === "step 1" || v === "phase1" || v === "phase 1") return "alpha"
+  if (v === "beta" || v === "step2" || v === "step 2" || v === "phase2" || v === "phase 2") return "beta"
+  if (v === "sigma" || v === "instant" || v === "step3" || v === "step 3") return "sigma"
+  return "alpha"
+}
+
 // Account sizes per account type
 const accountSizesByType: Record<string, Array<{ id: string; label: string; value: number }>> = {
   alpha: [
@@ -153,7 +161,7 @@ const paymentMethods = [
 export function BuysContent() {
   const router = useRouter()
   const [activePlatform, setActivePlatform] = useState("mt5")
-  const [activeAccountType, setActiveAccountType] = useState("alpha")
+  const [activeAccountType, setActiveAccountType] = useState<"alpha" | "beta" | "sigma">("alpha")
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
   const [selectedPlatform, setSelectedPlatform] = useState("mt5")
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("crypto")
@@ -170,8 +178,9 @@ export function BuysContent() {
 
   // Reset selected size if it doesn't exist in the new account type
   const handleAccountTypeChange = (newType: string) => {
-    setActiveAccountType(newType)
-    if (selectedSize && !accountSizesByType[newType]?.find(s => s.id === selectedSize)) {
+    const normalized = normalizeChallengeType(newType)
+    setActiveAccountType(normalized)
+    if (selectedSize && !accountSizesByType[normalized]?.find(s => s.id === selectedSize)) {
       setSelectedSize(null)
       setSidebarOpen(false)
     }
@@ -210,7 +219,7 @@ export function BuysContent() {
       // Crypto → POST /orders/create-with-oxapay (Oxapay)
       if (selectedPaymentMethod === "crypto") {
         response = await createOrderWithOxapay({
-          challenge_type: activeAccountType,
+          challenge_type: normalizeChallengeType(activeAccountType),
           account_size: String(accountSizeValue),
           platform: selectedPlatform,
           amount,
@@ -228,7 +237,7 @@ export function BuysContent() {
         })
       } else {
         response = await createOrder({
-          challenge_type: activeAccountType,
+          challenge_type: normalizeChallengeType(activeAccountType),
           account_size: String(accountSizeValue),
           platform: selectedPlatform,
           payment_method: "CARD",
