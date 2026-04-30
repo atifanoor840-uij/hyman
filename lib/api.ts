@@ -8,8 +8,8 @@
  * Admin and dashboard pages call the backend directly (genz)
  */
 export const getApiBaseUrl = (): string => {
-  const url = process.env.NEXT_PUBLIC_API_URL || process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'https://genz-34f298f57a04.herokuapp.com'
-  return (typeof url === 'string' && url.trim()) ? url.replace(/\/$/, '') : 'https://genz-34f298f57a04.herokuapp.com'
+  const url = process.env.NEXT_PUBLIC_API_URL || process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'https://genzpropbackend-5ce82dd885de.herokuapp.com'
+  return (typeof url === 'string' && url.trim()) ? url.replace(/\/$/, '') : 'https://genzpropbackend-5ce82dd885de.herokuapp.com'
 }
 
 export const API_BASE_URL = getApiBaseUrl()

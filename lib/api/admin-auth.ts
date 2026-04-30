@@ -5,8 +5,8 @@ function getApiBaseUrl(): string {
     process.env.NEXT_PUBLIC_API_URL ||
     process.env.API_BASE_URL ||
     process.env.NEXT_PUBLIC_API_BASE_URL ||
-    "https://genz-34f298f57a04.herokuapp.com"
-  return (typeof url === "string" && url.trim() ? url : "https://genz-34f298f57a04.herokuapp.com").replace(/\/$/, "")
+    "https://genzpropbackend-5ce82dd885de.herokuapp.com"
+  return (typeof url === "string" && url.trim() ? url : "https://genzpropbackend-5ce82dd885de.herokuapp.com").replace(/\/$/, "")
 }
 
 export type AdminSignin2faRequest = {

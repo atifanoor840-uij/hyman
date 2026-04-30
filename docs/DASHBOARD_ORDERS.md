@@ -419,7 +419,7 @@ Common sizes from the API:
 
 ```bash
 # Get orders (replace TOKEN with your auth token)
-curl -X GET https://genz-34f298f57a04.herokuapp.com/orders/my-account \
+curl -X GET https://genzpropbackend-5ce82dd885de.herokuapp.com/orders/my-account \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 

@@ -5,7 +5,7 @@
 ### 1. **Backend Integration**
 
 #### API Client (`lib/api/client.ts`)
-- Configured base URL: `https://genz-34f298f57a04.herokuapp.com`
+- Configured base URL: `https://genzpropbackend-5ce82dd885de.herokuapp.com`
 - Environment variable support via `NEXT_PUBLIC_API_URL`
 - Automatic Bearer token injection in requests
 - Secure error handling with sanitized logging
@@ -203,7 +203,7 @@ Try these invalid inputs to verify validation:
 
 Environment variables are already set for production:
 ```env
-NEXT_PUBLIC_API_URL=https://genz-34f298f57a04.herokuapp.com
+NEXT_PUBLIC_API_URL=https://genzpropbackend-5ce82dd885de.herokuapp.com
 NODE_ENV=production
 ```
 
@@ -325,4 +325,4 @@ For issues or questions:
 
 **Implementation Date:** January 30, 2026
 **Status:** ✅ Complete and Ready for Testing
-**Backend API:** https://genz-34f298f57a04.herokuapp.com
+**Backend API:** https://genzpropbackend-5ce82dd885de.herokuapp.com

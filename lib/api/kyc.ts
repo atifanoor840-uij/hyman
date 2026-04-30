@@ -13,7 +13,7 @@ export interface KycSessionResponse {
   message: string;
 }
 
-const DEFAULT_CALLBACK_URL = 'https://genz-34f298f57a04.herokuapp.com/kyc/webhook';
+const DEFAULT_CALLBACK_URL = 'https://genzpropbackend-5ce82dd885de.herokuapp.com/kyc/webhook';
 
 /**
  * GET /kyc/eligibility - Check if user is eligible to submit KYC.

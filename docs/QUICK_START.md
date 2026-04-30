@@ -2,7 +2,7 @@
 
 ## Prerequisites
 - Node.js installed
-- Backend API running at `https://genz-34f298f57a04.herokuapp.com`
+- Backend API running at `https://genzpropbackend-5ce82dd885de.herokuapp.com`
 
 ## Setup (First Time)
 
@@ -202,7 +202,7 @@ Test how the app handles backend errors:
 
 **Registration Request:**
 ```
-POST https://genz-34f298f57a04.herokuapp.com/auth/register
+POST https://genzpropbackend-5ce82dd885de.herokuapp.com/auth/register
 Content-Type: application/json
 
 Body:
@@ -219,7 +219,7 @@ Body:
 
 **Login Request:**
 ```
-POST https://genz-34f298f57a04.herokuapp.com/auth/signin
+POST https://genzpropbackend-5ce82dd885de.herokuapp.com/auth/signin
 Content-Type: multipart/form-data
 
 FormData:
@@ -308,7 +308,7 @@ sessionStorage.getItem('user')
 
 **Registration:**
 ```bash
-curl -X POST https://genz-34f298f57a04.herokuapp.com/auth/register \
+curl -X POST https://genzpropbackend-5ce82dd885de.herokuapp.com/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@example.com",
@@ -323,7 +323,7 @@ curl -X POST https://genz-34f298f57a04.herokuapp.com/auth/register \
 
 **Login:**
 ```bash
-curl -X POST https://genz-34f298f57a04.herokuapp.com/auth/signin \
+curl -X POST https://genzpropbackend-5ce82dd885de.herokuapp.com/auth/signin \
   -F "username=test@example.com" \
   -F "password=TestPass123"
 ```
@@ -332,7 +332,7 @@ curl -X POST https://genz-34f298f57a04.herokuapp.com/auth/signin \
 
 1. **Registration:**
    - Method: POST
-   - URL: `https://genz-34f298f57a04.herokuapp.com/auth/register`
+   - URL: `https://genzpropbackend-5ce82dd885de.herokuapp.com/auth/register`
    - Headers: `Content-Type: application/json`
    - Body (raw JSON):
      ```json
@@ -349,7 +349,7 @@ curl -X POST https://genz-34f298f57a04.herokuapp.com/auth/signin \
 
 2. **Login:**
    - Method: POST
-   - URL: `https://genz-34f298f57a04.herokuapp.com/auth/signin`
+   - URL: `https://genzpropbackend-5ce82dd885de.herokuapp.com/auth/signin`
    - Body: form-data
      - username: test@example.com
      - password: TestPass123
@@ -360,7 +360,7 @@ curl -X POST https://genz-34f298f57a04.herokuapp.com/auth/signin \
 
 1. **Set environment variables on hosting platform:**
    ```
-   NEXT_PUBLIC_API_URL=https://genz-34f298f57a04.herokuapp.com
+   NEXT_PUBLIC_API_URL=https://genzpropbackend-5ce82dd885de.herokuapp.com
    NODE_ENV=production
    ```
 

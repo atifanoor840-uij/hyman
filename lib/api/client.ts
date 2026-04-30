@@ -1,7 +1,7 @@
 import { clearAuth } from '@/lib/auth-utils';
 
-// Use environment variable or fallback to production URL
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://genz-34f298f57a04.herokuapp.com';
+// Use environment variable or fallback to production URL (trim trailing slash)
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://genzpropbackend-5ce82dd885de.herokuapp.com').replace(/\/$/, '');
 
 const LOGIN_PATH = '/login';
 

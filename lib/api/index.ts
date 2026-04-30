@@ -1,9 +1,9 @@
 /**
- * Admin API utilities - uses base URL https://genz-34f298f57a04.herokuapp.com
+ * Admin API utilities - uses base URL https://genzpropbackend-5ce82dd885de.herokuapp.com
  */
 
 const ADMIN_API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "https://genz-34f298f57a04.herokuapp.com";
+  process.env.NEXT_PUBLIC_API_URL || "https://genzpropbackend-5ce82dd885de.herokuapp.com";
 
 export function getApiBaseUrl(): string {
   return ADMIN_API_BASE.replace(/\/$/, "");
