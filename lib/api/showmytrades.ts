@@ -40,7 +40,6 @@ export function buildShowMyTradesSlug(platform: string, platformLogin: string): 
 
 /**
  * Fetch account statistics from ShowMyTrades.
- * Uses Next.js API proxy (`/api/showmytrades?slug=...`) in the browser to avoid CORS.
  * Upstream: `GET https://showmytrades.com/api/statistics/{mt5|mt4}-{platform_login}`
  */
 export async function getShowMyTradesStats(

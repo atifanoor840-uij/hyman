@@ -252,7 +252,7 @@ export function Header({
     let cancelled = false
     setStage2StatsLoading(true)
     setStage2Stats(null)
-    getShowMyTradesStats(resolved.platform, resolved.platformLogin)
+    getShowMyTradesStats(resolved.platform, resolved.platformLogin, resolved.credential?.graph_link ?? null)
       .then((data) => {
         if (!cancelled) setStage2Stats(data)
       })

@@ -14,6 +14,7 @@ import { getMyAccount, getOrderCredentialsForStats, findOrderById, type Order } 
 import { Card } from "@/components/ui/card"
 import { Activity } from "lucide-react"
 import { getAccountRules } from "@/lib/rules-config"
+import { useSearchParams } from "next/navigation"
 
 function getAccountStatusLabel(order: Order | null): string {
   if (!order) return "—"
@@ -112,6 +113,7 @@ const ACCOUNT_API_ERROR_MESSAGE =
   "Your account is not showing any statistics due to technical issue. Contact support team to solve it."
 
 export default function DashboardPage() {
+  const searchParams = useSearchParams()
   const [selectedOrderId, setSelectedOrderId] = useState<string>("")
   const [orders, setOrders] = useState<Order[]>([])
   const [ordersLoading, setOrdersLoading] = useState<boolean>(true)
@@ -121,6 +123,39 @@ export default function DashboardPage() {
   const [accountApiError, setAccountApiError] = useState<boolean>(false)
   /** Latest stats loader for Retry (avoids an extra useEffect dependency that changes array length across renders/HMR) */
   const loadStatsRef = useRef<() => Promise<void>>(async () => {})
+
+  // Persist selected order across pages and allow deep-linking from Overview -> Dashboard.
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const fromQuery = searchParams?.get("orderId")
+    if (fromQuery && fromQuery.trim()) {
+      setSelectedOrderId(fromQuery.trim())
+      try {
+        window.sessionStorage.setItem("dashboard_selected_order_id", fromQuery.trim())
+      } catch {
+        // ignore
+      }
+      return
+    }
+    try {
+      const saved = window.sessionStorage.getItem("dashboard_selected_order_id")
+      if (saved && saved.trim()) setSelectedOrderId(saved.trim())
+    } catch {
+      // ignore
+    }
+    // run once on mount (searchParams is stable in Next, but we only want initial sync)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    if (!selectedOrderId) return
+    try {
+      window.sessionStorage.setItem("dashboard_selected_order_id", selectedOrderId)
+    } catch {
+      // ignore
+    }
+  }, [selectedOrderId])
 
   useEffect(() => {
     let cancelled = false
@@ -148,7 +183,27 @@ export default function DashboardPage() {
   /** Non-pending order to load stats for: selected row, or first active order if none selected yet */
   const orderForStats = useMemo(() => {
     if (orders.length === 0) return null
-    const selectable = orders.filter((o) => o.status !== "Pending")
+    const selectable = orders
+      .filter((o) => String(o.status ?? "").toLowerCase().trim() !== "pending")
+      .slice()
+      .sort((a, b) => {
+        const aCreds = Array.isArray((a as any)?.credentials_with_status) ? ((a as any).credentials_with_status as any[]) : []
+        const bCreds = Array.isArray((b as any)?.credentials_with_status) ? ((b as any).credentials_with_status as any[]) : []
+        const aActive = aCreds.find((c) => String(c?.account_status ?? "").toLowerCase().trim() === "active")
+        const bActive = bCreds.find((c) => String(c?.account_status ?? "").toLowerCase().trim() === "active")
+        const aGraph = Boolean(aActive?.graph_link || aActive?.graphLink || aCreds.some((c) => c?.graph_link || c?.graphLink) || (a as any)?.graph_link || (a as any)?.graphLink)
+        const bGraph = Boolean(bActive?.graph_link || bActive?.graphLink || bCreds.some((c) => c?.graph_link || c?.graphLink) || (b as any)?.graph_link || (b as any)?.graphLink)
+
+        // 1) Prefer orders that have a graph_link (so we hit exact SMT key)
+        if (aGraph !== bGraph) return aGraph ? -1 : 1
+
+        // 2) Then newest by created_at (robust date parse)
+        const at = Number.isFinite(Date.parse(String((a as any)?.created_at ?? ""))) ? Date.parse(String((a as any)?.created_at ?? "")) : 0
+        const bt = Number.isFinite(Date.parse(String((b as any)?.created_at ?? ""))) ? Date.parse(String((b as any)?.created_at ?? "")) : 0
+        if (at !== bt) return bt - at
+
+        return String((a as any)?.order_id ?? "").localeCompare(String((b as any)?.order_id ?? ""))
+      })
     if (selectable.length === 0) return null
     const match = selectedOrderId ? findOrderById(selectable, selectedOrderId) : null
     return match ?? selectable[0]
@@ -179,10 +234,24 @@ export default function DashboardPage() {
         return
       }
       const { platform, platformLogin } = resolved
+      const credsList = Array.isArray((orderForStats as any)?.credentials_with_status)
+        ? ((orderForStats as any).credentials_with_status as any[])
+        : []
+      const activeRow = credsList.find((c) => String(c?.account_status ?? "").toLowerCase().trim() === "active")
+      const graphLink =
+        (resolved.credential as any)?.graph_link ??
+        (resolved.credential as any)?.graphLink ??
+        (orderForStats as any)?.graph_link ??
+        (orderForStats as any)?.graphLink ??
+        activeRow?.graph_link ??
+        activeRow?.graphLink ??
+        credsList.find((c) => c?.graph_link || c?.graphLink)?.graph_link ??
+        credsList.find((c) => c?.graph_link || c?.graphLink)?.graphLink ??
+        null
       setStatsLoading(true)
       setStatsError(false)
       try {
-        const data = await fetchDashboardStats(platform, platformLogin)
+        const data = await fetchDashboardStats(platform, platformLogin, graphLink)
         if (!cancelled) {
           setStats(data)
           setStatsError(false)

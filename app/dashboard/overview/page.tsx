@@ -376,7 +376,7 @@ function OrderCard({ order }: { order: Order }) {
             asChild
             className="h-9 rounded-2xl px-3 text-xs font-semibold bg-purple-600 hover:bg-purple-700 text-white"
           >
-            <Link href="/dashboard">
+            <Link href={`/dashboard?orderId=${encodeURIComponent(order.order_id)}`}>
               <BarChart3 className="h-4 w-4 mr-2" />
               Analytics
             </Link>

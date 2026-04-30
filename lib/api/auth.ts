@@ -137,6 +137,8 @@ export interface OrderCredentials {
 	platform_login: string;
 	platform_password: string;
 	profit_target?: number;
+	/** ShowMyTrades graph key or dashboard URL returned by backend */
+	graph_link?: string | null;
 	session_id?: string;
 	terminal_id?: number;
 	profit_share?: number;
@@ -153,6 +155,8 @@ export interface CredentialWithStatus {
 	platform_login: string;
 	platform_password: string;
 	profit_target?: number;
+	/** ShowMyTrades dashboard link (preferred key source for stats) */
+	graph_link?: string | null;
 }
 
 export interface Order {
@@ -234,6 +238,15 @@ function credentialsListFromOrder(order: Order): CredentialWithStatus[] {
 	return raw;
 }
 
+function pickGraphLinkFromRow(row: unknown): string | null {
+	if (!row || typeof row !== "object") return null;
+	const r = row as Record<string, unknown>;
+	const v = r.graph_link ?? r.graphLink ?? r.graphlink;
+	if (v === null || v === undefined) return null;
+	const s = String(v).trim();
+	return s ? s : null;
+}
+
 /**
  * Resolves MT login + platform for ShowMyTrades (`mt5-{platform_login}`).
  * Prefers legacy `credentials` / `stage2_credentials` / `live_credentials`, then `credentials_with_status`
@@ -243,6 +256,15 @@ export function getOrderCredentialsForStats(
 	order: Order | null | undefined
 ): ResolvedOrderCredentials | null {
 	if (!order) return null;
+	const list = credentialsListFromOrder(order);
+	const listActive = list.find(
+		(c) => String(c.account_status ?? "").toLowerCase().trim() === "active"
+	);
+	const graphFromList =
+		pickGraphLinkFromRow(listActive) ??
+		pickGraphLinkFromRow(list.find((c) => pickGraphLinkFromRow(c))) ??
+		null;
+
 	const legacy =
 		order.credentials ?? order.stage2_credentials ?? order.live_credentials;
 	const legacyLogin =
@@ -252,10 +274,13 @@ export function getOrderCredentialsForStats(
 		return {
 			platform,
 			platformLogin: legacyLogin,
-			credential: legacy,
+			credential: {
+				...legacy,
+				// Prefer backend-returned graph_link from legacy, else fall back to credentials_with_status list.
+				graph_link: legacy.graph_link ?? graphFromList,
+			},
 		};
 	}
-	const list = credentialsListFromOrder(order);
 	if (list.length === 0) return null;
 	const active = list.find(
 		(c) =>
@@ -280,6 +305,7 @@ export function getOrderCredentialsForStats(
 			platform_login: pl,
 			platform_password: picked!.platform_password,
 			profit_target: picked!.profit_target,
+			graph_link: picked!.graph_link ?? null,
 		},
 	};
 }
