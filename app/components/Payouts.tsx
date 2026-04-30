@@ -59,7 +59,7 @@ export default function Payouts() {
 						<div className="rounded-2xl border border-[#dadfea] bg-gradient-to-b from-[#0d1326] to-[#0a0f22] p-6 text-white shadow-[inset_0_0_1px_rgba(255,255,255,0.06)]">
 							<div className="text-[10px] uppercase tracking-wider text-white/60">Eligible balance</div>
 							<div className="font-sans mt-2 text-3xl font-bold tracking-tight">$2,800.00</div>
-							<button className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#0096ff] to-[#00d99f] px-4 py-2.5 text-sm font-semibold text-[#0b0b0f] transition hover:opacity-90">
+							<button className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#5235ff] to-[#00d99f] px-4 py-2.5 text-sm font-semibold text-[#0b0b0f] transition hover:opacity-90">
 								Request Payout
 							</button>
 						</div>
@@ -69,15 +69,15 @@ export default function Payouts() {
 						</p>
 						<ul className="mt-4 space-y-2 text-xs text-[#2e2e35]/70">
 							<li className="flex items-start gap-2">
-								<span className="mt-0.5 text-[#0ea5e9]">✓</span>
+								<span className="mt-0.5 text-[#5235ff]">✓</span>
 								<span>One‑click request submission</span>
 							</li>
 							<li className="flex items-start gap-2">
-								<span className="mt-0.5 text-[#0ea5e9]">✓</span>
+								<span className="mt-0.5 text-[#5235ff]">✓</span>
 								<span>Real‑time status tracking</span>
 							</li>
 							<li className="flex items-start gap-2">
-								<span className="mt-0.5 text-[#0ea5e9]">✓</span>
+								<span className="mt-0.5 text-[#5235ff]">✓</span>
 								<span>Dedicated support channel</span>
 							</li>
 						</ul>
@@ -103,15 +103,15 @@ export default function Payouts() {
 						</p>
 						<ul className="mt-4 space-y-2 text-xs text-[#2e2e35]/70">
 							<li className="flex items-start gap-2">
-								<span className="mt-0.5 text-[#0ea5e9]">✓</span>
+								<span className="mt-0.5 text-[#5235ff]">✓</span>
 								<span>Network fee transparency</span>
 							</li>
 							<li className="flex items-start gap-2">
-								<span className="mt-0.5 text-[#0ea5e9]">✓</span>
+								<span className="mt-0.5 text-[#5235ff]">✓</span>
 								<span>Secure address book</span>
 							</li>
 							<li className="flex items-start gap-2">
-								<span className="mt-0.5 text-[#0ea5e9]">✓</span>
+								<span className="mt-0.5 text-[#5235ff]">✓</span>
 								<span>Multi‑chain support</span>
 							</li>
 						</ul>
@@ -135,15 +135,15 @@ export default function Payouts() {
 						</p>
 						<ul className="mt-4 space-y-2 text-xs text-[#2e2e35]/70">
 							<li className="flex items-start gap-2">
-								<span className="mt-0.5 text-[#0ea5e9]">✓</span>
+								<span className="mt-0.5 text-[#5235ff]">✓</span>
 								<span>Global coverage</span>
 							</li>
 							<li className="flex items-start gap-2">
-								<span className="mt-0.5 text-[#0ea5e9]">✓</span>
+								<span className="mt-0.5 text-[#5235ff]">✓</span>
 								<span>SEPA / SWIFT networks</span>
 							</li>
 							<li className="flex items-start gap-2">
-								<span className="mt-0.5 text-[#0ea5e9]">✓</span>
+								<span className="mt-0.5 text-[#5235ff]">✓</span>
 								<span>Multi‑currency support</span>
 							</li>
 						</ul>
@@ -166,7 +166,7 @@ export default function Payouts() {
 function Card({ children }: { children: React.ReactNode }) {
 	return (
 		<article className="group relative overflow-hidden rounded-2xl border border-[#e6e9ef] bg-white p-6 shadow-[0_10px_30px_rgba(0,0,0,0.05)] transition hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.08)]">
-			<div className="absolute -inset-1 -z-10 rounded-2xl bg-[conic-gradient(from_180deg_at_50%_50%,rgba(14,165,233,0.1)_0deg,rgba(99,102,241,0.08)_120deg,rgba(20,184,166,0.08)_240deg,rgba(14,165,233,0.1)_360deg)] opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100" />
+			<div className="absolute -inset-1 -z-10 rounded-2xl bg-[conic-gradient(from_180deg_at_50%_50%,rgba(82,53,255,0.10)_0deg,rgba(168,85,247,0.08)_120deg,rgba(20,184,166,0.08)_240deg,rgba(82,53,255,0.10)_360deg)] opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100" />
 			{children}
 		</article>
 	);
@@ -185,7 +185,7 @@ function FlagIcon() {
 	return (
 		<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
 			<path d="M5 3v18" stroke="currentColor" strokeWidth="1.5" />
-			<path d="M5 4h11l-2 3h5l-2 3h-8" fill="currentColor" className="text-[#0ea5e9]" />
+			<path d="M5 4h11l-2 3h5l-2 3h-8" fill="currentColor" className="text-[#5235ff]" />
 		</svg>
 	);
 }
@@ -193,8 +193,8 @@ function FlagIcon() {
 function CoinIcon() {
 	return (
 		<svg width="140" height="140" viewBox="0 0 100 100" fill="none" aria-hidden="true">
-			<circle cx="50" cy="50" r="38" fill="#e9f6ff" stroke="#bfe7ff" />
-			<circle cx="50" cy="50" r="26" fill="#0ea5e9" />
+			<circle cx="50" cy="50" r="38" fill="#f5f3ff" stroke="#ddd6fe" />
+			<circle cx="50" cy="50" r="26" fill="#5235ff" />
 			<text x="50" y="56" textAnchor="middle" fontSize="22" fill="white" fontFamily="Arial">S</text>
 		</svg>
 	);

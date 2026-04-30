@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Loader2, BarChart3, ShoppingCart, CalendarDays, CheckCircle2, XCircle, Clock3 } from "lucide-react"
 import { getMyAccount, type Order } from "@/lib/api/auth"
 import { ApiClientError } from "@/lib/api/client"
+import { trackPurchaseEnhanced } from "@/components/MetaPixel"
 
 function orderStageLabel(order: Order): "Live" | "Stage 2" | "Phase 1" | "Pending" {
   if (String(order.status).toLowerCase() === "pending") return "Pending"
@@ -31,6 +32,72 @@ export default function OverviewPage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // Fire Purchase events when orders become paid/completed, but only once per order.
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    if (!orders.length) return
+
+    const storageKey = "meta_pixel_purchase_tracked_order_ids"
+    let tracked = new Set<string>()
+    try {
+      const raw = window.localStorage.getItem(storageKey)
+      const ids = raw ? (JSON.parse(raw) as unknown) : []
+      if (Array.isArray(ids)) tracked = new Set(ids.map((v) => String(v)))
+    } catch {
+      tracked = new Set()
+    }
+
+    let changed = false
+    for (const order of orders) {
+      const orderId = String((order as any).order_id ?? "")
+      if (!orderId || tracked.has(orderId)) continue
+
+      const paymentStatus = String((order as any).payment_status ?? "").toLowerCase()
+      const oxapayPaymentStatus = String((order as any).oxapay_payment_status ?? "").toLowerCase()
+      const orderStatus = String((order as any).status ?? "").toLowerCase()
+
+      const isPaid =
+        paymentStatus === "paid" ||
+        paymentStatus === "completed" ||
+        oxapayPaymentStatus === "paid" ||
+        oxapayPaymentStatus === "completed" ||
+        orderStatus === "completed"
+
+      if (!isPaid) continue
+
+      const valueRaw = (order as any).amount
+      const value = typeof valueRaw === "number" ? valueRaw : Number(valueRaw)
+      const safeValue = Number.isFinite(value) ? value : 0
+
+      const currency = String((order as any).currency ?? "USD") || "USD"
+      const challengeType = String((order as any).challenge_type ?? "").trim()
+      const accountSize = String((order as any).account_size ?? "").trim()
+      const platform = String((order as any).platform ?? "").trim()
+      const contentName = [challengeType, accountSize ? `$${Number(accountSize).toLocaleString("en-US")}` : ""]
+        .filter(Boolean)
+        .join(" - ") || "GenzProp Challenge"
+
+      trackPurchaseEnhanced(
+        safeValue,
+        currency,
+        contentName,
+        challengeType || undefined,
+        platform || undefined
+      )
+
+      tracked.add(orderId)
+      changed = true
+    }
+
+    if (changed) {
+      try {
+        window.localStorage.setItem(storageKey, JSON.stringify(Array.from(tracked)))
+      } catch {
+        // ignore
+      }
+    }
+  }, [orders])
 
   useEffect(() => {
     let cancelled = false

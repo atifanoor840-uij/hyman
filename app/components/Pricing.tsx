@@ -71,6 +71,7 @@ export default function Pricing() {
 	const accounts = currentTier.accounts;
 
 	const formatSizeK = (size: number) => (size >= 1000 ? `${size / 1000}K` : String(size));
+	const realPrice = (discounted: number) => Number((discounted * 1.65).toFixed(2));
 
 	const handleTierChange = (tierId: string) => {
 		setSelectedTierId(tierId);
@@ -148,6 +149,7 @@ export default function Pricing() {
 							{accounts.map((account) => {
 								const isSelected = selectedAccount === account.size;
 								const sizeLabel = formatSizeK(account.size);
+								const real = realPrice(account.price);
 								return (
 									<button
 										key={account.size}
@@ -175,9 +177,14 @@ export default function Pricing() {
 										</p>
 										{/* Price */}
 										<div className="mt-auto pt-5">
+											<div className={`text-xs ${isSelected ? "text-white/70" : "text-slate-500"}`}>
+												<span className="line-through">${real}</span>
+												<span className="ml-1">Real (+65%)</span>
+											</div>
 											<span className={`text-2xl md:text-3xl font-bold block ${isSelected ? "text-white" : "text-slate-900"}`}>
 												${account.price}
 											</span>
+											<div className={`text-xs ${isSelected ? "text-white/70" : "text-slate-500"}`}>Discounted</div>
 										</div>
 									</button>
 								);

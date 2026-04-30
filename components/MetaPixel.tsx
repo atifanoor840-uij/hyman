@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
+import { usePathname, useSearchParams } from "next/navigation"
 
 declare global {
   interface Window {
@@ -20,9 +21,13 @@ interface MetaPixelEvent {
 }
 
 export default function MetaPixel({ pixelId, debug = false }: MetaPixelProps) {
+  const initializedRef = useRef(false)
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
   useEffect(() => {
     // Initialize Facebook Pixel with enhanced error handling
-    if (typeof window !== 'undefined' && !window.fbq) {
+    if (typeof window !== 'undefined' && !window.fbq && !initializedRef.current) {
       try {
         if (debug) {
           console.log('🚀 Initializing Meta Pixel with ID:', pixelId)
@@ -52,6 +57,7 @@ export default function MetaPixel({ pixelId, debug = false }: MetaPixelProps) {
             try {
               window.fbq('init', pixelId)
               window.fbq('track', 'PageView')
+              initializedRef.current = true
               
               if (debug) {
                 console.log('✅ Meta Pixel initialized successfully with ID:', pixelId)
@@ -88,6 +94,21 @@ export default function MetaPixel({ pixelId, debug = false }: MetaPixelProps) {
       console.log('ℹ️ Meta Pixel already initialized')
     }
   }, [pixelId, debug])
+
+  // Track SPA pageviews on route changes (App Router navigation)
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    if (!window.fbq) return
+    try {
+      window.fbq("track", "PageView")
+      if (debug) {
+        const qs = searchParams?.toString() || ""
+        console.log("✅ Meta Pixel PageView (route change):", `${pathname}${qs ? `?${qs}` : ""}`)
+      }
+    } catch (e) {
+      if (debug) console.error("❌ Meta Pixel PageView failed:", e)
+    }
+  }, [pathname, searchParams, debug])
 
   return null
 }
@@ -134,7 +155,6 @@ export const trackSignup = (email?: string, debug = false) => {
     content_category: 'Trading Platform Signup',
     value: 0,
     currency: 'USD',
-    ...(email && { email })
   }, debug)
 }
 

@@ -10,7 +10,7 @@ export function HelpBreadcrumbs({ items }: { items: Crumb[] }) {
 					<li key={i} className="flex items-center gap-1">
 						{i > 0 && <span className="text-[#c4c8d0]">/</span>}
 						{item.href ? (
-							<Link href={item.href} className="transition hover:text-[#0ea5e9]">
+							<Link href={item.href} className="transition hover:text-[#5235ff]">
 								{item.label}
 							</Link>
 						) : (

@@ -49,19 +49,19 @@ export default async function HelpCategoryPage({ params }: Props) {
 				</div>
 
 				<div className="mt-8 overflow-hidden rounded-xl border border-[#e8ecf1] bg-white shadow-sm">
-					<div className="border-l-[5px] border-l-sky-500">
+					<div className="border-l-[5px] border-l-purple-600">
 						<ul className="divide-y divide-[#eef1f5]">
 							{category.articles.map((article) => (
 								<li key={article.slug}>
 									<Link
 										href={`/rules/help/${category.slug}/${article.slug}`}
-										className="group flex items-center justify-between gap-4 px-5 py-4 transition hover:bg-sky-50/60"
+										className="group flex items-center justify-between gap-4 px-5 py-4 transition hover:bg-purple-50/60"
 									>
-										<span className="text-[15px] font-medium text-[#0b0b0f] group-hover:text-[#0ea5e9]">
+										<span className="text-[15px] font-medium text-[#0b0b0f] group-hover:text-[#5235ff]">
 											{article.title}
 										</span>
 										<ChevronRight
-											className="h-5 w-5 shrink-0 text-[#c4c8d0] transition group-hover:text-[#0ea5e9]"
+											className="h-5 w-5 shrink-0 text-[#c4c8d0] transition group-hover:text-[#5235ff]"
 											aria-hidden
 										/>
 									</Link>
@@ -74,7 +74,7 @@ export default async function HelpCategoryPage({ params }: Props) {
 				<p className="mt-10">
 					<Link
 						href="/rules"
-						className="inline-flex items-center gap-1.5 text-sm font-medium text-[#6b7280] transition hover:text-[#0ea5e9]"
+						className="inline-flex items-center gap-1.5 text-sm font-medium text-[#6b7280] transition hover:text-[#5235ff]"
 					>
 						<span aria-hidden>←</span> Back to Rules
 					</Link>

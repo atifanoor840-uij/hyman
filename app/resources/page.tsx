@@ -77,9 +77,9 @@ export default function ResourcesPage() {
 							{steps.map((item, index) => (
 								<div
 									key={item.step}
-									className="group relative overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white p-8 shadow-sm transition-all hover:border-[#0ea5e9]/30 hover:shadow-lg"
+									className="group relative overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white p-8 shadow-sm transition-all hover:border-[#5235ff]/30 hover:shadow-lg"
 								>
-									<div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-[#0ea5e9]/10 text-lg font-bold text-[#0284c7]">
+									<div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-[#5235ff]/10 text-lg font-bold text-[#5235ff]">
 										{item.step}
 									</div>
 									<h3 className={`${display.className} text-xl font-semibold text-[#0b0b0f] mb-3`}>
@@ -90,7 +90,7 @@ export default function ResourcesPage() {
 									</p>
 									<a
 										href={item.href}
-										className="inline-flex items-center gap-2 rounded-full bg-[#0ea5e9] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#0284c7]"
+										className="inline-flex items-center gap-2 rounded-full bg-[#5235ff] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#452cff]"
 									>
 										{item.cta}
 										<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -103,7 +103,7 @@ export default function ResourcesPage() {
 					</section>
 
 					{/* CTA */}
-					<div className="rounded-2xl border border-[#e2e8f0] bg-gradient-to-br from-[#f0f9ff] to-white p-10 text-center">
+					<div className="rounded-2xl border border-[#e2e8f0] bg-gradient-to-br from-[#f5f3ff] to-white p-10 text-center">
 						<h2 className={`${display.className} text-2xl font-semibold text-[#0b0b0f] mb-4`}>
 							Ready to Get Funded?
 						</h2>
@@ -112,7 +112,7 @@ export default function ResourcesPage() {
 						</p>
 						<a
 							href="/signup"
-							className="inline-block rounded-full bg-[#0ea5e9] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#0284c7]"
+							className="inline-block rounded-full bg-[#5235ff] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#452cff]"
 						>
 							Start Your Challenge
 						</a>

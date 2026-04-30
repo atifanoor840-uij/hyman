@@ -622,31 +622,31 @@ export default function FAQPage() {
 						<h2 className={`${display.className} text-xl font-semibold text-[#0b0b0f] mb-4`}>Here&apos;s what you get:</h2>
 						<ul className="space-y-3 text-[#37353E]/90">
 							<li className="flex gap-3">
-								<span className="text-[#0ea5e9] mt-0.5">•</span>
+								<span className="text-[#5235ff] mt-0.5">•</span>
 								<span>Up to $100,000+ in trading capital — no personal risk</span>
 							</li>
 							<li className="flex gap-3">
-								<span className="text-[#0ea5e9] mt-0.5">•</span>
+								<span className="text-[#5235ff] mt-0.5">•</span>
 								<span>Keep up to 90% of your profits — your skill, your payout</span>
 							</li>
 							<li className="flex gap-3">
-								<span className="text-[#0ea5e9] mt-0.5">•</span>
+								<span className="text-[#5235ff] mt-0.5">•</span>
 								<span>Zero risk to your own funds — only the account fee</span>
 							</li>
 							<li className="flex gap-3">
-								<span className="text-[#0ea5e9] mt-0.5">•</span>
+								<span className="text-[#5235ff] mt-0.5">•</span>
 								<span>Real market conditions — no demo gimmicks</span>
 							</li>
 							<li className="flex gap-3">
-								<span className="text-[#0ea5e9] mt-0.5">•</span>
+								<span className="text-[#5235ff] mt-0.5">•</span>
 								<span>Fast, repeatable withdrawals — get paid for performance</span>
 							</li>
 							<li className="flex gap-3">
-								<span className="text-[#0ea5e9] mt-0.5">•</span>
+								<span className="text-[#5235ff] mt-0.5">•</span>
 								<span>Clear rules, no traps — trade freely within risk limits</span>
 							</li>
 							<li className="flex gap-3">
-								<span className="text-[#0ea5e9] mt-0.5">•</span>
+								<span className="text-[#5235ff] mt-0.5">•</span>
 								<span>Scale fast — consistent traders unlock bigger accounts</span>
 							</li>
 						</ul>
@@ -663,7 +663,7 @@ export default function FAQPage() {
 										className="flex w-full items-center justify-between gap-6 p-6 text-left hover:bg-[#f9f9f9] transition-colors"
 									>
 										<span className="text-base font-semibold text-[#0b0b0f] md:text-lg">{item.q}</span>
-										<span className="flex-shrink-0 text-2xl font-light text-[#0ea5e9] transition-transform">
+										<span className="flex-shrink-0 text-2xl font-light text-[#5235ff] transition-transform">
 											{isOpen ? '–' : '+'}
 										</span>
 									</button>
@@ -684,7 +684,7 @@ export default function FAQPage() {
 						</p>
 						<a
 							href="/contact"
-							className="mt-6 inline-block rounded-full bg-[#0ea5e9] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#0891d1]"
+							className="mt-6 inline-block rounded-full bg-[#5235ff] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#452cff]"
 						>
 							Contact Support
 						</a>

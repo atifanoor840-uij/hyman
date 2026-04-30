@@ -134,7 +134,7 @@ export default function PartnerPage() {
 			<main className="bg-white">
 				{/* Hero CTA */}
 				<section className="mx-auto max-w-7xl px-6 py-16 md:px-10 md:py-24">
-					<div className="rounded-2xl border border-[#e5e5e5] bg-gradient-to-br from-[#f0f9ff] to-white p-12 text-center">
+					<div className="rounded-2xl border border-[#e5e5e5] bg-gradient-to-br from-[#f5f3ff] to-white p-12 text-center">
 						<h2 className={`${display.className} text-3xl font-semibold text-[#0b0b0f] mb-4`}>
 							Earn Competitive Commissions
 						</h2>
@@ -143,7 +143,7 @@ export default function PartnerPage() {
 						</p>
 						<a
 							href="#apply"
-							className="inline-block rounded-full bg-[#0ea5e9] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#0891d1]"
+							className="inline-block rounded-full bg-[#5235ff] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#452cff]"
 						>
 							Apply Now
 						</a>
@@ -159,7 +159,7 @@ export default function PartnerPage() {
 						<div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
 							{benefits.map((benefit) => (
 								<div key={benefit.title} className="rounded-2xl border border-[#e5e5e5] bg-white p-6 shadow-sm">
-									<div className="mb-4 text-[#0ea5e9]">{benefit.icon}</div>
+									<div className="mb-4 text-[#5235ff]">{benefit.icon}</div>
 									<h3 className="text-xl font-semibold text-[#0b0b0f] mb-2">{benefit.title}</h3>
 									<p className="text-sm text-[#37353E]/80 leading-relaxed">{benefit.description}</p>
 								</div>
@@ -181,7 +181,7 @@ export default function PartnerPage() {
 							>
 								<div className="mb-4 flex items-center justify-between">
 									<h3 className="text-2xl font-semibold text-[#0b0b0f]">{type.title}</h3>
-									<span className="rounded-full bg-[#f0f9ff] px-4 py-1 text-sm font-bold text-[#0ea5e9]">
+									<span className="rounded-full bg-[#f5f3ff] px-4 py-1 text-sm font-bold text-[#5235ff]">
 										{type.commission}
 									</span>
 								</div>
@@ -192,7 +192,7 @@ export default function PartnerPage() {
 									<ul className="space-y-2">
 										{type.requirements.map((req) => (
 											<li key={req} className="flex items-start gap-2 text-sm text-[#37353E]/80">
-												<svg className="h-5 w-5 text-[#0ea5e9] mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+												<svg className="h-5 w-5 text-[#5235ff] mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
 												</svg>
 												{req}
@@ -206,7 +206,7 @@ export default function PartnerPage() {
 									<ul className="space-y-2">
 										{type.features.map((feature) => (
 											<li key={feature} className="flex items-start gap-2 text-sm text-[#37353E]/80">
-												<svg className="h-5 w-5 text-[#0ea5e9] mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+												<svg className="h-5 w-5 text-[#5235ff] mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
 												</svg>
 												{feature}
@@ -229,14 +229,14 @@ export default function PartnerPage() {
 							{steps.map((step) => (
 								<div key={step.step} className="relative">
 									<div className="rounded-2xl border border-[#e5e5e5] bg-white p-6 shadow-sm">
-										<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#0ea5e9] text-xl font-bold text-white">
+										<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#5235ff] text-xl font-bold text-white">
 											{step.step}
 										</div>
 										<h3 className="text-xl font-semibold text-[#0b0b0f] mb-2">{step.title}</h3>
 										<p className="text-sm text-[#37353E]/80 leading-relaxed">{step.description}</p>
 									</div>
 									{step.step !== '4' && (
-										<div className="hidden lg:block absolute top-1/2 -right-4 -translate-y-1/2 text-[#0ea5e9]">
+										<div className="hidden lg:block absolute top-1/2 -right-4 -translate-y-1/2 text-[#5235ff]">
 											<svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
 											</svg>
@@ -267,7 +267,7 @@ export default function PartnerPage() {
 										type="text"
 										id="firstName"
 										required
-										className="w-full rounded-xl border border-[#e5e5e5] bg-white px-4 py-3 text-sm text-[#0b0b0f] transition focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/20"
+										className="w-full rounded-xl border border-[#e5e5e5] bg-white px-4 py-3 text-sm text-[#0b0b0f] transition focus:border-[#5235ff] focus:outline-none focus:ring-2 focus:ring-[#5235ff]/20"
 									/>
 								</div>
 								<div>
@@ -278,7 +278,7 @@ export default function PartnerPage() {
 										type="text"
 										id="lastName"
 										required
-										className="w-full rounded-xl border border-[#e5e5e5] bg-white px-4 py-3 text-sm text-[#0b0b0f] transition focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/20"
+										className="w-full rounded-xl border border-[#e5e5e5] bg-white px-4 py-3 text-sm text-[#0b0b0f] transition focus:border-[#5235ff] focus:outline-none focus:ring-2 focus:ring-[#5235ff]/20"
 									/>
 								</div>
 							</div>
@@ -290,7 +290,7 @@ export default function PartnerPage() {
 									type="email"
 									id="email"
 									required
-									className="w-full rounded-xl border border-[#e5e5e5] bg-white px-4 py-3 text-sm text-[#0b0b0f] transition focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/20"
+									className="w-full rounded-xl border border-[#e5e5e5] bg-white px-4 py-3 text-sm text-[#0b0b0f] transition focus:border-[#5235ff] focus:outline-none focus:ring-2 focus:ring-[#5235ff]/20"
 								/>
 							</div>
 							<div>
@@ -300,7 +300,7 @@ export default function PartnerPage() {
 								<select
 									id="partnerType"
 									required
-									className="w-full rounded-xl border border-[#e5e5e5] bg-white px-4 py-3 text-sm text-[#0b0b0f] transition focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/20"
+									className="w-full rounded-xl border border-[#e5e5e5] bg-white px-4 py-3 text-sm text-[#0b0b0f] transition focus:border-[#5235ff] focus:outline-none focus:ring-2 focus:ring-[#5235ff]/20"
 								>
 									<option value="">Select partner type</option>
 									<option value="affiliate">Affiliate Partner</option>
@@ -316,7 +316,7 @@ export default function PartnerPage() {
 									type="url"
 									id="website"
 									placeholder="https://yourwebsite.com"
-									className="w-full rounded-xl border border-[#e5e5e5] bg-white px-4 py-3 text-sm text-[#0b0b0f] transition focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/20"
+									className="w-full rounded-xl border border-[#e5e5e5] bg-white px-4 py-3 text-sm text-[#0b0b0f] transition focus:border-[#5235ff] focus:outline-none focus:ring-2 focus:ring-[#5235ff]/20"
 								/>
 							</div>
 							<div>
@@ -327,13 +327,13 @@ export default function PartnerPage() {
 									id="message"
 									rows={5}
 									required
-									className="w-full rounded-xl border border-[#e5e5e5] bg-white px-4 py-3 text-sm text-[#0b0b0f] transition focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/20 resize-none"
+									className="w-full rounded-xl border border-[#e5e5e5] bg-white px-4 py-3 text-sm text-[#0b0b0f] transition focus:border-[#5235ff] focus:outline-none focus:ring-2 focus:ring-[#5235ff]/20 resize-none"
 									placeholder="Describe your experience, audience, and why you'd like to partner with us..."
 								/>
 							</div>
 							<button
 								type="submit"
-								className="w-full rounded-full bg-[#0ea5e9] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#0891d1]"
+								className="w-full rounded-full bg-[#5235ff] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#452cff]"
 							>
 								Submit Application
 							</button>

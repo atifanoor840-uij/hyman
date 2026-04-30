@@ -7,7 +7,6 @@ import Footer from "./components/Footer";
 import Pricing from "./components/Pricing";
 import PayoutCertificates from "./components/PayoutCertificates";
 import GlobalPresence from "./components/GlobalPresence";
-import PayoutVideos from "./components/PayoutVideos";
 import Community from "./components/Community";
 import WhyGenzProp from "./components/WhyGenzProp";
 import PayoutsPro from "./components/Payouts";
@@ -27,7 +26,6 @@ export default function Home() {
       <LoyaltyPrograms />
       <GlobalPresence />
       <PayoutCertificates />
-      <PayoutVideos />
       <Community />
       <CTA />
       <Footer />

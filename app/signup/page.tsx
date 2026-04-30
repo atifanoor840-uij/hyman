@@ -24,6 +24,7 @@ import {
 	setAuthToken,
 	setUser,
 } from '../../lib/auth-utils';
+import { trackSignup } from '../../components/MetaPixel';
 
 type SignupStep = 'details' | 'verify' | 'complete';
 
@@ -160,6 +161,8 @@ export default function SignupPage() {
 					setUser(response.user, true);
 				}
 			}
+
+			trackSignup();
 
 			setToastType('success');
 			setToastTitle('Account Created!');

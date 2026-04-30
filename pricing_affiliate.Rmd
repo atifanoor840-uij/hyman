@@ -1,0 +1,186 @@
+---
+title: "GenzProp — Pricing & Affiliate (Partner) Account"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    df_print: paged
+  pdf_document:
+    toc: true
+---
+
+## Pricing (Trader Development Program)
+
+**Notes**
+
+- All prices are **USD**.
+- Programs are **skills assessments on simulated accounts**.
+- Key evaluation rules are listed below.
+
+### Core rules / features
+
+```{r}
+features <- data.frame(
+  Feature = c(
+    "Hedging and News Trading is Allowed",
+    "Layering not allowed",
+    "Minimum trading days 5",
+    "Daily drawdown 5%",
+    "Maximum drawdown 8%",
+    "Leverage 1:100"
+  ),
+  Included = c(TRUE, FALSE, TRUE, TRUE, TRUE, TRUE)
+)
+
+knitr::kable(features)
+```
+
+### Pricing tiers and account sizes
+
+```{r}
+pricing <- data.frame(
+  Tier = c(
+    rep("Step 1", 7),
+    rep("Step 2", 7),
+    rep("Instant", 7)
+  ),
+  AccountSizeUSD = c(
+    3000, 5000, 10000, 50000, 100000, 200000, 500000,
+    3000, 5000, 10000, 50000, 100000, 200000, 500000,
+    3000, 5000, 10000, 50000, 100000, 200000, 500000
+  ),
+  DiscountedPriceUSD = c(
+    14, 23, 32, 49, 103, 145, 240,
+    9, 14, 23, 42, 82, 123, 200,
+    29, 38, 50, 91, 180, 323, 900
+  )
+)
+
+pricing$AccountSizeUSD <- format(pricing$AccountSizeUSD, big.mark = ",", scientific = FALSE)
+pricing$RealPriceUSD <- sprintf("%.2f", pricing$DiscountedPriceUSD * 1.65)
+knitr::kable(pricing)
+```
+
+### Available payment methods
+
+```{r}
+payment_methods <- data.frame(
+  Method = c("USDT", "Bitcoin", "Ethereum", "Google Pay", "Apple Pay")
+)
+knitr::kable(payment_methods)
+```
+
+## Affiliate / Partner Account
+
+### Overview
+
+Join the partner program and earn competitive commissions by referring traders to GenzProp.
+
+### Partner benefits
+
+```{r}
+benefits <- data.frame(
+  Benefit = c(
+    "Revenue Sharing",
+    "Marketing Support",
+    "Dedicated Support",
+    "Real-Time Analytics"
+  ),
+  Description = c(
+    "Earn competitive commissions on every trader you refer. The more traders you bring, the more you earn.",
+    "Access to professional marketing materials, banners, and promotional content to help you succeed.",
+    "Get dedicated partner support to help you maximize your earnings and grow your business.",
+    "Track your referrals, commissions, and performance with a comprehensive partner dashboard."
+  )
+)
+
+knitr::kable(benefits)
+```
+
+### Partner types (affiliate accounts)
+
+```{r}
+partner_types <- data.frame(
+  PartnerType = c("Affiliate Partner", "IB Partner", "Institutional Partner"),
+  Commission = c("Up to 20%", "Up to 30%", "Custom"),
+  Description = c(
+    "Perfect for content creators, bloggers, and marketers who want to earn commissions by referring traders.",
+    "Ideal for experienced traders and trading communities who can provide value-added services to their clients.",
+    "For businesses, trading schools, and institutions looking to offer funding programs to their clients."
+  )
+)
+
+knitr::kable(partner_types)
+```
+
+#### Requirements by partner type
+
+```{r}
+requirements <- data.frame(
+  PartnerType = c(
+    rep("Affiliate Partner", 3),
+    rep("IB Partner", 4),
+    rep("Institutional Partner", 3)
+  ),
+  Requirement = c(
+    "Active website or social media",
+    "Minimum 1,000 followers",
+    "Relevant audience",
+    "Trading experience",
+    "Client base",
+    "Educational resources",
+    "Support capabilities",
+    "Business registration",
+    "Established presence",
+    "Volume commitments"
+  )
+)
+
+knitr::kable(requirements)
+```
+
+#### Features by partner type
+
+```{r}
+partner_features <- data.frame(
+  PartnerType = c(
+    rep("Affiliate Partner", 4),
+    rep("IB Partner", 4),
+    rep("Institutional Partner", 4)
+  ),
+  Feature = c(
+    "Marketing materials",
+    "Tracking links",
+    "Monthly payouts",
+    "Performance dashboard",
+    "Higher commissions",
+    "White-label options",
+    "Dedicated manager",
+    "Custom solutions",
+    "Custom commission structure",
+    "API integration",
+    "Priority support",
+    "Co-marketing opportunities"
+  )
+)
+
+knitr::kable(partner_features)
+```
+
+### How it works (steps)
+
+```{r}
+steps <- data.frame(
+  Step = c(1, 2, 3, 4),
+  Title = c("Apply", "Review", "Onboarding", "Start Earning"),
+  Description = c(
+    "Fill out the partner application form with your details and business information.",
+    "The team reviews your application and gets back to you within 48 hours.",
+    "Get access to your partner dashboard, marketing materials, and tracking tools.",
+    "Begin referring traders and earning commissions. Payouts are processed monthly."
+  )
+)
+
+knitr::kable(steps)
+```
+

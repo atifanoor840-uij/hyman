@@ -71,7 +71,7 @@ export default function LoginPage() {
 			setToastMessage('Login successful. Taking you to your trading dashboard...');
 
 			setTimeout(() => {
-				router.push('/dashboard');
+				router.push('/dashboard/overview');
 			}, 2000);
 		} catch (error) {
 			setIsLoading(false);

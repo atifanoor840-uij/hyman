@@ -9,7 +9,7 @@ const helpCategories = [
     icon: BookOpen,
     title: "Documentation",
     description: "Browse our comprehensive guides and tutorials",
-    color: "bg-blue-500",
+    color: "bg-purple-600",
   },
   { icon: Video, title: "Video Tutorials", description: "Watch step-by-step video guides", color: "bg-purple-500" },
   {

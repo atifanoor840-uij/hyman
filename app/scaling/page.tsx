@@ -136,7 +136,7 @@ export default function ScalingPage() {
 			<main className="bg-white">
 				{/* Hero Section */}
 				<section className="mx-auto max-w-7xl px-6 py-16 md:px-10 md:py-24">
-					<div className="rounded-2xl border border-[#e5e5e5] bg-gradient-to-br from-[#f0f9ff] to-white p-12 text-center">
+					<div className="rounded-2xl border border-[#e5e5e5] bg-gradient-to-br from-[#f5f3ff] to-white p-12 text-center">
 						<div className="mb-6 flex justify-center">
 							<StarRating stars={5} />
 						</div>
@@ -149,17 +149,17 @@ export default function ScalingPage() {
 						</p>
 						<div className="flex flex-wrap items-center justify-center gap-6">
 							<div className="text-center">
-								<div className={`${display.className} text-3xl font-bold text-[#0ea5e9]`}>90%</div>
+								<div className={`${display.className} text-3xl font-bold text-[#5235ff]`}>90%</div>
 								<div className="text-sm text-[#37353E]/70">Maximum Profit Share</div>
 							</div>
 							<div className="h-12 w-px bg-[#e5e5e5]"></div>
 							<div className="text-center">
-								<div className={`${display.className} text-3xl font-bold text-[#0ea5e9]`}>5</div>
+								<div className={`${display.className} text-3xl font-bold text-[#5235ff]`}>5</div>
 								<div className="text-sm text-[#37353E]/70">Scaling Levels</div>
 							</div>
 							<div className="h-12 w-px bg-[#e5e5e5]"></div>
 							<div className="text-center">
-								<div className={`${display.className} text-3xl font-bold text-[#0ea5e9]`}>100+</div>
+								<div className={`${display.className} text-3xl font-bold text-[#5235ff]`}>100+</div>
 								<div className="text-sm text-[#37353E]/70">Payouts to Max Level</div>
 							</div>
 						</div>
@@ -184,7 +184,7 @@ export default function ScalingPage() {
 								>
 									<div className="grid gap-8 lg:grid-cols-12">
 										{/* Left: Level Info */}
-										<div className="lg:col-span-4 bg-gradient-to-br from-[#f0f9ff] to-white p-8">
+										<div className="lg:col-span-4 bg-gradient-to-br from-[#f5f3ff] to-white p-8">
 											<div className="mb-4">
 												<StarRating stars={tier.stars} />
 											</div>
@@ -192,7 +192,7 @@ export default function ScalingPage() {
 												{tier.level}
 											</h3>
 											<p className="text-sm text-[#37353E]/70 mb-4">{tier.accountSize}</p>
-											<div className="rounded-full bg-[#0ea5e9] px-6 py-3 text-center">
+											<div className="rounded-full bg-[#5235ff] px-6 py-3 text-center">
 												<div className={`${display.className} text-3xl font-bold text-white`}>
 													{tier.profitShare}
 												</div>
@@ -205,7 +205,7 @@ export default function ScalingPage() {
 											<div className="grid gap-8 md:grid-cols-2">
 												<div>
 													<h4 className="font-semibold text-[#0b0b0f] mb-4 flex items-center gap-2">
-														<svg className="h-5 w-5 text-[#0ea5e9]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+														<svg className="h-5 w-5 text-[#5235ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 															<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
 														</svg>
 														Requirements
@@ -213,7 +213,7 @@ export default function ScalingPage() {
 													<ul className="space-y-2">
 														{tier.requirements.map((req) => (
 															<li key={req} className="flex items-start gap-2 text-sm text-[#37353E]/80">
-																<span className="text-[#0ea5e9] mt-0.5">•</span>
+																<span className="text-[#5235ff] mt-0.5">•</span>
 																{req}
 															</li>
 														))}
@@ -221,7 +221,7 @@ export default function ScalingPage() {
 												</div>
 												<div>
 													<h4 className="font-semibold text-[#0b0b0f] mb-4 flex items-center gap-2">
-														<svg className="h-5 w-5 text-[#0ea5e9]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+														<svg className="h-5 w-5 text-[#5235ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 															<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
 														</svg>
 														Benefits
@@ -229,7 +229,7 @@ export default function ScalingPage() {
 													<ul className="space-y-2">
 														{tier.benefits.map((benefit) => (
 															<li key={benefit} className="flex items-start gap-2 text-sm text-[#37353E]/80">
-																<span className="text-[#0ea5e9] mt-0.5">✓</span>
+																<span className="text-[#5235ff] mt-0.5">✓</span>
 																{benefit}
 															</li>
 														))}
@@ -251,14 +251,14 @@ export default function ScalingPage() {
 					</h2>
 					<div className="relative">
 						{/* Progress Line */}
-						<div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#0ea5e9] via-[#0ea5e9] to-yellow-400 hidden md:block"></div>
+						<div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#5235ff] via-[#5235ff] to-yellow-400 hidden md:block"></div>
 						
 						<div className="space-y-8">
 							{milestones.map((milestone, index) => (
 								<div key={milestone.milestone} className="relative flex gap-6">
 									{/* Icon */}
 									<div className="flex-shrink-0">
-										<div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#0ea5e9] to-[#0891d1] text-white shadow-lg">
+										<div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#5235ff] to-[#452cff] text-white shadow-lg">
 											{index === milestones.length - 1 ? (
 												<StarRating stars={5} />
 											) : (
@@ -271,7 +271,7 @@ export default function ScalingPage() {
 									<div className="flex-1 rounded-2xl border border-[#e5e5e5] bg-white p-6 shadow-sm">
 										<div className="mb-2 flex items-center justify-between">
 											<h3 className="text-xl font-semibold text-[#0b0b0f]">{milestone.milestone}</h3>
-											<span className="rounded-full bg-[#f0f9ff] px-4 py-1 text-sm font-bold text-[#0ea5e9]">
+											<span className="rounded-full bg-[#f5f3ff] px-4 py-1 text-sm font-bold text-[#5235ff]">
 												{milestone.reward}
 											</span>
 										</div>
@@ -317,7 +317,7 @@ export default function ScalingPage() {
 
 				{/* CTA */}
 				<section className="mx-auto max-w-7xl px-6 py-16 md:px-10 md:py-24">
-					<div className="rounded-2xl border border-[#e5e5e5] bg-gradient-to-br from-[#f0f9ff] to-white p-12 text-center">
+					<div className="rounded-2xl border border-[#e5e5e5] bg-gradient-to-br from-[#f5f3ff] to-white p-12 text-center">
 						<div className="mb-6 flex justify-center">
 							<StarRating stars={5} />
 						</div>
@@ -329,7 +329,7 @@ export default function ScalingPage() {
 						</p>
 						<a
 							href="/signup"
-							className="inline-block rounded-full bg-[#0ea5e9] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#0891d1]"
+							className="inline-block rounded-full bg-[#5235ff] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#452cff]"
 						>
 							Get Started
 						</a>

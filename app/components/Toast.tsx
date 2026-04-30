@@ -41,21 +41,21 @@ export default function Toast({
 	const getIcon = () => {
 		if (isSuccess) return <CheckCircle2 className="h-6 w-6 text-emerald-600" />;
 		if (isError) return <AlertCircle className="h-6 w-6 text-red-600" />;
-		if (isLoading) return <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />;
-		return <Info className="h-6 w-6 text-blue-600" />;
+		if (isLoading) return <Loader2 className="h-6 w-6 text-purple-600 animate-spin" />;
+		return <Info className="h-6 w-6 text-purple-600" />;
 	};
 
 	const getStyles = () => {
 		if (isSuccess) return 'border-emerald-500/40 bg-white shadow-emerald-500/20';
 		if (isError) return 'border-red-500/40 bg-white shadow-red-500/20';
-		if (isLoading) return 'border-blue-500/40 bg-white shadow-blue-500/20';
-		return 'border-blue-500/40 bg-white shadow-blue-500/20';
+		if (isLoading) return 'border-purple-500/40 bg-white shadow-purple-500/20';
+		return 'border-purple-500/40 bg-white shadow-purple-500/20';
 	};
 
 	const getProgressBarColor = () => {
 		if (isSuccess) return 'bg-emerald-500';
 		if (isError) return 'bg-red-500';
-		return 'bg-blue-500';
+		return 'bg-purple-600';
 	};
 
 	return (
@@ -72,7 +72,7 @@ export default function Toast({
 				<div className="flex-1 min-w-0">
 					{title && (
 						<h4 className={`text-sm font-bold mb-1 ${
-							isSuccess ? 'text-emerald-900' : isError ? 'text-red-900' : 'text-blue-900'
+							isSuccess ? 'text-emerald-900' : isError ? 'text-red-900' : 'text-purple-900'
 						}`}>
 							{title}
 						</h4>

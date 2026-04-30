@@ -133,30 +133,30 @@ export default function SupportPage() {
 					<div className="mb-16 grid gap-4 md:grid-cols-3">
 						<a
 							href="/contact"
-							className="group rounded-2xl border border-[#e5e5e5] bg-white p-6 shadow-sm transition-all hover:border-[#0ea5e9] hover:shadow-lg"
+							className="group rounded-2xl border border-[#e5e5e5] bg-white p-6 shadow-sm transition-all hover:border-[#5235ff] hover:shadow-lg"
 						>
 							<div className="mb-4 text-4xl">💬</div>
-							<h3 className="font-semibold text-[#0b0b0f] mb-2 group-hover:text-[#0ea5e9] transition-colors">
+							<h3 className="font-semibold text-[#0b0b0f] mb-2 group-hover:text-[#5235ff] transition-colors">
 								Live Chat
 							</h3>
 							<p className="text-sm text-[#37353E]/80">Get instant help from our support team</p>
 						</a>
 						<a
 							href="/contact"
-							className="group rounded-2xl border border-[#e5e5e5] bg-white p-6 shadow-sm transition-all hover:border-[#0ea5e9] hover:shadow-lg"
+							className="group rounded-2xl border border-[#e5e5e5] bg-white p-6 shadow-sm transition-all hover:border-[#5235ff] hover:shadow-lg"
 						>
 							<div className="mb-4 text-4xl">📧</div>
-							<h3 className="font-semibold text-[#0b0b0f] mb-2 group-hover:text-[#0ea5e9] transition-colors">
+							<h3 className="font-semibold text-[#0b0b0f] mb-2 group-hover:text-[#5235ff] transition-colors">
 								Email Support
 							</h3>
 							<p className="text-sm text-[#37353E]/80">Send us a detailed message</p>
 						</a>
 						<a
 							href="/faq"
-							className="group rounded-2xl border border-[#e5e5e5] bg-white p-6 shadow-sm transition-all hover:border-[#0ea5e9] hover:shadow-lg"
+							className="group rounded-2xl border border-[#e5e5e5] bg-white p-6 shadow-sm transition-all hover:border-[#5235ff] hover:shadow-lg"
 						>
 							<div className="mb-4 text-4xl">❓</div>
-							<h3 className="font-semibold text-[#0b0b0f] mb-2 group-hover:text-[#0ea5e9] transition-colors">
+							<h3 className="font-semibold text-[#0b0b0f] mb-2 group-hover:text-[#5235ff] transition-colors">
 								FAQ
 							</h3>
 							<p className="text-sm text-[#37353E]/80">Browse frequently asked questions</p>
@@ -181,7 +181,7 @@ export default function SupportPage() {
 											<li key={article}>
 												<a
 													href="#"
-													className="text-sm text-[#0ea5e9] hover:underline flex items-center gap-2"
+													className="text-sm text-[#5235ff] hover:underline flex items-center gap-2"
 												>
 													<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 														<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -212,7 +212,7 @@ export default function SupportPage() {
 					</div>
 
 					{/* Contact CTA */}
-					<div className="rounded-2xl border border-[#e5e5e5] bg-gradient-to-br from-[#f0f9ff] to-white p-8 text-center">
+					<div className="rounded-2xl border border-[#e5e5e5] bg-gradient-to-br from-[#f5f3ff] to-white p-8 text-center">
 						<h2 className={`${display.className} text-2xl font-semibold text-[#0b0b0f] mb-4`}>
 							Still Need Help?
 						</h2>
@@ -221,7 +221,7 @@ export default function SupportPage() {
 						</p>
 						<a
 							href="/contact"
-							className="inline-block rounded-full bg-[#0ea5e9] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#0891d1]"
+							className="inline-block rounded-full bg-[#5235ff] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#452cff]"
 						>
 							Contact Support
 						</a>

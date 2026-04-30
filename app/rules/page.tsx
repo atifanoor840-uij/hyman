@@ -47,18 +47,18 @@ function RulesArticleCard({
 	return (
 		<Link
 			href={href}
-			className="group flex items-center gap-5 rounded-xl border border-[#e5e7eb] bg-white px-5 py-5 shadow-sm transition hover:border-sky-200 hover:shadow-md sm:gap-6 sm:px-6 sm:py-6"
+			className="group flex items-center gap-5 rounded-xl border border-[#e5e7eb] bg-white px-5 py-5 shadow-sm transition hover:border-purple-200 hover:shadow-md sm:gap-6 sm:px-6 sm:py-6"
 		>
 			<div className="flex h-14 w-14 shrink-0 items-center justify-center sm:h-16 sm:w-16" aria-hidden>
 				<Folder
-					className="h-12 w-12 text-sky-500 sm:h-14 sm:w-14"
+					className="h-12 w-12 text-purple-600 sm:h-14 sm:w-14"
 					strokeWidth={1.35}
 					fill="none"
 				/>
 			</div>
 			<div className="min-w-0 flex-1">
 				<h3 className="text-base font-bold leading-snug tracking-tight text-[#0f172a] sm:text-lg">
-					<span className="transition group-hover:text-sky-600">{title}</span>
+					<span className="transition group-hover:text-purple-600">{title}</span>
 				</h3>
 				<p className="mt-1 text-sm text-[#9ca3af]">{articleLabel}</p>
 			</div>

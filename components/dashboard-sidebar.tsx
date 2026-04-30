@@ -251,7 +251,7 @@ export default function DashboardSidebar({ onClose }: DashboardSidebarProps) {
                           >
                             <item.icon className="w-5 h-5" />
                             <span className="text-sm">{item.name}</span>
-                            <span className="ml-auto inline-flex items-center rounded-md bg-blue-400 px-2 py-0.5 text-xs font-medium text-gray-900">
+                            <span className="ml-auto inline-flex items-center rounded-md bg-purple-400 px-2 py-0.5 text-xs font-medium text-gray-900">
                               Checking...
                             </span>
                           </div>

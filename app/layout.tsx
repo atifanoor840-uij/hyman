@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import MetaPixel from "@/components/MetaPixel";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,12 +49,25 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const metaPixelId =
+    process.env.NEXT_PUBLIC_META_PIXEL_ID?.trim() || "944876151762415";
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${plusJakarta.variable} antialiased`}
       >
         {children}
+        <MetaPixel pixelId={metaPixelId} />
+        <noscript>
+          <img
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            src={`https://www.facebook.com/tr?id=${metaPixelId}&ev=PageView&noscript=1`}
+            alt=""
+          />
+        </noscript>
         <Script
           id="chatway"
           src="https://cdn.chatway.app/widget.js?id=Hwp2KLWVNhLU"

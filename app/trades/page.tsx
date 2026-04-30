@@ -23,7 +23,7 @@ export default function TradesPage() {
 					<div className="flex items-center gap-3">
 						<Link
 							href="/dashboard"
-							className="inline-flex items-center gap-2 rounded-full border border-[#e5e5e5] bg-white px-3 py-1.5 text-xs font-medium text-[#0b0b0f] hover:border-[#0ea5e9] hover:text-[#0ea5e9]"
+							className="inline-flex items-center gap-2 rounded-full border border-[#e5e5e5] bg-white px-3 py-1.5 text-xs font-medium text-[#0b0b0f] hover:border-[#5235ff] hover:text-[#5235ff]"
 						>
 							<ArrowLeft className="h-3.5 w-3.5" />
 							Back to dashboard
@@ -49,7 +49,7 @@ export default function TradesPage() {
 							<button className="inline-flex items-center gap-2 rounded-full bg-[#0b0b0f] px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-[#020617]">
 								Export history
 							</button>
-							<button className="inline-flex items-center gap-2 rounded-full border border-[#e5e5e5] bg-white px-4 py-2 text-xs font-semibold text-[#0b0b0f] hover:border-[#0ea5e9] hover:text-[#0ea5e9]">
+							<button className="inline-flex items-center gap-2 rounded-full border border-[#e5e5e5] bg-white px-4 py-2 text-xs font-semibold text-[#0b0b0f] hover:border-[#5235ff] hover:text-[#5235ff]">
 								Filter trades
 							</button>
 						</div>

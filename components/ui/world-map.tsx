@@ -24,7 +24,7 @@ interface MapProps {
   markers?: Marker[]
 }
 
-export default function WorldMap({ dots = [], lineColor = "#0ea5e9", markers = [] }: MapProps) {
+export default function WorldMap({ dots = [], lineColor = "#5235ff", markers = [] }: MapProps) {
   const svgRef = useRef<SVGSVGElement>(null)
   const { theme } = useTheme()
   const map = new DottedMap({ height: 120, grid: "vertical" })
@@ -129,7 +129,7 @@ export default function WorldMap({ dots = [], lineColor = "#0ea5e9", markers = [
                   draggable={false}
                 />
               ) : (
-                <div className="h-5 w-7 rounded bg-cyan-500 text-white text-[8px] flex items-center justify-center font-semibold">{m.code ?? "•"}</div>
+                <div className="h-5 w-7 rounded bg-purple-600 text-white text-[8px] flex items-center justify-center font-semibold">{m.code ?? "•"}</div>
               )}
             </div>
           </div>

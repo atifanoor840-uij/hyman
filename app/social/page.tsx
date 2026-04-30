@@ -141,14 +141,14 @@ export default function SocialPage() {
 								href={social.url}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="group rounded-2xl border border-[#e5e5e5] bg-white p-6 shadow-sm transition-all hover:border-[#0ea5e9] hover:shadow-lg"
+								className="group rounded-2xl border border-[#e5e5e5] bg-white p-6 shadow-sm transition-all hover:border-[#5235ff] hover:shadow-lg"
 							>
 								<div className="mb-4 flex items-center gap-4">
-									<div className="flex-shrink-0 rounded-full bg-[#f0f9ff] p-3 text-[#0ea5e9] group-hover:bg-[#0ea5e9] group-hover:text-white transition-colors">
+									<div className="flex-shrink-0 rounded-full bg-[#f5f3ff] p-3 text-[#5235ff] group-hover:bg-[#5235ff] group-hover:text-white transition-colors">
 										{social.icon}
 									</div>
 									<div>
-										<h3 className="font-semibold text-[#0b0b0f] group-hover:text-[#0ea5e9] transition-colors">
+										<h3 className="font-semibold text-[#0b0b0f] group-hover:text-[#5235ff] transition-colors">
 											{social.name}
 										</h3>
 										<p className="text-sm text-[#37353E]/70">{social.handle}</p>
@@ -156,8 +156,8 @@ export default function SocialPage() {
 								</div>
 								<p className="text-sm text-[#37353E]/80 mb-3">{social.description}</p>
 								<div className="flex items-center justify-between">
-									<span className="text-xs font-semibold text-[#0ea5e9]">{social.followers} followers</span>
-									<svg className="h-4 w-4 text-[#37353E]/40 group-hover:text-[#0ea5e9] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<span className="text-xs font-semibold text-[#5235ff]">{social.followers} followers</span>
+									<svg className="h-4 w-4 text-[#37353E]/40 group-hover:text-[#5235ff] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
 									</svg>
 								</div>
@@ -165,7 +165,7 @@ export default function SocialPage() {
 						))}
 					</div>
 
-					<div className="mt-16 rounded-2xl border border-[#e5e5e5] bg-gradient-to-br from-[#f0f9ff] to-white p-8 text-center">
+					<div className="mt-16 rounded-2xl border border-[#e5e5e5] bg-gradient-to-br from-[#f5f3ff] to-white p-8 text-center">
 						<h2 className={`${display.className} text-2xl font-semibold text-[#0b0b0f] mb-4`}>
 							Stay Connected
 						</h2>
@@ -179,7 +179,7 @@ export default function SocialPage() {
 									href={social.url}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="inline-flex items-center gap-2 rounded-full border border-[#0ea5e9]/20 bg-white px-4 py-2 text-sm font-semibold text-[#0ea5e9] transition hover:bg-[#0ea5e9] hover:text-white"
+									className="inline-flex items-center gap-2 rounded-full border border-[#5235ff]/20 bg-white px-4 py-2 text-sm font-semibold text-[#5235ff] transition hover:bg-[#5235ff] hover:text-white"
 								>
 									<div className="h-4 w-4">{social.icon}</div>
 									Follow on {social.name}

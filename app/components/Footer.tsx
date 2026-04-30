@@ -42,7 +42,7 @@ export default function Footer() {
 							Professional trading funding platform. Trade across multiple platforms with transparent rules, competitive pricing, and lightning-fast payouts.
 						</p>
 						<div className="flex flex-wrap items-center gap-3 mb-6">
-							<a href="/pricing" className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/30">
+							<a href="/pricing" className="inline-flex items-center justify-center rounded-lg bg-purple-600 px-6 py-3 text-sm font-semibold text-white hover:bg-purple-700 transition-colors shadow-lg shadow-purple-600/30">
 								Get Funded
 							</a>
 						</div>
@@ -186,7 +186,7 @@ function SocialLink({ href, label, icon }: { href: string; label: string; icon: 
 		<a
 			href={href}
 			aria-label={label}
-			className="group inline-flex h-12 w-12 items-center justify-center rounded-lg border-2 border-gray-700 bg-gray-800/50 text-gray-400 transition-all hover:border-blue-500 hover:bg-blue-500/10 hover:text-blue-400 hover:scale-110"
+			className="group inline-flex h-12 w-12 items-center justify-center rounded-lg border-2 border-gray-700 bg-gray-800/50 text-gray-400 transition-all hover:border-purple-500 hover:bg-purple-500/10 hover:text-purple-400 hover:scale-110"
 		>
 			{icon}
 		</a>

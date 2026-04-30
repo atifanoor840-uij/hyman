@@ -216,8 +216,8 @@ function VerifyEmailContent() {
 						</Link>
 
 						<div className="max-w-md">
-							<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600/20 mb-6">
-								<Mail className="h-8 w-8 text-blue-400" />
+							<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-purple-600/20 mb-6">
+								<Mail className="h-8 w-8 text-purple-400" />
 							</div>
 							
 							<h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
@@ -232,7 +232,7 @@ function VerifyEmailContent() {
 
 							<div className="mt-10 space-y-4">
 								<div className="flex items-start gap-3">
-									<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600/20 text-blue-400 flex-shrink-0">
+									<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-600/20 text-purple-400 flex-shrink-0">
 										<CheckCircle2 className="h-5 w-5" />
 									</div>
 									<div>
@@ -242,7 +242,7 @@ function VerifyEmailContent() {
 								</div>
 
 								<div className="flex items-start gap-3">
-									<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600/20 text-blue-400 flex-shrink-0">
+									<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-600/20 text-purple-400 flex-shrink-0">
 										<CheckCircle2 className="h-5 w-5" />
 									</div>
 									<div>
@@ -252,7 +252,7 @@ function VerifyEmailContent() {
 								</div>
 
 								<div className="flex items-start gap-3">
-									<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600/20 text-blue-400 flex-shrink-0">
+									<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-600/20 text-purple-400 flex-shrink-0">
 										<CheckCircle2 className="h-5 w-5" />
 									</div>
 									<div>
@@ -447,8 +447,8 @@ function VerifyEmailPageSkeleton() {
 							</span>
 						</Link>
 						<div className="max-w-md">
-							<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600/20 mb-6">
-								<Mail className="h-8 w-8 text-blue-400" />
+							<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-purple-600/20 mb-6">
+								<Mail className="h-8 w-8 text-purple-400" />
 							</div>
 							<div className="h-8 w-3/4 bg-gray-700 rounded animate-pulse mb-4"></div>
 							<div className="h-4 w-full bg-gray-700 rounded animate-pulse mb-2"></div>

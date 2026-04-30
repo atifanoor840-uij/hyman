@@ -80,6 +80,14 @@ function usd(n: number) {
   return `$${n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
 }
 
+function usd2(n: number) {
+  return `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+}
+
+function realPriceFromDiscounted(discounted: number) {
+  return Number((discounted * 1.65).toFixed(2))
+}
+
 function buildFeatures(accountTypeId: string, sizes: Array<{ id: string; value: number }>): FeatureRow[] {
   const profitTarget1 = accountTypeId === "beta" ? "8%" : accountTypeId === "sigma" ? "—" : "8%"
   const profitTarget2 = accountTypeId === "beta" ? "5%" : accountTypeId === "sigma" ? "—" : "5%"
@@ -110,33 +118,33 @@ function buildFeatures(accountTypeId: string, sizes: Array<{ id: string; value: 
 }
 
 // Pricing per account type
-const pricingByType: Record<string, Record<string, { original: string; amount: number }>> = {
+const pricingByType: Record<string, Record<string, { amount: number }>> = {
   alpha: {
-    "3k": { original: "$14", amount: 14 },
-    "5k": { original: "$23", amount: 23 },
-    "10k": { original: "$32", amount: 32 },
-    "50k": { original: "$49", amount: 49 },
-    "100k": { original: "$103", amount: 103 },
-    "200k": { original: "$145", amount: 145 },
-    "500k": { original: "$240", amount: 240 },
+    "3k": { amount: 14 },
+    "5k": { amount: 23 },
+    "10k": { amount: 32 },
+    "50k": { amount: 49 },
+    "100k": { amount: 103 },
+    "200k": { amount: 145 },
+    "500k": { amount: 240 },
   },
   beta: {
-    "3k": { original: "$9", amount: 9 },
-    "5k": { original: "$14", amount: 14 },
-    "10k": { original: "$23", amount: 23 },
-    "50k": { original: "$42", amount: 42 },
-    "100k": { original: "$82", amount: 82 },
-    "200k": { original: "$123", amount: 123 },
-    "500k": { original: "$200", amount: 200 },
+    "3k": { amount: 9 },
+    "5k": { amount: 14 },
+    "10k": { amount: 23 },
+    "50k": { amount: 42 },
+    "100k": { amount: 82 },
+    "200k": { amount: 123 },
+    "500k": { amount: 200 },
   },
   sigma: {
-    "3k": { original: "$29", amount: 29 },
-    "5k": { original: "$38", amount: 38 },
-    "10k": { original: "$50", amount: 50 },
-    "50k": { original: "$91", amount: 91 },
-    "100k": { original: "$180", amount: 180 },
-    "200k": { original: "$323", amount: 323 },
-    "500k": { original: "$900", amount: 900 },
+    "3k": { amount: 29 },
+    "5k": { amount: 38 },
+    "10k": { amount: 50 },
+    "50k": { amount: 91 },
+    "100k": { amount: 180 },
+    "200k": { amount: 323 },
+    "500k": { amount: 900 },
   },
 }
 
@@ -367,6 +375,8 @@ export function BuysContent() {
                   <td className="py-5 px-6"></td>
                   {accountSizes.map((size) => {
                     const price = pricing[size.id]
+                    const discounted = price?.amount ?? 0
+                    const real = realPriceFromDiscounted(discounted)
                     return (
                       <td key={size.id} className="py-5 px-4 text-center">
                         <div className="space-y-2">
@@ -378,11 +388,14 @@ export function BuysContent() {
                           </Button>
                           <div className="text-xs">
                             <span className="text-muted-foreground line-through mr-1">
-                              {price?.original}
+                              {usd2(real)}
                             </span>
                             <span className="font-semibold text-foreground">
-                              ${price?.amount}
+                              {usd2(discounted)}
                             </span>
+                            <div className="mt-0.5 text-[10px] text-muted-foreground">
+                              Discounted / Real (+65%)
+                            </div>
                           </div>
                         </div>
                       </td>
@@ -615,10 +628,18 @@ export function BuysContent() {
                   <p className="text-sm font-semibold text-foreground">Order Summary</p>
                 </div>
                 <div className="rounded-xl border border-border/60 bg-muted/20 p-4 space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Real Price (+65%)</span>
+                      <span className="font-medium text-muted-foreground line-through">
+                        {selectedSize && pricing[selectedSize]
+                          ? usd2(realPriceFromDiscounted(pricing[selectedSize].amount))
+                          : "$0.00"}
+                      </span>
+                    </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Base Fee</span>
+                      <span className="text-muted-foreground">Discounted Price</span>
                     <span className="font-medium text-foreground">
-                      ${selectedSize && pricing[selectedSize] ? pricing[selectedSize].amount.toFixed(2) : "0.00"}
+                        ${selectedSize && pricing[selectedSize] ? pricing[selectedSize].amount.toFixed(2) : "0.00"}
                     </span>
                   </div>
                   <div className="h-px bg-border/60" />

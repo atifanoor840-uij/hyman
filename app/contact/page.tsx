@@ -89,14 +89,14 @@ export default function ContactPage() {
 
 							<div className="space-y-6">
 								<div className="flex items-start gap-4">
-									<div className="flex-shrink-0 rounded-full bg-[#f0f9ff] p-3">
-										<svg className="h-6 w-6 text-[#0ea5e9]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<div className="flex-shrink-0 rounded-full bg-[#f5f3ff] p-3">
+										<svg className="h-6 w-6 text-[#5235ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
 										</svg>
 									</div>
 									<div>
 										<h3 className="font-semibold text-[#0b0b0f] mb-1">Email</h3>
-										<a href="mailto:support@GenzProp.com" className="text-[#0ea5e9] hover:underline">
+										<a href="mailto:support@GenzProp.com" className="text-[#5235ff] hover:underline">
 											support@GenzProp.com
 										</a>
 										<p className="text-sm text-[#37353E]/70 mt-1">We respond within 24 hours</p>
@@ -104,8 +104,8 @@ export default function ContactPage() {
 								</div>
 
 								<div className="flex items-start gap-4">
-									<div className="flex-shrink-0 rounded-full bg-[#f0f9ff] p-3">
-										<svg className="h-6 w-6 text-[#0ea5e9]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<div className="flex-shrink-0 rounded-full bg-[#f5f3ff] p-3">
+										<svg className="h-6 w-6 text-[#5235ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
 										</svg>
 									</div>
@@ -117,8 +117,8 @@ export default function ContactPage() {
 								</div>
 
 								<div className="flex items-start gap-4">
-									<div className="flex-shrink-0 rounded-full bg-[#f0f9ff] p-3">
-										<svg className="h-6 w-6 text-[#0ea5e9]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<div className="flex-shrink-0 rounded-full bg-[#f5f3ff] p-3">
+										<svg className="h-6 w-6 text-[#5235ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
 										</svg>
 									</div>
@@ -155,7 +155,7 @@ export default function ContactPage() {
 										value={formData.name}
 										onChange={handleChange}
 										required
-										className="w-full rounded-xl border border-[#e5e5e5] bg-white px-4 py-3 text-sm text-[#0b0b0f] transition focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/20"
+										className="w-full rounded-xl border border-[#e5e5e5] bg-white px-4 py-3 text-sm text-[#0b0b0f] transition focus:border-[#5235ff] focus:outline-none focus:ring-2 focus:ring-[#5235ff]/20"
 										placeholder="John Doe"
 									/>
 								</div>
@@ -171,7 +171,7 @@ export default function ContactPage() {
 										value={formData.email}
 										onChange={handleChange}
 										required
-										className="w-full rounded-xl border border-[#e5e5e5] bg-white px-4 py-3 text-sm text-[#0b0b0f] transition focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/20"
+										className="w-full rounded-xl border border-[#e5e5e5] bg-white px-4 py-3 text-sm text-[#0b0b0f] transition focus:border-[#5235ff] focus:outline-none focus:ring-2 focus:ring-[#5235ff]/20"
 										placeholder="john@example.com"
 									/>
 								</div>
@@ -186,7 +186,7 @@ export default function ContactPage() {
 										value={formData.subject}
 										onChange={handleChange}
 										required
-										className="w-full rounded-xl border border-[#e5e5e5] bg-white px-4 py-3 text-sm text-[#0b0b0f] transition focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/20"
+										className="w-full rounded-xl border border-[#e5e5e5] bg-white px-4 py-3 text-sm text-[#0b0b0f] transition focus:border-[#5235ff] focus:outline-none focus:ring-2 focus:ring-[#5235ff]/20"
 									>
 										<option value="">Select a subject</option>
 										<option value="general">General Inquiry</option>
@@ -209,7 +209,7 @@ export default function ContactPage() {
 										onChange={handleChange}
 										required
 										rows={6}
-										className="w-full rounded-xl border border-[#e5e5e5] bg-white px-4 py-3 text-sm text-[#0b0b0f] transition focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/20 resize-none"
+										className="w-full rounded-xl border border-[#e5e5e5] bg-white px-4 py-3 text-sm text-[#0b0b0f] transition focus:border-[#5235ff] focus:outline-none focus:ring-2 focus:ring-[#5235ff]/20 resize-none"
 										placeholder="Tell us how we can help..."
 									/>
 								</div>
@@ -229,7 +229,7 @@ export default function ContactPage() {
 								<button
 									type="submit"
 									disabled={status === 'loading'}
-									className="w-full rounded-full bg-[#0ea5e9] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#0891d1] disabled:cursor-not-allowed disabled:opacity-60"
+									className="w-full rounded-full bg-[#5235ff] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#452cff] disabled:cursor-not-allowed disabled:opacity-60"
 								>
 									{status === 'loading' ? (
 										<span className="flex items-center justify-center gap-2">

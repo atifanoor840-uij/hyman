@@ -40,7 +40,7 @@ export default async function HelpArticlePage({ params }: Props) {
 				/>
 
 				<article className="mt-8 overflow-hidden rounded-xl border border-[#e8ecf1] bg-white shadow-sm">
-					<div className="border-l-[6px] border-l-sky-500 px-6 py-8 sm:px-8 sm:py-10">
+					<div className="border-l-[6px] border-l-purple-600 px-6 py-8 sm:px-8 sm:py-10">
 						<h1 className="text-2xl font-bold tracking-tight text-[#0b0b0f] sm:text-3xl">{article.title}</h1>
 						<div className="my-6 border-t border-[#eef1f5]" />
 						<HelpArticleBody body={article.body} />
@@ -50,7 +50,7 @@ export default async function HelpArticlePage({ params }: Props) {
 				<p className="mt-10">
 					<Link
 						href={`/rules/help/${category.slug}`}
-						className="inline-flex items-center gap-1.5 text-sm font-medium text-[#6b7280] transition hover:text-[#0ea5e9]"
+						className="inline-flex items-center gap-1.5 text-sm font-medium text-[#6b7280] transition hover:text-[#5235ff]"
 					>
 						<span aria-hidden>←</span> Back to categories
 					</Link>

@@ -5,8 +5,8 @@ import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 const tradingPairs = [
-  { name: "EUR/USD", price: "1.0845", change: "+0.12%", color: "bg-blue-500", image: "https://flagcdn.com/w80/eu.png" },
-  { name: "GBP/USD", price: "1.2650", change: "-0.08%", color: "bg-cyan-500", image: "https://flagcdn.com/w80/gb.png" },
+  { name: "EUR/USD", price: "1.0845", change: "+0.12%", color: "bg-purple-600", image: "https://flagcdn.com/w80/eu.png" },
+  { name: "GBP/USD", price: "1.2650", change: "-0.08%", color: "bg-purple-500", image: "https://flagcdn.com/w80/gb.png" },
   { name: "USD/JPY", price: "149.25", change: "+0.25%", color: "bg-black", image: "https://flagcdn.com/w80/jp.png" },
   { name: "AUD/USD", price: "0.6520", change: "+0.15%", color: "bg-amber-500", image: "https://flagcdn.com/w80/au.png" },
   { name: "USD/CAD", price: "1.3480", change: "-0.05%", color: "bg-purple-500", image: "https://flagcdn.com/w80/ca.png" },

@@ -131,7 +131,7 @@ export default function AboutPage() {
 							<div className="pt-6">
 								<Link
 									href="/signup"
-									className="inline-block rounded-full bg-[#0ea5e9] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#0891d1]"
+									className="inline-block rounded-full bg-[#5235ff] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#452cff]"
 								>
 									Get Started
 								</Link>

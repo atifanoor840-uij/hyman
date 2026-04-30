@@ -222,7 +222,7 @@ export default function TermsPage() {
 						</p>
 						<a
 							href="/contact"
-							className="inline-block rounded-full bg-[#0ea5e9] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#0891d1]"
+							className="inline-block rounded-full bg-[#5235ff] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#452cff]"
 						>
 							Contact Legal Team
 						</a>

@@ -42,11 +42,11 @@ const DESIGN_KEYS: Achievement["design"][] = ["red", "blue", "gold", "green", "n
 
 const designStyles: Record<Achievement["design"], string> = {
   red: "bg-gradient-to-br from-red-600 to-red-800",
-  blue: "bg-gradient-to-br from-blue-600 to-blue-900",
+  blue: "bg-gradient-to-br from-purple-600 to-purple-900",
   gold: "bg-gradient-to-br from-amber-500 via-yellow-600 to-amber-800",
   green: "bg-gradient-to-br from-emerald-600 to-teal-800",
   navy: "bg-gradient-to-br from-slate-800 to-slate-900",
-  wave: "bg-gradient-to-br from-sky-500 via-blue-600 to-indigo-700",
+  wave: "bg-gradient-to-br from-purple-500 via-purple-600 to-fuchsia-700",
 }
 
 function mapApiToAchievement(cert: ApiCertificate, index: number): Achievement {

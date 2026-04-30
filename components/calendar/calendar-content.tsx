@@ -8,7 +8,7 @@ import { useState } from "react"
 
 const events = [
   { id: 1, title: "US Non-Farm Payrolls", time: "08:30 AM", duration: "High Impact", type: "news", color: "bg-red-500" },
-  { id: 2, title: "ECB Interest Rate Decision", time: "12:45 PM", duration: "High Impact", type: "news", color: "bg-blue-500" },
+  { id: 2, title: "ECB Interest Rate Decision", time: "12:45 PM", duration: "High Impact", type: "news", color: "bg-purple-600" },
   {
     id: 3,
     title: "UK GDP Release",

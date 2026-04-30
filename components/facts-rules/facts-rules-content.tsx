@@ -31,7 +31,7 @@ const rules = [
     title: "Account & risk rules",
     description: "Account usage and risk management requirements.",
     icon: Shield,
-    iconBg: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+    iconBg: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
     items: [
       "One account per person. Multiple accounts require approval.",
       "Expert Advisors (EAs) and copy trading are allowed.",
