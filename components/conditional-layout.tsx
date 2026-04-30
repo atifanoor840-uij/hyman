@@ -3,6 +3,7 @@ import { usePathname } from "next/navigation"
 import { Suspense, useEffect, useState, useRef } from "react"
 import { Toaster } from "@/components/ui/toaster"
 import SimpleNavbar from "@/components/simple-navbar"
+import PromoTicker from "@/components/promo-ticker"
 import { FooterSection } from "@/components/footer-section"
 // Analytics removed
 
@@ -39,16 +40,15 @@ function LoadingOverlay({ isVisible }: { isVisible: boolean }) {
 
 export default function ConditionalLayout({ children }: ConditionalLayoutProps) {
   const pathname = usePathname()
-  const [isAdminRoute, setIsAdminRoute] = useState(false)
   const [isClient, setIsClient] = useState(false)
   const [isAuthRoute, setIsAuthRoute] = useState(false)
   const [isDashboardRoute, setIsDashboardRoute] = useState(false)
+  const [isAdminRoute, setIsAdminRoute] = useState(false)
   const [isPageReady, setIsPageReady] = useState(false)
   const hasInitialized = useRef(false)
 
   useEffect(() => {
     setIsClient(true)
-    setIsAdminRoute(pathname.startsWith('/admin'))
     setIsAuthRoute(
       pathname.startsWith('/login') || 
       pathname.startsWith('/signup') || 
@@ -58,6 +58,7 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
       pathname.startsWith('/partners/login') ||
       pathname.startsWith('/partners/signup')
     )
+    setIsAdminRoute(pathname.startsWith("/admin"))
     // Dashboard routes include /dashboard/* and root-level dashboard pages
     const dashboardRoutes = [
       '/kyc',
@@ -85,8 +86,8 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
     if (isClient) {
       hasInitialized.current = true
       
-      const isAdminOrDashboard = pathname.startsWith('/admin') || 
-        pathname.startsWith('/dashboard') ||
+      const isDashboardOrAuthOrAdmin = pathname.startsWith('/dashboard') ||
+        pathname.startsWith('/admin') ||
         pathname.startsWith('/login') || 
         pathname.startsWith('/signup') ||
         pathname.startsWith('/forgot-password') ||
@@ -98,8 +99,8 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
           route => pathname === route || pathname.startsWith(route + '/')
         )
       
-      if (isAdminOrDashboard) {
-        // No loading overlay for admin/dashboard/auth routes
+      if (isDashboardOrAuthOrAdmin) {
+        // No loading overlay for dashboard/auth routes
         setIsPageReady(true)
         return
       }
@@ -159,7 +160,7 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
   }, [pathname])
 
   // Determine if we should show the loading overlay
-  const showPublicLayout = !isAdminRoute && !isAuthRoute && !isDashboardRoute
+  const showPublicLayout = !isAuthRoute && !isDashboardRoute && !isAdminRoute
   const showLoadingOverlay = isClient && showPublicLayout && !isPageReady
 
   return (
@@ -171,7 +172,10 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
       <div className={`flex flex-col min-h-screen ${showPublicLayout ? 'bg-black' : ''}`}>
         {/* Show Navbar on all pages except admin, dashboard, and auth routes */}
         {showPublicLayout && (
-          <SimpleNavbar />
+          <>
+            <PromoTicker />
+            <SimpleNavbar />
+          </>
         )}
         
         {/* Main content area - flex-grow to push footer down */}

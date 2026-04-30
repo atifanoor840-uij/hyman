@@ -332,7 +332,7 @@ export default function SignupPage() {
 			</div>
 
 			{/* Right panel - white form */}
-			<div className="flex-1 flex flex-col items-center justify-center min-h-0 px-6 py-12 lg:py-16 overflow-y-auto">
+			<div className="flex-1 flex flex-col items-center justify-center min-h-0 px-6 py-8 lg:py-10 overflow-y-auto">
 				{/* Mobile tabs */}
 				<div className="lg:hidden flex rounded-full bg-zinc-100 p-1 gap-1 mb-6">
 					<Link href="/login" className="px-4 py-2 rounded-full text-zinc-600 text-sm font-medium">
@@ -343,37 +343,21 @@ export default function SignupPage() {
 
 				{step === 'details' && (
 					<>
-						<div className="flex flex-col items-center mb-6">
-							<div className="flex items-center justify-center gap-3 mb-2">
-								<Image
-									src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769659705/ChatGPT_Image_Jan_28_2026_08_06_49_PM_moryyr.png"
-									alt="GenzProp"
-									width={48}
-									height={48}
-									className="object-contain"
-								/>
-								<span className="text-2xl font-bold text-black tracking-tight">GenzProp</span>
-							</div>
+						<div className="flex flex-col items-center mb-4">
 							<h1 className="text-xl font-bold text-zinc-600 tracking-tight">SIGN UP</h1>
 							<p className="text-sm text-zinc-500 mt-1">Create your GenzProp account</p>
 						</div>
 
-						<form onSubmit={handleDetailsSubmit} className="w-full max-w-md">
-							<div className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8 shadow-[0_1px_3px_rgba(0,0,0,0.06)] space-y-5">
-								{/* Pricing note */}
-								<div className="rounded-2xl border border-zinc-200/70 bg-white/80 backdrop-blur px-4 py-3">
-									<p className="text-xs font-semibold text-zinc-700">Secure signup</p>
-									<p className="mt-0.5 text-[11px] text-zinc-500">
-										Your details are encrypted in transit. Create your account in under a minute.
-									</p>
-								</div>
-								{/* Full name */}
-								<div className="space-y-1.5">
+						<form onSubmit={handleDetailsSubmit} className="w-full max-w-2xl">
+							<div className="rounded-2xl border border-zinc-200 bg-white p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+								<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
+									{/* Full name */}
+									<div className="space-y-1.5">
 									<label htmlFor="name" className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider">
 										Full name
 									</label>
 									<div
-										className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-4 py-3 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
+										className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-4 py-2.5 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
 											formErrors.name ? 'border-red-300 bg-red-50/50 focus-within:border-red-400 focus-within:ring-red-500/10' : 'border-zinc-200 hover:border-zinc-300'
 										}`}
 									>
@@ -396,7 +380,7 @@ export default function SignupPage() {
 										Email address
 									</label>
 									<div
-										className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-4 py-3 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
+										className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-4 py-2.5 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
 											formErrors.email ? 'border-red-300 bg-red-50/50 focus-within:border-red-400 focus-within:ring-red-500/10' : 'border-zinc-200 hover:border-zinc-300'
 										}`}
 									>
@@ -435,7 +419,7 @@ export default function SignupPage() {
 									<label htmlFor="referralCode" className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider">
 										Referral code <span className="font-normal normal-case text-zinc-400">(optional)</span>
 									</label>
-									<div className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black hover:border-zinc-300">
+									<div className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50/80 px-4 py-2.5 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black hover:border-zinc-300">
 										<span className="text-zinc-400 text-sm font-medium w-5 text-center">#</span>
 										<input
 											id="referralCode"
@@ -449,13 +433,13 @@ export default function SignupPage() {
 								</div>
 
 								{/* Password + Confirm */}
-								<div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+								<div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
 									<div className="space-y-1.5">
 										<label htmlFor="password" className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider">
 											Password
 										</label>
 										<div
-											className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-4 py-3 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
+											className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-4 py-2.5 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
 												formErrors.password ? 'border-red-300 bg-red-50/50 focus-within:border-red-400 focus-within:ring-red-500/10' : 'border-zinc-200 hover:border-zinc-300'
 											}`}
 										>
@@ -484,7 +468,7 @@ export default function SignupPage() {
 											Confirm password
 										</label>
 										<div
-											className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-4 py-3 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
+											className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-4 py-2.5 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
 												formErrors.confirmPassword ? 'border-red-300 bg-red-50/50 focus-within:border-red-400 focus-within:ring-red-500/10' : 'border-zinc-200 hover:border-zinc-300'
 											}`}
 										>
@@ -511,7 +495,7 @@ export default function SignupPage() {
 								</div>
 
 								{/* Terms */}
-								<label className="flex items-start gap-2.5 cursor-pointer group">
+								<label className="sm:col-span-2 flex items-start gap-2.5 cursor-pointer group">
 									<input
 										type="checkbox"
 										required
@@ -525,7 +509,7 @@ export default function SignupPage() {
 								<button
 									type="submit"
 									disabled={isLoading}
-									className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-black px-6 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+									className="sm:col-span-2 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-black px-6 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
 								>
 									{isLoading ? (
 										<>
@@ -539,6 +523,7 @@ export default function SignupPage() {
 										'Create account'
 									)}
 								</button>
+								</div>
 							</div>
 						</form>
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useRef } from "react"
 import Link from "next/link"
-import { Search, Mail, Bell, Loader2, KeyRound, Copy, Check, Wallet, TrendingUp, ChevronLeft, Server, MonitorSmartphone, Activity } from "lucide-react"
+import { Search, Mail, Bell, Loader2, KeyRound, Copy, Check, Wallet, TrendingUp, ChevronLeft, Server, MonitorSmartphone, Activity, User } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -275,8 +275,8 @@ export function Header({
 
   return (
     <header className="space-y-3 md:space-y-4 animate-slide-in-up w-full min-w-0">
-      <div className="relative -mx-3 -mt-3 overflow-hidden border-b border-border bg-muted/50 py-2.5 md:-mx-4 md:-mt-4 lg:-mx-5 lg:-mt-5">
-        <div className="flex w-max animate-ticker whitespace-nowrap text-xs sm:text-sm font-semibold text-muted-foreground">
+      <div className="relative -mx-3 -mt-3 overflow-hidden border-b border-purple-400/30 bg-gradient-to-r from-purple-800 via-purple-950 to-purple-800 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] md:-mx-4 md:-mt-4 lg:-mx-5 lg:-mt-5">
+        <div className="flex w-max animate-ticker whitespace-nowrap text-xs sm:text-sm font-semibold text-white/90">
           <span>{saleTickerText.repeat(6)}</span>
           <span aria-hidden="true">{saleTickerText.repeat(6)}</span>
         </div>
@@ -647,9 +647,11 @@ export function Header({
           </Button>
 
           <div className="flex items-center gap-2 pl-2 md:pl-3 border-l border-border min-w-0">
-            <Avatar className="w-9 h-9 md:w-9 md:h-9 ring-2 ring-border transition-all duration-300 hover:ring-muted-foreground/30 shrink-0">
+            <Avatar className="w-9 h-9 md:w-9 md:h-9 ring-2 ring-purple-400/35 shadow-[0_10px_24px_rgba(88,28,135,0.18)] transition-all duration-300 hover:ring-purple-300/55 shrink-0">
               <AvatarImage src={userData?.image ?? undefined} alt={userData?.username || userData?.name || 'User'} />
-              <AvatarFallback className="text-xs bg-muted text-foreground font-semibold">{getUserInitials()}</AvatarFallback>
+              <AvatarFallback className="bg-gradient-to-br from-purple-600/35 via-purple-950/35 to-muted text-white/90">
+                <User className="h-4 w-4 opacity-90" aria-hidden />
+              </AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex flex-col justify-center">
               <p className="text-sm font-semibold text-foreground truncate" title={userData?.username || userData?.name || 'User'}>

@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -33,47 +33,8 @@ export default function LoginPage() {
 	const [toastTitle, setToastTitle] = useState<string | undefined>(undefined);
 	const [showPassword, setShowPassword] = useState(false);
 
-	const validateForm = () => {
-		const nextErrors: typeof formErrors = {};
-
-		const sanitizedEmail = sanitizeInput(email);
-
-		if (!sanitizedEmail.trim()) {
-			nextErrors.email = 'Please enter the email linked to your GenzProp account.';
-		} else if (!isValidEmail(sanitizedEmail)) {
-			nextErrors.email = 'Use a valid email address (e.g. name@domain.com).';
-		}
-
-		if (!password) {
-			nextErrors.password = 'Enter your password to continue.';
-		} else if (password.length < 8) {
-			nextErrors.password = 'Passwords must be at least 8 characters.';
-		}
-
-		const lockoutTime = getRemainingLockoutTime(sanitizedEmail);
-		if (lockoutTime > 0) {
-			nextErrors.email = `Too many failed attempts. Please try again in ${Math.ceil(lockoutTime / 60)} minutes.`;
-		}
-
-		setFormErrors(nextErrors);
-		return Object.keys(nextErrors).length === 0;
-	};
-
-	const handleFormChange =
-		(field: 'email' | 'password') =>
-		(event: ChangeEvent<HTMLInputElement>) => {
-			if (field === 'email') setEmail(event.target.value);
-			else setPassword(event.target.value);
-			if (formErrors[field]) {
-				setFormErrors((prev) => ({ ...prev, [field]: undefined }));
-			}
-		};
-
-	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-		if (!validateForm()) return;
-
-		const sanitizedEmail = sanitizeInput(email).trim().toLowerCase();
+	const performLogin = async (rawEmail: string, rawPassword: string, remember: boolean) => {
+		const sanitizedEmail = sanitizeInput(rawEmail).trim().toLowerCase();
 
 		if (!trackLoginAttempt(sanitizedEmail)) {
 			const lockoutTime = getRemainingLockoutTime(sanitizedEmail);
@@ -92,16 +53,16 @@ export default function LoginPage() {
 		try {
 			const response = await login({
 				username: sanitizedEmail,
-				password: password,
+				password: rawPassword,
 			});
 
 			const authToken = response.token || response.access_token;
 
 			if (authToken) {
 				clearLoginAttempts(sanitizedEmail);
-				setAuthToken(authToken, rememberMe);
+				setAuthToken(authToken, remember);
 				if (response.user) {
-					setUser(response.user, rememberMe);
+					setUser(response.user, remember);
 				}
 			}
 
@@ -151,6 +112,72 @@ export default function LoginPage() {
 				setToastMessage('Unable to connect to the server. Please check your internet connection and try again.');
 			}
 		}
+	};
+
+	useEffect(() => {
+		// Admin "login as user" handoff: reads sessionStorage and auto-submits once.
+		try {
+			const params = new URLSearchParams(window.location.search);
+			if (params.get('adminAutoLogin') !== '1') return;
+			const raw = sessionStorage.getItem('admin_auto_login');
+			if (!raw) return;
+			sessionStorage.removeItem('admin_auto_login');
+
+			const parsed = JSON.parse(raw) as { email?: string; password?: string; remember?: boolean };
+			if (!parsed?.email || !parsed?.password) return;
+
+			setEmail(parsed.email);
+			setPassword(parsed.password);
+			setRememberMe(Boolean(parsed.remember));
+
+			// Trigger login with provided credentials
+			void performLogin(parsed.email, parsed.password, Boolean(parsed.remember));
+		} catch {
+			// ignore
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	const validateForm = () => {
+		const nextErrors: typeof formErrors = {};
+
+		const sanitizedEmail = sanitizeInput(email);
+
+		if (!sanitizedEmail.trim()) {
+			nextErrors.email = 'Please enter the email linked to your GenzProp account.';
+		} else if (!isValidEmail(sanitizedEmail)) {
+			nextErrors.email = 'Use a valid email address (e.g. name@domain.com).';
+		}
+
+		if (!password) {
+			nextErrors.password = 'Enter your password to continue.';
+		} else if (password.length < 8) {
+			nextErrors.password = 'Passwords must be at least 8 characters.';
+		}
+
+		const lockoutTime = getRemainingLockoutTime(sanitizedEmail);
+		if (lockoutTime > 0) {
+			nextErrors.email = `Too many failed attempts. Please try again in ${Math.ceil(lockoutTime / 60)} minutes.`;
+		}
+
+		setFormErrors(nextErrors);
+		return Object.keys(nextErrors).length === 0;
+	};
+
+	const handleFormChange =
+		(field: 'email' | 'password') =>
+		(event: ChangeEvent<HTMLInputElement>) => {
+			if (field === 'email') setEmail(event.target.value);
+			else setPassword(event.target.value);
+			if (formErrors[field]) {
+				setFormErrors((prev) => ({ ...prev, [field]: undefined }));
+			}
+		};
+
+	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		if (!validateForm()) return;
+		await performLogin(email, password, rememberMe);
 	};
 
 	return (

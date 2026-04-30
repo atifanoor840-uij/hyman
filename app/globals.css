@@ -3,6 +3,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* Fixed promo bar height — must match `components/promo-ticker.tsx` */
+  --promo-ticker-height: 2.5rem;
 }
 
 @theme inline {

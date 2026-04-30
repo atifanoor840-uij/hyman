@@ -1,4 +1,5 @@
 import Hero from "./components/Hero";
+import { ForexPriceTicker } from "@/components/forex-price-ticker";
 import Logos from "./components/Logos";
 import Metrics from "./components/Metrics";
 import CTA from "./components/CTA";
@@ -17,6 +18,7 @@ export default function Home() {
   return (
     <div className="bg-[#050406]">
       <Hero />
+      <ForexPriceTicker />
       <Pricing />
       <Logos />
       <WhyGenzProp />

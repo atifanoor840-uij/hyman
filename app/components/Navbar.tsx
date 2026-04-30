@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import PromoTicker from "@/components/promo-ticker";
 
 type NavbarVariant = "sticky" | "hero";
 
@@ -42,11 +43,13 @@ export default function Navbar({ variant = "sticky" }: { variant?: NavbarVariant
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Hero variant: full width main nav, fixed at top of viewport
+  // Hero variant: promo strip + full width main nav (fixed below promo)
   if (variant === "hero") {
     const links = heroNavLinks;
     return (
-      <header className="fixed top-0 left-0 right-0 z-50 w-full" style={{ fontFamily: 'var(--font-plus-jakarta-sans), var(--font-geist-sans), sans-serif' }}>
+      <>
+      <PromoTicker />
+      <header className="fixed top-[var(--promo-ticker-height)] left-0 right-0 z-[100] w-full" style={{ fontFamily: 'var(--font-plus-jakarta-sans), var(--font-geist-sans), sans-serif' }}>
         {/* Main nav bar - white with black accents, full width, rounded bottom */}
         <div className={`w-full rounded-b-xl transition-all duration-300 ${scrolled ? 'bg-white shadow-lg' : 'bg-white'}`}>
           <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3 md:px-10">
@@ -158,13 +161,16 @@ export default function Navbar({ variant = "sticky" }: { variant?: NavbarVariant
           )}
         </div>
       </header>
+      </>
     );
   }
 
-  // Sticky variant (default) - single bar, dark
-  const base = "sticky top-0 z-50 w-full border-b border-white/5 bg-black/95 backdrop-blur-md";
+  // Sticky variant (default) - promo + single bar, dark; sticks below promo
+  const base = "sticky top-[var(--promo-ticker-height)] z-50 w-full border-b border-white/5 bg-black/95 backdrop-blur-md";
 
   return (
+    <>
+    <PromoTicker />
     <header className={base} style={{ fontFamily: 'var(--font-plus-jakarta-sans), var(--font-geist-sans), sans-serif' }}>
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:px-10">
         <Link href="/" className="flex items-center gap-2 shrink-0">
@@ -251,5 +257,6 @@ export default function Navbar({ variant = "sticky" }: { variant?: NavbarVariant
         </div>
       )}
     </header>
+    </>
   );
 }

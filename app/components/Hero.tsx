@@ -1,4 +1,4 @@
-import Link from "next/link";
+ import Link from "next/link";
 import Image from "next/image";
 import { SiBitcoin, SiEthereum, SiTether, SiLinux, SiApple, SiAndroid } from "react-icons/si";
 import { TbBrandWindows } from "react-icons/tb";
@@ -13,7 +13,7 @@ const PRESS_LOGOS = [
 ];
 export default function Hero() {
 	return (
-		<section className="relative overflow-hidden">
+		<section className="relative overflow-hidden" data-hero-section>
 			<div className="absolute inset-0 -z-10 bg-[#050406]" />
 			<div className="pointer-events-none absolute inset-0 -translate-y-12">
 				<Hyperspeed />
@@ -27,7 +27,7 @@ export default function Hero() {
 
 			<div className="relative mx-auto max-w-7xl px-6 py-12 md:px-10 lg:py-20">
 				{/* Left: heading + subheading + payment icons + Start trading | Right: platform + vertical press logos */}
-				<div className="mt-16 flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
+				<div className="mt-[calc(4rem+var(--promo-ticker-height))] flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
 					{/* Left: heading, subheading, payment icons below subheading */}
 					<div className="flex flex-1 flex-col items-start justify-center text-left pl-4 md:pl-8 lg:pl-12">
 						<h1 className="whitespace-nowrap font-sans text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">

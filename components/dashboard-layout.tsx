@@ -177,22 +177,26 @@ export default function DashboardLayout({
                 </button>
                 <div className="flex items-center gap-2">
                   <button onClick={() => setShowProfileMenu(v => !v)} aria-label="Open profile menu">
-                  <Avatar className="h-8 w-8">
+                  <Avatar className="h-9 w-9 ring-2 ring-purple-400/40 shadow-[0_8px_20px_rgba(88,28,135,0.20)] transition hover:ring-purple-300/60">
                     {profile.profile_picture_url ? (
                       <AvatarImage src={profile.profile_picture_url} alt={profile.name || profile.username || "User"} />
                     ) : null}
-                    <AvatarFallback>{initials}</AvatarFallback>
+                    <AvatarFallback className="bg-gradient-to-br from-purple-900/70 via-purple-950/60 to-zinc-950 text-white">
+                      <UserIcon className="h-4 w-4 opacity-90" aria-hidden />
+                    </AvatarFallback>
                   </Avatar>
                   </button>
                 </div>
                 {showProfileMenu && (
                   <div className="absolute right-0 top-12 z-50 w-64 rounded-xl border border-gray-800/60 bg-gray-900/90 backdrop-blur p-4 shadow-xl">
                     <div className="flex items-center gap-3 mb-3">
-                      <Avatar className="h-8 w-8">
+                      <Avatar className="h-9 w-9 ring-2 ring-purple-400/40 shadow-[0_8px_20px_rgba(88,28,135,0.20)]">
                         {profile.profile_picture_url ? (
                           <AvatarImage src={profile.profile_picture_url} alt={profile.name || profile.username || "User"} />
                         ) : null}
-                        <AvatarFallback>{initials}</AvatarFallback>
+                        <AvatarFallback className="bg-gradient-to-br from-purple-900/70 via-purple-950/60 to-zinc-950 text-white">
+                          <UserIcon className="h-4 w-4 opacity-90" aria-hidden />
+                        </AvatarFallback>
                       </Avatar>
                       <div className="min-w-0">
                         <div className="text-sm font-semibold text-white truncate">{profile.name || profile.username || "User"}</div>

@@ -7,11 +7,14 @@ export function ForexPriceTicker() {
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!containerRef.current) return
-    
-    // Clear any existing content
-    containerRef.current.innerHTML = ""
-    
+    const root = containerRef.current
+    if (!root) return
+
+    root.innerHTML = ""
+    const widget = document.createElement("div")
+    widget.className = "tradingview-widget-container__widget"
+    root.appendChild(widget)
+
     const script = document.createElement("script")
     script.src = "https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js"
     script.async = true
@@ -29,6 +32,10 @@ export function ForexPriceTicker() {
         { proName: "FOREXCOM:GBPJPY", title: "GBP/JPY" },
         { proName: "FOREXCOM:NZDUSD", title: "NZD/USD" },
         { proName: "OANDA:XAGUSD", title: "XAG/USD" },
+        { proName: "BINANCE:BTCUSDT", title: "BTC/USDT" },
+        { proName: "BINANCE:ETHUSDT", title: "ETH/USDT" },
+        { proName: "BINANCE:SOLUSDT", title: "SOL/USDT" },
+        { proName: "BINANCE:XRPUSDT", title: "XRP/USDT" },
       ],
       showSymbolLogo: true,
       colorTheme: "dark",
@@ -36,30 +43,32 @@ export function ForexPriceTicker() {
       displayMode: "adaptive",
       locale: "en",
     })
-    
-    containerRef.current.appendChild(script)
+
+    root.appendChild(script)
 
     return () => {
-      if (containerRef.current) {
-        containerRef.current.innerHTML = ""
-      }
+      root.innerHTML = ""
     }
   }, [])
 
   return (
-    <div className="w-full bg-[#0a1f0a] border-t border-[#DEBF74]/10">
-      <div className="flex items-center gap-3 px-4 sm:px-6 py-2.5 bg-[#0a1f0a]/50">
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#DEBF74]" />
-          <span className="text-xs sm:text-sm font-medium text-white/90 uppercase tracking-wide">
-            Live Prices
+    <section
+      className="w-full border-t border-white/10 bg-[#050406]"
+      aria-label="Live forex and cryptocurrency quotes"
+    >
+      <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:gap-4 sm:px-6 sm:py-2.5">
+        <div className="flex shrink-0 items-center gap-2">
+          <TrendingUp className="h-4 w-4 text-emerald-400 sm:h-5 sm:w-5" aria-hidden />
+          <span className="text-xs font-medium uppercase tracking-wide text-white/90 sm:text-sm">
+            Live markets
           </span>
+          <span className="hidden text-[11px] text-white/45 sm:inline">· TradingView</span>
         </div>
-        <div className="flex-1 min-w-0">
-          <div ref={containerRef} className="tradingview-widget-container" />
+        <div className="min-h-[44px] min-w-0 flex-1">
+          <div ref={containerRef} className="tradingview-widget-container w-full" />
         </div>
       </div>
-    </div>
+    </section>
   )
 }
 

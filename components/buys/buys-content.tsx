@@ -251,7 +251,7 @@ export function BuysContent() {
           title: "Order Placed!",
           message: "Your order has been placed successfully. Taking you to your dashboard...",
         })
-        setTimeout(() => router.push("/dashboard"), 2500)
+        setTimeout(() => router.push("/dashboard/overview"), 2500)
       }
     } catch (err) {
       const message = err instanceof ApiClientError ? err.message : "Failed to create order. Please try again."
@@ -274,7 +274,7 @@ export function BuysContent() {
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-8">
           {/* Back to Dashboard */}
           <Link
-            href="/dashboard"
+            href="/dashboard/overview"
             className="inline-flex items-center text-white/80 hover:text-white transition-colors text-sm font-medium gap-1 mb-8"
           >
             <ChevronLeft className="w-4 h-4" />

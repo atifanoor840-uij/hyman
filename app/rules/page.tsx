@@ -84,7 +84,7 @@ export default function RulesPage() {
 		<div className={`min-h-screen bg-[#f8fafc] ${bodyFont.className}`}>
 			<Navbar variant="hero" />
 
-			<main className="mx-auto max-w-3xl px-6 pb-12 pt-28 md:px-8 md:pb-16 md:pt-32">
+			<main className="mx-auto max-w-3xl px-6 pb-12 pt-[calc(7rem+var(--promo-ticker-height))] md:px-8 md:pb-16 md:pt-[calc(8rem+var(--promo-ticker-height))]">
 				<h1
 					className={`${display.className} mb-10 text-center text-2xl font-semibold tracking-tight text-[#0b0b0f] md:text-left md:text-3xl`}
 				>

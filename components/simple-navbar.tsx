@@ -41,7 +41,7 @@ export default function SimpleNavbar() {
   ];
 
   return (
-    <nav className={`fixed left-0 right-0 z-[100] transition-all duration-300 pointer-events-auto top-0 ${
+    <nav className={`fixed left-0 right-0 z-[100] transition-all duration-300 pointer-events-auto top-[var(--promo-ticker-height)] ${
       isScrolled 
         ? 'bg-[#0a1f0a]/95 backdrop-blur-md border-b border-green-500/20' 
         : isLandingPage 

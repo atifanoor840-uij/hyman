@@ -16,7 +16,7 @@ export default function AboutPage() {
 			<Navbar variant="hero" />
 
 			{/* Header Section with background — pt offsets fixed navbar */}
-			<section className="relative overflow-hidden bg-[#050406] pt-[7.5rem] md:pt-32">
+			<section className="relative overflow-hidden bg-[#050406] pt-[calc(7.5rem+var(--promo-ticker-height))] md:pt-[calc(8rem+var(--promo-ticker-height))]">
 				<div className="pointer-events-none absolute inset-0">
 					<div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[#5235ff]/20 blur-[120px]" />
 					<div className="absolute top-1/2 right-0 h-[480px] w-[480px] -translate-y-1/2 rounded-full bg-[#1cf1ff]/10 blur-[140px]" />

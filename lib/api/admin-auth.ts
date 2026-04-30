@@ -1,62 +1,62 @@
-import { getApiBaseUrl } from "./index";
-import { getAdminToken } from "@/lib/admin-auth";
-import type { AdminUser } from "@/lib/admin-auth";
+import { ApiClientError } from "./client"
 
-function getBase(): string {
-  return getApiBaseUrl();
+function getApiBaseUrl(): string {
+  const url =
+    process.env.NEXT_PUBLIC_API_URL ||
+    process.env.API_BASE_URL ||
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    "https://genz-34f298f57a04.herokuapp.com"
+  return (typeof url === "string" && url.trim() ? url : "https://genz-34f298f57a04.herokuapp.com").replace(/\/$/, "")
 }
 
-export interface AdminLoginRequest {
-  email: string;
-  password: string;
+export type AdminSignin2faRequest = {
+  email: string
+  password: string
+  two_factor_code: string
 }
 
-export interface AdminLoginResponse {
-  token?: string;
-  access_token?: string;
-  user?: AdminUser & Record<string, unknown>;
-  message?: string;
+export type AdminSignin2faResponse = {
+  access_token?: string
+  token?: string
+  [key: string]: any
 }
 
-/**
- * POST /auth/admin/signin or /management/login - Admin login.
- * Configure your backend endpoint and response shape as needed.
- */
-export async function adminLogin(data: AdminLoginRequest): Promise<AdminLoginResponse> {
-  const res = await fetch(`${getBase()}/auth/admin/signin`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: data.email, password: data.password }),
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    let message = `Login failed (${res.status})`;
-    try {
-      const j = JSON.parse(text);
-      message = j.message || j.error || message;
-    } catch {
-      if (text) message = text;
-    }
-    throw new Error(message);
+export async function adminSignin2fa(payload: AdminSignin2faRequest): Promise<AdminSignin2faResponse> {
+  const url = `${getApiBaseUrl()}/admin/auth/signin-2fa`
+  // Dev-only request log (password redacted)
+  if (process.env.NODE_ENV === "development" && typeof window !== "undefined") {
+    // eslint-disable-next-line no-console
+    console.info("[adminSignin2fa] request", {
+      url,
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: { ...payload, password: "[REDACTED]" },
+    })
   }
-  return res.json();
+  let res: Response
+  try {
+    res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify(payload),
+      credentials: "omit",
+    })
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Network error"
+    throw new ApiClientError(msg || "Network error", 0)
+  }
+
+  const contentType = res.headers.get("content-type") || ""
+  const isJson = contentType.includes("application/json")
+  const data = isJson ? await res.json().catch(() => ({})) : await res.text().catch(() => "")
+
+  if (!res.ok) {
+    const message =
+      (typeof data === "object" && data && (data.message || data.error)) ||
+      (typeof data === "string" && data) ||
+      `Request failed with status ${res.status}`
+    throw new ApiClientError(String(message), res.status)
+  }
+
+  return (typeof data === "object" && data) ? (data as AdminSignin2faResponse) : {}
 }
 
-/**
- * Use this for admin API calls (sends Bearer token from getAdminToken).
- */
-export async function adminApiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const token = getAdminToken();
-  const url = endpoint.startsWith("http") ? endpoint : `${getBase()}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-    ...(token && { Authorization: `Bearer ${token}` }),
-    ...(options.headers as Record<string, string>),
-  };
-  const res = await fetch(url, { ...options, headers });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`API error ${res.status}: ${text}`);
-  }
-  return res.json();
-}

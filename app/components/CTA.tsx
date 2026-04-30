@@ -5,7 +5,7 @@ export default function CTA() {
 		<section className="relative bg-slate-50/80">
 			<div className="mx-auto max-w-7xl px-6 py-20 md:px-10">
 				<div className="relative overflow-hidden rounded-3xl border border-black/10 p-8 sm:p-12">
-					<div className="pointer-events-none absolute -inset-40 rounded-[40px] bg-gradient-to-r from-[#00f0ff]/30 to-[#7c3aed]/30 blur-3xl" />
+					<div className="pointer-events-none absolute -inset-40 rounded-[40px] bg-purple-600/25 blur-3xl" />
 					<div className="relative flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
 						<div>
 							<h3 className="text-2xl font-semibold text-[#0b0b0f] sm:text-3xl">
@@ -17,7 +17,7 @@ export default function CTA() {
 						</div>
 						<Link
 							href="/signup"
-							className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#00f0ff] to-[#7c3aed] px-6 py-3 text-sm font-semibold text-[#0b0b0f]"
+							className="inline-flex items-center justify-center rounded-full bg-purple-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-purple-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400/60"
 						>
 							Start skills assessment
 						</Link>

@@ -53,9 +53,9 @@ export default function LoyaltyPrograms() {
 		<section id="loyalty" className="relative overflow-hidden bg-white py-20 md:py-28">
 			{/* Aura background */}
 			<div className="pointer-events-none absolute inset-0">
-				<div className="absolute -top-24 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_center,rgba(14,165,233,0.18),transparent_60%)] blur-2xl" />
+				<div className="absolute -top-24 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_center,rgba(168,85,247,0.20),transparent_60%)] blur-2xl" />
 				<div className="absolute -bottom-28 -left-24 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.14),transparent_60%)] blur-2xl" />
-				<div className="absolute -bottom-24 -right-24 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.14),transparent_60%)] blur-2xl" />
+				<div className="absolute -bottom-24 -right-24 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle_at_center,rgba(147,51,234,0.14),transparent_60%)] blur-2xl" />
 			</div>
 			<div className="mx-auto max-w-7xl px-6 md:px-10">
 				{/* Header row */}
@@ -69,7 +69,10 @@ export default function LoyaltyPrograms() {
 						</p>
 					</div>
 					<div className="flex gap-3">
-						<a href="#pricing" className="inline-flex items-center justify-center rounded-full bg-[#0ea5e9] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0284c7] hover:shadow-md">
+						<a
+							href="#pricing"
+							className="inline-flex items-center justify-center rounded-full bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-purple-700 hover:shadow-md"
+						>
 							Start evaluation →
 						</a>
 						<a href="#" className="inline-flex items-center justify-center rounded-full border border-[#e2e8f0] bg-white px-5 py-2.5 text-sm font-semibold text-[#0f172a] shadow-sm transition hover:border-[#cbd5e1] hover:bg-slate-50">
@@ -131,13 +134,13 @@ function LoyaltyCard({
 		<article className="group relative flex-shrink-0 w-[320px] overflow-hidden rounded-2xl border border-slate-200/70 bg-white/70 p-6 shadow-[0_10px_40px_rgba(15,23,42,0.08)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-slate-300/80 hover:shadow-[0_18px_60px_rgba(15,23,42,0.12)]">
 			{/* Aura */}
 			<div className="pointer-events-none absolute -inset-1 opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100">
-				<div className="absolute inset-0 rounded-[18px] bg-[conic-gradient(from_180deg_at_50%_50%,rgba(14,165,233,0.18)_0deg,rgba(99,102,241,0.14)_120deg,rgba(16,185,129,0.16)_240deg,rgba(14,165,233,0.18)_360deg)]" />
+				<div className="absolute inset-0 rounded-[18px] bg-[conic-gradient(from_180deg_at_50%_50%,rgba(168,85,247,0.18)_0deg,rgba(147,51,234,0.14)_120deg,rgba(16,185,129,0.16)_240deg,rgba(168,85,247,0.18)_360deg)]" />
 			</div>
-			<div className="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(80%_60%_at_30%_0%,rgba(14,165,233,0.10),transparent_60%)]" />
+			<div className="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(80%_60%_at_30%_0%,rgba(168,85,247,0.10),transparent_60%)]" />
 			<div className="relative">
 				<div className="mb-4 flex items-center gap-3">
 					<div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200/70 bg-white/60 text-slate-900 shadow-sm">
-						<span className="text-sky-600">{icon}</span>
+						<span className="text-purple-600">{icon}</span>
 					</div>
 					<h3 className="font-sans text-base font-semibold tracking-tight text-slate-900">{title}</h3>
 				</div>

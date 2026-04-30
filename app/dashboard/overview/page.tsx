@@ -162,9 +162,9 @@ export default function OverviewPage() {
             )}
 
             {isLoading ? (
-              <div className="mt-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4">
+              <div className="mt-3 flex gap-3 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <Card key={i} className="rounded-2xl border border-border/70 bg-card/60 p-4">
+                  <Card key={i} className="min-w-[320px] sm:min-w-[360px] snap-start rounded-2xl border border-border/70 bg-card/60 p-4">
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <Loader2 className="h-4 w-4 animate-spin" />
                       <span className="text-sm font-medium">Loading…</span>
@@ -173,17 +173,41 @@ export default function OverviewPage() {
                 ))}
               </div>
             ) : orders.length === 0 ? (
-              <Card className="mt-3 rounded-2xl border border-border bg-muted/30 p-6 text-center">
-                <p className="text-sm font-semibold text-foreground">No orders yet</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  When you buy a challenge, it will appear here.
-                </p>
-                <Button asChild className="mt-4 rounded-full">
-                  <Link href="/dashboard/buys">Buy a challenge</Link>
-                </Button>
+              <Card className="relative mt-3 overflow-hidden rounded-3xl border border-border/70 bg-gradient-to-br from-card via-card to-muted/30 p-6">
+                <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-purple-500/10 blur-3xl" aria-hidden />
+                <div className="pointer-events-none absolute -left-24 -bottom-24 h-72 w-72 rounded-full bg-emerald-500/10 blur-3xl" aria-hidden />
+                <div className="relative flex flex-col items-center text-center">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border/60 bg-background/50 shadow-sm">
+                    <ShoppingCart className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <p className="mt-4 text-base font-bold tracking-tight text-foreground">
+                    No orders found yet
+                  </p>
+                  <p className="mt-1 max-w-md text-sm text-muted-foreground">
+                    When you purchase a challenge, your order will show up here with status and analytics.
+                  </p>
+                  <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+                    <Button
+                      asChild
+                      className="h-9 rounded-full bg-purple-600 px-5 text-xs sm:text-sm font-semibold text-white hover:bg-purple-700"
+                    >
+                      <Link href="/dashboard/buys">Buy a challenge</Link>
+                    </Button>
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="h-9 rounded-full border-border/70 bg-background/60 px-5 text-xs sm:text-sm font-semibold hover:bg-background"
+                    >
+                      <Link href="/rules">View rules</Link>
+                    </Button>
+                  </div>
+                  <p className="mt-4 text-xs text-muted-foreground">
+                    Orders will appear in the row above after purchase.
+                  </p>
+                </div>
               </Card>
             ) : (
-              <div className="mt-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4">
+              <div className="mt-3 flex gap-3 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory">
                 {orders
                   .slice()
                   .sort((a, b) => (a.created_at < b.created_at ? 1 : -1))
@@ -250,8 +274,11 @@ function OrderCard({ order }: { order: Order }) {
       : "—"
 
   return (
-    <Card className="group overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
-      <div className="p-4">
+    <Card className="group relative min-w-[320px] sm:min-w-[360px] snap-start overflow-hidden rounded-3xl border border-border/70 bg-card shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+      <div className="pointer-events-none absolute -inset-24 bg-[radial-gradient(circle_at_20%_0%,rgba(168,85,247,0.22),transparent_55%)] opacity-60" aria-hidden />
+      <div className="pointer-events-none absolute -inset-24 bg-[radial-gradient(circle_at_90%_20%,rgba(16,185,129,0.14),transparent_55%)] opacity-70" aria-hidden />
+
+      <div className="relative p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
@@ -267,11 +294,11 @@ function OrderCard({ order }: { order: Order }) {
         </div>
 
         <div className="mt-3 grid grid-cols-2 gap-2">
-          <div className="rounded-xl border border-border/60 bg-muted/20 px-3 py-2">
+          <div className="rounded-2xl border border-border/60 bg-background/40 px-3 py-2 backdrop-blur">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Platform</p>
             <p className="mt-1 text-sm font-semibold text-foreground">{order.platform || "—"}</p>
           </div>
-          <div className="rounded-xl border border-border/60 bg-muted/20 px-3 py-2">
+          <div className="rounded-2xl border border-border/60 bg-background/40 px-3 py-2 backdrop-blur">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Created</p>
             <p className="mt-1 text-sm font-semibold text-foreground">{createdLabel}</p>
           </div>
@@ -280,21 +307,17 @@ function OrderCard({ order }: { order: Order }) {
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <Button
             asChild
-            variant="outline"
-            className="h-9 rounded-xl border-border/70 bg-background/60 px-3 text-xs font-semibold hover:bg-background"
+            className="h-9 rounded-2xl px-3 text-xs font-semibold bg-purple-600 hover:bg-purple-700 text-white"
           >
-            <Link href={`/dashboard/performance/${encodeURIComponent(order.order_id)}`}>
+            <Link href="/dashboard">
               <BarChart3 className="h-4 w-4 mr-2" />
-              Performance
+              Analytics
             </Link>
-          </Button>
-          <Button asChild className="h-9 rounded-xl px-3 text-xs font-semibold">
-            <Link href="/dashboard">Open</Link>
           </Button>
         </div>
       </div>
 
-      <div className="h-1 w-full bg-gradient-to-r from-primary/30 via-emerald-500/20 to-transparent" />
+      <div className="h-1 w-full bg-gradient-to-r from-purple-500/35 via-primary/25 to-transparent" />
     </Card>
   )
 }

@@ -32,7 +32,7 @@ export default async function HelpCategoryPage({ params }: Props) {
 		<div className="flex min-h-screen flex-col font-sans">
 			<Navbar variant="hero" />
 
-			<main className="mx-auto w-full max-w-3xl flex-1 px-4 pb-8 pt-28 sm:px-6 sm:pb-10 sm:pt-32">
+			<main className="mx-auto w-full max-w-3xl flex-1 px-4 pb-8 pt-[calc(7rem+var(--promo-ticker-height))] sm:px-6 sm:pb-10 sm:pt-[calc(8rem+var(--promo-ticker-height))]">
 				<HelpBreadcrumbs
 					items={[
 						{ label: 'All collections', href: '/rules' },
