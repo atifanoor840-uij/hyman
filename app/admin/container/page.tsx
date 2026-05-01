@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/table"
 import {
   createAccountCredential,
+  deleteAccountCredential,
   listAccountCredentials,
   updateAccountCredential,
   type AccountCredential,
@@ -38,7 +39,7 @@ import {
 } from "@/lib/api/admin-container"
 import { ApiClientError } from "@/lib/api/client"
 import { formatDateKarachi } from "@/lib/utils"
-import { ExternalLink, Eye, Loader2, Plus, Pencil, RefreshCcw, ServerCrash, ShieldAlert } from "lucide-react"
+import { ExternalLink, Eye, Loader2, Plus, Pencil, RefreshCcw, ServerCrash, ShieldAlert, Trash2 } from "lucide-react"
 
 function statusTone(status: string | null | undefined) {
   const s = String(status ?? "").toLowerCase()
@@ -57,8 +58,11 @@ export default function AdminContainerPage() {
   const [createOpen, setCreateOpen] = useState(false)
   const [viewRow, setViewRow] = useState<AccountCredential | null>(null)
   const [editRow, setEditRow] = useState<AccountCredential | null>(null)
+  const [deleteRow, setDeleteRow] = useState<AccountCredential | null>(null)
   const [saving, setSaving] = useState(false)
   const [mutateError, setMutateError] = useState<string | null>(null)
+  const [deleteSaving, setDeleteSaving] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const [createForm, setCreateForm] = useState<UpsertAccountCredential>({
     platform: "mt5",
@@ -67,6 +71,7 @@ export default function AdminContainerPage() {
     server: "",
     account_size: "",
     status: "available",
+    graph_link: "",
   })
   const [editForm, setEditForm] = useState<Partial<UpsertAccountCredential>>({})
 
@@ -154,6 +159,7 @@ export default function AdminContainerPage() {
         server: "",
         account_size: "",
         status: "available",
+        graph_link: "",
       })
       await load()
     } catch (e) {
@@ -174,6 +180,7 @@ export default function AdminContainerPage() {
       account_size: row.account_size,
       status: row.status ?? undefined,
       graph_link: row.graph_link ?? undefined,
+      profit_target: (row as any).profit_target ?? undefined,
     })
   }
 
@@ -183,12 +190,13 @@ export default function AdminContainerPage() {
     setMutateError(null)
     try {
       await updateAccountCredential(editRow.id, {
-        ...editForm,
-        platform: editForm.platform?.trim(),
-        platform_login: editForm.platform_login ? String(editForm.platform_login).trim() : undefined,
-        platform_password: editForm.platform_password ? String(editForm.platform_password).trim() : undefined,
-        server: editForm.server ? String(editForm.server).trim() : undefined,
-        account_size: editForm.account_size ? String(editForm.account_size).trim() : undefined,
+        platform: String(editForm.platform ?? editRow.platform ?? "").trim(),
+        server: String(editForm.server ?? editRow.server ?? "").trim(),
+        platform_login: String(editForm.platform_login ?? editRow.platform_login ?? "").trim(),
+        platform_password: String(editForm.platform_password ?? editRow.platform_password ?? "").trim(),
+        account_size: String(editForm.account_size ?? editRow.account_size ?? "").trim(),
+        graph_link: String(editForm.graph_link ?? editRow.graph_link ?? ""),
+        profit_target: Number(editForm.profit_target ?? (editRow as any).profit_target ?? 0) || 0,
       })
       setEditRow(null)
       setEditForm({})
@@ -197,6 +205,21 @@ export default function AdminContainerPage() {
       setMutateError(e instanceof ApiClientError ? e.message : "Failed to update account.")
     } finally {
       setSaving(false)
+    }
+  }
+
+  const confirmDelete = async () => {
+    if (!deleteRow) return
+    setDeleteSaving(true)
+    setDeleteError(null)
+    try {
+      await deleteAccountCredential(deleteRow.id)
+      setDeleteRow(null)
+      await load()
+    } catch (e) {
+      setDeleteError(e instanceof ApiClientError ? e.message : "Failed to delete account.")
+    } finally {
+      setDeleteSaving(false)
     }
   }
 
@@ -416,6 +439,19 @@ export default function AdminContainerPage() {
                           <Pencil className="h-4 w-4 mr-1.5" />
                           Edit
                         </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          className="h-9 rounded-xl bg-destructive px-3 text-xs font-semibold text-destructive-foreground hover:bg-destructive/90"
+                          onClick={() => {
+                            setMutateError(null)
+                            setDeleteError(null)
+                            setDeleteRow(c)
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4 mr-1.5" />
+                          Delete
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -490,6 +526,15 @@ export default function AdminContainerPage() {
                 onChange={(e) => setCreateForm((p) => ({ ...p, server: e.target.value }))}
                 className="h-11 rounded-2xl"
                 placeholder="Server"
+              />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Graph link (optional)</Label>
+              <Input
+                value={String((createForm as any).graph_link ?? "")}
+                onChange={(e) => setCreateForm((p) => ({ ...(p as any), graph_link: e.target.value }))}
+                className="h-11 rounded-2xl"
+                placeholder="https://..."
               />
             </div>
           </div>
@@ -603,6 +648,15 @@ export default function AdminContainerPage() {
                 placeholder="https://..."
               />
             </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Profit target</Label>
+              <Input
+                value={String((editForm as any).profit_target ?? "")}
+                onChange={(e) => setEditForm((p) => ({ ...(p as any), profit_target: e.target.value }))}
+                className="h-11 rounded-2xl"
+                placeholder="0"
+              />
+            </div>
           </div>
           <div className="flex items-center justify-end gap-2 pt-2">
             <Button type="button" className="rounded-2xl border border-purple-400/30 bg-gradient-to-r from-purple-800 via-purple-950 to-purple-800 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:from-purple-700 hover:via-purple-900 hover:to-purple-700" onClick={() => setEditRow(null)} disabled={saving}>
@@ -613,6 +667,59 @@ export default function AdminContainerPage() {
               Save
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete modal */}
+      <Dialog
+        open={deleteRow != null}
+        onOpenChange={(o) => {
+          if (!o) {
+            setDeleteRow(null)
+            setDeleteSaving(false)
+            setDeleteError(null)
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Delete account</DialogTitle>
+          </DialogHeader>
+          {deleteError ? (
+            <div className="rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-foreground">
+              {deleteError}
+            </div>
+          ) : null}
+          {!deleteRow ? (
+            <div className="text-sm text-muted-foreground">No account selected.</div>
+          ) : (
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-border/70 bg-muted/20 px-4 py-3 text-sm text-muted-foreground">
+                You’re about to delete credential{" "}
+                <span className="font-semibold text-foreground">#{deleteRow.id}</span> (
+                <span className="font-semibold text-foreground">{String(deleteRow.platform_login ?? "—")}</span>).
+              </div>
+              <div className="flex items-center justify-end gap-2">
+                <Button
+                  type="button"
+                  className="h-9 rounded-xl border border-border/70 bg-background px-4 text-xs font-semibold text-foreground hover:bg-muted/40"
+                  onClick={() => setDeleteRow(null)}
+                  disabled={deleteSaving}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  className="h-9 rounded-xl bg-destructive px-4 text-xs font-semibold text-destructive-foreground hover:bg-destructive/90 disabled:opacity-60"
+                  onClick={() => void confirmDelete()}
+                  disabled={deleteSaving}
+                >
+                  {deleteSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                  Delete
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </AdminShell>

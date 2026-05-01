@@ -224,16 +224,16 @@ export function PricingSection() {
                   <div className="flex-1">
                     <div className="flex items-center gap-1.5 mb-0.5">
                       <span className="text-[10px] font-bold text-green-700">Use Code:</span>
-                      <span className="font-mono font-bold text-green-700 text-xs">WING2026</span>
-                      <span className="px-1.5 py-0.5 bg-green-600 text-white text-[9px] font-bold rounded">60% OFF</span>
+                      <span className="font-mono font-bold text-green-700 text-xs">VIP65</span>
+                      <span className="px-1.5 py-0.5 bg-green-600 text-white text-[9px] font-bold rounded">65% OFF</span>
                     </div>
-                    <p className="text-[10px] text-gray-600">60% discount on all accounts</p>
+                    <p className="text-[10px] text-gray-600">65% discount on all accounts</p>
                   </div>
                   <button
-                    onClick={() => copyToClipboard('WING2026')}
+                    onClick={() => copyToClipboard('VIP65')}
                     className="px-2 py-1 bg-green-600 hover:bg-green-700 text-white text-[10px] font-semibold rounded transition-colors flex items-center gap-1"
                   >
-                    {copiedCode === 'WING2026' ? (
+                    {copiedCode === 'VIP65' ? (
                       <>
                         <CheckCircle2 className="h-3 w-3" />
                         Copied
@@ -255,8 +255,8 @@ export function PricingSection() {
                 const originalPrice = selectedAccountType === "DRAGON INSTANT PRO" && ["100K", "200K", "500K"].includes(amount)
                   ? getOriginalPrice(selectedAccountType, amount)
                   : null
-                // Show discounted price with WING2026 (60% off)
-                const discountedPrice = Math.round(price * 0.4) // 60% off = 40% of original
+                // Show discounted price with VIP65 (65% off)
+                const discountedPrice = Math.round(price * 0.35) // 65% off = 35% of original
                 const displayPrice = originalPrice ? Math.round(originalPrice * 0.5) : price
                 const fundingNumber = parseInt(amount.replace("K", ""), 10) * 1000
                 const dailyDrawdown = getDailyDrawdown(selectedAccountType, amount)
@@ -286,7 +286,7 @@ export function PricingSection() {
                           </div>
                           <div className="flex flex-col items-end">
                             <span className="text-xs text-gray-400 line-through">${price}</span>
-                            <span className="text-[10px] font-semibold text-green-600">60% OFF</span>
+                            <span className="text-[10px] font-semibold text-green-600">65% OFF</span>
                           </div>
                         </div>
                       </div>

@@ -189,7 +189,7 @@ const faqCategories: FAQCategory[] = [
       {
         question: "Do you offer discount codes?",
         answer:
-          "Yes:\n\nFLAME20 → 20% discount (for $3k–$25k accounts)\n\nWING2026 → 60% discount (for all accounts)",
+          "Yes:\n\nFLAME20 → 20% discount (for $3k–$25k accounts)\n\nVIP65 → 65% discount (for all accounts)",
       },
       {
         question: "What is the Dragon Club Rewards program?",

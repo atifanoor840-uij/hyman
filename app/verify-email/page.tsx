@@ -3,11 +3,11 @@
 import { useMemo, useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Inter, Syne } from 'next/font/google';
+import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 import { Mail, CheckCircle2, ArrowLeft, RefreshCw } from 'lucide-react';
 import SuccessPopup from '../components/SuccessPopup';
 
-const brandFont = Syne({ subsets: ['latin'], weight: ['700', '800'] });
+const brandFont = Plus_Jakarta_Sans({ subsets: ['latin'], weight: ['600', '700', '800'] });
 const bodyFont = Inter({ subsets: ['latin'], weight: ['400', '500', '600'] });
 
 const CODE_LENGTH = 4;
@@ -198,69 +198,37 @@ function VerifyEmailContent() {
 	}
 
 	return (
-		<main className={`min-h-screen bg-white text-black ${bodyFont.className}`}>
-			<div className="flex min-h-screen flex-col lg:flex-row">
+		<main className={`h-dvh bg-white text-black ${bodyFont.className}`}>
+			<div className="flex h-dvh flex-col lg:flex-row">
 				{/* Left Side - Info Section */}
-				<aside className="flex flex-1 flex-col justify-between bg-gradient-to-br from-gray-900 via-black to-gray-900 px-6 py-10 lg:px-12 lg:py-16">
+				<aside className="flex flex-1 flex-col justify-between bg-gradient-to-br from-gray-900 via-black to-gray-900 px-6 py-8 lg:px-12 lg:py-12">
 					<div>
-						<Link href="/" className="mb-16 inline-flex items-center gap-3 text-white transition hover:opacity-80">
+						<Link href="/" className="mb-10 inline-flex items-center gap-3 text-white transition hover:opacity-80">
 							<img
 								src="/logo.png"
 								alt="GenzProp Logo"
-								className="h-12 w-12 object-contain rounded-lg"
+								className="h-11 w-11 object-contain rounded-lg"
 								loading="lazy"
 							/>
-							<span className={`${brandFont.className} text-3xl font-black tracking-tight`}>
+							<span className={`${brandFont.className} text-[28px] font-extrabold tracking-[-0.02em]`}>
 								Fx<span className="text-white">Genz</span>
 							</span>
 						</Link>
 
 						<div className="max-w-md">
-							<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-purple-600/20 mb-6">
-								<Mail className="h-8 w-8 text-purple-400" />
+							<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-600/20 mb-5">
+								<Mail className="h-6 w-6 text-purple-400" />
 							</div>
 							
-							<h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+							<h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
 								Check your email
 							</h1>
-							<p className="mt-6 text-lg text-gray-300 leading-relaxed">
+							<p className="mt-4 text-base text-gray-300 leading-relaxed">
 								We've sent a 4-digit verification code to:
 							</p>
-							<p className="mt-2 text-xl font-semibold text-white">
+							<p className="mt-2 text-lg font-semibold text-white break-all">
 								{email}
 							</p>
-
-							<div className="mt-10 space-y-4">
-								<div className="flex items-start gap-3">
-									<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-600/20 text-purple-400 flex-shrink-0">
-										<CheckCircle2 className="h-5 w-5" />
-									</div>
-									<div>
-										<p className="font-semibold text-white">Check your inbox</p>
-										<p className="text-sm text-gray-400">The code should arrive within a few minutes</p>
-									</div>
-								</div>
-
-								<div className="flex items-start gap-3">
-									<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-600/20 text-purple-400 flex-shrink-0">
-										<CheckCircle2 className="h-5 w-5" />
-									</div>
-									<div>
-										<p className="font-semibold text-white">Check spam folder</p>
-										<p className="text-sm text-gray-400">Sometimes emails end up in spam or junk</p>
-									</div>
-								</div>
-
-								<div className="flex items-start gap-3">
-									<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-600/20 text-purple-400 flex-shrink-0">
-										<CheckCircle2 className="h-5 w-5" />
-									</div>
-									<div>
-										<p className="font-semibold text-white">Valid for 15 minutes</p>
-										<p className="text-sm text-gray-400">Request a new code if it expires</p>
-									</div>
-								</div>
-							</div>
 						</div>
 					</div>
 
@@ -270,7 +238,7 @@ function VerifyEmailContent() {
 				</aside>
 
 				{/* Right Side - Verification Form */}
-				<section className="flex flex-1 items-center justify-center px-6 py-10 lg:px-12 lg:py-16">
+				<section className="flex flex-1 items-center justify-center px-6 py-8 lg:px-12 lg:py-12">
 					<div className="w-full max-w-xl">
 						{isVerified ? (
 							<div className="rounded-3xl border border-green-200 bg-green-50 px-8 py-10 text-center">
@@ -285,8 +253,8 @@ function VerifyEmailContent() {
 								</p>
 							</div>
 						) : (
-							<div className="rounded-3xl border border-zinc-200 bg-white px-8 py-10 shadow-sm">
-								<div className="flex items-center justify-between mb-6">
+							<div className="rounded-3xl border border-zinc-200 bg-white px-8 py-8 shadow-sm">
+								<div className="flex items-center justify-between mb-5">
 									<div>
 										<h2 className="text-xl font-semibold text-black sm:text-2xl">
 											Enter verification code
@@ -295,9 +263,15 @@ function VerifyEmailContent() {
 											Enter the 4-digit code sent to your email
 										</p>
 									</div>
+									<Link
+										href="/login"
+										className="inline-flex items-center justify-center rounded-full border border-zinc-200 bg-white px-4 py-2 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-50 hover:text-black"
+									>
+										Skip
+									</Link>
 								</div>
 
-								<form onSubmit={handleSubmit} className="space-y-8">
+								<form onSubmit={handleSubmit} className="space-y-6">
 									{/* Code Input */}
 									<div className="flex justify-center gap-3">
 										{code.map((value, index) => (
@@ -398,7 +372,7 @@ function VerifyEmailContent() {
 								</form>
 
 								{/* Back to login */}
-								<div className="mt-8 text-center">
+								<div className="mt-6 text-center">
 									<Link 
 										href="/login" 
 										className="inline-flex items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-black"
@@ -430,25 +404,25 @@ function VerifyEmailContent() {
 
 function VerifyEmailPageSkeleton() {
 	return (
-		<main className={`min-h-screen bg-white text-black ${bodyFont.className}`}>
-			<div className="flex min-h-screen flex-col lg:flex-row">
+		<main className={`h-dvh bg-white text-black ${bodyFont.className}`}>
+			<div className="flex h-dvh flex-col lg:flex-row">
 				{/* Left Side - Info Section */}
-				<aside className="flex flex-1 flex-col justify-between bg-gradient-to-br from-gray-900 via-black to-gray-900 px-6 py-10 lg:px-12 lg:py-16">
+				<aside className="flex flex-1 flex-col justify-between bg-gradient-to-br from-gray-900 via-black to-gray-900 px-6 py-8 lg:px-12 lg:py-12">
 					<div>
-						<Link href="/" className="mb-16 inline-flex items-center gap-3 text-white transition hover:opacity-80">
+						<Link href="/" className="mb-10 inline-flex items-center gap-3 text-white transition hover:opacity-80">
 							<img
 								src="/logo.png"
 								alt="GenzProp Logo"
-								className="h-12 w-12 object-contain rounded-lg"
+								className="h-11 w-11 object-contain rounded-lg"
 								loading="lazy"
 							/>
-							<span className={`${brandFont.className} text-3xl font-black tracking-tight`}>
+							<span className={`${brandFont.className} text-[28px] font-extrabold tracking-[-0.02em]`}>
 								Fx<span className="text-white">Genz</span>
 							</span>
 						</Link>
 						<div className="max-w-md">
-							<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-purple-600/20 mb-6">
-								<Mail className="h-8 w-8 text-purple-400" />
+							<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-600/20 mb-5">
+								<Mail className="h-6 w-6 text-purple-400" />
 							</div>
 							<div className="h-8 w-3/4 bg-gray-700 rounded animate-pulse mb-4"></div>
 							<div className="h-4 w-full bg-gray-700 rounded animate-pulse mb-2"></div>
@@ -461,9 +435,9 @@ function VerifyEmailPageSkeleton() {
 				</aside>
 				
 				{/* Right Side - Loading */}
-				<section className="flex flex-1 items-center justify-center px-6 py-10 lg:px-12 lg:py-16">
+				<section className="flex flex-1 items-center justify-center px-6 py-8 lg:px-12 lg:py-12">
 					<div className="w-full max-w-xl">
-						<div className="rounded-3xl border border-zinc-200 bg-white px-8 py-10 shadow-sm">
+						<div className="rounded-3xl border border-zinc-200 bg-white px-8 py-8 shadow-sm">
 							<div className="h-6 w-48 bg-gray-200 rounded animate-pulse mb-4"></div>
 							<div className="h-4 w-64 bg-gray-200 rounded animate-pulse mb-8"></div>
 							<div className="flex justify-center gap-3 mb-8">

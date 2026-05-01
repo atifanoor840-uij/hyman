@@ -59,9 +59,9 @@ export default function PromoTicker() {
       aria-label="Promotional offers"
     >
       <div className="mx-auto flex h-full w-full max-w-7xl items-center justify-center gap-4 overflow-x-auto px-3 py-0 [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-10 sm:px-6 [&::-webkit-scrollbar]:hidden">
-        <Segment labelPrefix="Existing Customer Promo:" boldOffer="10% OFF" code="BF10" />
+        <Segment labelPrefix="VIP Promo:" boldOffer="65% OFF" code="VIP65" />
         <div className="h-4 w-px shrink-0 bg-white/25" aria-hidden />
-        <Segment labelPrefix="New Customer Promo:" boldOffer="15% OFF" code="NEW15" />
+        <Segment labelPrefix="Existing Customer Promo:" boldOffer="10% OFF" code="BF10" />
       </div>
     </div>
   );

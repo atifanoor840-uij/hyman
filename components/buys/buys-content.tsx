@@ -15,7 +15,6 @@ import {
   ChevronRight,
 } from "lucide-react"
 import {
-  createOrder,
   createOrderWithOxapay,
   OXAPAY_ORDER_DESCRIPTION,
   OXAPAY_THANKS_MESSAGE,
@@ -154,15 +153,11 @@ const platforms = [
 ]
 
 const paymentMethods = [
-  { 
-    id: "crypto", 
-    label: "Crypto", 
-    image: "https://fundednext.fra1.digitaloceanspaces.com/utility-files/5967937.gif"
-  },
-  { 
-    id: "card", 
-    label: "Credit/Debit Card", 
-    image: "https://fundednext.fra1.digitaloceanspaces.com/utility-files/6267395.png"
+  {
+    id: "crypto",
+    label: "Crypto",
+    // Use same icon previously used for Credit/Debit Card
+    image: "https://fundednext.fra1.digitaloceanspaces.com/utility-files/6267395.png",
   },
 ]
 
@@ -223,38 +218,23 @@ export function BuysContent() {
     setSubmitError(null)
     setIsSubmitting(true)
     try {
-      let response: Awaited<ReturnType<typeof createOrder>>
-      // Crypto → POST /orders/create-with-oxapay (Oxapay)
-      if (selectedPaymentMethod === "crypto") {
-        response = await createOrderWithOxapay({
-          challenge_type: normalizeChallengeType(activeAccountType),
-          account_size: String(accountSizeValue),
-          platform: selectedPlatform,
-          amount,
-          currency: "USD",
-          to_currency: "USDT",
-          order_name: "",
-          description: OXAPAY_ORDER_DESCRIPTION,
-          lifetime: 60,
-          fee_paid_by_payer: 1,
-          under_paid_coverage: 2.5,
-          auto_withdrawal: false,
-          mixed_payment: true,
-          return_url: "https://www.fxonyx.com",
-          thanks_message: OXAPAY_THANKS_MESSAGE,
-        })
-      } else {
-        response = await createOrder({
-          challenge_type: normalizeChallengeType(activeAccountType),
-          account_size: String(accountSizeValue),
-          platform: selectedPlatform,
-          payment_method: "CARD",
-          amount,
-          token_name: "",
-          txid: "",
-          image: "",
-        })
-      }
+      const response = await createOrderWithOxapay({
+        challenge_type: normalizeChallengeType(activeAccountType),
+        account_size: String(accountSizeValue),
+        platform: selectedPlatform,
+        amount,
+        currency: "USD",
+        to_currency: "USDT",
+        order_name: "",
+        description: OXAPAY_ORDER_DESCRIPTION,
+        lifetime: 60,
+        fee_paid_by_payer: 1,
+        under_paid_coverage: 2.5,
+        auto_withdrawal: false,
+        mixed_payment: true,
+        return_url: "https://www.fxonyx.com",
+        thanks_message: OXAPAY_THANKS_MESSAGE,
+      })
       closeSidebar()
       const checkoutUrl = response?.checkout_session_url
       if (checkoutUrl && typeof checkoutUrl === "string" && checkoutUrl.trim() !== "") {
@@ -579,7 +559,7 @@ export function BuysContent() {
                   <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                   <p className="text-sm font-semibold text-foreground">Payment Method</p>
                 </div>
-                <div className="grid grid-cols-2 gap-2.5">
+                <div className={`grid ${paymentMethods.length === 1 ? "grid-cols-1" : "grid-cols-2"} gap-2.5`}>
                   {paymentMethods.map((method) => (
                     <button
                       key={method.id}

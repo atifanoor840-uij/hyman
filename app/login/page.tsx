@@ -138,6 +138,21 @@ export default function LoginPage() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
+	useEffect(() => {
+		// After signup -> verify email -> login: prefill email/password once.
+		try {
+			const raw = sessionStorage.getItem('login_prefill');
+			if (!raw) return;
+			sessionStorage.removeItem('login_prefill');
+
+			const parsed = JSON.parse(raw) as { email?: string; password?: string };
+			if (parsed?.email) setEmail(parsed.email);
+			if (parsed?.password) setPassword(parsed.password);
+		} catch {
+			// ignore
+		}
+	}, []);
+
 	const validateForm = () => {
 		const nextErrors: typeof formErrors = {};
 

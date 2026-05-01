@@ -123,12 +123,12 @@ export default function DiscountPopup(props: DiscountPopupProps) {
                 <div className="p-4 sm:p-5 md:p-6 space-y-3 sm:space-y-4 flex-1">
                   <div className="rounded-lg sm:rounded-xl bg-white/5 border border-white/10 p-3 sm:p-4">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
-                      <div className="text-[11px] sm:text-xs md:text-sm text-white/80">60% off</div>
-                      <Button type="button" variant="secondary" className="h-7 sm:h-8 px-3 sm:px-4 text-[10px] sm:text-xs rounded-lg w-full sm:w-auto" onClick={() => handleCopyCode('WING2026')}>
-                        {copiedCode === 'WING2026' ? 'Copied ✓' : 'Copy Code'}
+                      <div className="text-[11px] sm:text-xs md:text-sm text-white/80">65% off</div>
+                      <Button type="button" variant="secondary" className="h-7 sm:h-8 px-3 sm:px-4 text-[10px] sm:text-xs rounded-lg w-full sm:w-auto" onClick={() => handleCopyCode('VIP65')}>
+                        {copiedCode === 'VIP65' ? 'Copied ✓' : 'Copy Code'}
                       </Button>
                     </div>
-                    <div className="font-mono font-bold text-[#DEBF74] select-all text-sm sm:text-base md:text-base break-all">WING2026</div>
+                    <div className="font-mono font-bold text-[#DEBF74] select-all text-sm sm:text-base md:text-base break-all">VIP65</div>
                   </div>
                 </div>
 

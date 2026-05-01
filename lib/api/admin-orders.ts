@@ -238,3 +238,83 @@ export async function completeOrder(
   return data
 }
 
+export async function passOrder(
+  orderId: number | string,
+  payload: { profit_amount: string | number }
+): Promise<any> {
+  const token = getAuthToken()
+  if (!token) throw new ApiClientError("Missing access token. Please sign in again.", 401)
+
+  const url = `${getApiBaseUrl()}/orders/detail/${encodeURIComponent(String(orderId))}/pass`
+  const form = new FormData()
+  form.append("profit_amount", String(payload.profit_amount))
+
+  let res: Response
+  try {
+    res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: form,
+      credentials: "omit",
+    })
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Network error"
+    throw new ApiClientError(msg || "Network error", 0)
+  }
+  const data = await readResponse(res)
+  if (!res.ok) {
+    const message =
+      (typeof data === "object" && data && ((data as any).message || (data as any).error)) ||
+      (typeof data === "string" && data) ||
+      `Request failed with status ${res.status}`
+    throw new ApiClientError(String(message), res.status)
+  }
+  return data
+}
+
+export type FailOrderPayload = {
+  date_time: string
+  details: string
+  reason: string
+}
+
+export async function failOrder(
+  orderId: number | string,
+  payload: FailOrderPayload
+): Promise<any> {
+  const token = getAuthToken()
+  if (!token) throw new ApiClientError("Missing access token. Please sign in again.", 401)
+
+  const url = `${getApiBaseUrl()}/orders/detail/${encodeURIComponent(String(orderId))}/fail`
+  const form = new FormData()
+  form.append("date_time", String(payload.date_time ?? ""))
+  form.append("details", String(payload.details ?? ""))
+  form.append("reason", String(payload.reason ?? ""))
+
+  let res: Response
+  try {
+    res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: form,
+      credentials: "omit",
+    })
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Network error"
+    throw new ApiClientError(msg || "Network error", 0)
+  }
+  const data = await readResponse(res)
+  if (!res.ok) {
+    const message =
+      (typeof data === "object" && data && ((data as any).message || (data as any).error)) ||
+      (typeof data === "string" && data) ||
+      `Request failed with status ${res.status}`
+    throw new ApiClientError(String(message), res.status)
+  }
+  return data
+}
+

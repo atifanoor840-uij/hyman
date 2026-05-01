@@ -10,6 +10,7 @@ export type AccountCredential = {
   platform_password: string
   account_size: string
   graph_link?: string | null
+  profit_target?: number | null
   is_assigned?: boolean
   order_id?: number | null
   created_at?: string | null
@@ -20,9 +21,16 @@ export type AccountCredential = {
 
 export async function listAccountCredentials(): Promise<AccountCredential[]> {
   const url = `${getApiBaseUrl()}/accounts/credentials`
+  const token = getAuthToken()
   let res: Response
   try {
-    res = await fetch(url, { method: "GET" })
+    res = await fetch(url, {
+      method: "GET",
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      credentials: "omit",
+    })
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Network error"
     throw new ApiClientError(msg || "Network error", 0)
@@ -52,9 +60,21 @@ export type UpsertAccountCredential = {
   account_size: string
   status?: string | null
   graph_link?: string | null
+  profit_target?: number | null
   is_assigned?: boolean
   order_id?: number | null
   [key: string]: any
+}
+
+export type UpsertAccountCredentialsPayload = {
+  credentials: Array<{
+    platform: string
+    server: string
+    platform_login: string
+    platform_password: string
+    account_size: string
+    graph_link?: string | null
+  }>
 }
 
 async function readResponse(res: Response) {
@@ -63,7 +83,9 @@ async function readResponse(res: Response) {
   return isJson ? await res.json().catch(() => null) : await res.text().catch(() => null)
 }
 
-export async function createAccountCredential(payload: UpsertAccountCredential): Promise<AccountCredential> {
+export async function upsertAccountCredentials(
+  payload: UpsertAccountCredentialsPayload
+): Promise<any> {
   const token = getAuthToken()
   const url = `${getApiBaseUrl()}/accounts/credentials`
   let res: Response
@@ -89,6 +111,23 @@ export async function createAccountCredential(payload: UpsertAccountCredential):
       `Request failed with status ${res.status}`
     throw new ApiClientError(String(message), res.status)
   }
+  return data
+}
+
+export async function createAccountCredential(payload: UpsertAccountCredential): Promise<AccountCredential> {
+  // Backend expects { credentials: [...] } wrapper.
+  const data = await upsertAccountCredentials({
+    credentials: [
+      {
+        platform: String(payload.platform ?? "").trim(),
+        server: String(payload.server ?? "").trim(),
+        platform_login: String(payload.platform_login ?? "").trim(),
+        platform_password: String(payload.platform_password ?? "").trim(),
+        account_size: String(payload.account_size ?? "").trim(),
+        graph_link: payload.graph_link ?? "",
+      },
+    ],
+  })
   return (typeof data === "object" && data ? (data as AccountCredential) : ({} as AccountCredential))
 }
 
@@ -106,7 +145,15 @@ export async function updateAccountCredential(
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        platform: payload.platform,
+        server: payload.server,
+        platform_login: payload.platform_login,
+        platform_password: payload.platform_password,
+        account_size: payload.account_size,
+        graph_link: payload.graph_link ?? "",
+        profit_target: payload.profit_target ?? 0,
+      }),
       credentials: "omit",
     })
   } catch (e) {
@@ -122,5 +169,32 @@ export async function updateAccountCredential(
     throw new ApiClientError(String(message), res.status)
   }
   return (typeof data === "object" && data ? (data as AccountCredential) : ({} as AccountCredential))
+}
+
+export async function deleteAccountCredential(id: number | string): Promise<any> {
+  const token = getAuthToken()
+  const url = `${getApiBaseUrl()}/accounts/credentials/${encodeURIComponent(String(id))}`
+  let res: Response
+  try {
+    res = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      credentials: "omit",
+    })
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Network error"
+    throw new ApiClientError(msg || "Network error", 0)
+  }
+  const data = await readResponse(res)
+  if (!res.ok) {
+    const message =
+      (typeof data === "object" && data && ((data as any).message || (data as any).error)) ||
+      (typeof data === "string" && data) ||
+      `Request failed with status ${res.status}`
+    throw new ApiClientError(String(message), res.status)
+  }
+  return data
 }
 

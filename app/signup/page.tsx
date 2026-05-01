@@ -169,6 +169,15 @@ export default function SignupPage() {
 			setToastMessage('Please check your email to verify your account.');
 
 			setTimeout(() => {
+				// Prefill login after email verification redirect.
+				try {
+					sessionStorage.setItem(
+						'login_prefill',
+						JSON.stringify({ email: signupData.email, password: signupData.password })
+					);
+				} catch {
+					// ignore
+				}
 				router.push(`/verify-email?email=${encodeURIComponent(signupData.email)}`);
 			}, 2000);
 		} catch (err) {

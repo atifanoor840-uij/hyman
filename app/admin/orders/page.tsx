@@ -30,7 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { completeOrder, completeOrderByCredential, listAllOrders, updateOrderCredential, type AdminOrder } from "@/lib/api/admin-orders"
+import { completeOrder, completeOrderByCredential, failOrder, listAllOrders, passOrder, updateOrderCredential, type AdminOrder } from "@/lib/api/admin-orders"
 import { listAccountCredentials, type AccountCredential } from "@/lib/api/admin-container"
 import { ApiClientError } from "@/lib/api/client"
 import { formatDateKarachi } from "@/lib/utils"
@@ -71,6 +71,18 @@ export default function AdminOrdersPage() {
   const [showSensitive, setShowSensitive] = useState(false)
   const [viewOrder, setViewOrder] = useState<AdminOrder | null>(null)
   const [editOrder, setEditOrder] = useState<AdminOrder | null>(null)
+
+  const [passSaving, setPassSaving] = useState(false)
+  const [passError, setPassError] = useState<string | null>(null)
+
+  const [failOpen, setFailOpen] = useState(false)
+  const [failSaving, setFailSaving] = useState(false)
+  const [failError, setFailError] = useState<string | null>(null)
+  const [failForm, setFailForm] = useState({
+    date_time: "",
+    details: "",
+    reason: "",
+  })
 
   const [deliverOpen, setDeliverOpen] = useState(false)
   const [deliverContainerOpen, setDeliverContainerOpen] = useState(false)
@@ -138,6 +150,59 @@ export default function AdminOrdersPage() {
       graph_link: "",
     })
     setDeliverOpen(true)
+  }
+
+  const orderIdOf = (o: AdminOrder | null | undefined) => {
+    if (!o) return null
+    return (o as any).id ?? o.order_id ?? null
+  }
+
+  const submitPass = async (o: AdminOrder) => {
+    setPassSaving(true)
+    setPassError(null)
+    try {
+      const orderId = orderIdOf(o)
+      if (!orderId) throw new Error("Missing order id.")
+      await passOrder(orderId, { profit_amount: 1000 })
+      setEditOrder(null)
+      await load()
+    } catch (e) {
+      setPassError(e instanceof ApiClientError ? e.message : e instanceof Error ? e.message : "Failed to pass order.")
+    } finally {
+      setPassSaving(false)
+    }
+  }
+
+  const openFail = (o: AdminOrder) => {
+    setFailError(null)
+    setFailSaving(false)
+    setFailForm({
+      date_time: "",
+      details: "",
+      reason: "",
+    })
+    setFailOpen(true)
+  }
+
+  const submitFail = async (o: AdminOrder) => {
+    setFailSaving(true)
+    setFailError(null)
+    try {
+      const orderId = orderIdOf(o)
+      if (!orderId) throw new Error("Missing order id.")
+      await failOrder(orderId, {
+        date_time: failForm.date_time,
+        details: failForm.details,
+        reason: failForm.reason,
+      })
+      setFailOpen(false)
+      setEditOrder(null)
+      await load()
+    } catch (e) {
+      setFailError(e instanceof ApiClientError ? e.message : e instanceof Error ? e.message : "Failed to fail order.")
+    } finally {
+      setFailSaving(false)
+    }
   }
 
   const loadContainers = async () => {
@@ -905,7 +970,33 @@ export default function AdminOrdersPage() {
                     Deliver with container
                   </Button>
                 </div>
+
+                <div className="inline-flex items-center gap-2">
+                  <Button
+                    type="button"
+                    className="h-9 rounded-full bg-emerald-600 px-4 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+                    onClick={() => void submitPass(editOrder)}
+                    disabled={passSaving || failSaving}
+                  >
+                    {passSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                    PASS
+                  </Button>
+                  <Button
+                    type="button"
+                    className="h-9 rounded-full bg-destructive px-4 text-xs font-semibold text-destructive-foreground hover:bg-destructive/90 disabled:opacity-60"
+                    onClick={() => openFail(editOrder)}
+                    disabled={passSaving || failSaving}
+                  >
+                    FAIL
+                  </Button>
+                </div>
               </div>
+
+              {passError ? (
+                <div className="rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-foreground">
+                  {passError}
+                </div>
+              ) : null}
               <div className="rounded-2xl border border-border/70 bg-muted/20 px-4 py-3 text-sm text-muted-foreground">
                 Editing is not wired to an update endpoint yet — but the latest backend data is shown below.
               </div>
@@ -985,6 +1076,86 @@ export default function AdminOrdersPage() {
               )}
             </div>
           ) : null}
+        </DialogContent>
+      </Dialog>
+
+      {/* Fail modal */}
+      <Dialog
+        open={failOpen}
+        onOpenChange={(o) => {
+          setFailOpen(o)
+          if (!o) {
+            setFailError(null)
+            setFailSaving(false)
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Fail order</DialogTitle>
+          </DialogHeader>
+
+          {failError ? (
+            <div className="rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-foreground">
+              {failError}
+            </div>
+          ) : null}
+
+          {!editOrder ? (
+            <div className="text-sm text-muted-foreground">No order selected.</div>
+          ) : (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Date time</Label>
+                  <Input
+                    value={failForm.date_time}
+                    onChange={(e) => setFailForm((p) => ({ ...p, date_time: e.target.value }))}
+                    className="h-11 rounded-2xl"
+                    placeholder="2026-05-01 15:30"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Details</Label>
+                  <Input
+                    value={failForm.details}
+                    onChange={(e) => setFailForm((p) => ({ ...p, details: e.target.value }))}
+                    className="h-11 rounded-2xl"
+                    placeholder="Write details"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Reason</Label>
+                  <Input
+                    value={failForm.reason}
+                    onChange={(e) => setFailForm((p) => ({ ...p, reason: e.target.value }))}
+                    className="h-11 rounded-2xl"
+                    placeholder="Write reason"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-1">
+                <Button
+                  type="button"
+                  className="h-9 rounded-xl border border-border/70 bg-background px-4 text-xs font-semibold text-foreground hover:bg-muted/40"
+                  onClick={() => setFailOpen(false)}
+                  disabled={failSaving}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  className="h-9 rounded-xl bg-destructive px-4 text-xs font-semibold text-destructive-foreground hover:bg-destructive/90 disabled:opacity-60"
+                  onClick={() => void submitFail(editOrder)}
+                  disabled={failSaving}
+                >
+                  {failSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                  FAIL
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
