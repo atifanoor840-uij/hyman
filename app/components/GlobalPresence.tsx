@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from "react";
 import { ComposableMap, Geographies, Geography, Graticule } from "react-simple-maps";
 
 const COUNTRIES = [
@@ -97,6 +98,16 @@ export default function GlobalPresence() {
 
 function WorldMap() {
 	const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	if (!mounted) {
+		// Avoid SSR/client drift in react-simple-maps (projection/graticule path precision).
+		return <div className="h-full w-full" />;
+	}
 	return (
 		<ComposableMap projectionConfig={{ scale: 140 }} style={{ width: "100%", height: "100%" }}>
 			<Graticule stroke="rgba(255,255,255,0.1)" />

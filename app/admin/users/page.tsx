@@ -22,8 +22,36 @@ import {
 } from "@/components/ui/table"
 import { listMembers, type AdminMember } from "@/lib/api/admin-users"
 import { ApiClientError } from "@/lib/api/client"
-import { formatDateKarachi } from "@/lib/utils"
 import { CheckCircle2, Eye, EyeOff, Loader2, Pencil, RefreshCcw, ShieldAlert, Users } from "lucide-react"
+
+function parseBackendDate(input: string | number | Date) {
+  if (input instanceof Date) return input
+  if (typeof input === "number") return new Date(input)
+  const raw = String(input).trim()
+  // If backend sends a "naive" datetime (no timezone), assume it's UTC.
+  const hasTimezone = /([zZ]|[+-]\d{2}:?\d{2})$/.test(raw)
+  if (!hasTimezone) {
+    const isoish = raw.includes("T") ? raw : raw.replace(" ", "T")
+    return new Date(`${isoish}Z`)
+  }
+  return new Date(raw)
+}
+
+function formatDatePakistan(input: string | number | Date | null | undefined) {
+  if (!input) return "—"
+  const d = parseBackendDate(input)
+  if (!Number.isFinite(d.getTime())) return "—"
+  return new Intl.DateTimeFormat(undefined, {
+    timeZone: "Asia/Karachi",
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  }).format(d)
+}
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<AdminMember[]>([])
@@ -225,7 +253,7 @@ export default function AdminUsersPage() {
                       </TableCell>
                     ) : null}
                     <TableCell className="text-right text-muted-foreground text-xs">
-                      {u.created_at ? formatDateKarachi(u.created_at) : "—"}
+                      {formatDatePakistan(u.created_at)}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="inline-flex items-center gap-1.5">

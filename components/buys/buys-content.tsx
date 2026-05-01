@@ -223,7 +223,16 @@ export function BuysContent() {
     const sizeOption = accountSizes.find((s) => s.id === selectedSize)
     const accountSizeValue = sizeOption?.value ?? 0
     const amount = getPayableAmount()
-    trackInitiateCheckout(Number(amount), "USD", false, createEventId("checkout"))
+    const planLabel = accountTypes.find((p) => p.id === activeAccountType)?.label
+    trackInitiateCheckout(Number(amount), "USD", false, createEventId("checkout"), {
+      planLabel: planLabel || undefined,
+      challengeType:
+        activeAccountType === "alpha"
+          ? "step1"
+          : activeAccountType === "beta"
+            ? "step2"
+            : "instant",
+    })
     setSubmitError(null)
     setIsSubmitting(true)
     try {

@@ -56,6 +56,7 @@ export default function RootLayout({
 }>) {
   const metaPixelId =
     process.env.NEXT_PUBLIC_META_PIXEL_ID?.trim() || "944876151762415";
+  const metaPixelDebug = process.env.NEXT_PUBLIC_META_PIXEL_DEBUG === "true";
 
   return (
     <html lang="en">
@@ -64,7 +65,7 @@ export default function RootLayout({
       >
         {children}
         <Suspense fallback={null}>
-          <MetaPixel pixelId={metaPixelId} />
+          <MetaPixel pixelId={metaPixelId} debug={metaPixelDebug} />
         </Suspense>
         <noscript>
           <img

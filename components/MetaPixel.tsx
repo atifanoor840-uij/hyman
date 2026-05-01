@@ -240,14 +240,17 @@ export const trackInitiateCheckout = (
   value: number,
   currency: string = "USD",
   debug = false,
-  eventId?: string
+  eventId?: string,
+  options?: { planLabel?: string; challengeType?: string }
 ) => {
   trackMetaPixelEvent('InitiateCheckout', {
     content_name: 'Dragon Funded Checkout',
     content_category: 'Trading Program',
     value,
     currency,
-    content_type: 'product'
+    content_type: 'product',
+    ...(options?.planLabel ? { plan_label: options.planLabel } : null),
+    ...(options?.challengeType ? { challenge_type: options.challengeType } : null),
   }, debug, eventId)
 
   void sendConversionEvent("InitiateCheckout", {
@@ -258,6 +261,8 @@ export const trackInitiateCheckout = (
       value,
       currency,
       content_type: "product",
+      ...(options?.planLabel ? { plan_label: options.planLabel } : null),
+      ...(options?.challengeType ? { challenge_type: options.challengeType } : null),
     },
   })
 }

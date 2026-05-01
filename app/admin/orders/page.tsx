@@ -33,11 +33,40 @@ import {
 import { completeOrder, completeOrderByCredential, failOrder, listAllOrders, passOrder, updateOrderCredential, type AdminOrder } from "@/lib/api/admin-orders"
 import { listAccountCredentials, type AccountCredential } from "@/lib/api/admin-container"
 import { ApiClientError } from "@/lib/api/client"
-import { formatDateKarachi } from "@/lib/utils"
 import { getShowMyTradesStats } from "@/lib/api/showmytrades"
 import type { PerformanceResponse } from "@/lib/api/performance"
 import { PerformanceGraphPanel, DetailedStatisticsCard } from "@/components/dashboard/performance-graph-stats"
 import { ExternalLink, Eye, EyeOff, Loader2, Pencil, RefreshCcw, ShieldAlert, ShoppingCart, LogIn, LineChart, PackageCheck } from "lucide-react"
+
+function parseBackendDate(input: string | number | Date) {
+  if (input instanceof Date) return input
+  if (typeof input === "number") return new Date(input)
+  const raw = String(input).trim()
+  // If backend sends a "naive" datetime (no timezone), assume it's UTC.
+  const hasTimezone = /([zZ]|[+-]\d{2}:?\d{2})$/.test(raw)
+  if (!hasTimezone) {
+    // Support common forms like "2026-05-01 16:52:53" or "2026-05-01T16:52:53"
+    const isoish = raw.includes("T") ? raw : raw.replace(" ", "T")
+    return new Date(`${isoish}Z`)
+  }
+  return new Date(raw)
+}
+
+function formatDatePakistan(input: string | number | Date | null | undefined) {
+  if (!input) return "—"
+  const d = parseBackendDate(input)
+  if (!Number.isFinite(d.getTime())) return "—"
+  return new Intl.DateTimeFormat(undefined, {
+    timeZone: "Asia/Karachi",
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  }).format(d)
+}
 
 function paymentTone(status: string | null | undefined) {
   const s = String(status ?? "").toLowerCase()
@@ -722,7 +751,7 @@ export default function AdminOrdersPage() {
                         </TableCell>
                       ) : null}
                       <TableCell className="text-right text-muted-foreground text-xs">
-                        {updated ? formatDateKarachi(updated) : "—"}
+                        {formatDatePakistan(updated)}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="grid w-[220px] grid-cols-2 gap-2 ml-auto">
@@ -823,7 +852,7 @@ export default function AdminOrdersPage() {
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <InfoRow label="Completed" value={String(Boolean((viewOrder as any).completed))} />
-                  <InfoRow label="Completed at" value={String((viewOrder as any).completed_at ?? "—")} mono />
+                  <InfoRow label="Completed at" value={formatDatePakistan((viewOrder as any).completed_at)} mono />
                   <InfoRow label="Credential id" value={String((viewOrder as any).credential_id ?? "—")} mono />
                   <InfoRow label="Account status" value={String((viewOrder as any).account_status ?? "—")} />
                   <InfoRow label="Profit target" value={String((viewOrder as any).profit_target ?? "—")} mono />
@@ -856,7 +885,7 @@ export default function AdminOrdersPage() {
                       <div key={`${t.event_type ?? "event"}-${idx}`} className="rounded-2xl border border-border/70 bg-muted/20 px-4 py-3">
                         <div className="flex items-center justify-between gap-3">
                           <p className="text-sm font-semibold text-foreground">{String(t.event_type ?? "—")}</p>
-                          <p className="text-xs text-muted-foreground tabular-nums">{String(t.event_date ?? "—")}</p>
+                          <p className="text-xs text-muted-foreground tabular-nums">{formatDatePakistan(t.event_date)}</p>
                         </div>
                         {t.notes ? (
                           <p className="mt-1 text-xs text-muted-foreground">{String(t.notes)}</p>
