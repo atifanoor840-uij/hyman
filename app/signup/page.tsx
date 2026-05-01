@@ -26,6 +26,9 @@ import {
 } from '../../lib/auth-utils';
 import { trackSignup } from '../../components/MetaPixel';
 
+const createEventId = (prefix: string) =>
+	`${prefix}.${Date.now().toString(36)}.${Math.random().toString(36).slice(2, 10)}`;
+
 type SignupStep = 'details' | 'verify' | 'complete';
 
 const initialFormState = {
@@ -162,7 +165,7 @@ export default function SignupPage() {
 				}
 			}
 
-			trackSignup();
+			trackSignup(signupData.email, false, createEventId('signup'));
 
 			setToastType('success');
 			setToastTitle('Account Created!');

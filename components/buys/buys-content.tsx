@@ -23,6 +23,9 @@ import { ApiClientError } from "@/lib/api/client"
 import SuccessPopup from "@/app/components/SuccessPopup"
 import { trackInitiateCheckout, trackViewContent } from "@/components/MetaPixel"
 
+const createEventId = (prefix: string) =>
+  `${prefix}.${Date.now().toString(36)}.${Math.random().toString(36).slice(2, 10)}`
+
 const platformTypes = [
   { id: "mt4", label: "MT4", logo: "/MT4.png" },
   { id: "mt5", label: "MT5", logo: "/MT5 (2).png" },
@@ -220,7 +223,7 @@ export function BuysContent() {
     const sizeOption = accountSizes.find((s) => s.id === selectedSize)
     const accountSizeValue = sizeOption?.value ?? 0
     const amount = getPayableAmount()
-    trackInitiateCheckout(Number(amount), "USD")
+    trackInitiateCheckout(Number(amount), "USD", false, createEventId("checkout"))
     setSubmitError(null)
     setIsSubmitting(true)
     try {

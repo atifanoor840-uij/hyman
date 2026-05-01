@@ -115,10 +115,19 @@ export default function MetaPixel({ pixelId, debug = false }: MetaPixelProps) {
 }
 
 // Utility function to track custom events with enhanced error handling
-export const trackMetaPixelEvent = (eventName: string, parameters?: Record<string, any>, debug = false) => {
+export const trackMetaPixelEvent = (
+  eventName: string,
+  parameters?: Record<string, any>,
+  debug = false,
+  eventId?: string
+) => {
   if (typeof window !== 'undefined' && window.fbq) {
     try {
-      window.fbq('track', eventName, parameters)
+      if (eventId) {
+        window.fbq('track', eventName, parameters, { eventID: eventId })
+      } else {
+        window.fbq('track', eventName, parameters)
+      }
       if (debug) {
         console.log('✅ Meta Pixel event tracked:', eventName, parameters)
         console.log('🔍 Event verification:', {
@@ -177,7 +186,7 @@ export const trackSignup = (email?: string, debug = false, eventId?: string) => 
     content_category: 'Trading Platform Signup',
     value: 0,
     currency: 'USD',
-  }, debug)
+  }, debug, eventId)
 
   void sendConversionEvent("CompleteRegistration", {
     event_id: eventId,
@@ -227,14 +236,30 @@ export const trackAddToCart = (value: number, currency: string = 'USD', contentN
   }, debug)
 }
 
-export const trackInitiateCheckout = (value: number, currency: string = 'USD', debug = false) => {
+export const trackInitiateCheckout = (
+  value: number,
+  currency: string = "USD",
+  debug = false,
+  eventId?: string
+) => {
   trackMetaPixelEvent('InitiateCheckout', {
     content_name: 'Dragon Funded Checkout',
     content_category: 'Trading Program',
     value,
     currency,
     content_type: 'product'
-  }, debug)
+  }, debug, eventId)
+
+  void sendConversionEvent("InitiateCheckout", {
+    event_id: eventId,
+    custom_data: {
+      content_name: "Dragon Funded Checkout",
+      content_category: "Trading Program",
+      value,
+      currency,
+      content_type: "product",
+    },
+  })
 }
 
 // Enhanced purchase tracking with more details
