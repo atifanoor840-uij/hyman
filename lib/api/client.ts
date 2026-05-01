@@ -1,9 +1,11 @@
 import { clearAuth } from '@/lib/auth-utils';
+import { clearAdmin2fa } from "@/components/admin/admin-auth"
 
 // Use environment variable or fallback to production URL (trim trailing slash)
 const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://genzpropbackend-5ce82dd885de.herokuapp.com').replace(/\/$/, '');
 
 const LOGIN_PATH = '/login';
+const ADMIN_LOGIN_PATH = "/admin/login"
 
 export interface ApiError {
 	message: string;
@@ -54,7 +56,16 @@ async function handleResponse<T>(response: Response): Promise<T> {
 		// When access token is expired or invalid (401), clear auth and redirect to login
 		if (response.status === 401 && typeof window !== 'undefined') {
 			clearAuth();
-			window.location.href = LOGIN_PATH;
+			clearAdmin2fa();
+			const pathname = window.location.pathname || ""
+			const search = window.location.search || ""
+			const next = `${pathname}${search}`
+			const isAdmin = pathname.startsWith("/admin")
+			if (isAdmin && !pathname.startsWith("/admin/login")) {
+				window.location.href = `${ADMIN_LOGIN_PATH}?next=${encodeURIComponent(next)}`
+			} else {
+				window.location.href = LOGIN_PATH;
+			}
 		}
 		const errors = data?.errors ?? data?.detail ?? undefined;
 		let message = data?.message ?? data?.error ?? `Request failed with status ${response.status}`;
