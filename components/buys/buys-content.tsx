@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -21,6 +21,7 @@ import {
 } from "@/lib/api/orders"
 import { ApiClientError } from "@/lib/api/client"
 import SuccessPopup from "@/app/components/SuccessPopup"
+import { trackInitiateCheckout, trackViewContent } from "@/components/MetaPixel"
 
 const platformTypes = [
   { id: "mt4", label: "MT4", logo: "/MT4.png" },
@@ -179,6 +180,10 @@ export function BuysContent() {
   const features = buildFeatures(activeAccountType, accountSizes)
   const pricing = pricingByType[activeAccountType] || pricingByType.alpha
 
+  useEffect(() => {
+    trackViewContent("GenzProp Plans / Buys", "Checkout")
+  }, [])
+
   // Reset selected size if it doesn't exist in the new account type
   const handleAccountTypeChange = (newType: string) => {
     const normalized = normalizeChallengeType(newType)
@@ -215,6 +220,7 @@ export function BuysContent() {
     const sizeOption = accountSizes.find((s) => s.id === selectedSize)
     const accountSizeValue = sizeOption?.value ?? 0
     const amount = getPayableAmount()
+    trackInitiateCheckout(Number(amount), "USD")
     setSubmitError(null)
     setIsSubmitting(true)
     try {

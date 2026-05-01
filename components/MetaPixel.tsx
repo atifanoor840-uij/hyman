@@ -18,6 +18,7 @@ interface MetaPixelProps {
 interface MetaPixelEvent {
   eventName: string
   parameters?: Record<string, any>
+  eventId?: string
 }
 
 export default function MetaPixel({ pixelId, debug = false }: MetaPixelProps) {
@@ -148,14 +149,46 @@ export const trackMetaPixelEvent = (eventName: string, parameters?: Record<strin
   }
 }
 
+export const sendConversionEvent = async (
+  event_name: string,
+  options?: { event_id?: string; custom_data?: Record<string, unknown> }
+) => {
+  if (typeof window === "undefined") return
+  try {
+    await fetch("/api/meta/conversion", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        event_name,
+        event_id: options?.event_id,
+        custom_data: options?.custom_data,
+      }),
+      keepalive: true,
+    })
+  } catch {
+    // swallow: CAPI should never block UX
+  }
+}
+
 // Predefined event tracking functions with enhanced parameters
-export const trackSignup = (email?: string, debug = false) => {
+export const trackSignup = (email?: string, debug = false, eventId?: string) => {
   trackMetaPixelEvent('CompleteRegistration', {
     content_name: 'Dragon Funded User Registration',
     content_category: 'Trading Platform Signup',
     value: 0,
     currency: 'USD',
   }, debug)
+
+  void sendConversionEvent("CompleteRegistration", {
+    event_id: eventId,
+    custom_data: {
+      content_name: "Dragon Funded User Registration",
+      content_category: "Trading Platform Signup",
+      value: 0,
+      currency: "USD",
+      ...(email ? { email } : {}),
+    },
+  })
 }
 
 export const trackPurchase = (value: number, currency: string = 'USD', contentName?: string, debug = false) => {
