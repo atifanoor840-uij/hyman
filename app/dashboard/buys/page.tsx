@@ -1,4 +1,4 @@
-import { BuysContent } from "@/components/buys/buys-content"
+import { redirect } from "next/navigation"
 
 export default function BuysPage() {
   return (

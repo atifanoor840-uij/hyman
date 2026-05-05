@@ -2,9 +2,10 @@
 
 import { useMemo, useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
-import { Mail, CheckCircle2, ArrowLeft, RefreshCw } from 'lucide-react';
+import { CheckCircle2, ArrowLeft, RefreshCw } from 'lucide-react';
 import SuccessPopup from '../components/SuccessPopup';
 
 const brandFont = Plus_Jakarta_Sans({ subsets: ['latin'], weight: ['600', '700', '800'] });
@@ -216,8 +217,15 @@ function VerifyEmailContent() {
 						</Link>
 
 						<div className="max-w-md">
-							<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-600/20 mb-5">
-								<Mail className="h-6 w-6 text-purple-400" />
+							<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-transparent ring-1 ring-white/10 shadow-[0_0_30px_rgba(168,85,247,0.35)] mb-5">
+								<Image
+									src="/icons/email-3d-transparent.png"
+									alt="Email icon"
+									width={52}
+									height={52}
+									className="h-[52px] w-[52px] drop-shadow-[0_10px_20px_rgba(0,0,0,0.55)]"
+									priority
+								/>
 							</div>
 							
 							<h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
@@ -421,8 +429,14 @@ function VerifyEmailPageSkeleton() {
 							</span>
 						</Link>
 						<div className="max-w-md">
-							<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-600/20 mb-5">
-								<Mail className="h-6 w-6 text-purple-400" />
+							<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-transparent ring-1 ring-white/10 shadow-[0_0_30px_rgba(168,85,247,0.35)] mb-5">
+								<Image
+									src="/icons/email-3d-transparent.png"
+									alt="Email icon"
+									width={52}
+									height={52}
+									className="h-[52px] w-[52px] drop-shadow-[0_10px_20px_rgba(0,0,0,0.55)]"
+								/>
 							</div>
 							<div className="h-8 w-3/4 bg-gray-700 rounded animate-pulse mb-4"></div>
 							<div className="h-4 w-full bg-gray-700 rounded animate-pulse mb-2"></div>

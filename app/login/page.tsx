@@ -198,84 +198,21 @@ export default function LoginPage() {
 	return (
 		<div className="min-h-screen flex flex-col bg-gradient-to-br from-white via-white to-zinc-50 text-black">
 			<Navbar variant="sticky" />
-			<main className="flex-1 flex min-h-0">
-			{/* Left panel - professional geometric (folded planes / ribbons), black theme */}
-			<div className="hidden lg:flex lg:w-[38%] xl:w-[40%] relative overflow-hidden bg-black">
-				{/* Dark top bar */}
-				<div className="absolute top-0 left-0 right-0 h-20 bg-black/90 z-[1]" />
-				{/* Layered geometric shapes - overlapping ribbons/planes pointing right */}
-				<div className="absolute inset-0 z-0">
-					<div className="absolute inset-0 bg-zinc-950" />
-					<div
-						className="absolute -left-[10%] bottom-[5%] w-[95%] h-[75%] bg-zinc-800 shadow-2xl"
-						style={{
-							clipPath: 'polygon(0 15%, 92% 0, 100% 85%, 8% 100%)',
-							transform: 'skewY(-1deg)',
-						}}
-					/>
-					<div
-						className="absolute -left-[5%] top-[18%] w-[88%] h-[60%] bg-zinc-700 shadow-xl"
-						style={{
-							clipPath: 'polygon(2% 0, 100% 12%, 98% 88%, 0 100%)',
-							transform: 'skewY(2deg)',
-						}}
-					/>
-					<div
-						className="absolute right-0 top-[35%] w-[70%] h-[50%] bg-zinc-600/90 shadow-lg"
-						style={{
-							clipPath: 'polygon(25% 0, 100% 0, 100% 100%, 0 100%)',
-						}}
-					/>
-					<div
-						className="absolute left-0 bottom-[8%] w-[45%] h-[40%] bg-zinc-500/70 shadow-md"
-						style={{
-							clipPath: 'polygon(0 30%, 100% 0, 100% 100%, 0 70%)',
-							transform: 'skewX(-8deg)',
-						}}
-					/>
-				</div>
-				{/* Tab - overlaps into white panel, professional look */}
-				<div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-6 z-20 flex flex-col items-stretch min-w-[100px]">
-					<div className="bg-white rounded-l-2xl pl-6 pr-8 py-4 shadow-[4px_0_24px_rgba(0,0,0,0.12)]">
-						<span className="text-sm font-bold tracking-wide text-black">LOGIN</span>
+			<main className="flex-1 min-h-0">
+				<div className="mx-auto flex w-full max-w-[520px] flex-col items-stretch px-6 py-10 sm:py-14">
+					{/* Header */}
+					<div className="flex flex-col items-center text-center">
+						<div className="flex items-center justify-center gap-3">
+							<Image src="/logo.png" alt="GenzProp" width={44} height={44} className="object-contain" />
+							<span className="text-2xl font-bold text-black tracking-tight">GenzProp</span>
+						</div>
+						<h1 className="mt-4 text-2xl font-bold tracking-tight text-black">Welcome back</h1>
+						<p className="mt-1 text-sm text-zinc-600">Sign in to continue to your dashboard.</p>
 					</div>
-					<Link
-						href="/signup"
-						className="pl-6 pr-8 py-3 text-sm font-medium text-zinc-400 hover:text-white transition-colors"
-					>
-						SIGN UP
-					</Link>
-				</div>
-			</div>
 
-			{/* Right panel - white login form */}
-			<div className="flex-1 flex flex-col items-center justify-center min-h-0 px-6 py-12 lg:py-16 overflow-y-auto">
-				{/* Mobile: LOGIN / SIGN IN tabs */}
-			<div className="lg:hidden flex rounded-full bg-zinc-100 p-1 gap-1 mb-8">
-				<span className="px-4 py-2 rounded-full bg-black text-white text-sm font-bold">LOGIN</span>
-				<Link href="/signup" className="px-4 py-2 rounded-full text-zinc-600 text-sm font-medium">
-					SIGN UP
-				</Link>
-			</div>
-
-				{/* Logo + GenzProp name + LOGIN title */}
-				<div className="flex flex-col items-center mb-8">
-					<div className="flex items-center justify-center gap-3 mb-2">
-						<Image
-							src="/logo.png"
-							alt="GenzProp"
-							width={48}
-							height={48}
-							className="object-contain"
-						/>
-						<span className="text-2xl font-bold text-black tracking-tight">GenzProp</span>
-					</div>
-					<h1 className="text-xl font-bold text-zinc-600 tracking-tight">LOGIN</h1>
-				</div>
-
-				<form onSubmit={handleSubmit} className="w-full max-w-md">
-					{/* Form card */}
-					<div className="rounded-3xl border border-zinc-200/70 bg-white/80 backdrop-blur-xl p-6 sm:p-8 shadow-[0_18px_60px_rgba(0,0,0,0.10)] space-y-5">
+					<form onSubmit={handleSubmit} className="mt-8">
+						{/* Card */}
+						<div className="rounded-3xl border border-zinc-200/70 bg-white/80 backdrop-blur-xl p-6 sm:p-8 shadow-[0_18px_60px_rgba(0,0,0,0.10)] space-y-5">
 						{/* Email */}
 						<div className="space-y-1.5">
 							<label htmlFor="email" className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider">
@@ -380,12 +317,17 @@ export default function LoginPage() {
 							)}
 						</button>
 					</div>
-				</form>
+					</form>
 
-				<p className="mt-8 text-xs text-zinc-400">
-					© {CURRENT_YEAR} GenzProp. All rights reserved.
-				</p>
-			</div>
+					<p className="mt-6 text-center text-sm text-zinc-600">
+						Don&apos;t have an account?{' '}
+						<Link href="/signup" className="font-semibold text-black underline underline-offset-2 hover:no-underline">
+							Sign up
+						</Link>
+					</p>
+
+					<p className="mt-10 text-center text-xs text-zinc-400">© {CURRENT_YEAR} GenzProp. All rights reserved.</p>
+				</div>
 
 			{toastType === 'success' && toastMessage && (
 				<SuccessPopup
@@ -398,7 +340,7 @@ export default function LoginPage() {
 					}}
 				/>
 			)}
-					</main>
+			</main>
 		</div>
 	);
 }

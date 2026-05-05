@@ -164,7 +164,7 @@ export default function OverviewPage() {
                   asChild
                   className="h-9 rounded-full bg-gradient-to-r from-primary to-primary/80 px-5 text-xs sm:text-sm font-semibold text-primary-foreground shadow-md shadow-primary/30 hover:from-primary/95 hover:to-primary/80 hover:shadow-lg hover:shadow-primary/40 transition-all duration-300 gap-2"
                 >
-                  <Link href="/dashboard/buys">
+                  <Link href="/buy-challenge">
                     <ShoppingCart className="h-4 w-4" />
                     Buy Challenge
                   </Link>
@@ -258,7 +258,7 @@ export default function OverviewPage() {
                       asChild
                       className="h-9 rounded-full bg-purple-600 px-5 text-xs sm:text-sm font-semibold text-white hover:bg-purple-700"
                     >
-                      <Link href="/dashboard/buys">Buy a challenge</Link>
+                      <Link href="/buy-challenge">Buy a challenge</Link>
                     </Button>
                     <Button
                       asChild

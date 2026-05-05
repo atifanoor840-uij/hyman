@@ -13,6 +13,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { User, Lock, Mail, Eye, EyeOff } from 'lucide-react';
 import SuccessPopup from '../components/SuccessPopup';
+import Toast from '../components/Toast';
 import Navbar from '../components/Navbar';
 import CountrySelector from '../components/CountrySelector';
 import { signup } from '../../lib/api/auth';
@@ -187,9 +188,9 @@ export default function SignupPage() {
 			const error = err instanceof ApiClientError ? err : null;
 			if (error) {
 				setToastType('error');
-				setToastTitle('Signup Failed');
+				setToastTitle('Email Already Registered');
 				if (error.status === 409 || error.message?.toLowerCase().includes('already exists')) {
-					setToastMessage('An account with this email already exists. Please try logging in instead.');
+					setToastMessage('This email is already registered. Please sign in or use a different email address.');
 				} else if (error.status === 422) {
 					setToastMessage('Please check your information and try again.');
 				} else {
@@ -296,75 +297,29 @@ export default function SignupPage() {
 	return (
 		<div className="min-h-screen flex flex-col bg-gradient-to-br from-white via-white to-zinc-50 text-black">
 			<Navbar variant="sticky" />
-			<main className="flex-1 flex min-h-0">
-			{/* Left panel - professional geometric (folded planes / ribbons), black theme */}
-			<div className="hidden lg:flex lg:w-[38%] xl:w-[40%] relative overflow-hidden bg-black">
-				{/* Dark top bar */}
-				<div className="absolute top-0 left-0 right-0 h-20 bg-black/90 z-[1]" />
-				{/* Layered geometric shapes - overlapping ribbons/planes pointing right */}
-				<div className="absolute inset-0 z-0">
-					<div className="absolute inset-0 bg-zinc-950" />
-					<div
-						className="absolute -left-[10%] bottom-[5%] w-[95%] h-[75%] bg-zinc-800 shadow-2xl"
-						style={{
-							clipPath: 'polygon(0 15%, 92% 0, 100% 85%, 8% 100%)',
-							transform: 'skewY(-1deg)',
-						}}
-					/>
-					<div
-						className="absolute -left-[5%] top-[18%] w-[88%] h-[60%] bg-zinc-700 shadow-xl"
-						style={{
-							clipPath: 'polygon(2% 0, 100% 12%, 98% 88%, 0 100%)',
-							transform: 'skewY(2deg)',
-						}}
-					/>
-					<div
-						className="absolute right-0 top-[35%] w-[70%] h-[50%] bg-zinc-600/90 shadow-lg"
-						style={{
-							clipPath: 'polygon(25% 0, 100% 0, 100% 100%, 0 100%)',
-						}}
-					/>
-					<div
-						className="absolute left-0 bottom-[8%] w-[45%] h-[40%] bg-zinc-500/70 shadow-md"
-						style={{
-							clipPath: 'polygon(0 30%, 100% 0, 100% 100%, 0 70%)',
-							transform: 'skewX(-8deg)',
-						}}
-					/>
-				</div>
-				{/* Tab - overlaps into white panel */}
-				<div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-6 z-20 flex flex-col items-stretch min-w-[100px]">
-					<Link
-						href="/login"
-						className="pl-6 pr-8 py-3 text-sm font-medium text-zinc-400 hover:text-white transition-colors"
-					>
-						LOGIN
-					</Link>
-					<div className="bg-white rounded-l-2xl pl-6 pr-8 py-4 shadow-[4px_0_24px_rgba(0,0,0,0.12)]">
-						<span className="text-sm font-bold tracking-wide text-black">SIGN UP</span>
-					</div>
-				</div>
-			</div>
-
-			{/* Right panel - white form */}
-			<div className="flex-1 flex flex-col items-center justify-center min-h-0 px-6 py-8 lg:py-10 overflow-y-auto">
-				{/* Mobile tabs */}
-				<div className="lg:hidden flex rounded-full bg-zinc-100 p-1 gap-1 mb-6">
-					<Link href="/login" className="px-4 py-2 rounded-full text-zinc-600 text-sm font-medium">
-						LOGIN
-					</Link>
-					<span className="px-4 py-2 rounded-full bg-black text-white text-sm font-bold">SIGN UP</span>
-				</div>
-
-				{step === 'details' && (
-					<>
-						<div className="flex flex-col items-center mb-4">
-							<h1 className="text-xl font-bold text-zinc-600 tracking-tight">SIGN UP</h1>
-							<p className="text-sm text-zinc-500 mt-1">Create your GenzProp account</p>
+			<main className="flex-1 min-h-0">
+				<div className="mx-auto flex w-full max-w-[720px] flex-col items-stretch px-6 py-10 sm:py-14">
+					{/* Header */}
+					<div className="flex flex-col items-center text-center">
+						<div className="flex items-center justify-center gap-3">
+							<Image src="/logo.png" alt="GenzProp" width={44} height={44} className="object-contain" />
+							<span className="text-2xl font-bold text-black tracking-tight">GenzProp</span>
 						</div>
+						<h1 className="mt-4 text-2xl font-bold tracking-tight text-black">
+							{step === 'details' ? 'Create your account' : step === 'verify' ? 'Verify email' : 'You’re all set'}
+						</h1>
+						<p className="mt-1 text-sm text-zinc-600">
+							{step === 'details'
+								? 'Start your evaluation journey in minutes.'
+								: step === 'verify'
+									? 'Enter the 4 digit code we sent to your inbox.'
+									: 'Your account is ready. You can sign in now.'}
+						</p>
+					</div>
 
-						<form onSubmit={handleDetailsSubmit} className="w-full max-w-2xl">
-							<div className="rounded-2xl border border-zinc-200 bg-white p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+					{step === 'details' && (
+						<form onSubmit={handleDetailsSubmit} className="mt-8">
+							<div className="rounded-3xl border border-zinc-200/70 bg-white/80 backdrop-blur-xl p-6 sm:p-8 shadow-[0_18px_60px_rgba(0,0,0,0.10)]">
 								<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
 									{/* Full name */}
 									<div className="space-y-1.5">
@@ -541,29 +496,26 @@ export default function SignupPage() {
 								</div>
 							</div>
 						</form>
-
-						<p className="mt-6 text-center text-sm text-zinc-600">
-							Already have an account? <Link href="/login" className="font-semibold text-black underline underline-offset-2 hover:no-underline">Log in</Link>
-						</p>
-					</>
-				)}
+					)}
 
 				{step === 'verify' && (
-					<div className="w-full max-w-md">
-						<div className="flex flex-col items-center mb-6">
-							<div className="w-16 h-16 rounded-full bg-gradient-to-br from-black to-zinc-700 flex items-center justify-center shadow-lg mb-4">
-								<Mail className="w-8 h-8 text-white" strokeWidth={2} />
+					<div className="mt-8">
+						<div className="rounded-3xl border border-zinc-200/70 bg-white/80 backdrop-blur-xl p-6 sm:p-8 shadow-[0_18px_60px_rgba(0,0,0,0.10)]">
+							<div className="flex items-start justify-between gap-4">
+								<div>
+									<p className="text-sm text-zinc-600">
+										Code sent to <span className="font-semibold text-black">{formData.email}</span>
+									</p>
+									<p className="mt-1 text-xs text-zinc-400">
+										Demo code: <span className="font-mono font-semibold text-black">{generatedCode || '------'}</span>
+									</p>
+								</div>
+								<div className="w-11 h-11 rounded-2xl bg-black text-white flex items-center justify-center shadow-sm">
+									<Mail className="w-5 h-5" />
+								</div>
 							</div>
-							<h1 className="text-2xl font-bold text-black tracking-tight">Verify email</h1>
-							<p className="text-sm text-zinc-500 mt-1 text-center">
-								We sent a 4-digit code to <span className="font-medium text-black">{formData.email}</span>
-							</p>
-							<p className="mt-2 text-xs text-zinc-400">
-								Demo code: <span className="font-mono font-semibold text-black">{generatedCode || '------'}</span>
-							</p>
-						</div>
 
-						<form onSubmit={handleVerificationSubmit} className="space-y-6">
+							<form onSubmit={handleVerificationSubmit} className="mt-6 space-y-6">
 							<div className="flex justify-between items-center">
 								<label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Verification code</label>
 								<button
@@ -612,30 +564,38 @@ export default function SignupPage() {
 							</div>
 						</form>
 					</div>
+				</div>
 				)}
 
 				{step === 'complete' && (
-					<div className="w-full max-w-md text-center">
-						<div className="w-16 h-16 rounded-full bg-gradient-to-br from-black to-zinc-700 flex items-center justify-center shadow-lg mx-auto mb-4">
-							<Lock className="w-8 h-8 text-white" strokeWidth={2} />
+					<div className="mt-8">
+						<div className="rounded-3xl border border-zinc-200/70 bg-white/80 backdrop-blur-xl p-6 sm:p-8 shadow-[0_18px_60px_rgba(0,0,0,0.10)] text-center">
+							<div className="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center shadow-sm mx-auto mb-4">
+								<Lock className="w-5 h-5" />
+							</div>
+							<p className="text-sm text-zinc-600">
+								Your account is ready. Sign in with your email and password to access the dashboard.
+							</p>
+							<Link
+								href="/login"
+								className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-black px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-colors"
+							>
+								Go to login
+							</Link>
 						</div>
-						<h1 className="text-2xl font-bold text-black tracking-tight">You’re all set</h1>
-						<p className="text-sm text-zinc-500 mt-2">
-							Your account is ready. Sign in with your email and password to access the dashboard.
-						</p>
-						<Link
-							href="/login"
-							className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-black px-6 py-3 text-sm font-bold text-white shadow-md hover:bg-zinc-800 transition-colors"
-						>
-							Go to login
-						</Link>
 					</div>
 				)}
 
-				<p className="mt-8 text-xs text-zinc-400">
-					© {CURRENT_YEAR} GenzProp. All rights reserved.
-				</p>
-			</div>
+					{step === 'details' && (
+						<p className="mt-6 text-center text-sm text-zinc-600">
+							Already have an account?{' '}
+							<Link href="/login" className="font-semibold text-black underline underline-offset-2 hover:no-underline">
+								Log in
+							</Link>
+						</p>
+					)}
+
+					<p className="mt-10 text-center text-xs text-zinc-400">© {CURRENT_YEAR} GenzProp. All rights reserved.</p>
 
 			{toastType === 'success' && toastMessage && (
 				<SuccessPopup
@@ -648,6 +608,20 @@ export default function SignupPage() {
 					}}
 				/>
 			)}
+
+			{toastType !== 'success' && toastMessage && (
+				<Toast
+					message={toastMessage}
+					type={toastType}
+					title={toastTitle}
+					duration={5000}
+					onClose={() => {
+						setToastMessage(null);
+						setToastTitle(undefined);
+					}}
+				/>
+			)}
+				</div>
 			</main>
 		</div>
 	);

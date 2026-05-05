@@ -16,7 +16,7 @@ const FEATURES = [
 	{ label: "Hedging and News Trading is Allowed", included: true },
 	{ label: "Layering not allowed", included: false },
 	{ label: "Minimum trading days 5", included: true },
-	{ label: "Daily drawdown 5%", included: true },
+	{ label: "Daily drawdown 4%", included: true },
 	{ label: "Maximum drawdown 8%", included: true },
 	{ label: "Leverage 1:100", included: true },
 ];
@@ -195,7 +195,7 @@ export default function Pricing() {
 					{/* Bottom: Choose Plan button */}
 					<div className="mt-8 pt-6 border-t border-zinc-200 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4">
 						<Link
-							href="/dashboard/buys"
+							href="/signup"
 							className="inline-flex items-center justify-center rounded-xl bg-black px-8 py-3 text-sm font-bold text-white hover:bg-zinc-800 transition-colors"
 						>
 							Choose Plan

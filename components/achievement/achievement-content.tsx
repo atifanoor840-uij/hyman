@@ -112,7 +112,7 @@ export function AchievementContent() {
             You have not achieved any milestone. Buy a challenge and prove your skill to get an achievement certificate.
           </p>
           <Link
-            href="/dashboard/buys"
+            href="/buy-challenge"
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
           >
             <ShoppingCart className="w-4 h-4" />

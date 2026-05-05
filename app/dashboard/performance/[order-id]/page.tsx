@@ -495,7 +495,7 @@ export default function PerformancePage() {
                       variant="outline"
                       className="rounded-xl border-border/80 font-medium hover:bg-muted/80 transition-colors min-h-[44px] touch-manipulation"
                     >
-                      <Link href="/dashboard/buys" className="flex items-center justify-center">Start New Challenge</Link>
+                      <Link href="/buy-challenge" className="flex items-center justify-center">Start New Challenge</Link>
                     </Button>
                     <Button
                       type="button"

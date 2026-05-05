@@ -18,7 +18,7 @@ export interface AccountRules {
 
 const RULES: Record<AccountRuleType, AccountRules> = {
   sigma: {
-    label: "Sigma (Instant)",
+    label: "Instant",
     dailyDrawdown: "5%",
     maxDrawdown: "8%",
     weekendHolding: "Not Allowed",
@@ -28,7 +28,7 @@ const RULES: Record<AccountRuleType, AccountRules> = {
     hedging: "Not Allowed",
   },
   beta: {
-    label: "Beta",
+    label: "Step 2",
     dailyDrawdown: "5%",
     maxDrawdown: "8%",
     weekendHolding: "Allowed",
@@ -38,7 +38,7 @@ const RULES: Record<AccountRuleType, AccountRules> = {
     hedging: "Allowed",
   },
   alpha: {
-    label: "Alpha",
+    label: "Step 1",
     dailyDrawdown: "5%",
     maxDrawdown: "8%",
     weekendHolding: "Not Allowed",
@@ -54,6 +54,8 @@ export function getAccountRuleType(challengeType: string | null | undefined): Ac
   if (t.includes("sigma") || t.includes("instant")) return "sigma"
   if (t.includes("beta")) return "beta"
   if (t.includes("alpha")) return "alpha"
+  if (t.includes("step 2") || t.includes("step2") || t.includes("phase 2") || t.includes("phase2")) return "beta"
+  if (t.includes("step 1") || t.includes("step1") || t.includes("phase 1") || t.includes("phase1")) return "alpha"
   return "sigma"
 }
 

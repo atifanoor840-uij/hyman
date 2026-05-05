@@ -92,12 +92,12 @@ function realPriceFromDiscounted(discounted: number) {
 }
 
 function buildFeatures(accountTypeId: string, sizes: Array<{ id: string; value: number }>): FeatureRow[] {
-  const profitTarget1 = accountTypeId === "beta" ? "8%" : accountTypeId === "sigma" ? "—" : "8%"
+  const profitTarget1 = accountTypeId === "beta" ? "10%" : accountTypeId === "sigma" ? "—" : "10%"
   const profitTarget2 = accountTypeId === "beta" ? "5%" : accountTypeId === "sigma" ? "—" : "5%"
   const minDays = accountTypeId === "beta" ? "5 Days" : accountTypeId === "sigma" ? "0 Days" : "0 Days"
 
   const maxLossPct = 10
-  const dailyLossPct = 5
+  const dailyLossPct = accountTypeId === "sigma" ? 5 : 4
 
   const maxLossValues: Record<string, string> = {}
   const dailyLossValues: Record<string, string> = {}
@@ -184,7 +184,7 @@ export function BuysContent() {
   const pricing = pricingByType[activeAccountType] || pricingByType.alpha
 
   useEffect(() => {
-    trackViewContent("GenzProp Plans / Buys", "Checkout")
+    trackViewContent("GenzProp Plans / Buy Challenge", "Checkout")
   }, [])
 
   // Reset selected size if it doesn't exist in the new account type

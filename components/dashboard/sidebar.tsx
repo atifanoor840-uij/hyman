@@ -26,7 +26,7 @@ const iconClass = "shrink-0"
 
 const section1 = [
   { icon: LayoutGrid, label: "Overview", href: "/dashboard/overview" },
-  { icon: ShoppingCart, label: "Buys", href: "/dashboard/buys" },
+  { icon: ShoppingCart, label: "Buy Challenge", href: "/buy-challenge" },
   { icon: CreditCard, label: "Billing", href: "/dashboard/billing" },
 ]
 

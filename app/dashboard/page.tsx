@@ -375,7 +375,7 @@ function DashboardPageInner() {
                     asChild
                     className="h-9 rounded-full bg-gradient-to-r from-primary to-primary/80 px-5 text-xs sm:text-sm font-semibold text-primary-foreground shadow-md shadow-primary/30 hover:from-primary/95 hover:to-primary/80 hover:shadow-lg hover:shadow-primary/40 transition-all duration-300 gap-2"
                   >
-                    <Link href="/buys">
+                    <Link href="/buy-challenge">
                       <ShoppingCart className="h-4 w-4" />
                       Buy Challenge
                     </Link>

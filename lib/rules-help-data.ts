@@ -25,18 +25,18 @@ export const HELP_CATEGORIES: HelpCategory[] = [
 		articles: [
 			{
 				slug: 'sigma-instant-rules',
-				title: 'Sigma (Instant) — rules overview',
-				body: `**Sigma (Instant)** accounts use simulated capital under real market conditions. There is no separate evaluation phase.\n\nKey points include **balance-based drawdowns**, **leverage 1:100**, restrictions on scalping, grid, martingale, hedging, and EAs, plus **consistency** and **payout** rules.\n\nSee the full **Rules by Account Type** section on the main rules page for the complete list.`,
+				title: 'Instant — rules overview',
+				body: `**Instant** accounts use simulated capital under real market conditions. There is no separate evaluation phase.\n\nKey points include **balance-based drawdowns**, **leverage 1:100**, restrictions on scalping, grid, martingale, hedging, and EAs, plus **consistency** and **payout** rules.\n\nSee the full **Rules by Account Type** section on the main rules page for the complete list.`,
 			},
 			{
 				slug: 'beta-challenge-rules',
-				title: 'Beta — challenge rules overview',
-				body: `**Beta** programs follow our standard challenge structure with **daily and maximum drawdown** limits calculated from your account balance.\n\n**EA use**, **overnight** and **weekend holding**, and **news trading** are allowed under Beta rules where stated. An **inactivity rule** may apply if no trades are opened for an extended period.\n\nRefer to the rules page for exact percentages and conditions.`,
+				title: 'Step 2 — challenge rules overview',
+				body: `**Step 2** programs follow our standard challenge structure with **daily and maximum drawdown** limits calculated from your account balance.\n\n**EA use**, **overnight** and **weekend holding**, and **news trading** are allowed under Step 2 rules where stated. An **inactivity rule** may apply if no trades are opened for an extended period.\n\nRefer to the rules page for exact percentages and conditions.`,
 			},
 			{
 				slug: 'alpha-challenge-rules',
-				title: 'Alpha — challenge rules overview',
-				body: `**Alpha** typically includes a **single evaluation phase** before funded access, with **minimum trading days**, **drawdown limits**, and **profit split** tiers.\n\n**Weekend holding**, certain strategies, and **minimum trade holding time** on live accounts may apply. Always confirm current terms on the **Rules** page.`,
+				title: 'Step 1 — challenge rules overview',
+				body: `**Step 1** typically includes a **single evaluation phase** before funded access, with **minimum trading days**, **drawdown limits**, and **profit split** tiers.\n\n**Weekend holding**, certain strategies, and **minimum trade holding time** on live accounts may apply. Always confirm current terms on the **Rules** page.`,
 			},
 		],
 	},
