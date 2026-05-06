@@ -13,6 +13,7 @@ import {
   Wallet,
   Boxes,
   Link as LinkIcon,
+  Mail,
   LogOut,
 } from "lucide-react"
 
@@ -33,6 +34,7 @@ const sectionCompliance = [
 const sectionTools = [
   { icon: Boxes, label: "Container", href: "/admin/container" },
   { icon: LinkIcon, label: "Payment Links", href: "/admin/payment-links" },
+  { icon: Mail, label: "Email Sender", href: "/admin/email-sender" },
 ]
 
 const generalItems = [{ icon: LogOut, label: "Logout", href: "/admin/logout" }]

@@ -46,6 +46,10 @@ function normalizeChallengeType(input: string): "alpha" | "beta" | "sigma" {
   return "alpha"
 }
 
+function toApiChallengeType(accountType: "alpha" | "beta" | "sigma"): "step1" | "step2" | "instant" {
+  return accountType === "alpha" ? "step1" : accountType === "beta" ? "step2" : "instant"
+}
+
 // Account sizes per account type
 const accountSizesByType: Record<string, Array<{ id: string; label: string; value: number }>> = {
   alpha: [
@@ -224,20 +228,16 @@ export function BuysContent() {
     const accountSizeValue = sizeOption?.value ?? 0
     const amount = getPayableAmount()
     const planLabel = accountTypes.find((p) => p.id === activeAccountType)?.label
+    const apiChallengeType = toApiChallengeType(activeAccountType)
     trackInitiateCheckout(Number(amount), "USD", false, createEventId("checkout"), {
       planLabel: planLabel || undefined,
-      challengeType:
-        activeAccountType === "alpha"
-          ? "step1"
-          : activeAccountType === "beta"
-            ? "step2"
-            : "instant",
+      challengeType: apiChallengeType,
     })
     setSubmitError(null)
     setIsSubmitting(true)
     try {
       const response = await createOrderWithOxapay({
-        challenge_type: normalizeChallengeType(activeAccountType),
+        challenge_type: apiChallengeType,
         account_size: String(accountSizeValue),
         platform: selectedPlatform,
         amount,
@@ -327,7 +327,7 @@ export function BuysContent() {
               ))}
             </div>
 
-            {/* Account Types Toggle - Alpha, Beta, Gamma, Sigma */}
+            {/* Account Types Toggle */}
             <div className="inline-flex items-center bg-white/10 backdrop-blur-sm rounded-full p-1 border border-white/10">
               {accountTypes.map((accountType) => (
                 <button
