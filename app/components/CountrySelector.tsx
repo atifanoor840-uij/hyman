@@ -1,66 +1,27 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import ReactCountryFlag from 'react-country-flag';
 import { ChevronDown, Search, X } from 'lucide-react';
+import worldCountries from 'world-countries';
 
 interface Country {
 	name: string;
 	code: string;
 }
 
-const COUNTRIES: Country[] = [
-	{ name: 'United States', code: 'US' },
-	{ name: 'United Kingdom', code: 'GB' },
-	{ name: 'Canada', code: 'CA' },
-	{ name: 'Australia', code: 'AU' },
-	{ name: 'Germany', code: 'DE' },
-	{ name: 'France', code: 'FR' },
-	{ name: 'Spain', code: 'ES' },
-	{ name: 'Italy', code: 'IT' },
-	{ name: 'Netherlands', code: 'NL' },
-	{ name: 'Switzerland', code: 'CH' },
-	{ name: 'United Arab Emirates', code: 'AE' },
-	{ name: 'Singapore', code: 'SG' },
-	{ name: 'Hong Kong', code: 'HK' },
-	{ name: 'Japan', code: 'JP' },
-	{ name: 'South Korea', code: 'KR' },
-	{ name: 'India', code: 'IN' },
-	{ name: 'Brazil', code: 'BR' },
-	{ name: 'Mexico', code: 'MX' },
-	{ name: 'South Africa', code: 'ZA' },
-	{ name: 'Nigeria', code: 'NG' },
-	{ name: 'Argentina', code: 'AR' },
-	{ name: 'Belgium', code: 'BE' },
-	{ name: 'Austria', code: 'AT' },
-	{ name: 'Sweden', code: 'SE' },
-	{ name: 'Norway', code: 'NO' },
-	{ name: 'Denmark', code: 'DK' },
-	{ name: 'Finland', code: 'FI' },
-	{ name: 'Poland', code: 'PL' },
-	{ name: 'Portugal', code: 'PT' },
-	{ name: 'Greece', code: 'GR' },
-	{ name: 'Turkey', code: 'TR' },
-	{ name: 'Saudi Arabia', code: 'SA' },
-	{ name: 'Egypt', code: 'EG' },
-	{ name: 'Israel', code: 'IL' },
-	{ name: 'New Zealand', code: 'NZ' },
-	{ name: 'Thailand', code: 'TH' },
-	{ name: 'Malaysia', code: 'MY' },
-	{ name: 'Indonesia', code: 'ID' },
-	{ name: 'Philippines', code: 'PH' },
-	{ name: 'Vietnam', code: 'VN' },
-	{ name: 'China', code: 'CN' },
-	{ name: 'Pakistan', code: 'PK' },
-	{ name: 'Bangladesh', code: 'BD' },
-	{ name: 'Chile', code: 'CL' },
-	{ name: 'Colombia', code: 'CO' },
-	{ name: 'Peru', code: 'PE' },
-	{ name: 'Venezuela', code: 'VE' },
-	{ name: 'Kenya', code: 'KE' },
-	{ name: 'Ghana', code: 'GH' },
-	{ name: 'Morocco', code: 'MA' },
-];
+type WorldCountry = {
+	name?: { common?: string; official?: string };
+	cca2?: string;
+};
+
+function normalizeText(value: string): string {
+	return value
+		.normalize('NFKD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.toLowerCase()
+		.trim();
+}
 
 interface CountrySelectorProps {
 	value: string;
@@ -80,10 +41,38 @@ export default function CountrySelector({
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const searchInputRef = useRef<HTMLInputElement>(null);
 
-	const selectedCountry = COUNTRIES.find((c) => c.name === value);
-	const filteredCountries = COUNTRIES.filter((country) =>
-		country.name.toLowerCase().includes(searchQuery.toLowerCase())
+	const countries = useMemo<Country[]>(() => {
+		const list = (worldCountries as unknown as WorldCountry[])
+			.map((c) => {
+				const name =
+					c?.name?.common ??
+					c?.name?.official ??
+					'';
+				const code = c?.cca2 ?? '';
+				return { name: String(name).trim(), code: String(code).trim() };
+			})
+			.filter((c) => c.name && c.code && c.code.length === 2);
+
+		list.sort((a, b) => a.name.localeCompare(b.name));
+		// De-dupe by code (safeguard).
+		const seen = new Set<string>();
+		return list.filter((c) => {
+			if (seen.has(c.code)) return false;
+			seen.add(c.code);
+			return true;
+		});
+	}, []);
+
+	const selectedCountry = useMemo(
+		() => countries.find((c) => c.name === value),
+		[countries, value]
 	);
+
+	const filteredCountries = useMemo(() => {
+		const q = normalizeText(searchQuery);
+		if (!q) return countries;
+		return countries.filter((country) => normalizeText(country.name).includes(q));
+	}, [countries, searchQuery]);
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
