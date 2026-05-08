@@ -5,6 +5,7 @@ import { AdminShell } from "@/components/admin/admin-shell"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import EmptyState from "@/components/ui/empty-state"
 import {
   Dialog,
@@ -22,7 +23,7 @@ import {
 } from "@/components/ui/table"
 import { listMembers, type AdminMember } from "@/lib/api/admin-users"
 import { ApiClientError } from "@/lib/api/client"
-import { CheckCircle2, Eye, EyeOff, Loader2, Pencil, RefreshCcw, ShieldAlert, Users } from "lucide-react"
+import { CheckCircle2, Copy, Eye, EyeOff, Loader2, Pencil, RefreshCcw, Search, ShieldAlert, Users } from "lucide-react"
 
 function parseBackendDate(input: string | number | Date) {
   if (input instanceof Date) return input
@@ -58,6 +59,7 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showSensitive, setShowSensitive] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
   const [viewUser, setViewUser] = useState<AdminMember | null>(null)
   const [editUser, setEditUser] = useState<AdminMember | null>(null)
 
@@ -89,6 +91,26 @@ export default function AdminUsersPage() {
       .slice()
       .sort((a, b) => String(a.created_at ?? "") < String(b.created_at ?? "") ? 1 : -1)
   }, [users])
+
+  const filtered = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase()
+    if (!q) return sorted
+    return sorted.filter((u) => {
+      const hay = [
+        u.name,
+        u.username,
+        u.email,
+        u.country,
+        u.phone_no,
+        u.user_code,
+        u.referral_code,
+      ]
+        .filter(Boolean)
+        .map((v) => String(v).toLowerCase())
+        .join(" ")
+      return hay.includes(q)
+    })
+  }, [searchQuery, sorted])
 
   const summary = useMemo(() => {
     const total = users.length
@@ -155,12 +177,23 @@ export default function AdminUsersPage() {
           <div className="min-w-0">
             <h3 className="text-sm font-semibold text-foreground tracking-tight">User directory</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
-              {loading ? "Loading users..." : `${sorted.length} users`}
+              {loading ? "Loading users..." : `${filtered.length} users`}
             </p>
           </div>
-          <Badge variant="outline" className="rounded-full border-border/70 bg-background/40 px-3 py-1 text-xs">
-            Live
-          </Badge>
+          <div className="flex items-center gap-2">
+            <div className="relative hidden sm:block">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search users..."
+                className="h-9 w-[260px] rounded-full pl-9 text-xs"
+              />
+            </div>
+            <Badge variant="outline" className="rounded-full border-border/70 bg-background/40 px-3 py-1 text-xs">
+              Live
+            </Badge>
+          </div>
         </div>
 
         <div className="p-0">
@@ -176,6 +209,18 @@ export default function AdminUsersPage() {
             </div>
           ) : null}
 
+          <div className="sm:hidden px-4 sm:px-6 pt-4">
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search users..."
+                className="h-10 rounded-2xl pl-9 text-sm"
+              />
+            </div>
+          </div>
+
           <Table>
             <TableHeader>
               <TableRow>
@@ -185,7 +230,7 @@ export default function AdminUsersPage() {
                 <TableHead>Orders</TableHead>
                 <TableHead>Balance</TableHead>
                 <TableHead>Status</TableHead>
-                {showSensitive ? <TableHead>Admin pass</TableHead> : null}
+                <TableHead>Admin pass</TableHead>
                 <TableHead className="text-right">Joined</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -193,19 +238,19 @@ export default function AdminUsersPage() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={showSensitive ? 9 : 8} className="py-10">
+                  <TableCell colSpan={9} className="py-10">
                     <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
                       <Loader2 className="h-4 w-4 animate-spin" />
                       Loading…
                     </div>
                   </TableCell>
                 </TableRow>
-              ) : sorted.length === 0 ? (
+              ) : filtered.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={showSensitive ? 9 : 8} className="p-6">
+                  <TableCell colSpan={9} className="p-6">
                     <EmptyState
                       title="No users found"
-                      description="Try refreshing or confirm the admin token has access to members."
+                      description={searchQuery.trim() ? "No results match your search." : "Try refreshing or confirm the admin token has access to members."}
                       icon={
                         <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border/70 bg-muted/40">
                           <Users className="h-6 w-6 text-muted-foreground" />
@@ -220,7 +265,7 @@ export default function AdminUsersPage() {
                   </TableCell>
                 </TableRow>
               ) : (
-                sorted.map((u) => (
+                filtered.map((u) => (
                   <TableRow key={u.id ?? u.email ?? u.username}>
                     <TableCell className="font-semibold">
                       <div className="text-foreground font-semibold">{u.name || u.username || "—"}</div>
@@ -245,13 +290,38 @@ export default function AdminUsersPage() {
                         {u.is_verified ? "Verified" : "Unverified"}
                       </span>
                     </TableCell>
-                    {showSensitive ? (
-                      <TableCell>
-                        <code className="text-xs font-mono text-muted-foreground">
-                          {u.admin_access_password_plain ? String(u.admin_access_password_plain) : "—"}
-                        </code>
-                      </TableCell>
-                    ) : null}
+                    <TableCell>
+                      {showSensitive ? (
+                        <div className="flex items-center justify-between gap-2">
+                          <code className="text-xs font-mono text-muted-foreground">
+                            {u.admin_access_password_plain ? String(u.admin_access_password_plain) : "—"}
+                          </code>
+                          {u.admin_access_password_plain ? (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8 rounded-xl border-border/70"
+                              onClick={async () => {
+                                try {
+                                  await navigator.clipboard.writeText(String(u.admin_access_password_plain))
+                                } catch {
+                                  // ignore
+                                }
+                              }}
+                              title="Copy admin password"
+                              aria-label="Copy admin password"
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                          ) : null}
+                        </div>
+                      ) : (
+                        <span className="text-xs font-mono text-muted-foreground">
+                          {u.admin_access_password_plain ? "••••••••" : "—"}
+                        </span>
+                      )}
+                    </TableCell>
                     <TableCell className="text-right text-muted-foreground text-xs">
                       {formatDatePakistan(u.created_at)}
                     </TableCell>
@@ -305,12 +375,41 @@ export default function AdminUsersPage() {
               </div>
               {showSensitive ? (
                 <div className="rounded-2xl border border-border/70 bg-muted/20 px-4 py-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Admin pass</p>
-                  <p className="mt-1 font-mono text-sm text-foreground break-all">
-                    {viewUser.admin_access_password_plain ? String(viewUser.admin_access_password_plain) : "—"}
-                  </p>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Admin pass</p>
+                      <p className="mt-1 font-mono text-sm text-foreground break-all">
+                        {viewUser.admin_access_password_plain ? String(viewUser.admin_access_password_plain) : "—"}
+                      </p>
+                    </div>
+                    {viewUser.admin_access_password_plain ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-9 rounded-xl border-border/70"
+                        onClick={async () => {
+                          try {
+                            await navigator.clipboard.writeText(String(viewUser.admin_access_password_plain))
+                          } catch {
+                            // ignore
+                          }
+                        }}
+                      >
+                        <Copy className="h-4 w-4 mr-2" />
+                        Copy
+                      </Button>
+                    ) : null}
+                  </div>
                 </div>
               ) : null}
+
+              <div className="rounded-2xl border border-border/70 bg-muted/20 px-4 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Complete backend data</p>
+                <pre className="mt-2 max-h-80 overflow-auto rounded-xl border border-border/60 bg-background/40 p-3 text-[11px] leading-relaxed text-foreground/90">
+                  {JSON.stringify(viewUser, null, 2)}
+                </pre>
+              </div>
             </div>
           ) : null}
         </DialogContent>

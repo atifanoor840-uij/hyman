@@ -38,8 +38,11 @@ import {
   type UpsertAccountCredential,
 } from "@/lib/api/admin-container"
 import { ApiClientError } from "@/lib/api/client"
+import { getShowMyTradesStats } from "@/lib/api/showmytrades"
+import type { PerformanceResponse } from "@/lib/api/performance"
+import { PerformanceGraphPanel, DetailedStatisticsCard } from "@/components/dashboard/performance-graph-stats"
 import { formatDateKarachi } from "@/lib/utils"
-import { ExternalLink, Eye, Loader2, Plus, Pencil, RefreshCcw, ServerCrash, ShieldAlert, Trash2 } from "lucide-react"
+import { ExternalLink, Eye, LineChart, Loader2, Plus, Pencil, RefreshCcw, ServerCrash, ShieldAlert, Trash2 } from "lucide-react"
 
 function statusTone(status: string | null | undefined) {
   const s = String(status ?? "").toLowerCase()
@@ -63,6 +66,11 @@ export default function AdminContainerPage() {
   const [mutateError, setMutateError] = useState<string | null>(null)
   const [deleteSaving, setDeleteSaving] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+
+  const [graphRow, setGraphRow] = useState<AccountCredential | null>(null)
+  const [graphLoading, setGraphLoading] = useState(false)
+  const [graphError, setGraphError] = useState<string | null>(null)
+  const [graphData, setGraphData] = useState<PerformanceResponse | null>(null)
 
   const [createForm, setCreateForm] = useState<UpsertAccountCredential>({
     platform: "mt5",
@@ -220,6 +228,27 @@ export default function AdminContainerPage() {
       setDeleteError(e instanceof ApiClientError ? e.message : "Failed to delete account.")
     } finally {
       setDeleteSaving(false)
+    }
+  }
+
+  const openGraph = async (row: AccountCredential) => {
+    setGraphRow(row)
+    setGraphLoading(true)
+    setGraphError(null)
+    setGraphData(null)
+    try {
+      const platform = String((row as any).platform ?? "mt5").trim().toLowerCase() || "mt5"
+      const login = String((row as any).platform_login ?? "").trim()
+      const graphLink = (row as any).graph_link ? String((row as any).graph_link) : null
+      if (!login && !graphLink) {
+        throw new Error("Missing platform login / graph link for this account.")
+      }
+      const data = await getShowMyTradesStats(platform, login || "0", graphLink)
+      setGraphData(data)
+    } catch (e) {
+      setGraphError(e instanceof Error ? e.message : "Failed to load graph data.")
+    } finally {
+      setGraphLoading(false)
     }
   }
 
@@ -396,15 +425,14 @@ export default function AdminContainerPage() {
                     <TableCell className="font-semibold tabular-nums">{c.id}</TableCell>
                     <TableCell className="text-muted-foreground">
                       <div className="text-foreground font-semibold">{c.platform}</div>
-                      {c.graph_link ? (
-                        <a
-                          href={c.graph_link}
-                          target="_blank"
-                          rel="noreferrer"
+                      {c.graph_link || (c as any).platform_login ? (
+                        <button
+                          type="button"
+                          onClick={() => void openGraph(c)}
                           className="mt-1 inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground"
                         >
-                          Graph <ExternalLink className="h-3.5 w-3.5" />
-                        </a>
+                          Graph <LineChart className="h-3.5 w-3.5" />
+                        </button>
                       ) : null}
                     </TableCell>
                     <TableCell className="text-muted-foreground">{c.server}</TableCell>
@@ -719,6 +747,56 @@ export default function AdminContainerPage() {
                 </Button>
               </div>
             </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Graph modal */}
+      <Dialog
+        open={graphRow != null}
+        onOpenChange={(o) => {
+          if (!o) {
+            setGraphRow(null)
+            setGraphData(null)
+            setGraphError(null)
+            setGraphLoading(false)
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Performance (ShowMyTrades)</DialogTitle>
+          </DialogHeader>
+          {graphLoading ? (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Loading…
+            </div>
+          ) : graphError ? (
+            <div className="rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-foreground">
+              {graphError}
+            </div>
+          ) : graphData ? (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <InfoRow label="Platform" value={String((graphRow as any)?.platform ?? "—")} />
+                <InfoRow label="Login" value={String((graphRow as any)?.platform_login ?? "—")} mono />
+              </div>
+              <PerformanceGraphPanel stats={graphData} />
+              <DetailedStatisticsCard stats={graphData} />
+              {(graphRow as any)?.graph_link ? (
+                <a
+                  href={String((graphRow as any).graph_link)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 text-sm font-semibold text-foreground hover:underline"
+                >
+                  Open graph link <ExternalLink className="h-4 w-4" />
+                </a>
+              ) : null}
+            </div>
+          ) : (
+            <div className="text-sm text-muted-foreground">No data.</div>
           )}
         </DialogContent>
       </Dialog>
