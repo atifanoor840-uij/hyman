@@ -1,9 +1,9 @@
 /**
- * Admin API utilities - uses base URL https://genzpropbackend-5ce82dd885de.herokuapp.com
+ * Admin API utilities - uses base URL https://propakd.vercel.app
  */
 
 const ADMIN_API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "https://genzpropbackend-5ce82dd885de.herokuapp.com";
+  process.env.NEXT_PUBLIC_API_URL || "https://propakd.vercel.app";
 
 export function getApiBaseUrl(): string {
   return ADMIN_API_BASE.replace(/\/$/, "");

@@ -5,8 +5,8 @@ function getApiBaseUrl(): string {
     process.env.NEXT_PUBLIC_API_URL ||
     process.env.API_BASE_URL ||
     process.env.NEXT_PUBLIC_API_BASE_URL ||
-    "https://genzpropbackend-5ce82dd885de.herokuapp.com"
-  return (typeof url === "string" && url.trim() ? url : "https://genzpropbackend-5ce82dd885de.herokuapp.com").replace(/\/$/, "")
+    "https://propakd.vercel.app"
+  return (typeof url === "string" && url.trim() ? url : "https://propakd.vercel.app").replace(/\/$/, "")
 }
 
 export type AdminSignin2faRequest = {

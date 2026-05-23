@@ -22,7 +22,7 @@ import {
   ArrowPathIcon
 } from "@heroicons/react/24/outline"
 
-const WITHDRAWAL_ELIGIBLE_URL = "https://genzpropbackend-5ce82dd885de.herokuapp.com/withdrawal/my-eligible"
+const WITHDRAWAL_ELIGIBLE_URL = "https://propakd.vercel.app/withdrawal/my-eligible"
 
 const navigationGroups = [
   {

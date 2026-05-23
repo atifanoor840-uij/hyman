@@ -2,7 +2,7 @@ import { clearAuth } from '@/lib/auth-utils';
 import { clearAdmin2fa } from "@/components/admin/admin-auth"
 
 // Use environment variable or fallback to production URL (trim trailing slash)
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://genzpropbackend-5ce82dd885de.herokuapp.com').replace(/\/$/, '');
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://propakd.vercel.app').replace(/\/$/, '');
 
 const LOGIN_PATH = '/login';
 const ADMIN_LOGIN_PATH = "/admin/login"
