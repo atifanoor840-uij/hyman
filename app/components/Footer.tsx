@@ -6,6 +6,7 @@ import {
 	SiApplepay,
 	SiAmazon,
 } from "react-icons/si";
+import { COMPANY, COMPANY_LINE } from "@/lib/company";
 
 // Fixed year to avoid SSR/client hydration mismatch (date can differ by timezone)
 const CURRENT_YEAR = 2025;
@@ -40,6 +41,11 @@ export default function Footer() {
 						</div>
 						<p className="text-base leading-relaxed text-gray-400 mb-6">
 							Professional trading funding platform. Trade across multiple platforms with transparent rules, competitive pricing, and lightning-fast payouts.
+						</p>
+						<p className="text-sm leading-relaxed text-gray-500 mb-6">
+							{COMPANY.brand} is a brand operated by{" "}
+							<span className="font-semibold text-gray-300">{COMPANY.legalName}</span>, a company registered in {COMPANY.country}
+							{" "}(Company Registration No. {COMPANY.registrationNumber}).
 						</p>
 						<div className="flex flex-wrap items-center gap-3 mb-6">
 							<a href="/pricing" className="inline-flex items-center justify-center rounded-lg bg-purple-600 px-6 py-3 text-sm font-semibold text-white hover:bg-purple-700 transition-colors shadow-lg shadow-purple-600/30">
@@ -77,6 +83,7 @@ export default function Footer() {
 							<ul className="space-y-3 text-sm">
 								<li><a href="/terms" className="text-gray-400 hover:text-white transition-colors font-medium">Terms of Service</a></li>
 								<li><a href="/policy" className="text-gray-400 hover:text-white transition-colors font-medium">Privacy Policy</a></li>
+								<li><a href="/refund" className="text-gray-400 hover:text-white transition-colors font-medium">Refund Policy</a></li>
 								<li><a href="/rules" className="text-gray-400 hover:text-white transition-colors font-medium">Trading Rules</a></li>
 								<li><a href="/policy#risk-disclosure" className="text-gray-400 hover:text-white transition-colors font-medium">Risk Disclosure</a></li>
 							</ul>
@@ -135,7 +142,7 @@ export default function Footer() {
 							</p>
 							
 							<p>
-								<strong className="text-gray-300 font-semibold">Evaluation Programs:</strong> Our evaluation programs are designed to assess your trading skills and risk management capabilities. There is no guarantee that you will pass the evaluation or receive funding. Evaluation fees are non-refundable and do not guarantee access to a funded account. All trading rules, profit targets, and risk parameters must be strictly adhered to.
+								<strong className="text-gray-300 font-semibold">Evaluation Programs:</strong> Our evaluation programs are designed to assess your trading skills and risk management capabilities. There is no guarantee that you will pass the evaluation or receive funding. Evaluation fees are non-refundable once a program is activated, except as set out in our <a href="/refund" className="text-gray-300 underline underline-offset-2 hover:text-white">Refund Policy</a> — which includes a full refund of your evaluation fee once you receive your first payout from a funded account. All trading rules, profit targets, and risk parameters must be strictly adhered to.
 							</p>
 							
 							<p>
@@ -167,8 +174,13 @@ export default function Footer() {
 
 				{/* Bottom Bar */}
 				<div className="flex flex-col items-start justify-between gap-4 border-t border-gray-800 pt-8 md:flex-row md:items-center">
-					<div className="text-sm text-gray-500">
-						© {CURRENT_YEAR} <span className="text-white font-semibold">GenzProp</span>. All rights reserved.
+					<div className="space-y-1">
+						<div className="text-sm text-gray-500">
+							© {CURRENT_YEAR} <span className="text-white font-semibold">{COMPANY.brand}</span>. All rights reserved.
+						</div>
+						<div className="text-xs text-gray-500">
+							{COMPANY_LINE}
+						</div>
 					</div>
 					<div className="flex items-center gap-6 text-sm">
 						<a href="/policy#cookies" className="text-gray-400 hover:text-white transition-colors font-medium">Cookie Settings</a>

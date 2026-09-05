@@ -4,6 +4,7 @@ import Link from "next/link"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
+import { COMPANY, COMPANY_LINE } from "@/lib/company"
 
 export function Footer() {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -13,9 +14,12 @@ export function Footer() {
       <div className="w-full px-4 py-6 font-sans">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
           <div className="flex flex-col md:flex-row items-center gap-4 text-sm text-muted-foreground font-sans">
-            <span className="font-sans">© 2025 Forex Pro</span>
+            <div className="flex flex-col font-sans">
+              <span className="font-sans">© 2025 {COMPANY.brand}</span>
+              <span className="text-xs font-sans">{COMPANY_LINE}</span>
+            </div>
             <div className="flex flex-wrap gap-4 font-sans">
-              <Link href="/privacy" className="hover:text-foreground transition-colors font-sans">
+              <Link href="/policy" className="hover:text-foreground transition-colors font-sans">
                 Privacy Policy
               </Link>
               <Link href="/terms" className="hover:text-foreground transition-colors font-sans">
@@ -27,7 +31,7 @@ export function Footer() {
               <Link href="/contact" className="hover:text-foreground transition-colors font-sans">
                 Contact
               </Link>
-              <Link href="/help" className="hover:text-foreground transition-colors font-sans">
+              <Link href="/support" className="hover:text-foreground transition-colors font-sans">
                 Help & Support
               </Link>
               <Link href="/faq" className="hover:text-foreground transition-colors font-sans">
@@ -114,7 +118,7 @@ export function Footer() {
                 <p>
                   Past performance is not indicative of future results. Any opinions, news, research, analyses, prices, or
                   other information contained on this website is provided as general market commentary and does not
-                  constitute investment advice. Forex Pro will not accept liability for any loss or damage, including without
+                  constitute investment advice. {COMPANY.brand} will not accept liability for any loss or damage, including without
                   limitation to, any loss of profit, which may arise directly or indirectly from use of or reliance on such
                   information.
                 </p>
