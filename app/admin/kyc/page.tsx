@@ -1,190 +1,133 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { AdminShell } from "@/components/admin/admin-shell"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import EmptyState from "@/components/ui/empty-state"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { listDiditSessions, type DiditAdminSession } from "@/lib/api/admin-kyc"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { adminListKyc, adminSetKycStatus, type AdminKycRow } from "@/lib/api/app-client"
 import { ApiClientError } from "@/lib/api/client"
-import { formatDateKarachi } from "@/lib/utils"
-import { ExternalLink, Loader2, RefreshCcw, ShieldAlert, ShieldCheck } from "lucide-react"
-
-function statusTone(status: string | null | undefined) {
-  const s = String(status ?? "").toLowerCase()
-  if (s.includes("approved") || s.includes("verified")) return "bg-emerald-500/15 text-emerald-600 border-emerald-500/20"
-  if (s.includes("pending") || s.includes("in progress") || s.includes("in_review") || s.includes("review")) return "bg-amber-500/15 text-amber-600 border-amber-500/20"
-  if (s.includes("rejected") || s.includes("failed")) return "bg-destructive/10 text-destructive border-destructive/20"
-  if (s.includes("not started")) return "bg-muted/40 text-muted-foreground border-border/60"
-  return "bg-muted/40 text-muted-foreground border-border/60"
-}
+import { Loader2, ShieldAlert, ShieldCheck } from "lucide-react"
 
 export default function AdminKycPage() {
-  const [sessions, setSessions] = useState<DiditAdminSession[]>([])
+  const [rows, setRows] = useState<AdminKycRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [busyId, setBusyId] = useState<string | null>(null)
+  const [rejectReasons, setRejectReasons] = useState<Record<string, string>>({})
 
-  const load = async () => {
+  const refresh = async () => {
     setLoading(true)
     setError(null)
     try {
-      const data = await listDiditSessions()
-      setSessions(Array.isArray(data) ? data : [])
-      setError(null)
-    } catch (e) {
-      if (e instanceof ApiClientError) {
-        setError(e.status === 401 ? "Session expired. Please sign in again." : e.message || "Failed to load KYC sessions.")
-      } else {
-        setError("Failed to load KYC sessions.")
-      }
-      setSessions([])
+      const res = await adminListKyc()
+      setRows(res.submissions)
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "Failed to load KYC submissions.")
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    void load()
+    refresh()
   }, [])
 
-  const sorted = useMemo(() => {
-    return sessions
-      .slice()
-      .sort((a, b) => String(a.updated_at ?? a.created_at ?? "") < String(b.updated_at ?? b.created_at ?? "") ? 1 : -1)
-  }, [sessions])
+  const handleDecision = async (userId: string, status: "approved" | "rejected") => {
+    setBusyId(userId)
+    try {
+      await adminSetKycStatus(userId, status, status === "rejected" ? rejectReasons[userId] : undefined)
+      await refresh()
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "Failed to update KYC status.")
+    } finally {
+      setBusyId(null)
+    }
+  }
 
   return (
-    <AdminShell
-      title="KYC"
-      description="Review verification status and resolve pending cases."
-      actions={
-        <Button
-          variant="outline"
-          className="h-9 rounded-full border-border/70"
-          onClick={() => void load()}
-          disabled={loading}
-        >
-          {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCcw className="h-4 w-4 mr-2" />}
-          Refresh
-        </Button>
-      }
-    >
-      <Card className="rounded-2xl border border-border/80 bg-card shadow-sm overflow-hidden">
-        <div className="border-b border-border/80 bg-muted/20 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-2">
-          <div className="min-w-0">
-            <h3 className="text-sm font-semibold text-foreground tracking-tight">KYC queue</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">{loading ? "Loading sessions..." : `${sorted.length} sessions`}</p>
+    <AdminShell title="KYC review" description="Approve or reject customer identity verification submissions.">
+      <Card className="overflow-hidden">
+        {loading ? (
+          <div className="flex justify-center py-16">
+            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
           </div>
-          <Badge variant="outline" className="rounded-full border-border/70 bg-background/40 px-3 py-1 text-xs">Live</Badge>
-        </div>
-
-        <div className="p-0">
-          {error ? (
-            <div className="px-4 sm:px-6 py-4">
-              <div className="rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-foreground flex items-start gap-3">
-                <ShieldAlert className="h-5 w-5 text-destructive mt-0.5" />
-                <div className="min-w-0">
-                  <div className="font-semibold">Couldn’t load KYC sessions</div>
-                  <div className="text-muted-foreground text-xs mt-0.5">{error}</div>
-                </div>
-              </div>
-            </div>
-          ) : null}
-
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>User</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Workflow</TableHead>
-                <TableHead>Session</TableHead>
-                <TableHead>Callback</TableHead>
-                <TableHead className="text-right">Updated</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
+        ) : error ? (
+          <EmptyState icon={<ShieldAlert className="w-8 h-8 text-muted-foreground" />} title="Failed to load" description={error} />
+        ) : rows.length === 0 ? (
+          <EmptyState icon={<ShieldCheck className="w-8 h-8 text-muted-foreground" />} title="No submissions" description="No KYC submissions yet." />
+        ) : (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={7} className="py-10">
-                    <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Loading…
-                    </div>
-                  </TableCell>
+                  <TableHead>User</TableHead>
+                  <TableHead>Document</TableHead>
+                  <TableHead>Files</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Updated</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ) : sorted.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="p-6">
-                    <EmptyState
-                      title="No KYC sessions found"
-                      description="If you recently signed in, try refreshing."
-                      icon={
-                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border/70 bg-muted/40">
-                          <ShieldCheck className="h-6 w-6 text-muted-foreground" />
-                        </div>
-                      }
-                      action={
-                        <Button variant="outline" className="rounded-2xl border-border/70" onClick={() => void load()}>
-                          Refresh
-                        </Button>
-                      }
-                    />
-                  </TableCell>
-                </TableRow>
-              ) : (
-                sorted.map((s) => (
-                  <TableRow key={s.id}>
-                    <TableCell className="font-semibold tabular-nums">{s.id}</TableCell>
-                    <TableCell className="text-muted-foreground">
-                      <div className="text-foreground font-semibold">User #{s.user_id ?? "—"}</div>
-                      <div className="text-[11px] text-muted-foreground mt-1">vendor: {s.vendor_data ?? "—"}</div>
+              </TableHeader>
+              <TableBody>
+                {rows.map((r) => (
+                  <TableRow key={r.userId}>
+                    <TableCell className="font-mono text-xs">{r.userId.slice(0, 8)}</TableCell>
+                    <TableCell className="capitalize">{r.documentType}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2 text-xs">
+                        {r.frontUrl && <a href={r.frontUrl} target="_blank" rel="noreferrer" className="underline text-primary">Front</a>}
+                        {r.backUrl && <a href={r.backUrl} target="_blank" rel="noreferrer" className="underline text-primary">Back</a>}
+                        {r.selfieUrl && <a href={r.selfieUrl} target="_blank" rel="noreferrer" className="underline text-primary">Selfie</a>}
+                        {r.addressUrl && <a href={r.addressUrl} target="_blank" rel="noreferrer" className="underline text-primary">Address</a>}
+                      </div>
                     </TableCell>
                     <TableCell>
-                      <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusTone(s.status)}`}>
-                        {s.status ?? "—"}
-                      </span>
+                      <Badge
+                        className={
+                          r.status === "approved"
+                            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                            : r.status === "rejected"
+                              ? "bg-red-500/10 text-red-600 border-red-500/20"
+                              : "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                        }
+                      >
+                        {r.status}
+                      </Badge>
                     </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      <code className="text-xs font-mono">{s.workflow_id ?? "—"}</code>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      <code className="text-xs font-mono">{s.session_id ?? "—"}</code>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {s.callback_url ? (
-                        <a
-                          href={s.callback_url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
-                        >
-                          Open <ExternalLink className="h-4 w-4" />
-                        </a>
+                    <TableCell className="text-xs text-muted-foreground">{r.updatedAt ? new Date(r.updatedAt).toLocaleString() : "—"}</TableCell>
+                    <TableCell>
+                      {r.status === "pending" ? (
+                        <div className="flex flex-col gap-2">
+                          <div className="flex gap-2">
+                            <Button size="sm" disabled={busyId === r.userId} onClick={() => handleDecision(r.userId, "approved")}>
+                              Approve
+                            </Button>
+                            <Button size="sm" variant="destructive" disabled={busyId === r.userId} onClick={() => handleDecision(r.userId, "rejected")}>
+                              Reject
+                            </Button>
+                          </div>
+                          <Input
+                            placeholder="Reject reason (optional)"
+                            className="h-7 text-xs"
+                            value={rejectReasons[r.userId] ?? ""}
+                            onChange={(e) => setRejectReasons((prev) => ({ ...prev, [r.userId]: e.target.value }))}
+                          />
+                        </div>
                       ) : (
-                        "—"
+                        <span className="text-xs text-muted-foreground">Reviewed</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-right text-muted-foreground text-xs">
-                      {formatDateKarachi(s.updated_at || s.created_at || null)}
-                    </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </Card>
     </AdminShell>
   )
 }
-

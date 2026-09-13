@@ -7,12 +7,11 @@ import Image from 'next/image';
 import { User, Lock, Eye, EyeOff } from 'lucide-react';
 import SuccessPopup from '../components/SuccessPopup';
 import Navbar from '../components/Navbar';
-import { login } from '../../lib/api/auth';
+import { signinRequest } from '../../lib/api/auth-client';
 import { ApiClientError } from '../../lib/api/client';
 import {
 	sanitizeInput,
 	isValidEmail,
-	setAuthToken,
 	setUser,
 	trackLoginAttempt,
 	clearLoginAttempts,
@@ -51,20 +50,14 @@ export default function LoginPage() {
 		setToastMessage('Verifying your credentials...');
 
 		try {
-			const response = await login({
-				username: sanitizedEmail,
+			const response = await signinRequest({
+				email: sanitizedEmail,
 				password: rawPassword,
+				rememberMe: remember,
 			});
 
-			const authToken = response.token || response.access_token;
-
-			if (authToken) {
-				clearLoginAttempts(sanitizedEmail);
-				setAuthToken(authToken, remember);
-				if (response.user) {
-					setUser(response.user, remember);
-				}
-			}
+			clearLoginAttempts(sanitizedEmail);
+			setUser(response.user, remember);
 
 			setToastType('success');
 			setToastTitle('Welcome Back!');
@@ -199,27 +192,27 @@ export default function LoginPage() {
 		<div className="min-h-screen flex flex-col bg-gradient-to-br from-white via-white to-zinc-50 text-black">
 			<Navbar variant="sticky" />
 			<main className="flex-1 min-h-0">
-				<div className="mx-auto flex w-full max-w-[520px] flex-col items-stretch px-6 py-10 sm:py-14">
+				<div className="mx-auto flex w-full max-w-[640px] flex-col items-stretch px-6 py-10 sm:py-14">
 					{/* Header */}
 					<div className="flex flex-col items-center text-center">
 						<div className="flex items-center justify-center gap-3">
 							<Image src="/logo.png" alt="GenzProp" width={44} height={44} className="object-contain" />
 							<span className="text-2xl font-bold text-black tracking-tight">GenzProp</span>
 						</div>
-						<h1 className="mt-4 text-2xl font-bold tracking-tight text-black">Welcome back</h1>
-						<p className="mt-1 text-sm text-zinc-600">Sign in to continue to your dashboard.</p>
+						<h1 className="mt-4 text-3xl font-bold tracking-tight text-black">Welcome back</h1>
+						<p className="mt-2 text-base text-zinc-600">Sign in to continue to your dashboard.</p>
 					</div>
 
 					<form onSubmit={handleSubmit} className="mt-8">
 						{/* Card */}
-						<div className="rounded-3xl border border-zinc-200/70 bg-white/80 backdrop-blur-xl p-6 sm:p-8 shadow-[0_18px_60px_rgba(0,0,0,0.10)] space-y-5">
+						<div className="rounded-3xl border border-zinc-200/70 bg-white/80 backdrop-blur-xl p-7 sm:p-10 shadow-[0_18px_60px_rgba(0,0,0,0.10)] space-y-6">
 						{/* Email */}
-						<div className="space-y-1.5">
-							<label htmlFor="email" className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+						<div className="space-y-2">
+							<label htmlFor="email" className="block text-sm font-semibold text-zinc-500 uppercase tracking-wider">
 								Email address
 							</label>
 							<div
-								className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-4 py-3 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
+								className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-5 py-4 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
 									formErrors.email
 										? 'border-red-300 bg-red-50/50 focus-within:border-red-400 focus-within:ring-red-500/10'
 										: 'border-zinc-200 hover:border-zinc-300'
@@ -232,21 +225,21 @@ export default function LoginPage() {
 									value={email}
 									onChange={handleFormChange('email')}
 									placeholder="name@company.com"
-									className="flex-1 min-w-0 bg-transparent text-sm font-medium text-zinc-900 placeholder:text-zinc-400 outline-none"
+									className="flex-1 min-w-0 bg-transparent text-base font-medium text-zinc-900 placeholder:text-zinc-400 outline-none"
 								/>
 							</div>
 							{formErrors.email && (
-								<p className="text-xs font-medium text-red-600 flex items-center gap-1">{formErrors.email}</p>
+								<p className="text-sm font-medium text-red-600 flex items-center gap-1">{formErrors.email}</p>
 							)}
 						</div>
 
 						{/* Password */}
-						<div className="space-y-1.5">
-							<label htmlFor="password" className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+						<div className="space-y-2">
+							<label htmlFor="password" className="block text-sm font-semibold text-zinc-500 uppercase tracking-wider">
 								Password
 							</label>
 							<div
-								className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-4 py-3 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
+								className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-5 py-4 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
 									formErrors.password
 										? 'border-red-300 bg-red-50/50 focus-within:border-red-400 focus-within:ring-red-500/10'
 										: 'border-zinc-200 hover:border-zinc-300'
@@ -259,7 +252,7 @@ export default function LoginPage() {
 									value={password}
 									onChange={handleFormChange('password')}
 									placeholder="Enter your password"
-									className="flex-1 min-w-0 bg-transparent text-sm font-medium text-zinc-900 placeholder:text-zinc-400 outline-none"
+									className="flex-1 min-w-0 bg-transparent text-base font-medium text-zinc-900 placeholder:text-zinc-400 outline-none"
 								/>
 								<button
 									type="button"
@@ -267,11 +260,11 @@ export default function LoginPage() {
 									className="shrink-0 p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 hover:bg-zinc-200/60 transition-colors"
 									aria-label={showPassword ? 'Hide password' : 'Show password'}
 								>
-									{showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+									{showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
 								</button>
 							</div>
 							{formErrors.password && (
-								<p className="text-xs font-medium text-red-600 flex items-center gap-1">{formErrors.password}</p>
+								<p className="text-sm font-medium text-red-600 flex items-center gap-1">{formErrors.password}</p>
 							)}
 						</div>
 
@@ -282,13 +275,13 @@ export default function LoginPage() {
 									type="checkbox"
 									checked={rememberMe}
 									onChange={(e) => setRememberMe(e.target.checked)}
-									className="h-4 w-4 rounded border-zinc-300 text-black focus:ring-2 focus:ring-black/20 focus:ring-offset-0"
+									className="h-5 w-5 rounded border-zinc-300 text-black focus:ring-2 focus:ring-black/20 focus:ring-offset-0"
 								/>
-								<span className="text-sm text-zinc-600 group-hover:text-zinc-900 transition-colors">Remember this device</span>
+								<span className="text-base text-zinc-600 group-hover:text-zinc-900 transition-colors">Remember this device</span>
 							</label>
 							<Link
 								href="/forgot-password"
-								className="text-sm font-medium text-zinc-600 hover:text-black transition-colors"
+								className="text-base font-medium text-zinc-600 hover:text-black transition-colors"
 							>
 								Forgot password?
 							</Link>
@@ -298,7 +291,7 @@ export default function LoginPage() {
 						<button
 							type="submit"
 							disabled={isLoading}
-							className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-black px-6 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+							className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-black px-6 py-4 text-base font-bold text-white shadow-sm hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
 						>
 							{isLoading ? (
 								<>
@@ -319,7 +312,7 @@ export default function LoginPage() {
 					</div>
 					</form>
 
-					<p className="mt-6 text-center text-sm text-zinc-600">
+					<p className="mt-6 text-center text-base text-zinc-600">
 						Don&apos;t have an account?{' '}
 						<Link href="/signup" className="font-semibold text-black underline underline-offset-2 hover:no-underline">
 							Sign up

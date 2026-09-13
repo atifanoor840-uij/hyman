@@ -1,5 +1,5 @@
-import { getApiBaseUrl } from "@/lib/api"
-import { getAuthToken } from "@/lib/auth-utils"
+// The external FastAPI admin backend has been removed. Types are kept for
+// callers; the function is stubbed until CRM user management is rebuilt on Supabase.
 import { ApiClientError } from "@/lib/api/client"
 
 export type AdminMember = {
@@ -24,36 +24,8 @@ export type AdminMember = {
 }
 
 export async function listMembers(): Promise<AdminMember[]> {
-  const token = getAuthToken()
-  if (!token) throw new ApiClientError("Missing access token. Please sign in again.", 401)
-
-  const url = `${getApiBaseUrl()}/auth/members`
-  let res: Response
-  try {
-    res = await fetch(url, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : "Network error"
-    throw new ApiClientError(msg || "Network error", 0)
-  }
-
-  const contentType = res.headers.get("content-type") || ""
-  const isJson = contentType.includes("application/json")
-  const data = isJson ? await res.json().catch(() => null) : await res.text().catch(() => null)
-
-  if (!res.ok) {
-    const message =
-      (typeof data === "object" && data && ((data as any).message || (data as any).error)) ||
-      (typeof data === "string" && data) ||
-      `Request failed with status ${res.status}`
-    throw new ApiClientError(String(message), res.status)
-  }
-
-  if (!Array.isArray(data)) return []
-  return data as AdminMember[]
+  throw new ApiClientError(
+    "Member management is being migrated to the new backend and is temporarily unavailable.",
+    501
+  )
 }
-

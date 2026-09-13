@@ -5,7 +5,7 @@ import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
 import { WithdrawalContent } from "@/components/withdrawal/withdrawal-content"
 import { Footer } from "@/components/footer"
-import { getWithdrawalEligibility } from "@/lib/api/withdrawal"
+import { listMyAccounts, getMyKyc } from "@/lib/api/app-client"
 import { ApiClientError } from "@/lib/api/client"
 import { Loader2, Wallet } from "lucide-react"
 
@@ -15,21 +15,28 @@ export default function WithdrawalPage() {
 
   useEffect(() => {
     let cancelled = false
-    getWithdrawalEligibility()
-      .then((res) => {
+    async function check() {
+      try {
+        const [accounts, kyc] = await Promise.all([listMyAccounts(), getMyKyc()])
         if (cancelled) return
-        setEligible(res.is_eligible)
-        setReason(res.reason || "Not eligible for withdrawals. Contact support to become eligible.")
-      })
-      .catch((err) => {
+        const hasFunded = (accounts.accounts ?? []).some((a) => a.phase === "funded")
+        const kycApproved = kyc.kyc?.status === "approved"
+        if (!hasFunded) {
+          setEligible(false)
+          setReason("You need a funded account to request withdrawals.")
+        } else if (!kycApproved) {
+          setEligible(false)
+          setReason("Complete KYC verification before requesting withdrawals.")
+        } else {
+          setEligible(true)
+        }
+      } catch (err) {
         if (cancelled) return
         setEligible(false)
-        setReason(
-          err instanceof ApiClientError
-            ? err.message
-            : "Unable to check withdrawal eligibility. Please try again."
-        )
-      })
+        setReason(err instanceof ApiClientError ? err.message : "Unable to check withdrawal eligibility. Please try again.")
+      }
+    }
+    check()
     return () => {
       cancelled = true
     }
@@ -46,7 +53,7 @@ export default function WithdrawalPage() {
 
       <main className="min-w-0 flex-1 flex flex-col overflow-x-hidden p-3 sm:p-4 md:p-5 lg:ml-64 relative pb-8">
         <div
-          className={`mx-auto w-full max-w-[1200px] flex flex-col flex-1 min-w-0 transition-all duration-300 ${
+          className={`mx-auto w-full max-w-[1600px] flex flex-col flex-1 min-w-0 transition-all duration-300 ${
             showBlur ? "pointer-events-none select-none blur-sm" : ""
           }`}
         >
@@ -76,7 +83,6 @@ export default function WithdrawalPage() {
           </div>
         </div>
 
-        {/* Overlay when not eligible: show reason on top of blurred content */}
         {showBlur && (
           <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-auto">
             <div className="mx-auto w-full max-w-[480px] rounded-xl border border-amber-500/30 bg-card shadow-lg p-6 text-center">
@@ -85,15 +91,8 @@ export default function WithdrawalPage() {
                   <Wallet className="w-7 h-7 text-amber-600 dark:text-amber-400" />
                 </div>
               </div>
-              <h2 className="text-lg font-semibold text-foreground mb-2">
-                Withdrawal not available
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                {reason}
-              </p>
-              <p className="text-xs text-muted-foreground mt-3">
-                Contact support to become eligible for withdrawals.
-              </p>
+              <h2 className="text-lg font-semibold text-foreground mb-2">Withdrawal not available</h2>
+              <p className="text-sm text-muted-foreground">{reason}</p>
             </div>
           </div>
         )}

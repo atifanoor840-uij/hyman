@@ -10,7 +10,7 @@ export default function DownloadPage() {
         <Sidebar />
       </div>
       <main className="min-w-0 flex-1 flex flex-col overflow-x-hidden p-3 sm:p-4 md:p-5 lg:ml-64 font-sans pb-8">
-        <div className="mx-auto w-full max-w-[1200px] flex flex-col flex-1 min-w-0">
+        <div className="mx-auto w-full max-w-[1600px] flex flex-col flex-1 min-w-0">
           <Header
             title="Downloads"
             description="Download MetaTrader 5 (MT5) and MetaTrader 4 (MT4) for your evaluation."

@@ -1,5 +1,5 @@
-import { getApiBaseUrl } from "@/lib/api"
-import { getAuthToken } from "@/lib/auth-utils"
+// The external FastAPI admin backend has been removed. Types are kept for
+// callers; functions are stubbed until admin order management is rebuilt on Supabase.
 import { ApiClientError } from "@/lib/api/client"
 
 export type AdminOrderTimelineEvent = {
@@ -32,38 +32,11 @@ export type AdminOrder = {
   [key: string]: any
 }
 
+const NOT_MIGRATED_MESSAGE =
+  "Order management is being migrated to the new backend and is temporarily unavailable."
+
 export async function listAllOrders(): Promise<AdminOrder[]> {
-  const token = getAuthToken()
-  if (!token) throw new ApiClientError("Missing access token. Please sign in again.", 401)
-
-  const url = `${getApiBaseUrl()}/orders/list/all`
-  let res: Response
-  try {
-    res = await fetch(url, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : "Network error"
-    throw new ApiClientError(msg || "Network error", 0)
-  }
-
-  const contentType = res.headers.get("content-type") || ""
-  const isJson = contentType.includes("application/json")
-  const data = isJson ? await res.json().catch(() => null) : await res.text().catch(() => null)
-
-  if (!res.ok) {
-    const message =
-      (typeof data === "object" && data && ((data as any).message || (data as any).error)) ||
-      (typeof data === "string" && data) ||
-      `Request failed with status ${res.status}`
-    throw new ApiClientError(String(message), res.status)
-  }
-
-  if (!Array.isArray(data)) return []
-  return data as AdminOrder[]
+  throw new ApiClientError(NOT_MIGRATED_MESSAGE, 501)
 }
 
 export type UpdateOrderCredentialPayload = {
@@ -76,73 +49,12 @@ export type UpdateOrderCredentialPayload = {
   fail_reason?: string
 }
 
-async function readResponse(res: Response) {
-  const contentType = res.headers.get("content-type") || ""
-  const isJson = contentType.includes("application/json")
-  return isJson ? await res.json().catch(() => null) : await res.text().catch(() => null)
-}
-
 export async function updateOrderCredential(
-  orderId: number | string,
-  credentialId: number | string,
-  payload: UpdateOrderCredentialPayload
+  _orderId: number | string,
+  _credentialId: number | string,
+  _payload: UpdateOrderCredentialPayload
 ): Promise<any> {
-  const token = getAuthToken()
-  if (!token) throw new ApiClientError("Missing access token. Please sign in again.", 401)
-
-  const url = `${getApiBaseUrl()}/orders/detail/${encodeURIComponent(String(orderId))}/credentials/${encodeURIComponent(String(credentialId))}`
-  const form = new FormData()
-  ;(
-    [
-      "platform_login",
-      "platform_password",
-      "server",
-      "profit_target",
-      "account_status",
-      "status_type",
-      "fail_reason",
-    ] as const
-  ).forEach((k) => {
-    const v = payload[k]
-    if (v === undefined || v === null) return
-    form.append(k, String(v))
-  })
-
-  const attempt = async (method: "PUT" | "POST") => {
-    let res: Response
-    try {
-      res = await fetch(url, {
-        method,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: form,
-        credentials: "omit",
-      })
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "Network error"
-      throw new ApiClientError(msg || "Network error", 0)
-    }
-    const data = await readResponse(res)
-    if (!res.ok) {
-      const message =
-        (typeof data === "object" && data && ((data as any).message || (data as any).error)) ||
-        (typeof data === "string" && data) ||
-        `Request failed with status ${res.status}`
-      throw new ApiClientError(String(message), res.status)
-    }
-    return data
-  }
-
-  try {
-    return await attempt("PUT")
-  } catch (e) {
-    // Some backends only allow POST for form-data updates.
-    if (e instanceof ApiClientError && (e.status === 405 || e.status === 404)) {
-      return await attempt("POST")
-    }
-    throw e
-  }
+  throw new ApiClientError(NOT_MIGRATED_MESSAGE, 501)
 }
 
 export type CompleteByCredentialPayload = {
@@ -152,42 +64,10 @@ export type CompleteByCredentialPayload = {
 }
 
 export async function completeOrderByCredential(
-  orderId: number | string,
-  payload: CompleteByCredentialPayload
+  _orderId: number | string,
+  _payload: CompleteByCredentialPayload
 ): Promise<any> {
-  const token = getAuthToken()
-  if (!token) throw new ApiClientError("Missing access token. Please sign in again.", 401)
-
-  const url = `${getApiBaseUrl()}/orders/detail/${encodeURIComponent(String(orderId))}/complete/by-credential`
-  const form = new FormData()
-  form.append("credential_id", String(payload.credential_id))
-  if (payload.profit_target != null) form.append("profit_target", String(payload.profit_target))
-  // backend auto-generates graph_link; send empty string when requested
-  form.append("graph_link", payload.graph_link ?? "")
-
-  let res: Response
-  try {
-    res = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: form,
-      credentials: "omit",
-    })
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : "Network error"
-    throw new ApiClientError(msg || "Network error", 0)
-  }
-  const data = await readResponse(res)
-  if (!res.ok) {
-    const message =
-      (typeof data === "object" && data && ((data as any).message || (data as any).error)) ||
-      (typeof data === "string" && data) ||
-      `Request failed with status ${res.status}`
-    throw new ApiClientError(String(message), res.status)
-  }
-  return data
+  throw new ApiClientError(NOT_MIGRATED_MESSAGE, 501)
 }
 
 export type CompleteOrderPayload = {
@@ -198,80 +78,15 @@ export type CompleteOrderPayload = {
   graph_link?: string
 }
 
-export async function completeOrder(
-  orderId: number | string,
-  payload: CompleteOrderPayload
-): Promise<any> {
-  const token = getAuthToken()
-  if (!token) throw new ApiClientError("Missing access token. Please sign in again.", 401)
-
-  const url = `${getApiBaseUrl()}/orders/detail/${encodeURIComponent(String(orderId))}/complete`
-  const form = new FormData()
-  ;(["server", "platform_login", "platform_password", "profit_target", "graph_link"] as const).forEach((k) => {
-    const v = payload[k]
-    if (v === undefined || v === null) return
-    form.append(k, String(v))
-  })
-
-  let res: Response
-  try {
-    res = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: form,
-      credentials: "omit",
-    })
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : "Network error"
-    throw new ApiClientError(msg || "Network error", 0)
-  }
-  const data = await readResponse(res)
-  if (!res.ok) {
-    const message =
-      (typeof data === "object" && data && ((data as any).message || (data as any).error)) ||
-      (typeof data === "string" && data) ||
-      `Request failed with status ${res.status}`
-    throw new ApiClientError(String(message), res.status)
-  }
-  return data
+export async function completeOrder(_orderId: number | string, _payload: CompleteOrderPayload): Promise<any> {
+  throw new ApiClientError(NOT_MIGRATED_MESSAGE, 501)
 }
 
 export async function passOrder(
-  orderId: number | string,
-  payload: { profit_amount: string | number }
+  _orderId: number | string,
+  _payload: { profit_amount: string | number }
 ): Promise<any> {
-  const token = getAuthToken()
-  if (!token) throw new ApiClientError("Missing access token. Please sign in again.", 401)
-
-  const url = `${getApiBaseUrl()}/orders/detail/${encodeURIComponent(String(orderId))}/pass`
-  const form = new FormData()
-  form.append("profit_amount", String(payload.profit_amount))
-
-  let res: Response
-  try {
-    res = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: form,
-      credentials: "omit",
-    })
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : "Network error"
-    throw new ApiClientError(msg || "Network error", 0)
-  }
-  const data = await readResponse(res)
-  if (!res.ok) {
-    const message =
-      (typeof data === "object" && data && ((data as any).message || (data as any).error)) ||
-      (typeof data === "string" && data) ||
-      `Request failed with status ${res.status}`
-    throw new ApiClientError(String(message), res.status)
-  }
-  return data
+  throw new ApiClientError(NOT_MIGRATED_MESSAGE, 501)
 }
 
 export type FailOrderPayload = {
@@ -280,41 +95,6 @@ export type FailOrderPayload = {
   reason: string
 }
 
-export async function failOrder(
-  orderId: number | string,
-  payload: FailOrderPayload
-): Promise<any> {
-  const token = getAuthToken()
-  if (!token) throw new ApiClientError("Missing access token. Please sign in again.", 401)
-
-  const url = `${getApiBaseUrl()}/orders/detail/${encodeURIComponent(String(orderId))}/fail`
-  const form = new FormData()
-  form.append("date_time", String(payload.date_time ?? ""))
-  form.append("details", String(payload.details ?? ""))
-  form.append("reason", String(payload.reason ?? ""))
-
-  let res: Response
-  try {
-    res = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: form,
-      credentials: "omit",
-    })
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : "Network error"
-    throw new ApiClientError(msg || "Network error", 0)
-  }
-  const data = await readResponse(res)
-  if (!res.ok) {
-    const message =
-      (typeof data === "object" && data && ((data as any).message || (data as any).error)) ||
-      (typeof data === "string" && data) ||
-      `Request failed with status ${res.status}`
-    throw new ApiClientError(String(message), res.status)
-  }
-  return data
+export async function failOrder(_orderId: number | string, _payload: FailOrderPayload): Promise<any> {
+  throw new ApiClientError(NOT_MIGRATED_MESSAGE, 501)
 }
-

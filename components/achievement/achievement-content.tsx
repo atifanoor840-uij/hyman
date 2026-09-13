@@ -9,7 +9,7 @@ import {
 import { Award, ExternalLink, Download, Eye, Heart, Trophy, ShoppingCart } from "lucide-react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { apiRequest } from "@/lib/api/client"
+import { listMyCertificates, type Certificate as ApiCertificate } from "@/lib/api/app-client"
 
 type Achievement = {
   id: string
@@ -18,24 +18,6 @@ type Achievement = {
   pdfUrl: string
   imageUrl?: string
   design: "red" | "blue" | "gold" | "green" | "navy" | "wave"
-}
-
-type ApiCertificate = {
-  id?: string | number
-  title?: string
-  name?: string
-  date?: string
-  created_at?: string
-  pdf_url?: string
-  pdfUrl?: string
-  image_url?: string
-  imageUrl?: string
-  [key: string]: unknown
-}
-
-type MyCertificatesResponse = {
-  message?: string
-  certificates: ApiCertificate[]
 }
 
 const DESIGN_KEYS: Achievement["design"][] = ["red", "blue", "gold", "green", "navy", "wave"]
@@ -50,13 +32,10 @@ const designStyles: Record<Achievement["design"], string> = {
 }
 
 function mapApiToAchievement(cert: ApiCertificate, index: number): Achievement {
-  const id = String(cert.id ?? index + 1)
-  const title = cert.title ?? cert.name ?? `Certificate ${id}`
-  const date = cert.date ?? cert.created_at ?? ""
-  const pdfUrl = cert.pdf_url ?? cert.pdfUrl ?? ""
-  const imageUrl = cert.image_url ?? cert.imageUrl
+  const title = `${cert.planName} — ${cert.traderName}`
+  const date = cert.datePassed ?? ""
   const design = DESIGN_KEYS[index % DESIGN_KEYS.length]
-  return { id, title, date, pdfUrl, imageUrl, design }
+  return { id: cert.id, title, date, pdfUrl: "", imageUrl: undefined, design }
 }
 
 export function AchievementContent() {
@@ -71,7 +50,7 @@ export function AchievementContent() {
       setLoading(true)
       setError(null)
       try {
-        const res = await apiRequest<MyCertificatesResponse>("/orders/my-certificates")
+        const res = await listMyCertificates()
         const certs = res?.certificates ?? []
         if (Array.isArray(certs) && certs.length > 0) {
           setAchievements(certs.map((c, i) => mapApiToAchievement(c, i)))

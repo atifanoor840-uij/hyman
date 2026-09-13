@@ -6,461 +6,187 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import EmptyState from "@/components/ui/empty-state"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { listMembers, type AdminMember } from "@/lib/api/admin-users"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { adminListUsers, adminUpdateUser, crmImpersonate, type AdminUserRow } from "@/lib/api/app-client"
 import { ApiClientError } from "@/lib/api/client"
-import { CheckCircle2, Copy, Eye, EyeOff, Loader2, Pencil, RefreshCcw, Search, ShieldAlert, Users } from "lucide-react"
-
-function parseBackendDate(input: string | number | Date) {
-  if (input instanceof Date) return input
-  if (typeof input === "number") return new Date(input)
-  const raw = String(input).trim()
-  // If backend sends a "naive" datetime (no timezone), assume it's UTC.
-  const hasTimezone = /([zZ]|[+-]\d{2}:?\d{2})$/.test(raw)
-  if (!hasTimezone) {
-    const isoish = raw.includes("T") ? raw : raw.replace(" ", "T")
-    return new Date(`${isoish}Z`)
-  }
-  return new Date(raw)
-}
-
-function formatDatePakistan(input: string | number | Date | null | undefined) {
-  if (!input) return "—"
-  const d = parseBackendDate(input)
-  if (!Number.isFinite(d.getTime())) return "—"
-  return new Intl.DateTimeFormat(undefined, {
-    timeZone: "Asia/Karachi",
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  }).format(d)
-}
+import { Loader2, Search, ShieldAlert, Users, LogIn } from "lucide-react"
 
 export default function AdminUsersPage() {
-  const [users, setUsers] = useState<AdminMember[]>([])
+  const [users, setUsers] = useState<AdminUserRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [showSensitive, setShowSensitive] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [viewUser, setViewUser] = useState<AdminMember | null>(null)
-  const [editUser, setEditUser] = useState<AdminMember | null>(null)
+  const [search, setSearch] = useState("")
+  const [editing, setEditing] = useState<AdminUserRow | null>(null)
+  const [form, setForm] = useState({ name: "", phone: "", country: "", role: "customer", status: "active" })
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
-  const load = async () => {
+  const refresh = async () => {
     setLoading(true)
     setError(null)
     try {
-      const data = await listMembers()
-      setUsers(Array.isArray(data) ? data : [])
-      setError(null)
-    } catch (e) {
-      if (e instanceof ApiClientError) {
-        setError(e.status === 401 ? "Session expired. Please sign in again." : e.message || "Failed to load users.")
-      } else {
-        setError("Failed to load users.")
-      }
-      setUsers([])
+      const res = await adminListUsers()
+      setUsers(res.users)
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "Failed to load users.")
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    void load()
+    refresh()
   }, [])
 
-  const sorted = useMemo(() => {
-    return users
-      .slice()
-      .sort((a, b) => String(a.created_at ?? "") < String(b.created_at ?? "") ? 1 : -1)
-  }, [users])
-
   const filtered = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase()
-    if (!q) return sorted
-    return sorted.filter((u) => {
-      const hay = [
-        u.name,
-        u.username,
-        u.email,
-        u.country,
-        u.phone_no,
-        u.user_code,
-        u.referral_code,
-      ]
-        .filter(Boolean)
-        .map((v) => String(v).toLowerCase())
-        .join(" ")
-      return hay.includes(q)
-    })
-  }, [searchQuery, sorted])
+    const q = search.trim().toLowerCase()
+    if (!q) return users
+    return users.filter((u) => u.email.toLowerCase().includes(q) || u.name.toLowerCase().includes(q))
+  }, [users, search])
 
-  const summary = useMemo(() => {
-    const total = users.length
-    const verified = users.filter((u) => Boolean(u.is_verified)).length
-    const unverified = total - verified
-    const withOrders = users.filter((u) => Number(u.total_orders ?? 0) > 0).length
-    return { total, verified, unverified, withOrders }
-  }, [users])
+  const openEdit = (u: AdminUserRow) => {
+    setEditing(u)
+    setForm({ name: u.name, phone: u.phone ?? "", country: u.country ?? "", role: u.role, status: u.status })
+    setSaveError(null)
+  }
+
+  const handleSave = async () => {
+    if (!editing) return
+    setSaving(true)
+    setSaveError(null)
+    try {
+      await adminUpdateUser(editing.id, form)
+      await refresh()
+      setEditing(null)
+    } catch (err) {
+      setSaveError(err instanceof ApiClientError ? err.message : "Failed to save.")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleImpersonate = async (userId: string) => {
+    try {
+      await crmImpersonate(userId)
+      window.open("/dashboard/overview", "_blank")
+    } catch (err) {
+      setSaveError(err instanceof ApiClientError ? err.message : "Failed to impersonate user.")
+    }
+  }
 
   return (
-    <AdminShell
-      title="Users"
-      description="Search, review, and manage user accounts."
-      actions={
-        <div className="flex items-center gap-2">
-          <Button
-            className="h-9 rounded-full border border-purple-400/30 bg-gradient-to-r from-purple-800 via-purple-950 to-purple-800 px-4 text-xs font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:from-purple-700 hover:via-purple-900 hover:to-purple-700"
-            onClick={() => void load()}
-            disabled={loading}
-          >
-            {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCcw className="h-4 w-4 mr-2" />}
-            Refresh
-          </Button>
-          <Button
-            className="h-9 rounded-full border border-purple-400/30 bg-gradient-to-r from-purple-800 via-purple-950 to-purple-800 px-4 text-xs font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:from-purple-700 hover:via-purple-900 hover:to-purple-700"
-            onClick={() => setShowSensitive((v) => !v)}
-          >
-            {showSensitive ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
-            {showSensitive ? "Hide sensitive" : "Show sensitive"}
-          </Button>
-        </div>
-      }
-    >
-      <Card className="mb-3 md:mb-4 overflow-hidden rounded-3xl border border-border/80 bg-gradient-to-br from-card via-card to-muted/30 shadow-sm">
-        <div className="relative p-5 sm:p-6">
-          <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-purple-500/10 blur-3xl" aria-hidden />
-          <div className="absolute -left-24 -bottom-24 h-72 w-72 rounded-full bg-emerald-500/10 blur-3xl" aria-hidden />
-          <div className="relative flex flex-col gap-4">
-            <div className="flex items-end justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Users snapshot</p>
-                <h2 className="mt-1 text-xl sm:text-2xl font-bold tracking-tight text-foreground">User overview</h2>
-                <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
-                  Quick view of verification and activity (orders).
-                </p>
-              </div>
-              <Badge variant="outline" className="rounded-full border-border/70 bg-background/40 px-3 py-1 text-xs">
-                {loading ? "Loading…" : `${summary.total} total`}
-              </Badge>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-              <StatChip label="Verified" value={summary.verified} tone="success" />
-              <StatChip label="Unverified" value={summary.unverified} tone="muted" />
-              <StatChip label="With orders" value={summary.withOrders} tone="primary" />
-              <StatChip label="All" value={summary.total} tone="muted" />
-            </div>
-          </div>
+    <AdminShell title="Users" description="View and manage customer accounts.">
+      <Card className="p-4 mb-4">
+        <div className="flex items-center gap-2 max-w-sm">
+          <Search className="w-4 h-4 text-muted-foreground" />
+          <Input placeholder="Search by name or email…" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
       </Card>
 
-      <Card className="rounded-2xl border border-border/80 bg-card shadow-sm overflow-hidden">
-        <div className="border-b border-border/80 bg-muted/20 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-2">
-          <div className="min-w-0">
-            <h3 className="text-sm font-semibold text-foreground tracking-tight">User directory</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {loading ? "Loading users..." : `${filtered.length} users`}
-            </p>
+      <Card className="overflow-hidden">
+        {loading ? (
+          <div className="flex justify-center py-16">
+            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
           </div>
-          <div className="flex items-center gap-2">
-            <div className="relative hidden sm:block">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search users..."
-                className="h-9 w-[260px] rounded-full pl-9 text-xs"
-              />
-            </div>
-            <Badge variant="outline" className="rounded-full border-border/70 bg-background/40 px-3 py-1 text-xs">
-              Live
-            </Badge>
-          </div>
-        </div>
-
-        <div className="p-0">
-          {error ? (
-            <div className="px-4 sm:px-6 py-4">
-              <div className="rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-foreground flex items-start gap-3">
-                <ShieldAlert className="h-5 w-5 text-destructive mt-0.5" />
-                <div className="min-w-0">
-                  <div className="font-semibold">Couldn’t load users</div>
-                  <div className="text-muted-foreground text-xs mt-0.5">{error}</div>
-                </div>
-              </div>
-            </div>
-          ) : null}
-
-          <div className="sm:hidden px-4 sm:px-6 pt-4">
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search users..."
-                className="h-10 rounded-2xl pl-9 text-sm"
-              />
-            </div>
-          </div>
-
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Country</TableHead>
-                <TableHead>Orders</TableHead>
-                <TableHead>Balance</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Admin pass</TableHead>
-                <TableHead className="text-right">Joined</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
+        ) : error ? (
+          <EmptyState icon={<ShieldAlert className="w-8 h-8 text-muted-foreground" />} title="Failed to load" description={error} />
+        ) : filtered.length === 0 ? (
+          <EmptyState icon={<Users className="w-8 h-8 text-muted-foreground" />} title="No users" description="No users match your search." />
+        ) : (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={9} className="py-10">
-                    <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Loading…
-                    </div>
-                  </TableCell>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Verified</TableHead>
+                  <TableHead>Joined</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ) : filtered.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={9} className="p-6">
-                    <EmptyState
-                      title="No users found"
-                      description={searchQuery.trim() ? "No results match your search." : "Try refreshing or confirm the admin token has access to members."}
-                      icon={
-                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border/70 bg-muted/40">
-                          <Users className="h-6 w-6 text-muted-foreground" />
-                        </div>
-                      }
-                      action={
-                        <Button variant="outline" className="rounded-2xl border-border/70" onClick={() => void load()}>
-                          Refresh
-                        </Button>
-                      }
-                    />
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filtered.map((u) => (
-                  <TableRow key={u.id ?? u.email ?? u.username}>
-                    <TableCell className="font-semibold">
-                      <div className="text-foreground font-semibold">{u.name || u.username || "—"}</div>
-                      <div className="text-[11px] text-muted-foreground mt-1 truncate">{u.username}</div>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      <div className="text-foreground font-semibold">{u.email}</div>
-                      <div className="text-[11px] text-muted-foreground mt-1 truncate">{u.phone_no || "—"}</div>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">{u.country || "—"}</TableCell>
-                    <TableCell className="font-semibold tabular-nums">{Number(u.total_orders ?? 0)}</TableCell>
-                    <TableCell className="font-semibold tabular-nums">{Number(u.points_balance ?? 0)}</TableCell>
+              </TableHeader>
+              <TableBody>
+                {filtered.map((u) => (
+                  <TableRow key={u.id}>
+                    <TableCell className="font-medium">{u.name}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{u.email}</TableCell>
+                    <TableCell><Badge variant="secondary" className="capitalize">{u.role}</Badge></TableCell>
                     <TableCell>
-                      <span
-                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
-                          u.is_verified
-                            ? "bg-emerald-500/15 text-emerald-600 border-emerald-500/20"
-                            : "bg-muted/40 text-muted-foreground border-border/60"
-                        }`}
-                      >
-                        {u.is_verified ? <CheckCircle2 className="h-3.5 w-3.5" /> : null}
-                        {u.is_verified ? "Verified" : "Unverified"}
-                      </span>
+                      <Badge className={u.status === "active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}>
+                        {u.status}
+                      </Badge>
                     </TableCell>
+                    <TableCell>{u.emailVerified ? "Yes" : "No"}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "—"}</TableCell>
                     <TableCell>
-                      {showSensitive ? (
-                        <div className="flex items-center justify-between gap-2">
-                          <code className="text-xs font-mono text-muted-foreground">
-                            {u.admin_access_password_plain ? String(u.admin_access_password_plain) : "—"}
-                          </code>
-                          {u.admin_access_password_plain ? (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="icon"
-                              className="h-8 w-8 rounded-xl border-border/70"
-                              onClick={async () => {
-                                try {
-                                  await navigator.clipboard.writeText(String(u.admin_access_password_plain))
-                                } catch {
-                                  // ignore
-                                }
-                              }}
-                              title="Copy admin password"
-                              aria-label="Copy admin password"
-                            >
-                              <Copy className="h-4 w-4" />
-                            </Button>
-                          ) : null}
-                        </div>
-                      ) : (
-                        <span className="text-xs font-mono text-muted-foreground">
-                          {u.admin_access_password_plain ? "••••••••" : "—"}
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right text-muted-foreground text-xs">
-                      {formatDatePakistan(u.created_at)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="inline-flex items-center gap-1.5">
-                        <Button
-                          type="button"
-                          size="sm"
-                          className="h-9 rounded-xl border border-purple-400/30 bg-gradient-to-r from-purple-800 via-purple-950 to-purple-800 px-3 text-xs font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:from-purple-700 hover:via-purple-900 hover:to-purple-700"
-                          onClick={() => setViewUser(u)}
-                        >
-                          <Eye className="h-4 w-4 mr-1.5" />
-                          View
-                        </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          className="h-9 rounded-xl border border-purple-400/30 bg-gradient-to-r from-purple-800 via-purple-950 to-purple-800 px-3 text-xs font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:from-purple-700 hover:via-purple-900 hover:to-purple-700"
-                          onClick={() => setEditUser(u)}
-                        >
-                          <Pencil className="h-4 w-4 mr-1.5" />
-                          Edit
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline" onClick={() => openEdit(u)}>Edit</Button>
+                        <Button size="sm" variant="ghost" onClick={() => handleImpersonate(u.id)}>
+                          <LogIn className="w-3.5 h-3.5" />
                         </Button>
                       </div>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </Card>
 
-      {/* View modal */}
-      <Dialog open={viewUser != null} onOpenChange={(o) => { if (!o) setViewUser(null) }}>
-        <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
+      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle>User details</DialogTitle>
+            <DialogTitle>Edit {editing?.email}</DialogTitle>
           </DialogHeader>
-          {viewUser ? (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <InfoRow label="Name" value={String(viewUser.name || viewUser.username || "—")} />
-                <InfoRow label="Username" value={String(viewUser.username || "—")} />
-                <InfoRow label="Email" value={String(viewUser.email || "—")} />
-                <InfoRow label="Country" value={String(viewUser.country || "—")} />
-                <InfoRow label="Phone" value={String(viewUser.phone_no || "—")} />
-                <InfoRow label="Orders" value={String(Number(viewUser.total_orders ?? 0))} mono />
-                <InfoRow label="Balance" value={String(Number(viewUser.points_balance ?? 0))} mono />
-                <InfoRow label="Status" value={viewUser.is_verified ? "Verified" : "Unverified"} />
-              </div>
-              {showSensitive ? (
-                <div className="rounded-2xl border border-border/70 bg-muted/20 px-4 py-3">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Admin pass</p>
-                      <p className="mt-1 font-mono text-sm text-foreground break-all">
-                        {viewUser.admin_access_password_plain ? String(viewUser.admin_access_password_plain) : "—"}
-                      </p>
-                    </div>
-                    {viewUser.admin_access_password_plain ? (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="h-9 rounded-xl border-border/70"
-                        onClick={async () => {
-                          try {
-                            await navigator.clipboard.writeText(String(viewUser.admin_access_password_plain))
-                          } catch {
-                            // ignore
-                          }
-                        }}
-                      >
-                        <Copy className="h-4 w-4 mr-2" />
-                        Copy
-                      </Button>
-                    ) : null}
-                  </div>
-                </div>
-              ) : null}
-
-              <div className="rounded-2xl border border-border/70 bg-muted/20 px-4 py-3">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Complete backend data</p>
-                <pre className="mt-2 max-h-80 overflow-auto rounded-xl border border-border/60 bg-background/40 p-3 text-[11px] leading-relaxed text-foreground/90">
-                  {JSON.stringify(viewUser, null, 2)}
-                </pre>
-              </div>
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <Label>Name</Label>
+              <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
             </div>
-          ) : null}
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit modal (UI-only for now) */}
-      <Dialog open={editUser != null} onOpenChange={(o) => { if (!o) setEditUser(null) }}>
-        <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit user</DialogTitle>
-          </DialogHeader>
-          {editUser ? (
-            <div className="rounded-2xl border border-border/70 bg-muted/20 px-4 py-3 text-sm text-muted-foreground">
-              Editing users is not wired to an admin update endpoint yet. If you share the backend route for updating users, I’ll connect this modal to it.
+            <div className="space-y-1">
+              <Label>Phone</Label>
+              <Input value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} />
             </div>
-          ) : null}
+            <div className="space-y-1">
+              <Label>Country</Label>
+              <Input value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))} />
+            </div>
+            <div className="space-y-1">
+              <Label>Role</Label>
+              <select
+                value={form.role}
+                onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
+              >
+                <option value="customer">Customer</option>
+                <option value="collaborator">Collaborator</option>
+                <option value="support">Support</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            <div className="space-y-1">
+              <Label>Status</Label>
+              <select
+                value={form.status}
+                onChange={(e) => setForm((f) => ({ ...f, status: e.target.value }))}
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
+              >
+                <option value="active">Active</option>
+                <option value="suspended">Suspended</option>
+              </select>
+            </div>
+            {saveError && <p className="text-sm text-destructive">{saveError}</p>}
+            <Button className="w-full" disabled={saving} onClick={handleSave}>
+              {saving ? "Saving…" : "Save changes"}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </AdminShell>
   )
 }
-
-function InfoRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
-  return (
-    <div className="rounded-2xl border border-border/70 bg-muted/20 px-4 py-3">
-      <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{label}</p>
-      <p className={`mt-1 text-sm font-semibold text-foreground break-all ${mono ? "font-mono" : ""}`}>{value}</p>
-    </div>
-  )
-}
-
-function StatChip({
-  label,
-  value,
-  tone,
-}: {
-  label: string
-  value: number
-  tone: "success" | "primary" | "muted"
-}) {
-  const classes =
-    tone === "success"
-      ? "bg-emerald-500/10 border-emerald-500/20"
-      : tone === "primary"
-        ? "bg-primary/10 border-primary/20"
-        : "bg-muted/40 border-border/60"
-  return (
-    <div className={`rounded-2xl border p-3 ${classes}`}>
-      <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/80">{label}</p>
-      <p className="mt-1 text-lg font-bold tabular-nums text-foreground">{value}</p>
-    </div>
-  )
-}
-

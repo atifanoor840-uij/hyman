@@ -3,6 +3,15 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
+function isWebGLAvailable(): boolean {
+	try {
+		const canvas = document.createElement('canvas');
+		return !!(canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+	} catch {
+		return false;
+	}
+}
+
 export default function HeroBG() {
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -12,17 +21,27 @@ export default function HeroBG() {
 	useEffect(() => {
 		const container = containerRef.current;
 		if (!container) return;
+		if (!isWebGLAvailable()) return;
 		// Store window reference to avoid TypeScript narrowing issues
 		const win = typeof window !== "undefined" ? window : null;
 		const scene = new THREE.Scene();
 
 		const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
-		const renderer = new THREE.WebGLRenderer({
-			antialias: true,
-			alpha: true,
-			powerPreference: "high-performance",
-		});
+		let renderer: THREE.WebGLRenderer;
+		try {
+			renderer = new THREE.WebGLRenderer({
+				antialias: true,
+				alpha: true,
+				powerPreference: "high-performance",
+			});
+		} catch (err) {
+			// WebGL context creation can still fail even when a context probe
+			// succeeds (e.g. sandboxed/GPU-disabled browsers) — skip the
+			// decorative background instead of crashing the page.
+			console.warn('HeroBG: WebGL renderer unavailable, skipping animated background.', err);
+			return;
+		}
 		rendererRef.current = renderer;
 		renderer.setPixelRatio(win?.devicePixelRatio ?? 1);
 		container.appendChild(renderer.domElement);

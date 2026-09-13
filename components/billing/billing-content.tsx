@@ -6,14 +6,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Receipt, Loader2 } from "lucide-react"
-import { getMyAccount, type Order } from "@/lib/api/auth"
+import { listMyOrders, payOrder, type OrderWithPlan } from "@/lib/api/app-client"
 import { ApiClientError } from "@/lib/api/client"
 import { trackPurchaseEnhanced } from "@/components/MetaPixel"
 
-function formatCreatedAt(iso: string): string {
+function formatCreatedAt(iso: string | null): string {
+  if (!iso) return "—"
   try {
-    const d = new Date(iso)
-    return d.toLocaleDateString(undefined, {
+    return new Date(iso).toLocaleDateString(undefined, {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -27,41 +27,26 @@ function formatCreatedAt(iso: string): string {
 
 const getStatusBadge = (status: string) => {
   switch (status) {
-    case "Completed":
-      return <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs">Completed</Badge>
-    case "Pending":
-      return <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-xs">Pending</Badge>
-    case "Processing":
+    case "active":
+    case "passed":
+      return <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs capitalize">{status}</Badge>
+    case "pending_payment":
+      return <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-xs">Pending payment</Badge>
+    case "processing":
       return <Badge className="bg-purple-500/10 text-purple-600 border-purple-500/20 text-xs">Processing</Badge>
-    default:
-      return <Badge variant="secondary" className="text-xs">{status}</Badge>
-  }
-}
-
-const getPaymentStatusBadge = (paymentStatus: string | null) => {
-  if (paymentStatus == null || paymentStatus === "") {
-    return <span className="text-muted-foreground/70 text-sm">—</span>
-  }
-  switch (String(paymentStatus).toLowerCase()) {
-    case "paid":
-    case "completed":
-      return <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs">Paid</Badge>
-    case "pending":
-      return <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-xs">Pending</Badge>
     case "failed":
       return <Badge className="bg-red-500/10 text-red-600 border-red-500/20 text-xs">Failed</Badge>
     default:
-      return <Badge variant="secondary" className="text-xs">{paymentStatus}</Badge>
+      return <Badge variant="secondary" className="text-xs capitalize">{status}</Badge>
   }
 }
 
 export function BillingContent() {
-  const [orders, setOrders] = useState<Order[]>([])
-  const [totalOrders, setTotalOrders] = useState(0)
+  const [orders, setOrders] = useState<OrderWithPlan[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [payingId, setPayingId] = useState<string | null>(null)
 
-  // Fire Purchase events when orders become paid/completed, but only once per order.
   useEffect(() => {
     if (typeof window === "undefined") return
     if (!orders.length) return
@@ -78,43 +63,18 @@ export function BillingContent() {
 
     let changed = false
     for (const order of orders) {
-      const orderId = String((order as any).order_id ?? "")
-      if (!orderId || tracked.has(orderId)) continue
-
-      const paymentStatus = String((order as any).payment_status ?? "").toLowerCase()
-      const oxapayPaymentStatus = String((order as any).oxapay_payment_status ?? "").toLowerCase()
-      const orderStatus = String((order as any).status ?? "").toLowerCase()
-
-      const isPaid =
-        paymentStatus === "paid" ||
-        paymentStatus === "completed" ||
-        oxapayPaymentStatus === "paid" ||
-        oxapayPaymentStatus === "completed" ||
-        orderStatus === "completed"
-
+      if (tracked.has(order.id)) continue
+      const isPaid = order.status === "active" || order.status === "passed" || order.status === "processing"
       if (!isPaid) continue
 
-      const valueRaw = (order as any).amount
-      const value = typeof valueRaw === "number" ? valueRaw : Number(valueRaw)
-      const safeValue = Number.isFinite(value) ? value : 0
-
-      const currency = String((order as any).currency ?? "USD") || "USD"
-      const challengeType = String((order as any).challenge_type ?? "").trim()
-      const accountSize = String((order as any).account_size ?? "").trim()
-      const platform = String((order as any).platform ?? "").trim()
-      const contentName = [challengeType, accountSize ? `$${Number(accountSize).toLocaleString("en-US")}` : ""]
-        .filter(Boolean)
-        .join(" - ") || "GenzProp Challenge"
-
       trackPurchaseEnhanced(
-        safeValue,
-        currency,
-        contentName,
-        challengeType || undefined,
-        platform || undefined
+        order.amountPaid,
+        "USD",
+        order.challenge_plans?.name ?? "GenzProp Challenge",
+        order.challenge_plans?.name ?? undefined,
+        order.challenge_plans?.platform ?? undefined
       )
-
-      tracked.add(orderId)
+      tracked.add(order.id)
       changed = true
     }
 
@@ -133,22 +93,31 @@ export function BillingContent() {
       setIsLoading(true)
       setError(null)
       try {
-        const data = await getMyAccount()
-        if (!cancelled) {
-          setOrders(data.orders ?? [])
-          setTotalOrders(data.total_orders ?? 0)
-        }
+        const data = await listMyOrders()
+        if (!cancelled) setOrders(data.orders ?? [])
       } catch (err) {
-        if (!cancelled) {
-          setError(err instanceof ApiClientError ? err.message : "Failed to load orders.")
-        }
+        if (!cancelled) setError(err instanceof ApiClientError ? err.message : "Failed to load orders.")
       } finally {
         if (!cancelled) setIsLoading(false)
       }
     }
     fetchOrders()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [])
+
+  const handleComplete = async (orderId: string) => {
+    setPayingId(orderId)
+    try {
+      const { checkoutUrl } = await payOrder(orderId)
+      window.location.href = checkoutUrl
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "Unable to start payment. Please try again.")
+    } finally {
+      setPayingId(null)
+    }
+  }
 
   return (
     <div className="space-y-4 animate-fade-in font-sans">
@@ -159,9 +128,7 @@ export function BillingContent() {
               <Receipt className="h-4 w-4 text-muted-foreground" />
               <CardTitle className="text-base font-semibold">Order History</CardTitle>
             </div>
-            {!isLoading && !error && (
-              <span className="text-xs text-muted-foreground">Total: {totalOrders}</span>
-            )}
+            {!isLoading && !error && <span className="text-xs text-muted-foreground">Total: {orders.length}</span>}
           </div>
         </CardHeader>
         <CardContent className="px-0 pb-0">
@@ -178,12 +145,12 @@ export function BillingContent() {
               <Table>
                 <TableHeader>
                   <TableRow className="border-border bg-muted/30 hover:bg-muted/30">
-                    <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9 px-4">Challenge Type</TableHead>
+                    <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9 px-4">Plan</TableHead>
                     <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9">Platform</TableHead>
                     <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9">Order ID</TableHead>
                     <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9">Created At</TableHead>
                     <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9">Payment Method</TableHead>
-                    <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9">Payment Status</TableHead>
+                    <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9">Amount</TableHead>
                     <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9">Status</TableHead>
                     <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide h-9 px-4">Action</TableHead>
                   </TableRow>
@@ -191,41 +158,30 @@ export function BillingContent() {
                 <TableBody>
                   {orders.map((order, index) => (
                     <TableRow
-                      key={order.order_id}
+                      key={order.id}
                       className="border-border hover:bg-muted/40 transition-colors"
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
-                      <TableCell className="text-sm font-medium px-4 py-3 capitalize">{order.challenge_type}</TableCell>
-                      <TableCell className="text-sm py-3 uppercase">{order.platform}</TableCell>
-                      <TableCell className="font-mono text-xs text-muted-foreground py-3">{order.order_id}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground py-3">{formatCreatedAt(order.created_at)}</TableCell>
-                      <TableCell className="text-sm py-3">{order.payment_method || "—"}</TableCell>
-                      <TableCell className="py-3">{getPaymentStatusBadge(order.payment_status)}</TableCell>
+                      <TableCell className="text-sm font-medium px-4 py-3">{order.challenge_plans?.name ?? "—"}</TableCell>
+                      <TableCell className="text-sm py-3 uppercase">{order.challenge_plans?.platform ?? "—"}</TableCell>
+                      <TableCell className="font-mono text-xs text-muted-foreground py-3">{order.id.slice(0, 8)}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground py-3">{formatCreatedAt(order.createdAt)}</TableCell>
+                      <TableCell className="text-sm py-3 capitalize">{order.paymentMethod || "—"}</TableCell>
+                      <TableCell className="text-sm py-3">${order.amountPaid.toFixed(2)}</TableCell>
                       <TableCell className="py-3">{getStatusBadge(order.status)}</TableCell>
                       <TableCell className="px-4 py-3">
-                        {order.status === "Pending" ? (
-                          order.checkout_session_url ? (
-                            <Button
-                              variant="default"
-                              size="sm"
-                              className="h-7 text-xs px-3"
-                              asChild
-                            >
-                              <a
-                                href={order.checkout_session_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                Complete
-                              </a>
-                            </Button>
-                          ) : (
-                            <Button variant="default" size="sm" className="h-7 text-xs px-3" disabled>
-                              Complete
-                            </Button>
-                          )
+                        {order.status === "pending_payment" ? (
+                          <Button
+                            variant="default"
+                            size="sm"
+                            className="h-7 text-xs px-3"
+                            disabled={payingId === order.id}
+                            onClick={() => handleComplete(order.id)}
+                          >
+                            {payingId === order.id ? "Starting…" : "Complete"}
+                          </Button>
                         ) : (
-                          <Button variant="outline" size="sm" className="h-7 text-xs px-3">
+                          <Button variant="outline" size="sm" className="h-7 text-xs px-3" disabled>
                             Download
                           </Button>
                         )}

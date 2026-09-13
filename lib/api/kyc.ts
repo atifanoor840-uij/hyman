@@ -13,7 +13,7 @@ export interface KycSessionResponse {
   message: string;
 }
 
-const DEFAULT_CALLBACK_URL = 'https://propakd.vercel.app/kyc/webhook';
+const DEFAULT_CALLBACK_URL = '/api/kyc/didit-webhook';
 
 /**
  * GET /kyc/eligibility - Check if user is eligible to submit KYC.

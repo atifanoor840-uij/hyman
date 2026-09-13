@@ -62,9 +62,9 @@ function Gauge({
   const strokeDashoffset = circumference - (pct / 100) * circumference
 
   return (
-    <div className="flex flex-col items-center p-3 rounded-xl bg-muted/20 border border-border/50 hover:bg-muted/40 transition-colors duration-200">
-      <p className="text-xs font-bold text-foreground mb-1 w-full text-center truncate">{label}</p>
-      <div className="relative w-full max-w-[120px] aspect-[120/72]">
+    <div className="flex flex-col items-center p-4 rounded-xl bg-muted/20 border border-border/50 hover:bg-muted/40 transition-colors duration-200">
+      <p className="text-sm font-bold text-foreground mb-1 w-full text-center truncate">{label}</p>
+      <div className="relative w-full max-w-[160px] aspect-[120/72]">
         <svg viewBox="0 0 120 72" className="w-full h-full" aria-hidden>
           <path
             d={`M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`}
@@ -99,7 +99,7 @@ function Gauge({
         <span className="absolute bottom-0 left-0 text-[9px] font-medium text-muted-foreground">0</span>
         <span className="absolute bottom-0 right-0 text-[9px] font-medium text-muted-foreground">{maxLabel ?? String(max)}</span>
       </div>
-      <p className="text-sm font-bold tabular-nums text-foreground mt-1">
+      <p className="text-base font-bold tabular-nums text-foreground mt-1">
         {displayValue ?? clamped.toFixed(1)}
       </p>
     </div>
@@ -335,7 +335,7 @@ function DashboardPageInner() {
       </div>
 
       <main className="min-w-0 flex-1 flex flex-col overflow-x-hidden p-3 sm:p-4 md:p-5 lg:ml-64 pb-8">
-        <div className="mx-auto w-full max-w-[1400px] flex flex-col flex-1 min-w-0">
+        <div className="mx-auto w-full max-w-[1600px] flex flex-col flex-1 min-w-0">
           <Header
             title="Forex Trading Dashboard"
             description="Monitor your trading performance, analyze market trends, and manage your positions."

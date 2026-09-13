@@ -5,32 +5,29 @@ import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
 import { KycContent } from "@/components/kyc/kyc-content"
 import { Footer } from "@/components/footer"
-import { getKycEligibility, type KycEligibilityResponse } from "@/lib/api/kyc"
+import { listMyAccounts } from "@/lib/api/app-client"
 import { ApiClientError } from "@/lib/api/client"
 import { Loader2, ShieldAlert } from "lucide-react"
 
 export default function KycPage() {
   const [eligible, setEligible] = useState<boolean | null>(null)
   const [message, setMessage] = useState<string>("")
-  const [eligibilityData, setEligibilityData] = useState<KycEligibilityResponse | null>(null)
 
   useEffect(() => {
     let cancelled = false
-    getKycEligibility()
+    listMyAccounts()
       .then((res) => {
         if (cancelled) return
-        setEligible(res.is_eligible)
-        setEligibilityData(res)
-        setMessage(res.message || "You must have a live order or instant account with credentials delivered to submit KYC documents.")
+        const hasAccount = (res.accounts?.length ?? 0) > 0
+        setEligible(hasAccount)
+        if (!hasAccount) {
+          setMessage("You need a live account with credentials delivered before you can submit KYC documents.")
+        }
       })
       .catch((err) => {
         if (cancelled) return
         setEligible(false)
-        setMessage(
-          err instanceof ApiClientError
-            ? err.message
-            : "Unable to check KYC eligibility. Please try again."
-        )
+        setMessage(err instanceof ApiClientError ? err.message : "Unable to check KYC eligibility. Please try again.")
       })
     return () => {
       cancelled = true
@@ -48,7 +45,7 @@ export default function KycPage() {
 
       <main className="min-w-0 flex-1 flex flex-col overflow-x-hidden p-3 sm:p-4 md:p-5 lg:ml-64 relative pb-8">
         <div
-          className={`mx-auto w-full max-w-[1200px] flex flex-col flex-1 min-w-0 transition-all duration-300 ${
+          className={`mx-auto w-full max-w-[1600px] flex flex-col flex-1 min-w-0 transition-all duration-300 ${
             showBlur ? "pointer-events-none select-none blur-sm" : ""
           }`}
         >
@@ -69,10 +66,7 @@ export default function KycPage() {
                 <p className="text-sm text-muted-foreground">Checking eligibility…</p>
               </div>
             ) : (
-              <KycContent
-                hasKycSubmission={eligibilityData?.has_kyc_submission}
-                kycStatus={eligibilityData?.kyc_status ?? undefined}
-              />
+              <KycContent />
             )}
           </div>
 
@@ -81,7 +75,6 @@ export default function KycPage() {
           </div>
         </div>
 
-        {/* Overlay when not eligible: show message on top of blurred content */}
         {showBlur && (
           <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-auto">
             <div className="mx-auto w-full max-w-[480px] rounded-xl border border-amber-500/30 bg-card shadow-lg p-6 text-center">
@@ -90,15 +83,8 @@ export default function KycPage() {
                   <ShieldAlert className="w-7 h-7 text-amber-600 dark:text-amber-400" />
                 </div>
               </div>
-              <h2 className="text-lg font-semibold text-foreground mb-2">
-                KYC not available
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                {message}
-              </p>
-              <p className="text-xs text-muted-foreground mt-3">
-                You need a live order or an instant account with credentials delivered before you can submit KYC documents.
-              </p>
+              <h2 className="text-lg font-semibold text-foreground mb-2">KYC not available</h2>
+              <p className="text-sm text-muted-foreground">{message}</p>
             </div>
           </div>
         )}

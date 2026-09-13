@@ -15,6 +15,9 @@ import {
   Link as LinkIcon,
   Mail,
   LogOut,
+  Tag,
+  Percent,
+  Handshake,
 } from "lucide-react"
 
 const iconClass = "shrink-0"
@@ -24,6 +27,9 @@ const sectionOverview = [{ icon: LayoutGrid, label: "Overview", href: "/admin/ov
 const sectionManagement = [
   { icon: ShoppingCart, label: "Orders", href: "/admin/orders" },
   { icon: Users, label: "Users", href: "/admin/users" },
+  { icon: Tag, label: "Pricing", href: "/admin/pricing" },
+  { icon: Percent, label: "Coupons", href: "/admin/coupons" },
+  { icon: Handshake, label: "Affiliates", href: "/admin/affiliates" },
 ]
 
 const sectionCompliance = [

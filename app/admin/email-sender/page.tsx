@@ -19,9 +19,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useToast } from "@/components/ui/use-toast"
-import { listMembers, type AdminMember } from "@/lib/api/admin-users"
+import { adminListUsers, type AdminUserRow } from "@/lib/api/app-client"
 import { ApiClientError } from "@/lib/api/client"
-import { getAuthToken, isValidEmail } from "@/lib/auth-utils"
+import { isValidEmail } from "@/lib/auth-utils"
 import { Loader2, Mail, RefreshCcw, Send, X } from "lucide-react"
 
 type SendResult = {
@@ -66,7 +66,7 @@ const FROM_ACCOUNTS = [
 export default function AdminEmailSenderPage() {
   const { toast } = useToast()
 
-  const [users, setUsers] = useState<AdminMember[]>([])
+  const [users, setUsers] = useState<AdminUserRow[]>([])
   const [usersLoading, setUsersLoading] = useState(true)
   const [usersError, setUsersError] = useState<string | null>(null)
   const [search, setSearch] = useState("")
@@ -86,8 +86,8 @@ export default function AdminEmailSenderPage() {
     setUsersLoading(true)
     setUsersError(null)
     try {
-      const data = await listMembers()
-      setUsers(Array.isArray(data) ? data : [])
+      const data = await adminListUsers()
+      setUsers(data.users ?? [])
     } catch (e) {
       if (e instanceof ApiClientError) setUsersError(e.message || "Failed to load users.")
       else setUsersError("Failed to load users.")
@@ -106,10 +106,10 @@ export default function AdminEmailSenderPage() {
     const base = users
       .filter((u) => Boolean(String(u.email || "").trim()))
       .map((u) => ({
-        id: String(u.id ?? u.email ?? ""),
-        name: String(u.name || u.username || "—"),
-        email: String(u.email || "").trim().toLowerCase(),
-        verified: Boolean(u.is_verified),
+        id: u.id,
+        name: u.name || "—",
+        email: u.email.trim().toLowerCase(),
+        verified: u.emailVerified,
       }))
     const filtered = q
       ? base.filter((u) => u.email.includes(q) || u.name.toLowerCase().includes(q))
@@ -189,21 +189,12 @@ export default function AdminEmailSenderPage() {
       return
     }
 
-    const token = getAuthToken()
-    if (!token) {
-      toast({ title: "Not signed in", description: "Admin session missing token. Please sign in again.", variant: "destructive" })
-      return
-    }
-
     setSending(true)
     setSendResult(null)
     try {
       const res = await fetch("/api/admin/email/send", {
         method: "POST",
-        headers: {
-          "content-type": "application/json",
-          authorization: `Bearer ${token}`,
-        },
+        headers: { "content-type": "application/json" },
         body: JSON.stringify({
           account: fromAccount,
           subject: subjectTrim,

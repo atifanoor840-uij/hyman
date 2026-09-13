@@ -109,7 +109,7 @@ export default function CountrySelector({
 				type="button"
 				onClick={() => !disabled && setIsOpen(!isOpen)}
 				disabled={disabled}
-				className={`mt-2 w-full rounded-2xl border px-4 py-3 text-left text-sm font-semibold tracking-wide transition focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10 ${
+				className={`mt-2 w-full rounded-2xl border px-5 py-4 text-left text-base font-semibold tracking-wide transition focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10 ${
 					error
 						? 'border-red-500 bg-red-50 text-red-900'
 						: 'border-zinc-200 bg-zinc-50 text-zinc-900'

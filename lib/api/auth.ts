@@ -320,12 +320,103 @@ export interface MyAccountResponse {
 	orders: Order[];
 }
 
+/** Maps this app's `challenge_plans.name` values to the tokens rules-config.ts expects. */
+function planNameToChallengeType(name: string | undefined): string {
+	const n = (name ?? '').toLowerCase().trim();
+	if (n === 'one step') return 'step1';
+	if (n === 'two step') return 'step2';
+	if (n === 'instant') return 'instant';
+	return n;
+}
+
+function orderStatusToLegacy(status: string): string {
+	switch (status) {
+		case 'pending_payment':
+			return 'Pending';
+		case 'processing':
+			return 'Processing';
+		case 'passed':
+			return 'Passed';
+		case 'failed':
+			return 'Failed';
+		default:
+			return 'Active';
+	}
+}
+
+/**
+ * `getMyAccount()` used to hit the external FastAPI backend directly. It now
+ * composes /api/orders + /api/accounts (this app's real Supabase-backed
+ * routes) and maps them onto the legacy `Order` shape below, so the existing
+ * gauge/credentials-dialog UI (Header, dashboard/page.tsx,
+ * performance/[order-id]/page.tsx) keeps working unmodified.
+ */
 export async function getMyAccount(): Promise<MyAccountResponse> {
+	const { listMyOrders, listMyAccounts } = await import('./app-client');
 	try {
-		const response = await apiRequest<MyAccountResponse>('/orders/my-account', {
-			method: 'GET',
+		const [ordersRes, accountsRes] = await Promise.all([listMyOrders(), listMyAccounts()]);
+		const accountsByOrder = new Map<string, typeof accountsRes.accounts>();
+		for (const acc of accountsRes.accounts) {
+			if (!acc.orderId) continue;
+			const list = accountsByOrder.get(acc.orderId) ?? [];
+			list.push(acc);
+			accountsByOrder.set(acc.orderId, list);
+		}
+
+		const orders: Order[] = ordersRes.orders.map((o) => {
+			const accounts = accountsByOrder.get(o.id) ?? [];
+			const toCredential = (a: (typeof accounts)[number]): OrderCredentials => ({
+				credential_id: 0,
+				server: a.server,
+				platform_login: a.login,
+				platform_password: a.passwordMaster ?? '',
+				profit_target: a.profitTarget,
+				graph_link: a.graphLink,
+			});
+			const toCredentialWithStatus = (a: (typeof accounts)[number]): CredentialWithStatus => ({
+				credential_id: 0,
+				account_status: a.status,
+				status_type: a.phase ?? undefined,
+				platform: a.platform,
+				server: a.server,
+				platform_login: a.login,
+				platform_password: a.passwordMaster ?? '',
+				profit_target: a.profitTarget,
+				graph_link: a.graphLink,
+			});
+
+			const phase1 = accounts.find((a) => a.phase === 'phase1');
+			const phase2 = accounts.find((a) => a.phase === 'phase2');
+			const funded = accounts.find((a) => a.phase === 'funded');
+
+			return {
+				order_id: o.id,
+				username: '',
+				status: orderStatusToLegacy(o.status),
+				account_size: String(o.challenge_plans?.size ?? ''),
+				challenge_type: planNameToChallengeType(o.challenge_plans?.name),
+				created_at: o.createdAt ?? '',
+				platform: accounts[0]?.platform ?? o.challenge_plans?.platform ?? '',
+				payment_method: o.paymentMethod,
+				payment_status: o.status === 'failed' ? 'failed' : o.status === 'pending_payment' ? 'pending' : 'paid',
+				oxapay_payment_status: null,
+				payment_intent_id: null,
+				checkout_session_id: null,
+				txid: null,
+				checkout_session_url: null,
+				image: null,
+				credentials: phase1 ? toCredential(phase1) : null,
+				stage2_credentials: phase2 ? toCredential(phase2) : null,
+				live_credentials: funded ? toCredential(funded) : null,
+				credentials_with_status: accounts.map(toCredentialWithStatus),
+			};
 		});
-		return response;
+
+		return {
+			user: { username: '', email: '', name: '' },
+			total_orders: orders.length,
+			orders,
+		};
 	} catch (error) {
 		if (error instanceof ApiClientError) {
 			throw error;

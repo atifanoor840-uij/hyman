@@ -1218,8 +1218,18 @@ class App {
   }
 }
 
+function isWebGLAvailable(): boolean {
+  try {
+    const canvas = document.createElement('canvas');
+    return !!(canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+  } catch {
+    return false;
+  }
+}
+
 const Hyperspeed: FC<HyperspeedProps> = ({ effectOptions = {} }) => {
   const [mounted, setMounted] = useState(false);
+  const [unavailable, setUnavailable] = useState(false);
   const mergedOptions: HyperspeedOptions = {
     ...defaultOptions,
     ...effectOptions
@@ -1233,6 +1243,11 @@ const Hyperspeed: FC<HyperspeedProps> = ({ effectOptions = {} }) => {
 
   useEffect(() => {
     if (!mounted) return;
+    if (!isWebGLAvailable()) {
+      setUnavailable(true);
+      return;
+    }
+
     if (appRef.current) {
       appRef.current.dispose();
       const container = document.getElementById('lights');
@@ -1251,9 +1266,17 @@ const Hyperspeed: FC<HyperspeedProps> = ({ effectOptions = {} }) => {
       options.distortion = distortions[options.distortion];
     }
 
-    const myApp = new App(container, options);
-    appRef.current = myApp;
-    myApp.loadAssets().then(myApp.init);
+    try {
+      const myApp = new App(container, options);
+      appRef.current = myApp;
+      myApp.loadAssets().then(myApp.init).catch(() => setUnavailable(true));
+    } catch (err) {
+      // WebGL context creation can fail even when a context object is
+      // returned (e.g. sandboxed/GPU-disabled browsers) — fall back to a
+      // static background instead of crashing the page.
+      console.warn('Hyperspeed: WebGL renderer unavailable, skipping animated background.', err);
+      setUnavailable(true);
+    }
 
     return () => {
       if (appRef.current) {
@@ -1262,7 +1285,7 @@ const Hyperspeed: FC<HyperspeedProps> = ({ effectOptions = {} }) => {
     };
   }, [mounted, mergedOptions]);
 
-  if (!mounted) {
+  if (!mounted || unavailable) {
     return <div className="w-full h-full" aria-hidden />;
   }
   return <div id="lights" className="w-full h-full" ref={hyperspeed}></div>;

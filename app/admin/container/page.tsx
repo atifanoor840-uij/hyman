@@ -1,838 +1,159 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { AdminShell } from "@/components/admin/admin-shell"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import EmptyState from "@/components/ui/empty-state"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  createAccountCredential,
-  deleteAccountCredential,
-  listAccountCredentials,
-  updateAccountCredential,
-  type AccountCredential,
-  type UpsertAccountCredential,
-} from "@/lib/api/admin-container"
+import EmptyState from "@/components/ui/empty-state"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { adminListInventory, adminCreateInventory, adminDeleteInventory, type InventoryItem } from "@/lib/api/app-client"
 import { ApiClientError } from "@/lib/api/client"
-import { getShowMyTradesStats } from "@/lib/api/showmytrades"
-import type { PerformanceResponse } from "@/lib/api/performance"
-import { PerformanceGraphPanel, DetailedStatisticsCard } from "@/components/dashboard/performance-graph-stats"
-import { formatDateKarachi } from "@/lib/utils"
-import { ExternalLink, Eye, LineChart, Loader2, Plus, Pencil, RefreshCcw, ServerCrash, ShieldAlert, Trash2 } from "lucide-react"
+import { Loader2, ShieldAlert, PackagePlus, Trash2 } from "lucide-react"
 
-function statusTone(status: string | null | undefined) {
-  const s = String(status ?? "").toLowerCase()
-  if (s.includes("available")) return "bg-emerald-500/15 text-emerald-600 border-emerald-500/20"
-  if (s.includes("assigned")) return "bg-primary/15 text-primary border-primary/20"
-  if (s.includes("not_available") || s.includes("unavailable")) return "bg-muted/40 text-muted-foreground border-border/60"
-  return "bg-muted/40 text-muted-foreground border-border/60"
-}
+const EMPTY_FORM = { platform: "mt5", size: "", login: "", password: "", server: "" }
 
 export default function AdminContainerPage() {
-  const [rows, setRows] = useState<AccountCredential[]>([])
+  const [items, setItems] = useState<InventoryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [selectedSize, setSelectedSize] = useState<string>("all")
+  const [form, setForm] = useState(EMPTY_FORM)
+  const [creating, setCreating] = useState(false)
+  const [createError, setCreateError] = useState<string | null>(null)
 
-  const [createOpen, setCreateOpen] = useState(false)
-  const [viewRow, setViewRow] = useState<AccountCredential | null>(null)
-  const [editRow, setEditRow] = useState<AccountCredential | null>(null)
-  const [deleteRow, setDeleteRow] = useState<AccountCredential | null>(null)
-  const [saving, setSaving] = useState(false)
-  const [mutateError, setMutateError] = useState<string | null>(null)
-  const [deleteSaving, setDeleteSaving] = useState(false)
-  const [deleteError, setDeleteError] = useState<string | null>(null)
-
-  const [graphRow, setGraphRow] = useState<AccountCredential | null>(null)
-  const [graphLoading, setGraphLoading] = useState(false)
-  const [graphError, setGraphError] = useState<string | null>(null)
-  const [graphData, setGraphData] = useState<PerformanceResponse | null>(null)
-
-  const [createForm, setCreateForm] = useState<UpsertAccountCredential>({
-    platform: "mt5",
-    platform_login: "",
-    platform_password: "",
-    server: "",
-    account_size: "",
-    status: "available",
-    graph_link: "",
-  })
-  const [editForm, setEditForm] = useState<Partial<UpsertAccountCredential>>({})
-
-  const load = async () => {
+  const refresh = async () => {
     setLoading(true)
     setError(null)
     try {
-      const data = await listAccountCredentials()
-      setRows(Array.isArray(data) ? data : [])
-      setError(null)
-    } catch (e) {
-      if (e instanceof ApiClientError) {
-        setError(e.message || "Failed to load credentials.")
-      } else {
-        setError("Failed to load credentials.")
-      }
-      setRows([])
+      const res = await adminListInventory()
+      setItems(res.items)
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "Failed to load inventory.")
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    void load()
+    refresh()
   }, [])
 
-  const sorted = useMemo(() => {
-    return rows
-      .slice()
-      .sort((a, b) => String(a.updated_at ?? a.created_at ?? "") < String(b.updated_at ?? b.created_at ?? "") ? 1 : -1)
-  }, [rows])
-
-  const sizeOptions = useMemo(() => {
-    const uniq = new Set<string>()
-    for (const r of rows) {
-      const s = String(r.account_size ?? "").trim()
-      if (s) uniq.add(s)
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setCreateError(null)
+    if (!form.login || !form.password || !form.server || !form.size) {
+      setCreateError("All fields are required.")
+      return
     }
-    return Array.from(uniq).sort((a, b) => {
-      const na = Number(String(a).replace(/[^\d.]/g, ""))
-      const nb = Number(String(b).replace(/[^\d.]/g, ""))
-      if (Number.isFinite(na) && Number.isFinite(nb) && na !== nb) return na - nb
-      return String(a).localeCompare(String(b))
-    })
-  }, [rows])
-
-  const filtered = useMemo(() => {
-    if (selectedSize === "all") return sorted
-    return sorted.filter((r) => String(r.account_size ?? "") === selectedSize)
-  }, [sorted, selectedSize])
-
-  const stats = useMemo(() => {
-    const total = rows.length
-    const available = rows.filter((r) => String(r.status ?? "").toLowerCase().includes("available")).length
-    const unavailable = rows.filter((r) => {
-      const s = String(r.status ?? "").toLowerCase()
-      return s.includes("not_available") || s.includes("unavailable")
-    }).length
-    const assigned = rows.filter((r) => Boolean(r.is_assigned)).length
-    return { total, available, unavailable, assigned }
-  }, [rows])
-
-  const createSubmit = async () => {
-    setMutateError(null)
-    if (!String(createForm.platform_login).trim()) return setMutateError("Platform login is required.")
-    if (!String(createForm.platform_password).trim()) return setMutateError("Platform password is required.")
-    if (!String(createForm.server).trim()) return setMutateError("Server is required.")
-    if (!String(createForm.account_size).trim()) return setMutateError("Account size is required.")
-
-    setSaving(true)
+    setCreating(true)
     try {
-      await createAccountCredential({
-        ...createForm,
-        platform: (createForm.platform || "mt5").trim(),
-        platform_login: String(createForm.platform_login).trim(),
-        platform_password: String(createForm.platform_password).trim(),
-        server: String(createForm.server).trim(),
-        account_size: String(createForm.account_size).trim(),
-      })
-      setCreateOpen(false)
-      setCreateForm({
-        platform: "mt5",
-        platform_login: "",
-        platform_password: "",
-        server: "",
-        account_size: "",
-        status: "available",
-        graph_link: "",
-      })
-      await load()
-    } catch (e) {
-      setMutateError(e instanceof ApiClientError ? e.message : "Failed to create account.")
+      await adminCreateInventory({ platform: form.platform, size: Number(form.size), login: form.login, password: form.password, server: form.server })
+      setForm(EMPTY_FORM)
+      await refresh()
+    } catch (err) {
+      setCreateError(err instanceof ApiClientError ? err.message : "Failed to add account.")
     } finally {
-      setSaving(false)
+      setCreating(false)
     }
   }
 
-  const startEdit = (row: AccountCredential) => {
-    setMutateError(null)
-    setEditRow(row)
-    setEditForm({
-      platform: row.platform,
-      platform_login: row.platform_login,
-      platform_password: row.platform_password,
-      server: row.server,
-      account_size: row.account_size,
-      status: row.status ?? undefined,
-      graph_link: row.graph_link ?? undefined,
-      profit_target: (row as any).profit_target ?? undefined,
-    })
-  }
-
-  const editSubmit = async () => {
-    if (!editRow) return
-    setSaving(true)
-    setMutateError(null)
+  const handleDelete = async (id: string) => {
     try {
-      await updateAccountCredential(editRow.id, {
-        platform: String(editForm.platform ?? editRow.platform ?? "").trim(),
-        server: String(editForm.server ?? editRow.server ?? "").trim(),
-        platform_login: String(editForm.platform_login ?? editRow.platform_login ?? "").trim(),
-        platform_password: String(editForm.platform_password ?? editRow.platform_password ?? "").trim(),
-        account_size: String(editForm.account_size ?? editRow.account_size ?? "").trim(),
-        graph_link: String(editForm.graph_link ?? editRow.graph_link ?? ""),
-        profit_target: Number(editForm.profit_target ?? (editRow as any).profit_target ?? 0) || 0,
-      })
-      setEditRow(null)
-      setEditForm({})
-      await load()
-    } catch (e) {
-      setMutateError(e instanceof ApiClientError ? e.message : "Failed to update account.")
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const confirmDelete = async () => {
-    if (!deleteRow) return
-    setDeleteSaving(true)
-    setDeleteError(null)
-    try {
-      await deleteAccountCredential(deleteRow.id)
-      setDeleteRow(null)
-      await load()
-    } catch (e) {
-      setDeleteError(e instanceof ApiClientError ? e.message : "Failed to delete account.")
-    } finally {
-      setDeleteSaving(false)
-    }
-  }
-
-  const openGraph = async (row: AccountCredential) => {
-    setGraphRow(row)
-    setGraphLoading(true)
-    setGraphError(null)
-    setGraphData(null)
-    try {
-      const platform = String((row as any).platform ?? "mt5").trim().toLowerCase() || "mt5"
-      const login = String((row as any).platform_login ?? "").trim()
-      const graphLink = (row as any).graph_link ? String((row as any).graph_link) : null
-      if (!login && !graphLink) {
-        throw new Error("Missing platform login / graph link for this account.")
-      }
-      const data = await getShowMyTradesStats(platform, login || "0", graphLink)
-      setGraphData(data)
-    } catch (e) {
-      setGraphError(e instanceof Error ? e.message : "Failed to load graph data.")
-    } finally {
-      setGraphLoading(false)
+      await adminDeleteInventory(id)
+      await refresh()
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "Failed to delete account.")
     }
   }
 
   return (
-    <AdminShell
-      title="Container"
-      description="Account credentials inventory (no auth required by this endpoint)."
-      actions={
-        <div className="flex items-center gap-2">
-          <Button
-            className="h-9 rounded-full bg-purple-600 hover:bg-purple-700 text-white"
-            onClick={() => {
-              setMutateError(null)
-              setCreateForm((p) => ({ ...p, platform: "mt5" }))
-              setCreateOpen(true)
-            }}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add account
-          </Button>
-          <Button
-            variant="outline"
-            className="h-9 rounded-full border border-purple-400/30 bg-gradient-to-r from-purple-800 via-purple-950 to-purple-800 px-4 text-xs font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:from-purple-700 hover:via-purple-900 hover:to-purple-700"
-            onClick={() => void load()}
-            disabled={loading}
-          >
-            {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCcw className="h-4 w-4 mr-2" />}
-            Refresh
-          </Button>
-        </div>
-      }
-    >
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4 mb-3 md:mb-4">
-        <Card className="lg:col-span-2 overflow-hidden rounded-3xl border border-border/80 bg-gradient-to-br from-card via-card to-muted/30 shadow-sm">
-          <div className="relative p-5 sm:p-6">
-            <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-purple-500/10 blur-3xl" aria-hidden />
-            <div className="absolute -left-24 -bottom-24 h-72 w-72 rounded-full bg-emerald-500/10 blur-3xl" aria-hidden />
-            <div className="relative flex flex-col gap-4">
-              <div className="flex items-end justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Inventory</p>
-                  <h2 className="mt-1 text-xl sm:text-2xl font-bold tracking-tight text-foreground">Container overview</h2>
-                  <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
-                    Track available vs unavailable accounts, and filter by account size.
-                  </p>
-                </div>
-                <Badge variant="outline" className="rounded-full border-border/70 bg-background/40 px-3 py-1 text-xs">
-                  {loading ? "Loading…" : `${stats.total} total`}
-                </Badge>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                <StatChip label="Available" value={stats.available} tone="success" />
-                <StatChip label="Unavailable" value={stats.unavailable} tone="muted" />
-                <StatChip label="Assigned" value={stats.assigned} tone="primary" />
-                <StatChip label="All" value={stats.total} tone="muted" />
-              </div>
-            </div>
+    <AdminShell title="Account inventory" description="Pre-provisioned MT4/MT5 accounts ready to deliver to customers.">
+      <Card className="p-4 mb-4">
+        <form onSubmit={handleCreate} className="grid grid-cols-2 sm:grid-cols-5 gap-3 items-end">
+          <div className="space-y-1">
+            <Label className="text-xs">Platform</Label>
+            <select value={form.platform} onChange={(e) => setForm((f) => ({ ...f, platform: e.target.value }))} className="flex h-9 w-full rounded-md border border-input bg-transparent px-2 text-sm">
+              <option value="mt4">MT4</option>
+              <option value="mt5">MT5</option>
+            </select>
           </div>
-        </Card>
-
-        <Card className="rounded-3xl border border-border/80 bg-card shadow-sm overflow-hidden">
-          <div className="border-b border-border/80 bg-muted/20 px-4 sm:px-5 py-3.5">
-            <h3 className="text-sm font-semibold text-foreground tracking-tight">Filter by account size</h3>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Click a size to filter the table below.</p>
+          <div className="space-y-1">
+            <Label className="text-xs">Size</Label>
+            <Input value={form.size} onChange={(e) => setForm((f) => ({ ...f, size: e.target.value }))} placeholder="10000" />
           </div>
-          <div className="p-4 sm:p-5">
-            <div className="flex flex-wrap gap-2">
-              <Button
-                type="button"
-                variant={selectedSize === "all" ? "default" : "outline"}
-                className={`h-9 rounded-full px-4 text-xs font-semibold ${selectedSize === "all" ? "bg-purple-600 hover:bg-purple-700 text-white" : "border-border/70"}`}
-                onClick={() => setSelectedSize("all")}
-              >
-                All
-              </Button>
-              {sizeOptions.map((s) => (
-                <Button
-                  key={s}
-                  type="button"
-                  variant={selectedSize === s ? "default" : "outline"}
-                  className={`h-9 rounded-full px-4 text-xs font-semibold ${selectedSize === s ? "bg-purple-600 hover:bg-purple-700 text-white" : "border-border/70"}`}
-                  onClick={() => setSelectedSize(s)}
-                >
-                  {s}
-                </Button>
-              ))}
-            </div>
-            <div className="mt-4 rounded-2xl border border-border/70 bg-muted/20 px-4 py-3 text-sm text-muted-foreground">
-              Showing <span className="font-semibold text-foreground">{loading ? "—" : filtered.length}</span>{" "}
-              accounts {selectedSize === "all" ? "" : <>for size <span className="font-semibold text-foreground">{selectedSize}</span></>}
-            </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Login</Label>
+            <Input value={form.login} onChange={(e) => setForm((f) => ({ ...f, login: e.target.value }))} />
           </div>
-        </Card>
-      </div>
-
-      <Card className="rounded-2xl border border-border/80 bg-card shadow-sm overflow-hidden">
-        <div className="border-b border-border/80 bg-muted/20 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-2">
-          <div className="min-w-0">
-            <h3 className="text-sm font-semibold text-foreground tracking-tight">Account credentials</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">{loading ? "Loading..." : `${filtered.length} credentials`}</p>
+          <div className="space-y-1">
+            <Label className="text-xs">Password</Label>
+            <Input value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} />
           </div>
-          <Badge variant="outline" className="rounded-full border-border/70 bg-background/40 px-3 py-1 text-xs">Live</Badge>
-        </div>
-
-        <div className="p-0">
-          {error ? (
-            <div className="px-4 sm:px-6 py-4">
-              <div className="rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-foreground flex items-start gap-3">
-                <ShieldAlert className="h-5 w-5 text-destructive mt-0.5" />
-                <div className="min-w-0">
-                  <div className="font-semibold">Couldn’t load credentials</div>
-                  <div className="text-muted-foreground text-xs mt-0.5">{error}</div>
-                </div>
-              </div>
-            </div>
-          ) : null}
-
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>Platform</TableHead>
-                <TableHead>Server</TableHead>
-                <TableHead>Login</TableHead>
-                <TableHead>Size</TableHead>
-                <TableHead>Assigned</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Updated</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={9} className="py-10">
-                    <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Loading…
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : filtered.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={9} className="p-6">
-                    <EmptyState
-                      title="No credentials found"
-                      description={selectedSize === "all" ? "Try refreshing — or confirm the backend is returning credentials." : "No credentials match this account size filter."}
-                      icon={
-                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border/70 bg-muted/40">
-                          <ServerCrash className="h-6 w-6 text-muted-foreground" />
-                        </div>
-                      }
-                      action={
-                        <div className="flex items-center gap-2">
-                          <Button
-                            className="rounded-2xl bg-purple-600 hover:bg-purple-700 text-white"
-                            onClick={() => setCreateOpen(true)}
-                          >
-                            <Plus className="h-4 w-4 mr-2" />
-                            Add account
-                          </Button>
-                          <Button variant="outline" className="rounded-2xl border-border/70" onClick={() => void load()}>
-                            Refresh
-                          </Button>
-                        </div>
-                      }
-                    />
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filtered.map((c) => (
-                  <TableRow key={c.id}>
-                    <TableCell className="font-semibold tabular-nums">{c.id}</TableCell>
-                    <TableCell className="text-muted-foreground">
-                      <div className="text-foreground font-semibold">{c.platform}</div>
-                      {c.graph_link || (c as any).platform_login ? (
-                        <button
-                          type="button"
-                          onClick={() => void openGraph(c)}
-                          className="mt-1 inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground"
-                        >
-                          Graph <LineChart className="h-3.5 w-3.5" />
-                        </button>
-                      ) : null}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">{c.server}</TableCell>
-                    <TableCell className="text-muted-foreground font-mono text-xs">{c.platform_login}</TableCell>
-                    <TableCell className="font-semibold tabular-nums">{c.account_size}</TableCell>
-                    <TableCell className="text-muted-foreground">{c.is_assigned ? "Yes" : "No"}</TableCell>
-                    <TableCell>
-                      <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusTone(c.status)}`}>
-                        {c.status ?? "—"}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right text-muted-foreground text-xs">
-                      {formatDateKarachi(c.updated_at || c.created_at || null)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="inline-flex items-center gap-1.5">
-                        <Button
-                          type="button"
-                          size="sm"
-                          className="h-9 rounded-xl border border-purple-400/30 bg-gradient-to-r from-purple-800 via-purple-950 to-purple-800 px-3 text-xs font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:from-purple-700 hover:via-purple-900 hover:to-purple-700"
-                          onClick={() => setViewRow(c)}
-                        >
-                          <Eye className="h-4 w-4 mr-1.5" />
-                          View
-                        </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          className="h-9 rounded-xl border border-purple-400/30 bg-gradient-to-r from-purple-800 via-purple-950 to-purple-800 px-3 text-xs font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:from-purple-700 hover:via-purple-900 hover:to-purple-700"
-                          onClick={() => startEdit(c)}
-                        >
-                          <Pencil className="h-4 w-4 mr-1.5" />
-                          Edit
-                        </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          className="h-9 rounded-xl bg-destructive px-3 text-xs font-semibold text-destructive-foreground hover:bg-destructive/90"
-                          onClick={() => {
-                            setMutateError(null)
-                            setDeleteError(null)
-                            setDeleteRow(c)
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4 mr-1.5" />
-                          Delete
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Server</Label>
+            <Input value={form.server} onChange={(e) => setForm((f) => ({ ...f, server: e.target.value }))} />
+          </div>
+          <div className="col-span-2 sm:col-span-5 flex items-center gap-3">
+            <Button type="submit" size="sm" disabled={creating} className="gap-1">
+              <PackagePlus className="w-3.5 h-3.5" /> {creating ? "Adding…" : "Add account"}
+            </Button>
+            {createError && <p className="text-sm text-destructive">{createError}</p>}
+          </div>
+        </form>
       </Card>
 
-      {/* Create modal */}
-      <Dialog open={createOpen} onOpenChange={(o) => { setCreateOpen(o); if (!o) setMutateError(null) }}>
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Add account</DialogTitle>
-          </DialogHeader>
-          {mutateError ? (
-            <div className="rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-foreground">
-              {mutateError}
-            </div>
-          ) : null}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Platform</Label>
-              <Input
-                value={createForm.platform}
-                onChange={(e) => setCreateForm((p) => ({ ...p, platform: e.target.value }))}
-                className="h-11 rounded-2xl"
-                placeholder="mt5"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Account size</Label>
-              <Select
-                value={createForm.account_size}
-                onValueChange={(v) => setCreateForm((p) => ({ ...p, account_size: v }))}
-              >
-                <SelectTrigger className="h-11 rounded-2xl">
-                  <SelectValue placeholder="Select size" />
-                </SelectTrigger>
-                <SelectContent className="rounded-2xl">
-                  {["3000","5000","10000","50000","100000","200000","500000"].map((v) => (
-                    <SelectItem key={v} value={v}>
-                      {Number(v).toLocaleString("en-US")}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Platform login</Label>
-              <Input
-                value={createForm.platform_login}
-                onChange={(e) => setCreateForm((p) => ({ ...p, platform_login: e.target.value }))}
-                className="h-11 rounded-2xl"
-                placeholder="Login"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Password</Label>
-              <Input
-                value={createForm.platform_password}
-                onChange={(e) => setCreateForm((p) => ({ ...p, platform_password: e.target.value }))}
-                className="h-11 rounded-2xl"
-                placeholder="Password"
-              />
-            </div>
-            <div className="space-y-2 sm:col-span-2">
-              <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Server</Label>
-              <Input
-                value={createForm.server}
-                onChange={(e) => setCreateForm((p) => ({ ...p, server: e.target.value }))}
-                className="h-11 rounded-2xl"
-                placeholder="Server"
-              />
-            </div>
-            <div className="space-y-2 sm:col-span-2">
-              <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Graph link (optional)</Label>
-              <Input
-                value={String((createForm as any).graph_link ?? "")}
-                onChange={(e) => setCreateForm((p) => ({ ...(p as any), graph_link: e.target.value }))}
-                className="h-11 rounded-2xl"
-                placeholder="https://..."
-              />
-            </div>
+      <Card className="overflow-hidden">
+        {loading ? (
+          <div className="flex justify-center py-16">
+            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
           </div>
-          <div className="flex items-center justify-end gap-2 pt-2">
-            <Button type="button" className="rounded-2xl border border-purple-400/30 bg-gradient-to-r from-purple-800 via-purple-950 to-purple-800 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:from-purple-700 hover:via-purple-900 hover:to-purple-700" onClick={() => setCreateOpen(false)} disabled={saving}>
-              Cancel
-            </Button>
-            <Button type="button" className="rounded-2xl bg-purple-600 hover:bg-purple-700 text-white" onClick={() => void createSubmit()} disabled={saving}>
-              {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-              Create
-            </Button>
+        ) : error ? (
+          <EmptyState icon={<ShieldAlert className="w-8 h-8 text-muted-foreground" />} title="Failed to load" description={error} />
+        ) : items.length === 0 ? (
+          <EmptyState icon={<PackagePlus className="w-8 h-8 text-muted-foreground" />} title="No inventory" description="Add pre-provisioned accounts above." />
+        ) : (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Platform</TableHead>
+                  <TableHead>Size</TableHead>
+                  <TableHead>Login</TableHead>
+                  <TableHead>Server</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Order</TableHead>
+                  <TableHead></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {items.map((i) => (
+                  <TableRow key={i.id}>
+                    <TableCell className="uppercase">{i.platform}</TableCell>
+                    <TableCell>${i.size.toLocaleString()}</TableCell>
+                    <TableCell className="font-mono text-xs">{i.login}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{i.server}</TableCell>
+                    <TableCell>
+                      <Badge className={i.status === "available" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-muted text-muted-foreground"}>
+                        {i.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="font-mono text-xs">{i.orderId ? i.orderId.slice(0, 8) : "—"}</TableCell>
+                    <TableCell>
+                      {i.status === "available" && (
+                        <Button size="sm" variant="ghost" onClick={() => handleDelete(i.id)}>
+                          <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* View modal */}
-      <Dialog open={viewRow != null} onOpenChange={(o) => { if (!o) setViewRow(null) }}>
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Account details</DialogTitle>
-          </DialogHeader>
-          {viewRow ? (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <InfoRow label="Platform" value={viewRow.platform} />
-                <InfoRow label="Size" value={String(viewRow.account_size ?? "—")} />
-                <InfoRow label="Login" value={String(viewRow.platform_login ?? "—")} mono />
-                <InfoRow label="Server" value={String(viewRow.server ?? "—")} />
-                <InfoRow label="Status" value={String(viewRow.status ?? "—")} />
-                <InfoRow label="Assigned" value={viewRow.is_assigned ? "Yes" : "No"} />
-              </div>
-              <div className="rounded-2xl border border-border/70 bg-muted/20 p-4">
-                <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Password</p>
-                <p className="mt-1 font-mono text-sm text-foreground break-all">
-                  {viewRow.platform_password ? String(viewRow.platform_password) : "—"}
-                </p>
-              </div>
-              {viewRow.graph_link ? (
-                <a
-                  href={viewRow.graph_link}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1 text-sm font-semibold text-foreground hover:underline"
-                >
-                  Open graph <ExternalLink className="h-4 w-4" />
-                </a>
-              ) : null}
-            </div>
-          ) : null}
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit modal */}
-      <Dialog open={editRow != null} onOpenChange={(o) => { if (!o) { setEditRow(null); setEditForm({}); setMutateError(null) } }}>
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit account</DialogTitle>
-          </DialogHeader>
-          {mutateError ? (
-            <div className="rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-foreground">
-              {mutateError}
-            </div>
-          ) : null}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Platform</Label>
-              <Input
-                value={String(editForm.platform ?? "")}
-                onChange={(e) => setEditForm((p) => ({ ...p, platform: e.target.value }))}
-                className="h-11 rounded-2xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Account size</Label>
-              <Input
-                value={String(editForm.account_size ?? "")}
-                onChange={(e) => setEditForm((p) => ({ ...p, account_size: e.target.value }))}
-                className="h-11 rounded-2xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Platform login</Label>
-              <Input
-                value={String(editForm.platform_login ?? "")}
-                onChange={(e) => setEditForm((p) => ({ ...p, platform_login: e.target.value }))}
-                className="h-11 rounded-2xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Password</Label>
-              <Input
-                value={String(editForm.platform_password ?? "")}
-                onChange={(e) => setEditForm((p) => ({ ...p, platform_password: e.target.value }))}
-                className="h-11 rounded-2xl"
-              />
-            </div>
-            <div className="space-y-2 sm:col-span-2">
-              <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Server</Label>
-              <Input
-                value={String(editForm.server ?? "")}
-                onChange={(e) => setEditForm((p) => ({ ...p, server: e.target.value }))}
-                className="h-11 rounded-2xl"
-              />
-            </div>
-            <div className="space-y-2 sm:col-span-2">
-              <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Graph link (optional)</Label>
-              <Input
-                value={String(editForm.graph_link ?? "")}
-                onChange={(e) => setEditForm((p) => ({ ...p, graph_link: e.target.value }))}
-                className="h-11 rounded-2xl"
-                placeholder="https://..."
-              />
-            </div>
-            <div className="space-y-2 sm:col-span-2">
-              <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Profit target</Label>
-              <Input
-                value={String((editForm as any).profit_target ?? "")}
-                onChange={(e) => setEditForm((p) => ({ ...(p as any), profit_target: e.target.value }))}
-                className="h-11 rounded-2xl"
-                placeholder="0"
-              />
-            </div>
-          </div>
-          <div className="flex items-center justify-end gap-2 pt-2">
-            <Button type="button" className="rounded-2xl border border-purple-400/30 bg-gradient-to-r from-purple-800 via-purple-950 to-purple-800 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:from-purple-700 hover:via-purple-900 hover:to-purple-700" onClick={() => setEditRow(null)} disabled={saving}>
-              Cancel
-            </Button>
-            <Button type="button" className="rounded-2xl bg-purple-600 hover:bg-purple-700 text-white" onClick={() => void editSubmit()} disabled={saving}>
-              {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-              Save
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete modal */}
-      <Dialog
-        open={deleteRow != null}
-        onOpenChange={(o) => {
-          if (!o) {
-            setDeleteRow(null)
-            setDeleteSaving(false)
-            setDeleteError(null)
-          }
-        }}
-      >
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Delete account</DialogTitle>
-          </DialogHeader>
-          {deleteError ? (
-            <div className="rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-foreground">
-              {deleteError}
-            </div>
-          ) : null}
-          {!deleteRow ? (
-            <div className="text-sm text-muted-foreground">No account selected.</div>
-          ) : (
-            <div className="space-y-4">
-              <div className="rounded-2xl border border-border/70 bg-muted/20 px-4 py-3 text-sm text-muted-foreground">
-                You’re about to delete credential{" "}
-                <span className="font-semibold text-foreground">#{deleteRow.id}</span> (
-                <span className="font-semibold text-foreground">{String(deleteRow.platform_login ?? "—")}</span>).
-              </div>
-              <div className="flex items-center justify-end gap-2">
-                <Button
-                  type="button"
-                  className="h-9 rounded-xl border border-border/70 bg-background px-4 text-xs font-semibold text-foreground hover:bg-muted/40"
-                  onClick={() => setDeleteRow(null)}
-                  disabled={deleteSaving}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="button"
-                  className="h-9 rounded-xl bg-destructive px-4 text-xs font-semibold text-destructive-foreground hover:bg-destructive/90 disabled:opacity-60"
-                  onClick={() => void confirmDelete()}
-                  disabled={deleteSaving}
-                >
-                  {deleteSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-                  Delete
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Graph modal */}
-      <Dialog
-        open={graphRow != null}
-        onOpenChange={(o) => {
-          if (!o) {
-            setGraphRow(null)
-            setGraphData(null)
-            setGraphError(null)
-            setGraphLoading(false)
-          }
-        }}
-      >
-        <DialogContent className="sm:max-w-6xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Performance (ShowMyTrades)</DialogTitle>
-          </DialogHeader>
-          {graphLoading ? (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Loading…
-            </div>
-          ) : graphError ? (
-            <div className="rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-foreground">
-              {graphError}
-            </div>
-          ) : graphData ? (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <InfoRow label="Platform" value={String((graphRow as any)?.platform ?? "—")} />
-                <InfoRow label="Login" value={String((graphRow as any)?.platform_login ?? "—")} mono />
-              </div>
-              <PerformanceGraphPanel stats={graphData} />
-              <DetailedStatisticsCard stats={graphData} />
-              {(graphRow as any)?.graph_link ? (
-                <a
-                  href={String((graphRow as any).graph_link)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1 text-sm font-semibold text-foreground hover:underline"
-                >
-                  Open graph link <ExternalLink className="h-4 w-4" />
-                </a>
-              ) : null}
-            </div>
-          ) : (
-            <div className="text-sm text-muted-foreground">No data.</div>
-          )}
-        </DialogContent>
-      </Dialog>
+        )}
+      </Card>
     </AdminShell>
   )
 }
-
-function StatChip({
-  label,
-  value,
-  tone,
-}: {
-  label: string
-  value: number
-  tone: "success" | "primary" | "muted"
-}) {
-  const classes =
-    tone === "success"
-      ? "bg-emerald-500/10 border-emerald-500/20"
-      : tone === "primary"
-        ? "bg-primary/10 border-primary/20"
-        : "bg-muted/40 border-border/60"
-  return (
-    <div className={`rounded-2xl border p-3 ${classes}`}>
-      <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/80">{label}</p>
-      <p className="mt-1 text-lg font-bold tabular-nums text-foreground">{value}</p>
-    </div>
-  )
-}
-
-function InfoRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
-  return (
-    <div className="rounded-2xl border border-border/70 bg-muted/20 px-4 py-3">
-      <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{label}</p>
-      <p className={`mt-1 text-sm font-semibold text-foreground break-all ${mono ? "font-mono" : ""}`}>{value}</p>
-    </div>
-  )
-}
-

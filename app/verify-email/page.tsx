@@ -7,6 +7,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 import { CheckCircle2, ArrowLeft, RefreshCw } from 'lucide-react';
 import SuccessPopup from '../components/SuccessPopup';
+import { verifyEmailRequest, resendCodeRequest } from '../../lib/api/auth-client';
+import { ApiClientError } from '../../lib/api/client';
 
 const brandFont = Plus_Jakarta_Sans({ subsets: ['latin'], weight: ['600', '700', '800'] });
 const bodyFont = Inter({ subsets: ['latin'], weight: ['400', '500', '600'] });
@@ -129,18 +131,7 @@ function VerifyEmailContent() {
 		setToastMessage('Please wait while we verify your email address...');
 
 		try {
-			// TODO: Replace with actual API call
-			// const response = await verifyEmail({ email, code: mergedCode });
-			
-			// Simulate API call
-			await new Promise((resolve) => setTimeout(resolve, 2000));
-			
-			// For demo: accept any 4-digit code
-			const isValid = mergedCode.length === 4;
-			
-			if (!isValid) {
-				throw new Error('Invalid verification code');
-			}
+			await verifyEmailRequest({ email, code: mergedCode });
 
 			setIsVerified(true);
 			setToastType('success');
@@ -151,10 +142,11 @@ function VerifyEmailContent() {
 				router.push('/login');
 			}, 2500);
 		} catch (err) {
-			setError('The verification code you entered is incorrect. Please try again.');
+			const message = err instanceof ApiClientError ? err.message : 'Invalid verification code. Please check your email and try again.';
+			setError(message);
 			setToastType('error');
 			setToastTitle('Verification Failed');
-			setToastMessage('Invalid verification code. Please check your email and try again.');
+			setToastMessage(message);
 			setIsSubmitting(false);
 		}
 	};
@@ -170,25 +162,22 @@ function VerifyEmailContent() {
 		setToastMessage('Sending a new verification code to your email...');
 
 		try {
-			// TODO: Replace with actual API call
-			// await resendVerificationCode({ email });
-			
-			// Simulate API call
-			await new Promise((resolve) => setTimeout(resolve, 1500));
+			await resendCodeRequest({ email });
 
 			setCode(Array<string>(CODE_LENGTH).fill(''));
 			setResendCooldown(60); // 60 seconds cooldown
-			
+
 			setToastType('success');
 			setToastTitle('Code Sent!');
 			setToastMessage('A new verification code has been sent to your email. Please check your inbox.');
-			
+
 			// Focus first input
 			inputRefs.current[0]?.focus();
 		} catch (err) {
+			const message = err instanceof ApiClientError ? err.message : 'Unable to send verification code. Please try again later.';
 			setToastType('error');
 			setToastTitle('Failed to Send');
-			setToastMessage('Unable to send verification code. Please try again later.');
+			setToastMessage(message);
 		} finally {
 			setIsResending(false);
 		}

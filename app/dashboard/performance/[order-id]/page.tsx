@@ -401,7 +401,7 @@ export default function PerformancePage() {
       </div>
 
       <main className="min-w-0 flex-1 flex flex-col overflow-x-hidden p-3 sm:p-4 md:p-5 lg:ml-64 pb-8">
-        <div className="mx-auto w-full max-w-[1400px] flex flex-col flex-1 min-w-0">
+        <div className="mx-auto w-full max-w-[1600px] flex flex-col flex-1 min-w-0">
           <Header
             useOrderIdSelect
             selectedOrderId={selectedOrderId}

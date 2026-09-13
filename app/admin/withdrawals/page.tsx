@@ -1,37 +1,114 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { AdminShell } from "@/components/admin/admin-shell"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import EmptyState from "@/components/ui/empty-state"
-import { Wallet } from "lucide-react"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { adminListPayouts, adminSetPayoutStatus, type Payout } from "@/lib/api/app-client"
+import { ApiClientError } from "@/lib/api/client"
+import { Loader2, ShieldAlert, Wallet } from "lucide-react"
 
 export default function AdminWithdrawalsPage() {
+  const [payouts, setPayouts] = useState<Payout[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [busyId, setBusyId] = useState<string | null>(null)
+
+  const refresh = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await adminListPayouts()
+      setPayouts(res.payouts)
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "Failed to load withdrawals.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    refresh()
+  }, [])
+
+  const handleAction = async (id: string, status: "approved" | "rejected" | "paid") => {
+    setBusyId(id)
+    try {
+      await adminSetPayoutStatus(id, status)
+      await refresh()
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "Failed to update payout.")
+    } finally {
+      setBusyId(null)
+    }
+  }
+
   return (
-    <AdminShell title="Withdrawals" description="Approve, reject, and track payout requests.">
-      <Card className="rounded-2xl border border-border/80 bg-card shadow-sm overflow-hidden">
-        <div className="border-b border-border/80 bg-muted/20 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-2">
-          <div className="min-w-0">
-            <h3 className="text-sm font-semibold text-foreground tracking-tight">Withdrawal requests</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">Built to match the dashboard theme.</p>
+    <AdminShell title="Withdrawals" description="Review and approve customer payout requests.">
+      <Card className="overflow-hidden">
+        {loading ? (
+          <div className="flex justify-center py-16">
+            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
           </div>
-          <Badge variant="outline" className="rounded-full border-border/70 bg-background/40 px-3 py-1 text-xs">
-            Placeholder
-          </Badge>
-        </div>
-        <div className="p-4 sm:p-6">
-          <EmptyState
-            title="No withdrawals loaded"
-            description="Wire this page to admin withdrawals endpoints to review payout requests."
-            icon={
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border/70 bg-muted/40">
-                <Wallet className="h-6 w-6 text-muted-foreground" />
-              </div>
-            }
-          />
-        </div>
+        ) : error ? (
+          <EmptyState icon={<ShieldAlert className="w-8 h-8 text-muted-foreground" />} title="Failed to load" description={error} />
+        ) : payouts.length === 0 ? (
+          <EmptyState icon={<Wallet className="w-8 h-8 text-muted-foreground" />} title="No withdrawal requests" description="Customer payout requests will appear here." />
+        ) : (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Method</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Requested</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {payouts.map((p) => (
+                  <TableRow key={p.id}>
+                    <TableCell className="font-semibold">${p.amount.toFixed(2)}</TableCell>
+                    <TableCell className="capitalize">{p.paymentMethod}</TableCell>
+                    <TableCell>
+                      <Badge
+                        className={
+                          p.status === "paid"
+                            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                            : p.status === "rejected"
+                              ? "bg-red-500/10 text-red-600 border-red-500/20"
+                              : p.status === "approved"
+                                ? "bg-blue-500/10 text-blue-600 border-blue-500/20"
+                                : "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                        }
+                      >
+                        {p.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{p.createdAt ? new Date(p.createdAt).toLocaleString() : "—"}</TableCell>
+                    <TableCell>
+                      {p.status === "requested" ? (
+                        <div className="flex gap-2">
+                          <Button size="sm" disabled={busyId === p.id} onClick={() => handleAction(p.id, "approved")}>Approve</Button>
+                          <Button size="sm" variant="destructive" disabled={busyId === p.id} onClick={() => handleAction(p.id, "rejected")}>Reject</Button>
+                        </div>
+                      ) : p.status === "approved" ? (
+                        <Button size="sm" disabled={busyId === p.id} onClick={() => handleAction(p.id, "paid")}>Mark paid</Button>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </Card>
     </AdminShell>
   )
 }
-

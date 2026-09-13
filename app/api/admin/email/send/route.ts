@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import nodemailer from "nodemailer"
+import { withSession } from "@/lib/http/guard"
 
 export const dynamic = "force-dynamic"
 
@@ -45,8 +46,6 @@ const transporterCache = new Map<AccountId, nodemailer.Transporter>()
 const transporterByHostCache = new Map<string, nodemailer.Transporter>()
 
 function getAccountConfig(account: AccountId) {
-  // Prefer environment variables; if missing, fallback to hardcoded defaults (requested).
-  // NOTE: Hardcoding credentials is not recommended for production.
   const envHost = getEnv("SMTP_HOST")
   const envPortRaw = getEnv("SMTP_PORT")
   const secureRaw = getEnv("SMTP_SECURE")
@@ -83,16 +82,9 @@ function getAccountConfig(account: AccountId) {
         ? "SMTP_GENZPROP"
         : "SMTP"
 
-  const hardcoded =
-    account === "fxonyx"
-      ? { user: "support@fxonyx.com", pass: "Fxonyx@123", from: "support@fxonyx.com" }
-      : account === "genzprop"
-        ? { user: "helpdesk@genzprop.com", pass: "Propgenz@321", from: "helpdesk@genzprop.com" }
-        : null
-
-  const user = getEnv(`${prefix}_USER`) || getEnv("SMTP_USER") || hardcoded?.user || ""
-  const pass = getEnv(`${prefix}_PASS`) || getEnv("SMTP_PASS") || hardcoded?.pass || ""
-  const from = getEnv(`${prefix}_FROM`) || getEnv("SMTP_FROM") || hardcoded?.from || user
+  const user = getEnv(`${prefix}_USER`) || getEnv("SMTP_USER") || ""
+  const pass = getEnv(`${prefix}_PASS`) || getEnv("SMTP_PASS") || ""
+  const from = getEnv(`${prefix}_FROM`) || getEnv("SMTP_FROM") || user
 
   if (!user || !pass) {
     if (account === "default") {
@@ -163,10 +155,8 @@ async function sendWithRetry(account: AccountId, opts: { from: string; to: strin
 }
 
 export async function POST(req: NextRequest) {
-  const auth = req.headers.get("authorization") || ""
-  if (!auth.toLowerCase().startsWith("bearer ")) {
-    return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 })
-  }
+  const { error: authError } = await withSession(["admin", "support"])
+  if (authError) return authError
 
   let body: Body
   try {
