@@ -22,13 +22,16 @@ const platformTypes = [
 
 // Maps this app's plan.name values to the tab keys/labels the UI already used.
 const ACCOUNT_TYPE_ORDER: Array<{ key: string; planName: string; label: string }> = [
-  { key: "alpha", planName: "One Step", label: "One Step" },
-  { key: "beta", planName: "Two Step", label: "Two Step" },
-  { key: "sigma", planName: "Instant", label: "Instant" },
+  { key: "alpha", planName: "Genz Step1", label: "Genz Step1" },
+  { key: "beta", planName: "Genz Step2", label: "Genz Step2" },
+  { key: "sigma", planName: "Genz Instant", label: "Genz Instant" },
 ]
 
+// Hardcoded trading rules shown for every account size. Percent rules also show the $ amount per size.
+const DAILY_DRAWDOWN_PCT = 4
+const MAX_DRAWDOWN_PCT = 8
+
 const paymentMethods = [
-  { id: "oxapay", label: "Crypto (Oxapay)", image: "https://fundednext.fra1.digitaloceanspaces.com/utility-files/6267395.png" },
   { id: "nowpayments", label: "Crypto (NOWPayments)", image: "https://fundednext.fra1.digitaloceanspaces.com/utility-files/6267395.png" },
 ]
 
@@ -42,27 +45,18 @@ function usd2(n: number) {
 type FeatureRow = { name: string; values: Record<string, string> }
 
 function buildFeatures(plansForType: ChallengePlan[]): FeatureRow[] {
-  const byId = Object.fromEntries(plansForType.map((p) => [p.id, p]))
   const fill = (fn: (p: ChallengePlan) => string) =>
     Object.fromEntries(plansForType.map((p) => [p.id, fn(p)])) as Record<string, string>
+  const pct = (percent: number) => (p: ChallengePlan) => `${percent}% (${usd(Math.round((p.size * percent) / 100))})`
 
-  const hasP1 = plansForType.some((p) => p.profitTargetP1 > 0)
-  const hasP2 = plansForType.some((p) => p.profitTargetP2 > 0)
-
-  const rows: FeatureRow[] = []
-  if (hasP1) rows.push({ name: "Phase 1 Profit Target", values: fill((p) => (p.profitTargetP1 ? `${p.profitTargetP1}%` : "—")) })
-  if (hasP2) rows.push({ name: "Phase 2 Profit Target", values: fill((p) => (p.profitTargetP2 ? `${p.profitTargetP2}%` : "—")) })
-  rows.push({
-    name: "Maximum Loss Limit",
-    values: fill((p) => `${p.maxTotalLoss}% (${usd(Math.round((p.size * p.maxTotalLoss) / 100))})`),
-  })
-  rows.push({
-    name: "Daily Loss Limit",
-    values: fill((p) => `${p.maxDailyLoss}% (${usd(Math.round((p.size * p.maxDailyLoss) / 100))})`),
-  })
-  rows.push({ name: "Profit Split", values: fill((p) => `${p.profitSplit}%`) })
-  void byId
-  return rows
+  return [
+    { name: "Daily Drawdown", values: fill(pct(DAILY_DRAWDOWN_PCT)) },
+    { name: "Maximum Drawdown", values: fill(pct(MAX_DRAWDOWN_PCT)) },
+    { name: "Minimum Trading Days", values: fill(() => "5") },
+    { name: "Leverage", values: fill(() => "1:100") },
+    { name: "Hedging & News Trading", values: fill(() => "check") },
+    { name: "Layering", values: fill(() => "no") },
+  ]
 }
 
 export function BuysContent() {
@@ -73,7 +67,7 @@ export function BuysContent() {
   const [activeAccountType, setActiveAccountType] = useState("alpha")
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null)
   const [selectedPlatform, setSelectedPlatform] = useState("mt5")
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<"oxapay" | "nowpayments">("oxapay")
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<"nowpayments">("nowpayments")
   const [couponCode, setCouponCode] = useState("")
   const [couponDiscount, setCouponDiscount] = useState<number | null>(null)
   const [couponError, setCouponError] = useState<string | null>(null)
@@ -224,6 +218,9 @@ export function BuysContent() {
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-4 pb-12">
         <Card className="max-w-5xl mx-auto border-border bg-card shadow-xl rounded-xl overflow-hidden animate-slide-in-up p-0">
+          {plansForType.length === 0 ? (
+            <p className="py-12 px-6 text-center text-sm text-muted-foreground">No {activeTypeMeta.label} accounts are available right now.</p>
+          ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[700px]">
               <thead>
@@ -266,7 +263,13 @@ export function BuysContent() {
                       const val = feature.values[p.id]
                       return (
                         <td key={p.id} className="py-3.5 px-4 text-center text-sm text-foreground">
-                          {val === "check" ? <Check className="w-4 h-4 text-primary mx-auto" /> : val}
+                          {val === "check" ? (
+                            <Check className="w-4 h-4 text-primary mx-auto" />
+                          ) : val === "no" ? (
+                            <X className="w-4 h-4 text-muted-foreground mx-auto" />
+                          ) : (
+                            val
+                          )}
                         </td>
                       )
                     })}
@@ -275,6 +278,7 @@ export function BuysContent() {
               </tbody>
             </table>
           </div>
+          )}
         </Card>
       </div>
 
@@ -380,11 +384,11 @@ export function BuysContent() {
                   <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                   <p className="text-sm font-semibold text-foreground">Payment Method</p>
                 </div>
-                <div className="grid grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-1 gap-2.5">
                   {paymentMethods.map((method) => (
                     <button
                       key={method.id}
-                      onClick={() => setSelectedPaymentMethod(method.id as "oxapay" | "nowpayments")}
+                      onClick={() => setSelectedPaymentMethod(method.id as "nowpayments")}
                       className={`relative flex flex-col items-center gap-2 p-3.5 rounded-xl border transition-all duration-200 group ${
                         selectedPaymentMethod === method.id
                           ? "border-primary bg-primary/5 shadow-md shadow-primary/10"

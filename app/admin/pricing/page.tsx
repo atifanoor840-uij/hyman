@@ -32,16 +32,12 @@ import {
 } from "@/components/admin/admin-ui"
 import { Pencil, Plus, Tag, Trash2 } from "lucide-react"
 
+const ACCOUNT_TYPES = ["Genz Step1", "Genz Step2", "Genz Instant"]
+
 const EMPTY_FORM = {
-  name: "",
+  name: ACCOUNT_TYPES[0],
   size: "",
   price: "",
-  profitTargetP1: "",
-  profitTargetP2: "",
-  maxDailyLoss: "",
-  maxTotalLoss: "",
-  profitSplit: "80",
-  platform: "",
 }
 
 type FormState = typeof EMPTY_FORM
@@ -51,12 +47,6 @@ function toPlanInput(f: FormState) {
     name: f.name.trim(),
     size: Number(f.size),
     price: Number(f.price),
-    profitTargetP1: Number(f.profitTargetP1) || 0,
-    profitTargetP2: Number(f.profitTargetP2) || 0,
-    maxDailyLoss: Number(f.maxDailyLoss) || 0,
-    maxTotalLoss: Number(f.maxTotalLoss) || 0,
-    profitSplit: Number(f.profitSplit) || 0,
-    platform: f.platform.trim() || null,
   }
 }
 
@@ -111,12 +101,6 @@ export default function AdminPricingPage() {
       name: p.name,
       size: String(p.size),
       price: String(p.price),
-      profitTargetP1: String(p.profitTargetP1),
-      profitTargetP2: String(p.profitTargetP2),
-      maxDailyLoss: String(p.maxDailyLoss),
-      maxTotalLoss: String(p.maxTotalLoss),
-      profitSplit: String(p.profitSplit),
-      platform: p.platform ?? "",
     })
     setSaveError(null)
     setEditing(p)
@@ -127,13 +111,14 @@ export default function AdminPricingPage() {
     if (!editing) return
     const input = toPlanInput(form)
     if (!input.name || !Number.isFinite(input.size) || input.size <= 0 || !Number.isFinite(input.price) || input.price < 0) {
-      setSaveError("Name, a positive account size, and a price of 0 or more are required.")
+      setSaveError("Account type, a positive account size, and a price of 0 or more are required.")
       return
     }
     setSaving(true)
     setSaveError(null)
     try {
-      if (editing === "new") await adminCreatePlan(input)
+      if (editing === "new")
+        await adminCreatePlan({ ...input, profitTargetP1: 0, profitTargetP2: 0, maxDailyLoss: 0, maxTotalLoss: 0, profitSplit: 0, platform: null })
       else await adminUpdatePlan(editing.id, input)
       setNotice({ tone: "success", text: editing === "new" ? `Plan “${input.name}” created.` : `Plan “${input.name}” updated.` })
       setEditing(null)
@@ -191,7 +176,7 @@ export default function AdminPricingPage() {
               onChange={setPlanType}
               options={[{ value: "all", label: "All plans", count: plans.length }, ...planNames.map((n) => ({ value: n, label: n, count: plans.filter((p) => p.name === n).length }))]}
             />
-            <SearchBox value={search} onChange={setSearch} placeholder="Search name or size" />
+            <SearchBox value={search} onChange={setSearch} placeholder="Search account type or size" />
           </Toolbar>
 
           {loading && plans.length === 0 ? (
@@ -212,26 +197,12 @@ export default function AdminPricingPage() {
               }
             />
           ) : (
-            <DataTable head={["Plan", "Price", "Profit targets", "Loss limits", "Profit split", "Platform", ""]}>
+            <DataTable head={["Account type", "Account size", "Price", ""]}>
               {visible.map((p) => (
                 <tr key={p.id}>
-                  <td>
-                    <p className="font-medium text-foreground">{p.name}</p>
-                    <p className="text-xs text-muted-foreground">{money(p.size, 0)} account</p>
-                  </td>
+                  <td className="font-medium text-foreground">{p.name}</td>
+                  <td className="text-sm tabular-nums">{money(p.size, 0)}</td>
                   <td className="text-base font-semibold tabular-nums text-foreground">{money(p.price)}</td>
-                  <td className="text-sm">
-                    <span className="text-muted-foreground">P1</span> {p.profitTargetP1}%
-                    <span className="mx-1.5 text-border">|</span>
-                    <span className="text-muted-foreground">P2</span> {p.profitTargetP2 ? `${p.profitTargetP2}%` : "—"}
-                  </td>
-                  <td className="text-sm">
-                    <span className="text-muted-foreground">Daily</span> {p.maxDailyLoss}%
-                    <span className="mx-1.5 text-border">|</span>
-                    <span className="text-muted-foreground">Max</span> {p.maxTotalLoss}%
-                  </td>
-                  <td className="text-sm tabular-nums">{p.profitSplit}%</td>
-                  <td className="text-xs uppercase text-muted-foreground">{p.platform ?? "Any"}</td>
                   <td>
                     <div className="flex justify-end gap-1.5">
                       <Button size="sm" variant="outline" className="h-8 gap-1.5 rounded-lg border-border" onClick={() => openEdit(p)}>
@@ -259,47 +230,26 @@ export default function AdminPricingPage() {
         <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>{editing === "new" ? "New plan" : "Edit plan"}</DialogTitle>
-            <DialogDescription>Percentages are of the starting account balance.</DialogDescription>
+            <DialogDescription>Set the account type, account size, and price.</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSave} className="space-y-6">
-            <FormSection title="Basics">
+            <FormSection title="Plan">
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <Field label="Plan name" hint="Plans with the same name are grouped together." className="sm:col-span-2" htmlFor="p-name">
-                  <Input id="p-name" className={inputClass} value={form.name} onChange={set("name")} placeholder="e.g. Two Step" />
+                <Field label="Account type" className="sm:col-span-2" htmlFor="p-name">
+                  <NativeSelect id="p-name" value={form.name} onChange={(v) => setForm((f) => ({ ...f, name: v }))}>
+                    {ACCOUNT_TYPES.map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))}
+                    {!ACCOUNT_TYPES.includes(form.name) && <option value={form.name}>{form.name}</option>}
+                  </NativeSelect>
                 </Field>
                 <Field label="Account size ($)" htmlFor="p-size">
                   {numberInput("size", "p-size", "10000")}
                 </Field>
                 <Field label="Price ($)" htmlFor="p-price">
                   {numberInput("price", "p-price", "89")}
-                </Field>
-                <Field label="Platform" className="sm:col-span-2" htmlFor="p-platform">
-                  <NativeSelect id="p-platform" value={form.platform} onChange={(v) => setForm((f) => ({ ...f, platform: v }))}>
-                    <option value="">Any platform</option>
-                    <option value="mt4">MT4 only</option>
-                    <option value="mt5">MT5 only</option>
-                    {!["", "mt4", "mt5"].includes(form.platform) && <option value={form.platform}>{form.platform.toUpperCase()} only</option>}
-                  </NativeSelect>
-                </Field>
-              </div>
-            </FormSection>
-
-            <FormSection title="Trading rules">
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="Phase 1 target (%)" htmlFor="p-t1">
-                  {numberInput("profitTargetP1", "p-t1", "8")}
-                </Field>
-                <Field label="Phase 2 target (%)" hint="Use 0 for one-step plans." htmlFor="p-t2">
-                  {numberInput("profitTargetP2", "p-t2", "5")}
-                </Field>
-                <Field label="Max daily loss (%)" htmlFor="p-dl">
-                  {numberInput("maxDailyLoss", "p-dl", "5")}
-                </Field>
-                <Field label="Max total loss (%)" htmlFor="p-tl">
-                  {numberInput("maxTotalLoss", "p-tl", "10")}
-                </Field>
-                <Field label="Profit split (%)" hint="Trader’s share of profits." htmlFor="p-split">
-                  {numberInput("profitSplit", "p-split", "80")}
                 </Field>
               </div>
             </FormSection>

@@ -49,7 +49,7 @@ export interface OrderWithPlan {
   challenge_plans: { name: string; size: number; platform: string | null; price: number } | null
 }
 export const listMyOrders = () => getJson<{ orders: OrderWithPlan[] }>("/api/orders")
-export const createOrder = (input: { planId: string; paymentMethod: "oxapay" | "nowpayments"; couponCode?: string }) =>
+export const createOrder = (input: { planId: string; paymentMethod: "nowpayments"; couponCode?: string }) =>
   postJson<{ order: OrderWithPlan }>("/api/orders", input)
 export const payOrder = (orderId: string) => postJson<{ checkoutUrl: string }>(`/api/orders/${orderId}/pay`, {})
 

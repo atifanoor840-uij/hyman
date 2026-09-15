@@ -3,6 +3,8 @@ import { withSession } from "@/lib/http/guard"
 import { createOrder, listOrdersForUserDetailed } from "@/lib/services/orders"
 import { findChallengePlanById } from "@/lib/services/challengePlans"
 import { findValidCoupon } from "@/lib/services/coupons"
+import { findUserById } from "@/lib/services/users"
+import { clearSession } from "@/lib/auth/session"
 
 export const dynamic = "force-dynamic"
 
@@ -18,6 +20,12 @@ export async function POST(req: NextRequest) {
   const { session, error } = await withSession()
   if (error) return error
 
+  // A still-valid cookie can outlive its user (e.g. the account was deleted); the orders FK would reject it.
+  if (!(await findUserById(session.sub))) {
+    await clearSession()
+    return NextResponse.json({ message: "Your session has expired. Please sign in again." }, { status: 401 })
+  }
+
   let body: { planId?: string; paymentMethod?: string; couponCode?: string }
   try {
     body = await req.json()
@@ -27,7 +35,7 @@ export async function POST(req: NextRequest) {
 
   const planId = (body.planId ?? "").trim()
   const paymentMethod = (body.paymentMethod ?? "").trim()
-  if (!planId || (paymentMethod !== "oxapay" && paymentMethod !== "nowpayments")) {
+  if (!planId || paymentMethod !== "nowpayments") {
     return NextResponse.json({ message: "planId and a valid paymentMethod are required." }, { status: 422 })
   }
 
