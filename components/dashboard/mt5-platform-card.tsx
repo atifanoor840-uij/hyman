@@ -101,7 +101,7 @@ export function MT5PlatformCard({ variant = "default" }: { variant?: MT5CardVari
 
   return (
     <Card
-      className="action-card overflow-hidden relative p-4 md:p-5 transition-shadow duration-200 hover:shadow-md animate-slide-in-up bg-card border-border min-w-0"
+      className="action-card overflow-hidden relative rounded-2xl p-4 md:p-5 transition-shadow duration-200 hover:shadow-md animate-slide-in-up bg-card border-border min-w-0"
       style={{ animationDelay: "700ms" }}
     >
       <div className="action-card__body relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 min-h-[120px] sm:min-h-[130px]">
@@ -117,12 +117,12 @@ export function MT5PlatformCard({ variant = "default" }: { variant?: MT5CardVari
               rel="noopener noreferrer"
               className="inline-flex"
             >
-              <Button size="sm" variant="secondary" className="h-7 text-xs px-3 bg-primary text-primary-foreground hover:bg-primary/90">
+              <Button size="sm" variant="secondary" className="h-8 rounded-lg text-xs px-3 bg-primary text-primary-foreground hover:bg-primary/90">
                 {cfg.cta}
               </Button>
             </a>
           ) : (
-            <Button asChild size="sm" variant="secondary" className="h-7 text-xs px-3 w-fit bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button asChild size="sm" variant="secondary" className="h-8 rounded-lg text-xs px-3 w-fit bg-primary text-primary-foreground hover:bg-primary/90">
               <Link href={cfg.href}>{cfg.cta}</Link>
             </Button>
           )}

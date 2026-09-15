@@ -9,12 +9,11 @@ import {
 	useState,
 } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { User, Lock, Mail, Eye, EyeOff } from 'lucide-react';
+import { User, Lock, Mail, Eye, EyeOff, Gift, Loader2, ArrowRight, CheckCircle2 } from 'lucide-react';
 import SuccessPopup from '../components/SuccessPopup';
 import Toast from '../components/Toast';
-import Navbar from '../components/Navbar';
+import AuthShell, { authFieldClass, authInputClass, authLabelClass, authPrimaryButtonClass } from '../components/AuthShell';
 import CountrySelector from '../components/CountrySelector';
 import { signupRequest } from '../../lib/api/auth-client';
 import { ApiClientError } from '../../lib/api/client';
@@ -41,8 +40,6 @@ const initialFormState = {
 
 const generateVerificationCode = () =>
 	Math.floor(1000 + Math.random() * 9000).toString();
-
-const CURRENT_YEAR = new Date().getFullYear();
 
 export default function SignupPage() {
 	const router = useRouter();
@@ -283,307 +280,268 @@ export default function SignupPage() {
 	const verificationComplete = verificationDigits.join('').length === 4;
 
 	return (
-		<div className="min-h-screen flex flex-col bg-gradient-to-br from-white via-white to-zinc-50 text-black">
-			<Navbar variant="sticky" />
-			<main className="flex-1 min-h-0">
-				<div className="mx-auto flex w-full max-w-[900px] flex-col items-stretch px-6 py-10 sm:py-14">
-					{/* Header */}
-					<div className="flex flex-col items-center text-center">
-						<div className="flex items-center justify-center gap-3">
-							<Image src="/logo.png" alt="GenzProp" width={44} height={44} className="object-contain" />
-							<span className="text-2xl font-bold text-black tracking-tight">GenzProp</span>
+		<AuthShell
+			wide={step === 'details'}
+			title={step === 'details' ? 'Create your account' : step === 'verify' ? 'Verify your email' : 'You’re all set'}
+			subtitle={
+				step === 'details'
+					? 'Start your evaluation journey in minutes.'
+					: step === 'verify'
+						? 'Enter the 4 digit code we sent to your inbox.'
+						: 'Your account is ready. You can sign in now.'
+			}
+			footer={
+				step === 'details' ? (
+					<>
+						Already have an account?{' '}
+						<Link href="/login" className="font-semibold text-[#5235ff] hover:text-[#4527f0]">
+							Sign in
+						</Link>
+					</>
+				) : undefined
+			}
+		>
+			{step === 'details' && (
+				<form onSubmit={handleDetailsSubmit} noValidate>
+					<div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+						{/* Full name */}
+						<div className="space-y-2">
+							<label htmlFor="name" className={authLabelClass}>
+								Full name
+							</label>
+							<div className={authFieldClass(!!formErrors.name)}>
+								<User className={`h-[18px] w-[18px] shrink-0 ${formErrors.name ? 'text-red-400' : 'text-slate-400'}`} />
+								<input
+									id="name"
+									type="text"
+									autoComplete="name"
+									value={formData.name}
+									onChange={handleFormChange('name')}
+									placeholder="John Smith"
+									className={authInputClass}
+								/>
+							</div>
+							{formErrors.name && <p className="text-sm text-red-600">{formErrors.name}</p>}
 						</div>
-						<h1 className="mt-4 text-3xl font-bold tracking-tight text-black">
-							{step === 'details' ? 'Create your account' : step === 'verify' ? 'Verify email' : 'You’re all set'}
-						</h1>
-						<p className="mt-2 text-base text-zinc-600">
-							{step === 'details'
-								? 'Start your evaluation journey in minutes.'
-								: step === 'verify'
-									? 'Enter the 4 digit code we sent to your inbox.'
-									: 'Your account is ready. You can sign in now.'}
-						</p>
-					</div>
 
-					{step === 'details' && (
-						<form onSubmit={handleDetailsSubmit} className="mt-8">
-							<div className="rounded-3xl border border-zinc-200/70 bg-white/80 backdrop-blur-xl p-7 sm:p-10 shadow-[0_18px_60px_rgba(0,0,0,0.10)]">
-								<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
-									{/* Full name */}
-									<div className="space-y-2">
-									<label htmlFor="name" className="block text-sm font-semibold text-zinc-500 uppercase tracking-wider">
-										Full name
-									</label>
-									<div
-										className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-5 py-4 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
-											formErrors.name ? 'border-red-300 bg-red-50/50 focus-within:border-red-400 focus-within:ring-red-500/10' : 'border-zinc-200 hover:border-zinc-300'
-										}`}
-									>
-										<User className={`w-5 h-5 shrink-0 ${formErrors.name ? 'text-red-400' : 'text-zinc-400'}`} />
-										<input
-											id="name"
-											type="text"
-											value={formData.name}
-											onChange={handleFormChange('name')}
-											placeholder="John Smith"
-											className="flex-1 min-w-0 bg-transparent text-base font-medium text-zinc-900 placeholder:text-zinc-400 outline-none"
-										/>
-									</div>
-									{formErrors.name && <p className="text-sm font-medium text-red-600">{formErrors.name}</p>}
-								</div>
-
-								{/* Email */}
-								<div className="space-y-2">
-									<label htmlFor="email" className="block text-sm font-semibold text-zinc-500 uppercase tracking-wider">
-										Email address
-									</label>
-									<div
-										className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-5 py-4 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
-											formErrors.email ? 'border-red-300 bg-red-50/50 focus-within:border-red-400 focus-within:ring-red-500/10' : 'border-zinc-200 hover:border-zinc-300'
-										}`}
-									>
-										<Mail className={`w-5 h-5 shrink-0 ${formErrors.email ? 'text-red-400' : 'text-zinc-400'}`} />
-										<input
-											id="email"
-											type="email"
-											value={formData.email}
-											onChange={handleFormChange('email')}
-											placeholder="name@company.com"
-											className="flex-1 min-w-0 bg-transparent text-base font-medium text-zinc-900 placeholder:text-zinc-400 outline-none"
-										/>
-									</div>
-									{formErrors.email && <p className="text-sm font-medium text-red-600">{formErrors.email}</p>}
-								</div>
-
-								{/* Country */}
-								<div className="space-y-2">
-									<label className="block text-sm font-semibold text-zinc-500 uppercase tracking-wider">
-										Country
-									</label>
-									<CountrySelector
-										value={formData.country}
-										onChange={(value) => {
-											setFormData((prev) => ({ ...prev, country: value }));
-											if (formErrors.country) setFormErrors((prev) => ({ ...prev, country: undefined }));
-										}}
-										error={formErrors.country}
-										disabled={isLoading}
-									/>
-									{formErrors.country && <p className="text-sm font-medium text-red-600">{formErrors.country}</p>}
-								</div>
-
-								{/* Referral code (optional) */}
-								<div className="space-y-2">
-									<label htmlFor="referralCode" className="block text-sm font-semibold text-zinc-500 uppercase tracking-wider">
-										Referral code <span className="font-normal normal-case text-zinc-400">(optional)</span>
-									</label>
-									<div className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50/80 px-5 py-4 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black hover:border-zinc-300">
-										<span className="text-zinc-400 text-sm font-medium w-5 text-center">#</span>
-										<input
-											id="referralCode"
-											type="text"
-											value={formData.referralCode}
-											onChange={handleFormChange('referralCode')}
-											placeholder="Enter code if you have one"
-											className="flex-1 min-w-0 bg-transparent text-base font-medium text-zinc-900 placeholder:text-zinc-400 outline-none"
-										/>
-									</div>
-								</div>
-
-								{/* Password + Confirm */}
-								<div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
-									<div className="space-y-2">
-										<label htmlFor="password" className="block text-sm font-semibold text-zinc-500 uppercase tracking-wider">
-											Password
-										</label>
-										<div
-											className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-5 py-4 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
-												formErrors.password ? 'border-red-300 bg-red-50/50 focus-within:border-red-400 focus-within:ring-red-500/10' : 'border-zinc-200 hover:border-zinc-300'
-											}`}
-										>
-											<Lock className={`w-5 h-5 shrink-0 ${formErrors.password ? 'text-red-400' : 'text-zinc-400'}`} />
-											<input
-												id="password"
-												type={showPassword ? 'text' : 'password'}
-												value={formData.password}
-												onChange={handleFormChange('password')}
-												placeholder="Min. 8 characters"
-												className="flex-1 min-w-0 bg-transparent text-base font-medium text-zinc-900 placeholder:text-zinc-400 outline-none"
-											/>
-											<button
-												type="button"
-												onClick={() => setShowPassword((p) => !p)}
-												className="shrink-0 p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 hover:bg-zinc-200/60 transition-colors"
-												aria-label={showPassword ? 'Hide password' : 'Show password'}
-											>
-												{showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-											</button>
-										</div>
-										{formErrors.password && <p className="text-sm font-medium text-red-600">{formErrors.password}</p>}
-									</div>
-									<div className="space-y-2">
-										<label htmlFor="confirmPassword" className="block text-sm font-semibold text-zinc-500 uppercase tracking-wider">
-											Confirm password
-										</label>
-										<div
-											className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-5 py-4 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
-												formErrors.confirmPassword ? 'border-red-300 bg-red-50/50 focus-within:border-red-400 focus-within:ring-red-500/10' : 'border-zinc-200 hover:border-zinc-300'
-											}`}
-										>
-											<Lock className={`w-5 h-5 shrink-0 ${formErrors.confirmPassword ? 'text-red-400' : 'text-zinc-400'}`} />
-											<input
-												id="confirmPassword"
-												type={showConfirmPassword ? 'text' : 'password'}
-												value={formData.confirmPassword}
-												onChange={handleFormChange('confirmPassword')}
-												placeholder="Re-enter password"
-												className="flex-1 min-w-0 bg-transparent text-base font-medium text-zinc-900 placeholder:text-zinc-400 outline-none"
-											/>
-											<button
-												type="button"
-												onClick={() => setShowConfirmPassword((p) => !p)}
-												className="shrink-0 p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 hover:bg-zinc-200/60 transition-colors"
-												aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-											>
-												{showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-											</button>
-										</div>
-										{formErrors.confirmPassword && <p className="text-sm font-medium text-red-600">{formErrors.confirmPassword}</p>}
-									</div>
-								</div>
-
-								{/* Terms */}
-								<label className="sm:col-span-2 flex items-start gap-2.5 cursor-pointer group">
-									<input
-										type="checkbox"
-										required
-										className="mt-0.5 h-5 w-5 rounded border-zinc-300 text-black focus:ring-2 focus:ring-black/20 focus:ring-offset-0"
-									/>
-									<span className="text-base text-zinc-600 group-hover:text-zinc-900 transition-colors">
-										I agree to the <Link href="/terms" className="font-medium text-black underline underline-offset-2 hover:no-underline">Terms</Link> and <Link href="/policy" className="font-medium text-black underline underline-offset-2 hover:no-underline">Privacy Policy</Link>.
-									</span>
-								</label>
-
-								<button
-									type="submit"
-									disabled={isLoading}
-									className="sm:col-span-2 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-black px-6 py-4 text-base font-bold text-white shadow-sm hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-								>
-									{isLoading ? (
-										<>
-											<svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-												<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-												<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-											</svg>
-											Creating account…
-										</>
-									) : (
-										'Create account'
-									)}
-								</button>
-								</div>
+						{/* Email */}
+						<div className="space-y-2">
+							<label htmlFor="email" className={authLabelClass}>
+								Email address
+							</label>
+							<div className={authFieldClass(!!formErrors.email)}>
+								<Mail className={`h-[18px] w-[18px] shrink-0 ${formErrors.email ? 'text-red-400' : 'text-slate-400'}`} />
+								<input
+									id="email"
+									type="email"
+									autoComplete="email"
+									value={formData.email}
+									onChange={handleFormChange('email')}
+									placeholder="name@company.com"
+									className={authInputClass}
+								/>
 							</div>
-						</form>
-					)}
+							{formErrors.email && <p className="text-sm text-red-600">{formErrors.email}</p>}
+						</div>
 
-				{step === 'verify' && (
-					<div className="mt-8">
-						<div className="rounded-3xl border border-zinc-200/70 bg-white/80 backdrop-blur-xl p-7 sm:p-10 shadow-[0_18px_60px_rgba(0,0,0,0.10)]">
-							<div className="flex items-start justify-between gap-4">
-								<div>
-									<p className="text-sm text-zinc-600">
-										Code sent to <span className="font-semibold text-black">{formData.email}</span>
-									</p>
-									<p className="mt-1 text-xs text-zinc-400">
-										Demo code: <span className="font-mono font-semibold text-black">{generatedCode || '------'}</span>
-									</p>
-								</div>
-								<div className="w-11 h-11 rounded-2xl bg-black text-white flex items-center justify-center shadow-sm">
-									<Mail className="w-5 h-5" />
-								</div>
+						{/* Country */}
+						<div className="space-y-2">
+							<label className={authLabelClass}>Country</label>
+							<CountrySelector
+								value={formData.country}
+								onChange={(value) => {
+									setFormData((prev) => ({ ...prev, country: value }));
+									if (formErrors.country) setFormErrors((prev) => ({ ...prev, country: undefined }));
+								}}
+								error={formErrors.country}
+								disabled={isLoading}
+							/>
+							{formErrors.country && <p className="text-sm text-red-600">{formErrors.country}</p>}
+						</div>
+
+						{/* Referral code (optional) */}
+						<div className="space-y-2">
+							<label htmlFor="referralCode" className={authLabelClass}>
+								Referral code <span className="font-normal text-slate-400">(optional)</span>
+							</label>
+							<div className={authFieldClass(!!formErrors.referralCode)}>
+								<Gift className="h-[18px] w-[18px] shrink-0 text-slate-400" />
+								<input
+									id="referralCode"
+									type="text"
+									value={formData.referralCode}
+									onChange={handleFormChange('referralCode')}
+									placeholder="Enter code"
+									className={authInputClass}
+								/>
 							</div>
+							{formErrors.referralCode && <p className="text-sm text-red-600">{formErrors.referralCode}</p>}
+						</div>
 
-							<form onSubmit={handleVerificationSubmit} className="mt-6 space-y-6">
-							<div className="flex justify-between items-center">
-								<label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Verification code</label>
+						{/* Password */}
+						<div className="space-y-2">
+							<label htmlFor="password" className={authLabelClass}>
+								Password
+							</label>
+							<div className={authFieldClass(!!formErrors.password)}>
+								<Lock className={`h-[18px] w-[18px] shrink-0 ${formErrors.password ? 'text-red-400' : 'text-slate-400'}`} />
+								<input
+									id="password"
+									type={showPassword ? 'text' : 'password'}
+									autoComplete="new-password"
+									value={formData.password}
+									onChange={handleFormChange('password')}
+									placeholder="Min. 8 characters"
+									className={authInputClass}
+								/>
 								<button
 									type="button"
-									onClick={handleResendCode}
-									disabled={resendCooldown > 0}
-									className="text-xs font-medium text-black hover:text-zinc-600 disabled:text-zinc-400 transition-colors"
+									onClick={() => setShowPassword((p) => !p)}
+									className="-mr-1.5 shrink-0 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+									aria-label={showPassword ? 'Hide password' : 'Show password'}
 								>
-									{resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
+									{showPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
 								</button>
 							</div>
-							<div className="grid grid-cols-4 gap-3">
-								{verificationDigits.map((digit, index) => (
-									<input
-										key={index}
-										type="text"
-										inputMode="numeric"
-										maxLength={1}
-										value={digit}
-										onChange={(e) => handleVerificationChange(index, e.target.value)}
-										onKeyDown={(e) => handleVerificationKeyDown(e, index)}
-										onPaste={index === 0 ? handleVerificationPaste : undefined}
-										ref={(el) => { if (el) verificationInputs.current[index] = el; }}
-										className="h-16 rounded-xl border border-zinc-200 bg-zinc-50/80 text-center text-xl font-bold tracking-[0.35em] text-zinc-900 transition-all focus:border-black focus:bg-white focus:outline-none focus:ring-2 focus:ring-black/10"
-									/>
-								))}
+							{formErrors.password && <p className="text-sm text-red-600">{formErrors.password}</p>}
+						</div>
+
+						{/* Confirm password */}
+						<div className="space-y-2">
+							<label htmlFor="confirmPassword" className={authLabelClass}>
+								Confirm password
+							</label>
+							<div className={authFieldClass(!!formErrors.confirmPassword)}>
+								<Lock className={`h-[18px] w-[18px] shrink-0 ${formErrors.confirmPassword ? 'text-red-400' : 'text-slate-400'}`} />
+								<input
+									id="confirmPassword"
+									type={showConfirmPassword ? 'text' : 'password'}
+									autoComplete="new-password"
+									value={formData.confirmPassword}
+									onChange={handleFormChange('confirmPassword')}
+									placeholder="Re-enter password"
+									className={authInputClass}
+								/>
+								<button
+									type="button"
+									onClick={() => setShowConfirmPassword((p) => !p)}
+									className="-mr-1.5 shrink-0 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+									aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+								>
+									{showConfirmPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
+								</button>
 							</div>
-							{verificationError && (
-								<p className="text-sm font-medium text-red-600">{verificationError}</p>
+							{formErrors.confirmPassword && <p className="text-sm text-red-600">{formErrors.confirmPassword}</p>}
+						</div>
+
+						{/* Terms */}
+						<label className="flex cursor-pointer items-start gap-2.5 sm:col-span-2">
+							<input type="checkbox" required className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 accent-[#5235ff]" />
+							<span className="text-sm text-slate-600">
+								I agree to the{' '}
+								<Link href="/terms" className="font-medium text-[#0b1020] underline underline-offset-2 hover:text-[#5235ff]">
+									Terms
+								</Link>{' '}
+								and{' '}
+								<Link href="/policy" className="font-medium text-[#0b1020] underline underline-offset-2 hover:text-[#5235ff]">
+									Privacy Policy
+								</Link>
+								.
+							</span>
+						</label>
+
+						<button type="submit" disabled={isLoading} className={`${authPrimaryButtonClass} sm:col-span-2`}>
+							{isLoading ? (
+								<>
+									<Loader2 className="h-4 w-4 animate-spin" />
+									Creating account…
+								</>
+							) : (
+								<>
+									Create account <ArrowRight className="h-4 w-4" />
+								</>
 							)}
-							<div className="flex gap-3">
-								<button
-									type="button"
-									onClick={handleBackToDetails}
-									className="flex-1 py-4 rounded-xl border border-zinc-200 text-sm font-medium text-zinc-700 bg-white hover:bg-zinc-50 hover:border-zinc-300 transition-colors"
-								>
-									Edit email
-								</button>
-								<button
-									type="submit"
-									disabled={!verificationComplete}
-									className="flex-1 py-4 rounded-xl bg-black text-sm font-bold text-white shadow-sm hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
-								>
-									Verify
-								</button>
-							</div>
-						</form>
+						</button>
 					</div>
-				</div>
-				)}
+				</form>
+			)}
 
-				{step === 'complete' && (
-					<div className="mt-8">
-						<div className="rounded-3xl border border-zinc-200/70 bg-white/80 backdrop-blur-xl p-7 sm:p-10 shadow-[0_18px_60px_rgba(0,0,0,0.10)] text-center">
-							<div className="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center shadow-sm mx-auto mb-4">
-								<Lock className="w-5 h-5" />
-							</div>
-							<p className="text-sm text-zinc-600">
-								Your account is ready. Sign in with your email and password to access the dashboard.
+			{step === 'verify' && (
+				<div>
+					<div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+						<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#efecff] text-[#5235ff]">
+							<Mail className="h-5 w-5" />
+						</span>
+						<div className="min-w-0">
+							<p className="truncate text-sm text-slate-600">
+								Code sent to <span className="font-semibold text-[#0b1020]">{formData.email}</span>
 							</p>
-							<Link
-								href="/login"
-								className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-black px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-colors"
-							>
-								Go to login
-							</Link>
+							<p className="mt-0.5 text-xs text-slate-400">
+								Demo code: <span className="font-mono font-semibold text-[#0b1020]">{generatedCode || '------'}</span>
+							</p>
 						</div>
 					</div>
-				)}
 
-					{step === 'details' && (
-						<p className="mt-6 text-center text-base text-zinc-600">
-							Already have an account?{' '}
-							<Link href="/login" className="font-semibold text-black underline underline-offset-2 hover:no-underline">
-								Log in
-							</Link>
-						</p>
-					)}
+					<form onSubmit={handleVerificationSubmit} className="mt-6 space-y-5">
+						<div className="flex items-center justify-between">
+							<label className={authLabelClass}>Verification code</label>
+							<button
+								type="button"
+								onClick={handleResendCode}
+								disabled={resendCooldown > 0}
+								className="text-sm font-medium text-[#5235ff] transition-colors hover:text-[#4527f0] disabled:text-slate-400"
+							>
+								{resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
+							</button>
+						</div>
+						<div className="grid grid-cols-4 gap-3">
+							{verificationDigits.map((digit, index) => (
+								<input
+									key={index}
+									type="text"
+									inputMode="numeric"
+									maxLength={1}
+									value={digit}
+									onChange={(e) => handleVerificationChange(index, e.target.value)}
+									onKeyDown={(e) => handleVerificationKeyDown(e, index)}
+									onPaste={index === 0 ? handleVerificationPaste : undefined}
+									ref={(el) => {
+										if (el) verificationInputs.current[index] = el;
+									}}
+									className="h-16 rounded-xl border border-slate-200 bg-white text-center text-2xl font-semibold text-[#0b1020] transition-all focus:border-[#5235ff] focus:outline-none focus:ring-4 focus:ring-[#5235ff]/10"
+								/>
+							))}
+						</div>
+						{verificationError && <p className="text-sm text-red-600">{verificationError}</p>}
+						<div className="flex gap-3">
+							<button
+								type="button"
+								onClick={handleBackToDetails}
+								className="h-12 flex-1 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+							>
+								Edit email
+							</button>
+							<button type="submit" disabled={!verificationComplete} className={`${authPrimaryButtonClass} flex-1`}>
+								Verify
+							</button>
+						</div>
+					</form>
+				</div>
+			)}
 
-					<p className="mt-10 text-center text-xs text-zinc-400">© {CURRENT_YEAR} GenzProp. All rights reserved.</p>
+			{step === 'complete' && (
+				<div className="rounded-2xl border border-slate-200 bg-slate-50 p-8 text-center">
+					<span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+						<CheckCircle2 className="h-6 w-6" />
+					</span>
+					<p className="mt-4 text-sm text-slate-600">
+						Your account is ready. Sign in with your email and password to access the dashboard.
+					</p>
+					<Link href="/login" className={`${authPrimaryButtonClass} mt-6`}>
+						Go to login <ArrowRight className="h-4 w-4" />
+					</Link>
+				</div>
+			)}
 
 			{toastType === 'success' && toastMessage && (
 				<SuccessPopup
@@ -609,8 +567,6 @@ export default function SignupPage() {
 					}}
 				/>
 			)}
-				</div>
-			</main>
-		</div>
+		</AuthShell>
 	);
 }

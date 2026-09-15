@@ -75,30 +75,44 @@
   --sidebar-ring: oklch(0.92 0 0);
 }
 
-/* Authentic light-black theme for dashboard & performance */
-.dashboard-authentic {
-  --background: #0f0f0f;
-  --foreground: #fafafa;
-  --card: #18181b;
-  --card-foreground: #fafafa;
-  --popover: #18181b;
-  --popover-foreground: #fafafa;
-  --primary: #fafafa;
-  --primary-foreground: #0f0f0f;
-  --secondary: #27272a;
-  --secondary-foreground: #fafafa;
-  --muted: #27272a;
-  --muted-foreground: #a1a1aa;
-  --border: #3f3f46;
-  --input: #3f3f46;
-  --ring: #71717a;
-  --sidebar: #18181b;
-  --sidebar-foreground: #fafafa;
-  --sidebar-border: #3f3f46;
-  --sidebar-primary: #fafafa;
-  --sidebar-primary-foreground: #0f0f0f;
-  --sidebar-accent: #27272a;
-  --sidebar-accent-foreground: #fafafa;
+/* GenzProp workspace theme for dashboard & admin: light slate canvas, navy sidebar, violet brand.
+   Also applied to <body> while a workspace page is mounted, so portaled dialogs/menus inherit it. */
+.dashboard-authentic,
+body:has(.dashboard-authentic) {
+  --background: #f5f6fa;
+  --foreground: #0b1020;
+  --card: #ffffff;
+  --card-foreground: #0b1020;
+  --popover: #ffffff;
+  --popover-foreground: #0b1020;
+  --primary: #5235ff;
+  --primary-foreground: #ffffff;
+  --secondary: #eef0f6;
+  --secondary-foreground: #0b1020;
+  --muted: #f1f3f8;
+  --muted-foreground: #64748b;
+  --accent: #efecff;
+  --accent-foreground: #3b24d9;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #e6e9ef;
+  --input: #e2e6ee;
+  --ring: #5235ff;
+  --chart-1: #5235ff;
+  --chart-2: #00b386;
+  --chart-3: #f59e0b;
+  --chart-4: #0ea5e9;
+  --chart-5: #ec4899;
+  --radius: 0.875rem;
+  --sidebar: #0b1020;
+  --sidebar-foreground: #cbd5e1;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-primary: #5235ff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(255, 255, 255, 0.06);
+  --sidebar-accent-foreground: #ffffff;
+  color: var(--foreground);
+  background: var(--background);
 }
 
 @theme inline {

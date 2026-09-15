@@ -62,7 +62,7 @@ function Gauge({
   const strokeDashoffset = circumference - (pct / 100) * circumference
 
   return (
-    <div className="flex flex-col items-center p-4 rounded-xl bg-muted/20 border border-border/50 hover:bg-muted/40 transition-colors duration-200">
+    <div className="flex flex-col items-center p-4 rounded-xl bg-muted/50 border border-border hover:bg-muted transition-colors duration-200">
       <p className="text-sm font-bold text-foreground mb-1 w-full text-center truncate">{label}</p>
       <div className="relative w-full max-w-[160px] aspect-[120/72]">
         <svg viewBox="0 0 120 72" className="w-full h-full" aria-hidden>
@@ -363,7 +363,7 @@ function DashboardPageInner() {
                   <Button
                     asChild
                     variant="outline"
-                    className="h-9 rounded-full border-border/70 bg-background/80 px-4 text-xs sm:text-sm font-semibold text-foreground shadow-sm hover:bg-background hover:border-border focus-visible:ring-2 focus-visible:ring-primary/40 gap-2"
+                    className="h-10 rounded-xl border-border bg-card px-4 text-sm font-semibold text-foreground gap-2"
                     disabled={!hasActiveOrder || !selectedOrderId}
                   >
                     <Link href={selectedOrderId && hasActiveOrder ? `/dashboard/performance/${selectedOrderId}` : "#"}>
@@ -373,7 +373,7 @@ function DashboardPageInner() {
                   </Button>
                   <Button
                     asChild
-                    className="h-9 rounded-full bg-gradient-to-r from-primary to-primary/80 px-5 text-xs sm:text-sm font-semibold text-primary-foreground shadow-md shadow-primary/30 hover:from-primary/95 hover:to-primary/80 hover:shadow-lg hover:shadow-primary/40 transition-all duration-300 gap-2"
+                    className="h-10 rounded-xl px-5 text-sm font-semibold gap-2 shadow-sm shadow-primary/25"
                   >
                     <Link href="/buy-challenge">
                       <ShoppingCart className="h-4 w-4" />
@@ -409,8 +409,8 @@ function DashboardPageInner() {
           )}
 
           {noActiveAccount && (
-            <div className="mt-4 rounded-lg border border-border bg-muted/50 px-4 py-3 text-sm text-muted-foreground">
-              You have not active account.
+            <div className="mt-2 rounded-xl border border-dashed border-primary/30 bg-accent px-4 py-3 text-sm font-medium text-accent-foreground">
+              You don&apos;t have an active account yet. Buy a challenge to unlock live analytics.
             </div>
           )}
 
@@ -418,8 +418,8 @@ function DashboardPageInner() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4 min-w-0">
               <div className={`lg:col-span-2 space-y-3 md:space-y-4 min-w-0 transition-all duration-300 ${blurClass}`}>
                 <ProjectAnalytics {...({ stats } satisfies ProjectAnalyticsProps)} />
-                <Card className="overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm min-w-0" id="rules">
-                  <div className="border-b border-border/80 bg-muted/20 px-4 sm:px-6 py-3.5">
+                <Card className="overflow-hidden rounded-2xl border border-border bg-card shadow-[0_1px_2px_rgba(16,24,40,0.04)] min-w-0" id="rules">
+                  <div className="border-b border-border bg-card px-4 sm:px-6 py-3.5">
                     <h3 className="text-sm font-semibold text-foreground tracking-tight">Objectives & Rules</h3>
                     <p className="text-xs text-muted-foreground mt-0.5">
                       {accountRules.label} · Targets and rules
@@ -492,8 +492,8 @@ function DashboardPageInner() {
               </div>
 
               <div className="space-y-3 md:space-y-4 min-w-0">
-                <Card className="overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm" id="violations">
-                  <div className="border-b border-border/80 bg-muted/20 px-4 sm:px-5 py-3.5 flex items-center gap-2.5">
+                <Card className="overflow-hidden rounded-2xl border border-border bg-card shadow-[0_1px_2px_rgba(16,24,40,0.04)]" id="violations">
+                  <div className="border-b border-border bg-card px-4 sm:px-5 py-3.5 flex items-center gap-2.5">
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-destructive/10 border border-destructive/20">
                       <AlertTriangle className="h-3.5 w-3.5 text-destructive" />
                     </div>
@@ -554,7 +554,7 @@ function DashboardPageInner() {
                     </p>
                   </div>
                 </Card>
-                <div className="rounded-xl overflow-hidden border border-border bg-card shadow-sm animate-slide-in-up" style={{ animationDelay: "500ms" }}>
+                <div className="rounded-2xl overflow-hidden border border-border bg-card animate-slide-in-up" style={{ animationDelay: "500ms" }}>
                   <img
                     src="https://res.cloudinary.com/dqzibxdtn/image/upload/v1769775710/Black_White_Grunge_Modern_Buy_One_Get_One_Black_Friday_Instagram_Post_plnvf9.png"
                     alt="Promo"

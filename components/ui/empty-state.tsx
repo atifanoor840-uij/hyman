@@ -10,7 +10,7 @@ type EmptyStateProps = {
 export default function EmptyState({ title, description, icon, action }: EmptyStateProps) {
   return (
     <div className="w-full">
-      <div className="flex flex-col items-center justify-center text-center rounded-2xl border border-white/10 bg-white/5 p-10">
+      <div className="flex flex-col items-center justify-center text-center rounded-2xl border border-dashed border-border bg-muted/40 p-10">
         {icon ? <div className="mb-4">{icon}</div> : null}
         <h3 className="text-lg font-semibold mb-1">{title}</h3>
         {description ? (
@@ -21,5 +21,3 @@ export default function EmptyState({ title, description, icon, action }: EmptySt
     </div>
   )
 }
-
-

@@ -2,14 +2,16 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { AdminShell } from "@/components/admin/admin-shell"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import EmptyState from "@/components/ui/empty-state"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   adminListOrders,
   adminPassOrder,
@@ -23,29 +25,34 @@ import {
 } from "@/lib/api/app-client"
 import { ApiClientError } from "@/lib/api/client"
 import { OrderDetailsView } from "@/components/admin/order-details-view"
-import { Loader2, Search, ShieldAlert, LogIn, PackageCheck, Eye } from "lucide-react"
+import {
+  DataTable,
+  EmptyBlock,
+  ErrorBlock,
+  Field,
+  FilterTabs,
+  LoadingBlock,
+  NativeSelect,
+  Notice,
+  Panel,
+  Person,
+  SearchBox,
+  StatRow,
+  StatusPill,
+  Toolbar,
+  inputClass,
+  money,
+  shortDate,
+  useConfirm,
+} from "@/components/admin/admin-ui"
+import { CheckCircle2, Eye, LogIn, MoreHorizontal, PackageCheck, RefreshCcw, ShoppingCart, XCircle } from "lucide-react"
 
-function formatDate(input: string | null) {
-  if (!input) return "—"
-  const d = new Date(input)
-  if (!Number.isFinite(d.getTime())) return "—"
-  return d.toLocaleString()
-}
+type Filter = "all" | "delivery" | "unpaid" | "active" | "passed" | "failed"
 
-function statusBadgeClass(status: string) {
-  switch (status) {
-    case "active":
-    case "passed":
-    case "funded":
-      return "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
-    case "failed":
-      return "bg-red-500/10 text-red-600 border-red-500/20"
-    case "processing":
-      return "bg-purple-500/10 text-purple-600 border-purple-500/20"
-    default:
-      return "bg-amber-500/10 text-amber-600 border-amber-500/20"
-  }
-}
+/** Paid, but the customer hasn't received trading credentials yet. */
+const needsDelivery = (o: AdminOrderRow) => o.status === "processing" || (o.status === "active" && o.accounts.length === 0)
+
+const EMPTY_MANUAL = { phase: "phase1", platform: "mt5", login: "", passwordMaster: "", server: "", profitTarget: "", balance: "", graphLink: "" }
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<AdminOrderRow[]>([])
@@ -53,27 +60,16 @@ export default function AdminOrdersPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState("")
-  const [selected, setSelected] = useState<AdminOrderRow | null>(null)
+  const [filter, setFilter] = useState<Filter>("all")
   const [viewId, setViewId] = useState<string | null>(null)
   const [deliverFor, setDeliverFor] = useState<AdminOrderRow | null>(null)
+  const [deliverMode, setDeliverMode] = useState<"inventory" | "manual">("inventory")
   const [busy, setBusy] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
-  const [failReason, setFailReason] = useState("")
-  const [manualForm, setManualForm] = useState({
-    phase: "phase1",
-    platform: "mt5",
-    login: "",
-    passwordMaster: "",
-    server: "",
-    profitTarget: "",
-    balance: "",
-    graphLink: "",
-  })
+  const [manualForm, setManualForm] = useState(EMPTY_MANUAL)
   const [inventoryId, setInventoryId] = useState("")
-  const [pageError, setPageError] = useState<string | null>(null)
-  const [notice, setNotice] = useState<string | null>(null)
-
-  const emptyManualForm = { phase: "phase1", platform: "mt5", login: "", passwordMaster: "", server: "", profitTarget: "", balance: "", graphLink: "" }
+  const [notice, setNotice] = useState<{ tone: "success" | "error"; text: string } | null>(null)
+  const { confirm, dialog } = useConfirm()
 
   const refresh = async () => {
     setLoading(true)
@@ -93,234 +89,278 @@ export default function AdminOrdersPage() {
     refresh()
   }, [])
 
+  const counts = useMemo(
+    () => ({
+      all: orders.length,
+      delivery: orders.filter(needsDelivery).length,
+      unpaid: orders.filter((o) => o.status === "pending_payment").length,
+      active: orders.filter((o) => o.status === "active" && o.accounts.length > 0).length,
+      passed: orders.filter((o) => o.status === "passed").length,
+      failed: orders.filter((o) => o.status === "failed").length,
+    }),
+    [orders],
+  )
+
+  const revenue = useMemo(
+    () => orders.filter((o) => o.status !== "pending_payment").reduce((s, o) => s + (o.amountPaid || 0), 0),
+    [orders],
+  )
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
-    if (!q) return orders
-    return orders.filter(
-      (o) =>
+    return orders.filter((o) => {
+      if (filter === "delivery" && !needsDelivery(o)) return false
+      if (filter === "unpaid" && o.status !== "pending_payment") return false
+      if (filter === "active" && !(o.status === "active" && o.accounts.length > 0)) return false
+      if (filter === "passed" && o.status !== "passed") return false
+      if (filter === "failed" && o.status !== "failed") return false
+      if (!q) return true
+      return (
         o.id.toLowerCase().includes(q) ||
         o.users?.email.toLowerCase().includes(q) ||
         o.users?.name.toLowerCase().includes(q) ||
         o.challenge_plans?.name.toLowerCase().includes(q)
-    )
-  }, [orders, search])
+      )
+    })
+  }, [orders, search, filter])
 
   const runAction = async (fn: () => Promise<unknown>, successMessage: string) => {
     setBusy(true)
     setActionError(null)
     try {
       await fn()
-      setSelected(null)
       setDeliverFor(null)
-      setFailReason("")
       setInventoryId("")
-      setManualForm(emptyManualForm)
-      setNotice(successMessage)
+      setManualForm(EMPTY_MANUAL)
+      setNotice({ tone: "success", text: successMessage })
       await refresh()
     } catch (err) {
-      setActionError(err instanceof ApiClientError ? err.message : "Action failed.")
+      const msg = err instanceof ApiClientError ? err.message : "Action failed."
+      if (deliverFor) setActionError(msg)
+      else setNotice({ tone: "error", text: msg })
     } finally {
       setBusy(false)
     }
   }
 
+  const handlePass = async (o: AdminOrderRow) => {
+    const { ok } = await confirm({
+      title: "Mark order as passed?",
+      description: `${o.users?.name ?? "The customer"} will be notified and a certificate will be issued.`,
+      confirmLabel: "Mark as passed",
+    })
+    if (ok) void runAction(() => adminPassOrder(o.id), "Order marked as passed.")
+  }
+
+  const handleFail = async (o: AdminOrderRow) => {
+    const { ok, reason } = await confirm({
+      title: "Mark order as failed?",
+      description: `${o.users?.name ?? "The customer"} will be notified that their challenge ended.`,
+      confirmLabel: "Mark as failed",
+      tone: "danger",
+      reasonLabel: "Reason (shown to the customer)",
+      reasonPlaceholder: "e.g. Daily loss limit breached on May 4",
+    })
+    if (ok) void runAction(() => adminFailOrder(o.id, reason), "Order marked as failed.")
+  }
+
   const handleImpersonate = async (userId: string) => {
-    if (!window.confirm("This will sign you out of admin in this browser and log you in as the user. Continue?")) return
-    setPageError(null)
+    const { ok } = await confirm({
+      title: "Log in as this customer?",
+      description: "You’ll be signed out of admin in this browser and their dashboard opens in a new tab.",
+      confirmLabel: "Continue",
+    })
+    if (!ok) return
     try {
       await crmImpersonate(userId)
       window.open("/dashboard/overview", "_blank")
     } catch (err) {
-      const msg = err instanceof ApiClientError ? err.message : "Failed to impersonate user."
-      setActionError(msg)
-      setPageError(msg)
+      setNotice({ tone: "error", text: err instanceof ApiClientError ? err.message : "Failed to log in as user." })
     }
   }
 
+  const openDeliver = (o: AdminOrderRow) => {
+    setActionError(null)
+    setInventoryId("")
+    setManualForm({ ...EMPTY_MANUAL, balance: o.challenge_plans ? String(o.challenge_plans.size) : "" })
+    setDeliverMode(inventory.length ? "inventory" : "manual")
+    setDeliverFor(o)
+  }
+
+  const submitManual = () => {
+    if (!deliverFor) return
+    const missing = [
+      !manualForm.platform.trim() && "platform",
+      !manualForm.server.trim() && "server",
+      !manualForm.login.trim() && "login",
+      !manualForm.passwordMaster.trim() && "password",
+    ].filter(Boolean)
+    if (missing.length) {
+      setActionError(`Please fill in: ${missing.join(", ")}.`)
+      return
+    }
+    void runAction(
+      () =>
+        adminCompleteManual(deliverFor.id, {
+          phase: manualForm.phase,
+          platform: manualForm.platform,
+          login: manualForm.login,
+          passwordMaster: manualForm.passwordMaster,
+          server: manualForm.server,
+          profitTarget: Number(manualForm.profitTarget) || 0,
+          balance: Number(manualForm.balance) || 0,
+          graphLink: manualForm.graphLink.trim() || undefined,
+        }),
+      "Account delivered.",
+    )
+  }
+
+  const setManual = (key: keyof typeof EMPTY_MANUAL) => (v: string) => setManualForm((f) => ({ ...f, [key]: v }))
+
   return (
-    <AdminShell title="Orders" description="Review, approve, and fulfill customer orders.">
-      <Card className="p-4 mb-4">
-        <div className="flex items-center gap-2 max-w-sm">
-          <Search className="w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Search by order, email, plan…" value={search} onChange={(e) => setSearch(e.target.value)} />
-        </div>
-      </Card>
+    <AdminShell
+      title="Orders"
+      description="Deliver trading accounts, and pass or fail challenges."
+      actions={
+        <Button variant="outline" className="h-10 gap-2 rounded-xl border-border bg-card" onClick={() => void refresh()} disabled={loading}>
+          <RefreshCcw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh
+        </Button>
+      }
+    >
+      <div className="space-y-4">
+        <StatRow
+          items={[
+            { label: "Needs delivery", value: counts.delivery, tone: "warning", hint: "Paid, no account sent yet" },
+            { label: "Awaiting payment", value: counts.unpaid, tone: "neutral", hint: "Checkout not completed" },
+            { label: "Active challenges", value: counts.active, tone: "success", hint: "Customers trading now" },
+            { label: "Revenue", value: money(revenue, 0), tone: "brand", hint: "All paid orders" },
+          ]}
+        />
 
-      {notice && (
-        <div className="mb-4 flex items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700">
-          <span>{notice}</span>
-          <button type="button" className="text-xs font-semibold hover:underline" onClick={() => setNotice(null)}>Dismiss</button>
-        </div>
-      )}
-      {pageError && (
-        <div className="mb-4 flex items-center justify-between rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-          <span>{pageError}</span>
-          <button type="button" className="text-xs font-semibold hover:underline" onClick={() => setPageError(null)}>Dismiss</button>
-        </div>
-      )}
+        {notice && (
+          <Notice tone={notice.tone} onDismiss={() => setNotice(null)}>
+            {notice.text}
+          </Notice>
+        )}
 
-      <Card className="overflow-hidden">
-        {loading && orders.length === 0 ? (
-          <div className="flex justify-center py-16">
-            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-          </div>
-        ) : error ? (
-          <EmptyState icon={<ShieldAlert className="w-8 h-8 text-muted-foreground" />} title="Failed to load" description={error} />
-        ) : filtered.length === 0 ? (
-          <EmptyState icon={<PackageCheck className="w-8 h-8 text-muted-foreground" />} title="No orders" description="No orders match your search." />
-        ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Plan</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Payment</TableHead>
-                  <TableHead>Payment status</TableHead>
-                  <TableHead>Account status</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map((o) => (
-                  <TableRow key={o.id}>
-                    <TableCell>
-                      <div className="font-medium">{o.users?.name ?? "—"}</div>
-                      <div className="text-xs text-muted-foreground">{o.users?.email}</div>
-                    </TableCell>
-                    <TableCell>
-                      {o.challenge_plans?.name} ({o.challenge_plans ? `$${o.challenge_plans.size.toLocaleString()}` : "—"})
-                    </TableCell>
-                    <TableCell>${o.amountPaid.toFixed(2)}</TableCell>
-                    <TableCell className="capitalize">{o.paymentMethod}</TableCell>
-                    <TableCell>
-                      <Badge className={`${statusBadgeClass(o.status)} capitalize`}>{o.status.replace(/_/g, " ")}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      {o.accounts.length === 0 ? (
-                        <span className="text-xs text-muted-foreground">Not delivered</span>
-                      ) : (
-                        <div className="flex flex-col items-start gap-1">
-                          <Badge className={`${statusBadgeClass(o.accounts[0].status)} capitalize`}>{o.accounts[0].status}</Badge>
-                          <span className="text-xs text-muted-foreground capitalize">
-                            {o.accounts[0].phase ?? "—"} · #{o.accounts[0].login}
-                            {o.accounts.length > 1 ? ` (+${o.accounts.length - 1})` : ""}
-                          </span>
+        <Panel>
+          <Toolbar>
+            <FilterTabs<Filter>
+              value={filter}
+              onChange={setFilter}
+              options={[
+                { value: "all", label: "All", count: counts.all },
+                { value: "delivery", label: "Needs delivery", count: counts.delivery },
+                { value: "unpaid", label: "Awaiting payment", count: counts.unpaid },
+                { value: "active", label: "Active", count: counts.active },
+                { value: "passed", label: "Passed", count: counts.passed },
+                { value: "failed", label: "Failed", count: counts.failed },
+              ]}
+            />
+            <SearchBox value={search} onChange={setSearch} placeholder="Search customer, plan or order ID" />
+          </Toolbar>
+
+          {loading && orders.length === 0 ? (
+            <LoadingBlock label="Loading orders…" />
+          ) : error ? (
+            <ErrorBlock message={error} onRetry={() => void refresh()} />
+          ) : filtered.length === 0 ? (
+            <EmptyBlock
+              icon={ShoppingCart}
+              title={search || filter !== "all" ? "No matching orders" : "No orders yet"}
+              description={search || filter !== "all" ? "Try another filter or clear the search." : "New customer orders will show up here."}
+            />
+          ) : (
+            <DataTable head={["Customer", "Plan", "Amount", "Status", "Trading account", "Created", ""]}>
+              {filtered.map((o) => {
+                const acct = o.accounts[0]
+                const deliver = needsDelivery(o)
+                return (
+                  <tr key={o.id}>
+                    <td>
+                      <Person name={o.users?.name} email={o.users?.email} />
+                    </td>
+                    <td>
+                      <p className="font-medium text-foreground">{o.challenge_plans?.name ?? "—"}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {o.challenge_plans ? money(o.challenge_plans.size, 0) : "—"} account · #{o.id.slice(0, 8)}
+                      </p>
+                    </td>
+                    <td>
+                      <p className="font-medium tabular-nums text-foreground">{money(o.amountPaid)}</p>
+                      <p className="text-xs capitalize text-muted-foreground">{o.paymentMethod}</p>
+                    </td>
+                    <td>
+                      {deliver ? <StatusPill label="Needs delivery" tone="warning" /> : <StatusPill status={o.status} />}
+                    </td>
+                    <td>
+                      {acct ? (
+                        <div>
+                          <p className="font-mono text-xs text-foreground">#{acct.login}</p>
+                          <p className="text-xs capitalize text-muted-foreground">
+                            {acct.phase ?? "—"} · {acct.status}
+                            {o.accounts.length > 1 ? ` · +${o.accounts.length - 1} more` : ""}
+                          </p>
                         </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">Not delivered</span>
                       )}
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{formatDate(o.createdAt)}</TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-2">
-                        <Button size="sm" onClick={() => setViewId(o.id)}>
-                          <Eye className="w-3.5 h-3.5 mr-1" /> View
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="border-emerald-500/40 text-emerald-700 hover:bg-emerald-500/10"
-                          onClick={() => {
-                            setActionError(null)
-                            setInventoryId("")
-                            setManualForm({ ...emptyManualForm, balance: o.challenge_plans ? String(o.challenge_plans.size) : "" })
-                            setDeliverFor(o)
-                          }}
-                        >
-                          <PackageCheck className="w-3.5 h-3.5 mr-1" /> Deliver
-                        </Button>
-                        <Button size="sm" variant="outline" onClick={() => { setActionError(null); setFailReason(""); setSelected(o) }}>
-                          Manage
-                        </Button>
-                        {o.userId && (
-                          <Button size="sm" variant="outline" onClick={() => handleImpersonate(o.userId!)} title="Login to user dashboard">
-                            <LogIn className="w-3.5 h-3.5" />
+                    </td>
+                    <td className="whitespace-nowrap text-xs text-muted-foreground">{shortDate(o.createdAt)}</td>
+                    <td>
+                      <div className="flex items-center justify-end gap-2">
+                        {deliver ? (
+                          <Button size="sm" className="h-8 gap-1.5 rounded-lg" onClick={() => openDeliver(o)}>
+                            <PackageCheck className="h-3.5 w-3.5" /> Deliver
+                          </Button>
+                        ) : (
+                          <Button size="sm" variant="outline" className="h-8 gap-1.5 rounded-lg border-border" onClick={() => setViewId(o.id)}>
+                            <Eye className="h-3.5 w-3.5" /> View
                           </Button>
                         )}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button size="icon" variant="ghost" className="h-8 w-8 rounded-lg" aria-label="More actions">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-52 rounded-xl">
+                            <DropdownMenuItem onClick={() => setViewId(o.id)}>
+                              <Eye className="mr-2 h-4 w-4" /> View details
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => openDeliver(o)} disabled={o.status === "pending_payment"}>
+                              <PackageCheck className="mr-2 h-4 w-4" /> {o.accounts.length ? "Deliver another account" : "Deliver account"}
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => void handlePass(o)} disabled={busy || o.status === "passed"}>
+                              <CheckCircle2 className="mr-2 h-4 w-4 text-emerald-600" /> Mark as passed
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => void handleFail(o)} disabled={busy || o.status === "failed"} className="text-destructive focus:text-destructive">
+                              <XCircle className="mr-2 h-4 w-4" /> Mark as failed
+                            </DropdownMenuItem>
+                            {o.userId && (
+                              <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => void handleImpersonate(o.userId!)}>
+                                  <LogIn className="mr-2 h-4 w-4" /> Log in as customer
+                                </DropdownMenuItem>
+                              </>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
-      </Card>
-
-      <Dialog open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Order {selected?.id.slice(0, 8)}</DialogTitle>
-          </DialogHeader>
-          {selected && (
-            <div className="space-y-5">
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <div className="text-muted-foreground text-xs">Customer</div>
-                  <div>{selected.users?.name} ({selected.users?.email})</div>
-                </div>
-                <div>
-                  <div className="text-muted-foreground text-xs">Plan</div>
-                  <div>{selected.challenge_plans?.name} — ${selected.challenge_plans?.size.toLocaleString()}</div>
-                </div>
-                <div>
-                  <div className="text-muted-foreground text-xs">Status</div>
-                  <Badge className={`${statusBadgeClass(selected.status)} capitalize`}>{selected.status.replace(/_/g, " ")}</Badge>
-                </div>
-                <div>
-                  <div className="text-muted-foreground text-xs">Amount</div>
-                  <div>${selected.amountPaid.toFixed(2)} via {selected.paymentMethod}</div>
-                </div>
-              </div>
-
-              {selected.accounts.length > 0 && (
-                <div>
-                  <div className="text-sm font-semibold mb-2">Delivered accounts</div>
-                  <div className="space-y-2">
-                    {selected.accounts.map((a) => (
-                      <div key={a.id} className="rounded-lg border border-border p-3 text-xs">
-                        <div className="flex justify-between">
-                          <span className="font-medium capitalize">{a.phase} · {a.status}</span>
-                          <span className="text-muted-foreground">{a.platform} — {a.login}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {actionError && <p className="text-sm text-destructive">{actionError}</p>}
-
-              <div className="flex flex-wrap gap-2">
-                <Button size="sm" disabled={busy || selected.status === "passed"} onClick={() => {
-                    if (!window.confirm("Mark this order as PASSED? The user will be notified and a certificate issued.")) return
-                    void runAction(() => adminPassOrder(selected.id), "Order marked as passed.")
-                  }}>
-                  Pass
-                </Button>
-                <div className="flex items-center gap-2">
-                  <Input placeholder="Fail reason" value={failReason} onChange={(e) => setFailReason(e.target.value)} className="h-8 w-40" />
-                  <Button size="sm" variant="destructive" disabled={busy || selected.status === "failed"} onClick={() => {
-                    if (!window.confirm("Mark this order as FAILED? The user will be notified.")) return
-                    void runAction(() => adminFailOrder(selected.id, failReason), "Order marked as failed.")
-                  }}>
-                    Fail
-                  </Button>
-                </div>
-                {selected.userId && (
-                  <Button size="sm" variant="outline" disabled={busy} onClick={() => handleImpersonate(selected.userId!)}>
-                    <LogIn className="w-3.5 h-3.5 mr-1" /> Login as user
-                  </Button>
-                )}
-              </div>
-
-            </div>
+                    </td>
+                  </tr>
+                )
+              })}
+            </DataTable>
           )}
-        </DialogContent>
-      </Dialog>
+        </Panel>
+      </div>
+
+      {/* Order details */}
       <Dialog open={!!viewId} onOpenChange={(open) => !open && setViewId(null)}>
-        <DialogContent className="sm:max-w-5xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl sm:max-w-5xl">
           <DialogHeader>
             <DialogTitle>Order details</DialogTitle>
           </DialogHeader>
@@ -328,113 +368,118 @@ export default function AdminOrdersPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Deliver account */}
       <Dialog open={!!deliverFor} onOpenChange={(open) => !open && setDeliverFor(null)}>
-        <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl sm:max-w-xl">
           <DialogHeader>
-            <DialogTitle>Deliver account — order {deliverFor?.id.slice(0, 8)}</DialogTitle>
+            <DialogTitle>Deliver trading account</DialogTitle>
+            <DialogDescription>Send login credentials to the customer for this order.</DialogDescription>
           </DialogHeader>
           {deliverFor && (
-            <div className="space-y-4">
-              <div className="text-sm text-muted-foreground">
-                {deliverFor.users?.name} ({deliverFor.users?.email}) · {deliverFor.challenge_plans?.name}{" "}
-                {deliverFor.challenge_plans ? `$${deliverFor.challenge_plans.size.toLocaleString()}` : ""}
-                {deliverFor.accounts.length > 0 && (
-                  <span className="block mt-1 text-amber-600">
-                    This order already has {deliverFor.accounts.length} delivered account{deliverFor.accounts.length === 1 ? "" : "s"}.
-                  </span>
-                )}
+            <div className="space-y-5">
+              <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-muted/50 p-3">
+                <Person name={deliverFor.users?.name} email={deliverFor.users?.email} />
+                <div className="shrink-0 text-right">
+                  <p className="text-sm font-semibold text-foreground">{deliverFor.challenge_plans?.name}</p>
+                  <p className="text-xs text-muted-foreground">{deliverFor.challenge_plans ? money(deliverFor.challenge_plans.size, 0) : ""}</p>
+                </div>
               </div>
-              {actionError && <p className="text-sm text-destructive">{actionError}</p>}
-              <div className="space-y-3">
-                <div className="text-sm font-semibold">Deliver from inventory</div>
-                <div className="flex flex-wrap items-end gap-2">
-                  <div className="space-y-1">
-                    <Label className="text-xs">Phase</Label>
-                    <select
-                      value={manualForm.phase}
-                      onChange={(e) => setManualForm((f) => ({ ...f, phase: e.target.value }))}
-                      className="h-8 rounded-md border border-input bg-transparent px-2 text-sm"
+
+              {deliverFor.accounts.length > 0 && (
+                <Notice tone="error">
+                  This order already has {deliverFor.accounts.length} delivered account{deliverFor.accounts.length === 1 ? "" : "s"}. Only continue if
+                  you’re sending the next phase.
+                </Notice>
+              )}
+
+              <Field label="Phase to deliver" htmlFor="phase">
+                <NativeSelect id="phase" value={manualForm.phase} onChange={setManual("phase")}>
+                  <option value="phase1">Phase 1</option>
+                  <option value="phase2">Phase 2</option>
+                  <option value="funded">Funded</option>
+                </NativeSelect>
+              </Field>
+
+              <FilterTabs<"inventory" | "manual">
+                value={deliverMode}
+                onChange={setDeliverMode}
+                options={[
+                  { value: "inventory", label: "From inventory", count: inventory.length },
+                  { value: "manual", label: "Enter manually" },
+                ]}
+              />
+
+              {deliverMode === "inventory" ? (
+                inventory.length === 0 ? (
+                  <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
+                    No available accounts in inventory. Add some under <span className="font-medium text-foreground">Container</span>, or enter
+                    credentials manually.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    <Field label="Available account" hint="Accounts matching the plan size are listed first." htmlFor="inv">
+                      <NativeSelect id="inv" value={inventoryId} onChange={setInventoryId}>
+                        <option value="">Choose an account…</option>
+                        {[...inventory]
+                          .sort((a, b) => Number(b.size === deliverFor.challenge_plans?.size) - Number(a.size === deliverFor.challenge_plans?.size))
+                          .map((i) => (
+                            <option key={i.id} value={i.id}>
+                              {i.platform.toUpperCase()} · {i.login} · {money(i.size, 0)}
+                              {i.size === deliverFor.challenge_plans?.size ? "  ✓ matches plan" : ""}
+                            </option>
+                          ))}
+                      </NativeSelect>
+                    </Field>
+                    <Button
+                      className="h-10 w-full rounded-xl"
+                      disabled={busy || !inventoryId}
+                      onClick={() => void runAction(() => adminCompleteFromInventory(deliverFor.id, inventoryId, manualForm.phase), "Account delivered from inventory.")}
                     >
-                      <option value="phase1">Phase 1</option>
-                      <option value="phase2">Phase 2</option>
-                      <option value="funded">Funded</option>
-                    </select>
+                      <PackageCheck className="h-4 w-4" /> {busy ? "Delivering…" : "Deliver selected account"}
+                    </Button>
                   </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs">Available account</Label>
-                    <select
-                      value={inventoryId}
-                      onChange={(e) => setInventoryId(e.target.value)}
-                      className="h-8 rounded-md border border-input bg-transparent px-2 text-sm min-w-[220px]"
-                    >
-                      <option value="">Select…</option>
-                      {[...inventory]
-                        .sort((a, b) => Number(b.size === deliverFor.challenge_plans?.size) - Number(a.size === deliverFor.challenge_plans?.size))
-                        .map((i) => (
-                          <option key={i.id} value={i.id}>
-                            {i.size === deliverFor.challenge_plans?.size ? "(matches plan) " : ""}
-                            {i.platform} — {i.login} (${i.size.toLocaleString()})
-                          </option>
-                        ))}
-                    </select>
+                )
+              ) : (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <Field label="Platform" htmlFor="m-platform">
+                      <NativeSelect id="m-platform" value={manualForm.platform} onChange={setManual("platform")}>
+                        <option value="mt5">MT5</option>
+                        <option value="mt4">MT4</option>
+                      </NativeSelect>
+                    </Field>
+                    <Field label="Server" htmlFor="m-server">
+                      <Input id="m-server" className={inputClass} value={manualForm.server} onChange={(e) => setManual("server")(e.target.value)} />
+                    </Field>
+                    <Field label="Login" htmlFor="m-login">
+                      <Input id="m-login" className={inputClass} value={manualForm.login} onChange={(e) => setManual("login")(e.target.value)} />
+                    </Field>
+                    <Field label="Password" htmlFor="m-pass">
+                      <Input id="m-pass" className={inputClass} value={manualForm.passwordMaster} onChange={(e) => setManual("passwordMaster")(e.target.value)} />
+                    </Field>
+                    <Field label="Profit target (%)" htmlFor="m-target">
+                      <Input id="m-target" type="number" className={inputClass} value={manualForm.profitTarget} onChange={(e) => setManual("profitTarget")(e.target.value)} />
+                    </Field>
+                    <Field label="Starting balance ($)" htmlFor="m-balance">
+                      <Input id="m-balance" type="number" className={inputClass} value={manualForm.balance} onChange={(e) => setManual("balance")(e.target.value)} />
+                    </Field>
+                    <Field label="Graph link" hint="Optional — used for live statistics." className="sm:col-span-2" htmlFor="m-graph">
+                      <Input id="m-graph" className={inputClass} value={manualForm.graphLink} onChange={(e) => setManual("graphLink")(e.target.value)} />
+                    </Field>
                   </div>
-                  {inventory.length === 0 && <p className="w-full text-xs text-muted-foreground">No available inventory accounts — enter credentials manually below.</p>}
-                  <Button
-                    size="sm"
-                    disabled={busy || !inventoryId}
-                    onClick={() => void runAction(() => adminCompleteFromInventory(deliverFor.id, inventoryId, manualForm.phase), "Account delivered from inventory.")}
-                  >
-                    Deliver
+                  <Button className="h-10 w-full rounded-xl" disabled={busy} onClick={submitManual}>
+                    <PackageCheck className="h-4 w-4" /> {busy ? "Delivering…" : "Deliver account"}
                   </Button>
                 </div>
+              )}
 
-                <div className="text-sm font-semibold pt-2">Or enter credentials manually</div>
-                <div className="grid grid-cols-2 gap-2">
-                  <Input placeholder="Platform (mt4/mt5)" value={manualForm.platform} onChange={(e) => setManualForm((f) => ({ ...f, platform: e.target.value }))} className="h-8" />
-                  <Input placeholder="Server" value={manualForm.server} onChange={(e) => setManualForm((f) => ({ ...f, server: e.target.value }))} className="h-8" />
-                  <Input placeholder="Login" value={manualForm.login} onChange={(e) => setManualForm((f) => ({ ...f, login: e.target.value }))} className="h-8" />
-                  <Input placeholder="Password" value={manualForm.passwordMaster} onChange={(e) => setManualForm((f) => ({ ...f, passwordMaster: e.target.value }))} className="h-8" />
-                  <Input placeholder="Profit target %" value={manualForm.profitTarget} onChange={(e) => setManualForm((f) => ({ ...f, profitTarget: e.target.value }))} className="h-8" />
-                  <Input placeholder="Balance" value={manualForm.balance} onChange={(e) => setManualForm((f) => ({ ...f, balance: e.target.value }))} className="h-8" />
-                  <Input placeholder="Graph link (optional)" value={manualForm.graphLink} onChange={(e) => setManualForm((f) => ({ ...f, graphLink: e.target.value }))} className="h-8 col-span-2" />
-                </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={busy}
-                  onClick={() => {
-                    const missing = [
-                      !manualForm.platform.trim() && "platform",
-                      !manualForm.server.trim() && "server",
-                      !manualForm.login.trim() && "login",
-                      !manualForm.passwordMaster.trim() && "password",
-                    ].filter(Boolean)
-                    if (missing.length) {
-                      setActionError(`Please fill in: ${missing.join(", ")}.`)
-                      return
-                    }
-                    void runAction(() =>
-                      adminCompleteManual(deliverFor.id, {
-                        phase: manualForm.phase,
-                        platform: manualForm.platform,
-                        login: manualForm.login,
-                        passwordMaster: manualForm.passwordMaster,
-                        server: manualForm.server,
-                        profitTarget: Number(manualForm.profitTarget) || 0,
-                        balance: Number(manualForm.balance) || 0,
-                        graphLink: manualForm.graphLink.trim() || undefined,
-                      }),
-                      "Account delivered."
-                    )
-                  }}
-                >
-                  Deliver manually
-                </Button>
-              </div>
+              {actionError && <Notice tone="error">{actionError}</Notice>}
             </div>
           )}
         </DialogContent>
       </Dialog>
+
+      {dialog}
     </AdminShell>
   )
 }

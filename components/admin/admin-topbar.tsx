@@ -1,11 +1,11 @@
 "use client"
 
-import type { ReactNode } from "react"
-import Link from "next/link"
-import { Shield, Bell, Search } from "lucide-react"
+import { useEffect, useState, type ReactNode } from "react"
+import { Bell, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { MobileNav } from "@/components/dashboard/mobile-nav"
+import { AdminSidebar } from "./admin-sidebar"
 
 export function AdminTopbar({
   title,
@@ -16,62 +16,44 @@ export function AdminTopbar({
   description?: string
   actions?: ReactNode
 }) {
+  // Rendered after mount so server and client timezones can’t cause a hydration mismatch
+  const [today, setToday] = useState("")
+  useEffect(() => {
+    setToday(new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" }))
+  }, [])
+
   return (
-    <header className="space-y-3 md:space-y-4 animate-slide-in-up w-full min-w-0">
-      <div className="relative -mx-3 -mt-3 overflow-hidden border-b border-border bg-muted/50 py-2.5 md:-mx-4 md:-mt-4 lg:-mx-5 lg:-mt-5">
-        <div className="flex w-max animate-ticker whitespace-nowrap text-xs sm:text-sm font-semibold text-muted-foreground">
-          <span>{"Admin console • Monitor orders • Review compliance • Ship faster • ".repeat(6)}</span>
-          <span aria-hidden="true">{"Admin console • Monitor orders • Review compliance • Ship faster • ".repeat(6)}</span>
+    <header className="w-full min-w-0 space-y-5">
+      {/* Utility bar */}
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2">
+          <MobileNav sidebar={<AdminSidebar />} />
+          <div className="relative hidden md:block">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input placeholder="Search users, orders…" className="h-10 w-72 rounded-xl border-border bg-card pl-9 text-sm shadow-none" />
+          </div>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <span className="hidden items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-xs font-medium text-muted-foreground sm:inline-flex">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">AD</span>
+            Administrator
+          </span>
+          <Button variant="outline" size="icon" className="relative h-10 w-10 rounded-xl border-border bg-card text-muted-foreground hover:text-foreground" aria-label="Notifications">
+            <Bell className="h-4 w-4" />
+            <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-primary ring-2 ring-card" />
+          </Button>
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 min-w-0">
-        <div className="min-w-0 space-y-1">
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-border/70 bg-muted/40">
-              <Shield className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground tracking-tight truncate">
-                {title}
-              </h1>
-              {description ? (
-                <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">{description}</p>
-              ) : null}
-            </div>
-          </div>
+      {/* Page title */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div className="min-w-0">
+          <p className="mb-1.5 h-4 text-xs font-semibold uppercase tracking-[0.16em] text-primary">{today}</p>
+          <h1 className="truncate text-2xl font-semibold tracking-tight text-foreground md:text-[28px]">{title}</h1>
+          {description ? <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{description}</p> : null}
         </div>
-
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2.5">
-          {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
-
-          <div className="flex items-center gap-2">
-            <div className="relative hidden md:block">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search…"
-                className="h-9 w-56 rounded-2xl bg-card border-border/70 pl-9"
-              />
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-all duration-300 h-11 w-11 sm:h-9 sm:w-9 rounded-xl"
-              aria-label="Notifications"
-            >
-              <Bell className="h-4 w-4" />
-              <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-destructive rounded-full animate-pulse" />
-            </Button>
-            <Link href="/dashboard/profile" className="flex items-center gap-2 rounded-2xl border border-border/70 bg-card/70 px-2.5 py-2 hover:bg-card transition-colors">
-              <Avatar className="h-7 w-7">
-                <AvatarFallback className="text-[10px] font-bold">AD</AvatarFallback>
-              </Avatar>
-              <span className="hidden sm:inline text-xs font-semibold text-foreground">Admin</span>
-            </Link>
-          </div>
-        </div>
+        {actions ? <div className="flex flex-wrap items-center gap-2 md:justify-end">{actions}</div> : null}
       </div>
     </header>
   )
 }
-

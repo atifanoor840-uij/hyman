@@ -2,14 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { AdminShell } from "@/components/admin/admin-shell"
-import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import {
   Select,
@@ -22,7 +19,8 @@ import { useToast } from "@/components/ui/use-toast"
 import { adminListUsers, type AdminUserRow } from "@/lib/api/app-client"
 import { ApiClientError } from "@/lib/api/client"
 import { isValidEmail } from "@/lib/auth-utils"
-import { Loader2, Mail, RefreshCcw, Send, X } from "lucide-react"
+import { Loader2, RefreshCcw, Send, X } from "lucide-react"
+import { Field, LoadingBlock, Notice, Panel, SearchBox, StatRow, StatusPill, inputClass, useConfirm } from "@/components/admin/admin-ui"
 
 type SendResult = {
   ok: boolean
@@ -65,6 +63,7 @@ const FROM_ACCOUNTS = [
 
 export default function AdminEmailSenderPage() {
   const { toast } = useToast()
+  const { confirm, dialog } = useConfirm()
 
   const [users, setUsers] = useState<AdminUserRow[]>([])
   const [usersLoading, setUsersLoading] = useState(true)
@@ -228,340 +227,251 @@ export default function AdminEmailSenderPage() {
     }
   }
 
+  const confirmAndSend = async () => {
+    if (sending) return
+    const count = selectedEmails.length
+    if (count > 0 && subject.trim() && html.trim() && invalidSelected.length === 0) {
+      const { ok } = await confirm({
+        title: `Send this email to ${count} ${count === 1 ? "person" : "people"}?`,
+        description: `From ${FROM_ACCOUNTS.find((a) => a.id === fromAccount)?.label}, subject “${subject.trim()}”. Emails can’t be recalled once sent.`,
+        confirmLabel: `Send to ${count}`,
+      })
+      if (!ok) return
+    }
+    await send()
+  }
+
+  const allVisibleSelected = userRows.length > 0 && userRows.every((u) => selected[u.email])
+
   return (
     <AdminShell
-      title="Email Sender"
-      description="Send HTML emails to selected users (one-by-one)."
-      actions={
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            className="h-9 rounded-full border border-purple-400/30 bg-gradient-to-r from-purple-800 via-purple-950 to-purple-800 px-4 text-xs font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:from-purple-700 hover:via-purple-900 hover:to-purple-700"
-            onClick={() => void loadUsers()}
-            disabled={usersLoading}
-          >
-            {usersLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCcw className="h-4 w-4 mr-2" />}
-            Refresh users
-          </Button>
-          <Button
-            className="h-9 rounded-full border border-emerald-400/30 bg-gradient-to-r from-emerald-700 via-emerald-950 to-emerald-700 px-4 text-xs font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:from-emerald-600 hover:via-emerald-900 hover:to-emerald-600"
-            onClick={() => void send()}
-            disabled={sending}
-          >
-            {sending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
-            Send
-          </Button>
-        </div>
-      }
+      title="Email sender"
+      description="Write an HTML email, pick recipients, and send it one-by-one."
     >
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4">
-        <Card className="lg:col-span-2 overflow-hidden rounded-3xl border border-border/80 bg-card shadow-sm">
-          <div className="border-b border-border/80 bg-muted/20 px-5 sm:px-6 py-4 flex items-center justify-between gap-3">
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <div className="flex h-9 w-9 items-center justify-center rounded-2xl border border-border/70 bg-background/50">
-                  <Mail className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <div className="min-w-0">
-                  <h2 className="text-sm font-semibold tracking-tight text-foreground">Composer</h2>
-                  <p className="text-xs text-muted-foreground">Paste HTML and preview before sending.</p>
-                </div>
-              </div>
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-5">
+        {/* Step 1 + 2: message */}
+        <div className="space-y-4 xl:col-span-3">
+          <Panel title={<StepTitle n={1} title="Sender & subject" />}>
+            <div className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2">
+              <Field label="From" hint="Credentials come from server settings." htmlFor="from">
+                <Select
+                  value={fromAccount}
+                  onValueChange={(v) => {
+                    const next = FROM_ACCOUNTS.find((a) => a.id === v)?.id
+                    if (next) setFromAccount(next)
+                  }}
+                >
+                  <SelectTrigger id="from" className="h-10 rounded-xl border-input bg-card shadow-none">
+                    <SelectValue placeholder="Select sender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {FROM_ACCOUNTS.map((a) => (
+                      <SelectItem key={a.id} value={a.id}>
+                        {a.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field label="Subject" htmlFor="subject">
+                <Input id="subject" value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="e.g. Your payout is on its way" className={inputClass} />
+              </Field>
             </div>
-            <Badge variant="outline" className="rounded-full border-border/70 bg-background/40 px-3 py-1 text-xs">
-              {selectedEmails.length} recipients
-            </Badge>
-          </div>
+          </Panel>
 
-          <div className="p-5 sm:p-6 space-y-5">
-            <div className="space-y-2">
-              <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                From email
-              </Label>
-              <Select
-                value={fromAccount}
-                onValueChange={(v) => {
-                  const next = FROM_ACCOUNTS.find((a) => a.id === v)?.id
-                  if (next) setFromAccount(next)
-                }}
-              >
-                <SelectTrigger className="h-11 rounded-2xl border-border/70 bg-background/40">
-                  <SelectValue placeholder="Select sender" />
-                </SelectTrigger>
-                <SelectContent>
-                  {FROM_ACCOUNTS.map((a) => (
-                    <SelectItem key={a.id} value={a.id}>
-                      {a.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground">
-                Sender credentials are read from server environment variables (not stored in the browser).
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="subject" className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                Subject
-              </Label>
-              <Input
-                id="subject"
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-                placeholder="Email subject"
-                className="h-11 rounded-2xl border-border/70 bg-background/40"
-              />
-            </div>
-
-            <Tabs defaultValue="editor">
-              <TabsList className="rounded-2xl">
-                <TabsTrigger value="editor" className="rounded-xl">Editor</TabsTrigger>
-                <TabsTrigger value="preview" className="rounded-xl">Preview</TabsTrigger>
+          <Panel title={<StepTitle n={2} title="Email content" />} description="Paste HTML, then check the preview.">
+            <Tabs defaultValue="editor" className="p-5">
+              <TabsList className="rounded-xl">
+                <TabsTrigger value="editor" className="rounded-lg">
+                  HTML
+                </TabsTrigger>
+                <TabsTrigger value="preview" className="rounded-lg">
+                  Preview
+                </TabsTrigger>
               </TabsList>
               <TabsContent value="editor" className="mt-3">
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                    HTML
-                  </Label>
-                  <Textarea
-                    value={html}
-                    onChange={(e) => setHtml(e.target.value)}
-                    className="min-h-[360px] rounded-2xl border-border/70 bg-background/40 font-mono text-xs"
-                    placeholder="<h1>...</h1>"
-                  />
-                </div>
+                <Textarea
+                  value={html}
+                  onChange={(e) => setHtml(e.target.value)}
+                  className="min-h-[380px] rounded-xl border-input bg-card font-mono text-xs shadow-none"
+                  placeholder="<h1>...</h1>"
+                  aria-label="Email HTML"
+                />
               </TabsContent>
               <TabsContent value="preview" className="mt-3">
-                <div className="rounded-2xl border border-border/70 bg-background/40 overflow-hidden">
-                  <div className="border-b border-border/70 bg-muted/20 px-4 py-3 text-xs text-muted-foreground font-semibold uppercase tracking-widest">
-                    Preview (sanity-check layout)
-                  </div>
-                  <div className="p-4">
-                    <iframe
-                      title="Email preview"
-                      className="w-full min-h-[380px] rounded-xl border border-border/60 bg-background"
-                      sandbox=""
-                      srcDoc={html}
-                    />
-                  </div>
-                </div>
+                <iframe title="Email preview" className="min-h-[380px] w-full rounded-xl border border-border bg-white" sandbox="" srcDoc={html} />
               </TabsContent>
             </Tabs>
-          </div>
-        </Card>
+          </Panel>
+        </div>
 
-        <Card className="overflow-hidden rounded-3xl border border-border/80 bg-card shadow-sm">
-          <div className="border-b border-border/80 bg-muted/20 px-5 py-4 flex items-center justify-between gap-2">
-            <div className="min-w-0">
-              <h2 className="text-sm font-semibold tracking-tight text-foreground">Recipients</h2>
-              <p className="text-xs text-muted-foreground mt-0.5">Manual emails + pick users.</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                className="h-9 rounded-2xl border-border/70"
-                onClick={clearRecipients}
-                disabled={selectedEmails.length === 0}
-              >
-                Clear
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="h-9 rounded-2xl border-border/70"
-                onClick={selectAllVisible}
-                disabled={userRows.length === 0}
-              >
-                Select visible
-              </Button>
-            </div>
-          </div>
-
-          <div className="p-5 space-y-4">
-            <div className="space-y-2">
-              <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                Add emails (comma / space / newline)
-              </Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  value={manualInput}
-                  onChange={(e) => setManualInput(e.target.value)}
-                  placeholder="user1@email.com, user2@email.com"
-                  className="h-11 rounded-2xl border-border/70 bg-background/40"
-                />
-                <Button
-                  type="button"
-                  className="h-11 rounded-2xl"
-                  onClick={addManualEmails}
-                  disabled={!manualInput.trim()}
-                >
-                  Add
+        {/* Step 3: recipients */}
+        <div className="xl:col-span-2">
+          <Panel
+            title={<StepTitle n={3} title="Recipients" />}
+            description={`${selectedEmails.length} selected`}
+            actions={
+              selectedEmails.length > 0 && (
+                <Button type="button" variant="ghost" size="sm" className="h-8 rounded-lg text-muted-foreground" onClick={clearRecipients}>
+                  Clear all
                 </Button>
-              </div>
-            </div>
-
-            {selectedEmails.length ? (
-              <div className="rounded-2xl border border-border/70 bg-muted/20 p-3">
-                <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/80">
-                  Selected ({selectedEmails.length})
+              )
+            }
+            className="xl:sticky xl:top-6"
+          >
+            <div className="space-y-4 p-5">
+              <Field label="Add email addresses" hint="Separate with commas, spaces or new lines." htmlFor="manual">
+                <div className="flex gap-2">
+                  <Input
+                    id="manual"
+                    value={manualInput}
+                    onChange={(e) => setManualInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault()
+                        addManualEmails()
+                      }
+                    }}
+                    placeholder="name@email.com"
+                    className={inputClass}
+                  />
+                  <Button type="button" variant="outline" className="h-10 rounded-xl border-border" onClick={addManualEmails} disabled={!manualInput.trim()}>
+                    Add
+                  </Button>
                 </div>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {selectedEmails.slice(0, 18).map((e) => (
-                    <span
-                      key={e}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background/60 px-2.5 py-1 text-xs font-semibold text-foreground"
-                    >
+              </Field>
+
+              {selectedEmails.length > 0 && (
+                <div className="flex max-h-32 flex-wrap gap-1.5 overflow-y-auto rounded-xl border border-border bg-muted/40 p-2.5">
+                  {selectedEmails.map((e) => (
+                    <span key={e} className="inline-flex items-center gap-1 rounded-full bg-card py-0.5 pl-2.5 pr-1 text-xs font-medium text-foreground ring-1 ring-border">
                       {e}
                       <button
                         type="button"
-                        className="inline-flex h-5 w-5 items-center justify-center rounded-full hover:bg-muted/70"
+                        className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-muted"
                         onClick={() => setSelected((p) => ({ ...p, [e]: false }))}
                         aria-label={`Remove ${e}`}
                       >
-                        <X className="h-3.5 w-3.5 text-muted-foreground" />
+                        <X className="h-3 w-3 text-muted-foreground" />
                       </button>
                     </span>
                   ))}
-                  {selectedEmails.length > 18 ? (
-                    <span className="text-xs text-muted-foreground font-semibold px-1.5 py-1">
-                      +{selectedEmails.length - 18} more
-                    </span>
-                  ) : null}
                 </div>
+              )}
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm font-medium text-foreground">Pick from users</p>
+                  <button
+                    type="button"
+                    onClick={() => void loadUsers()}
+                    disabled={usersLoading}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+                  >
+                    <RefreshCcw className={`h-3 w-3 ${usersLoading ? "animate-spin" : ""}`} /> Reload
+                  </button>
+                </div>
+                <SearchBox value={search} onChange={setSearch} placeholder="Search name or email" className="sm:w-full" />
               </div>
-            ) : null}
 
-            <div className="space-y-2">
-              <Label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                Users
-              </Label>
-              <Input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by name or email"
-                className="h-11 rounded-2xl border-border/70 bg-background/40"
-              />
-            </div>
+              {usersError && <Notice tone="error">{usersError}</Notice>}
 
-            {usersError ? (
-              <div className="rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-foreground">
-                {usersError}
-              </div>
-            ) : null}
-
-            <div className="rounded-2xl border border-border/70 overflow-hidden">
-              <div className="max-h-[420px] overflow-y-auto">
-                {usersLoading ? (
-                  <div className="p-6 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Loading users…
-                  </div>
-                ) : userRows.length === 0 ? (
-                  <div className="p-6 text-sm text-muted-foreground">No users.</div>
-                ) : (
-                  <div className="divide-y divide-border/70">
-                    {userRows.map((u) => {
-                      const checked = Boolean(selected[u.email])
-                      return (
-                        <label
-                          key={u.email}
-                          className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 transition-colors cursor-pointer"
-                        >
+              <div className="overflow-hidden rounded-xl border border-border">
+                <label className="flex cursor-pointer items-center gap-3 border-b border-border bg-muted/50 px-4 py-2.5 text-xs font-medium text-muted-foreground">
+                  <Checkbox
+                    checked={allVisibleSelected}
+                    disabled={userRows.length === 0}
+                    onCheckedChange={(v) => {
+                      if (v === true) selectAllVisible()
+                      else setSelected((p) => {
+                        const next = { ...p }
+                        for (const u of userRows) next[u.email] = false
+                        return next
+                      })
+                    }}
+                  />
+                  Select all {search ? "matching" : ""} ({userRows.length})
+                </label>
+                <div className="max-h-[360px] overflow-y-auto">
+                  {usersLoading ? (
+                    <LoadingBlock label="Loading users…" />
+                  ) : userRows.length === 0 ? (
+                    <p className="p-6 text-center text-sm text-muted-foreground">No users found.</p>
+                  ) : (
+                    <div className="divide-y divide-border">
+                      {userRows.map((u) => (
+                        <label key={u.email} className="flex cursor-pointer items-center gap-3 px-4 py-2.5 transition-colors hover:bg-muted/40">
                           <Checkbox
-                            checked={checked}
-                            onCheckedChange={(v) => {
-                              const isChecked = v === true
-                              setSelected((p) => ({ ...p, [u.email]: isChecked }))
-                            }}
+                            checked={Boolean(selected[u.email])}
+                            onCheckedChange={(v) => setSelected((p) => ({ ...p, [u.email]: v === true }))}
                           />
                           <div className="min-w-0 flex-1">
-                            <div className="flex items-center justify-between gap-2">
-                              <div className="truncate text-sm font-semibold text-foreground">{u.name}</div>
-                              {u.verified ? (
-                                <Badge variant="outline" className="rounded-full text-[10px] px-2 py-0.5 border-emerald-500/30 bg-emerald-500/10 text-emerald-600">
-                                  Verified
-                                </Badge>
-                              ) : (
-                                <Badge variant="outline" className="rounded-full text-[10px] px-2 py-0.5 border-border/70 bg-background/40 text-muted-foreground">
-                                  Unverified
-                                </Badge>
-                              )}
-                            </div>
-                            <div className="truncate text-xs text-muted-foreground mt-0.5">{u.email}</div>
+                            <p className="truncate text-sm font-medium text-foreground">{u.name}</p>
+                            <p className="truncate text-xs text-muted-foreground">{u.email}</p>
                           </div>
+                          {!u.verified && <span className="shrink-0 text-[11px] text-muted-foreground">Unverified</span>}
                         </label>
-                      )
-                    })}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
-            <div className="text-xs text-muted-foreground">
-              Tip: add manual emails above, or tick users here—then hit <span className="font-semibold text-foreground">Send</span>.
+            <div className="border-t border-border bg-muted/40 p-4">
+              <Button className="h-11 w-full gap-2 rounded-xl" onClick={() => void confirmAndSend()} disabled={sending}>
+                {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                {sending ? "Sending…" : selectedEmails.length ? `Send to ${selectedEmails.length} ${selectedEmails.length === 1 ? "person" : "people"}` : "Send email"}
+              </Button>
             </div>
-          </div>
-        </Card>
+          </Panel>
+        </div>
       </div>
 
       <Dialog open={resultOpen} onOpenChange={setResultOpen}>
-        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>Send report</DialogTitle>
           </DialogHeader>
           {!sendResult ? (
-            <div className="text-sm text-muted-foreground">No result.</div>
+            <p className="text-sm text-muted-foreground">No result.</p>
           ) : !sendResult.ok ? (
-            <div className="rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-foreground">
-              {sendResult.error || "Send failed."}
-            </div>
+            <Notice tone="error">{sendResult.error || "Send failed."}</Notice>
           ) : (
-            <div className="space-y-3">
-              <div className="flex flex-wrap items-center gap-2">
-                {sendResult.account ? (
-                  <Badge variant="outline" className="rounded-full">
-                    From: {sendResult.account}
-                  </Badge>
-                ) : null}
-                <Badge variant="outline" className="rounded-full">{sendResult.summary?.total ?? 0} total</Badge>
-                <Badge variant="outline" className="rounded-full border-emerald-500/30 bg-emerald-500/10 text-emerald-700">
-                  {sendResult.summary?.sent ?? 0} sent
-                </Badge>
-                <Badge variant="outline" className="rounded-full border-destructive/30 bg-destructive/10 text-destructive">
-                  {sendResult.summary?.failed ?? 0} failed
-                </Badge>
-              </div>
-
-              <div className="rounded-2xl border border-border/70 overflow-hidden">
-                <div className="divide-y divide-border/70">
-                  {(sendResult.results || []).map((r) => (
-                    <div key={r.to} className="px-4 py-3 flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="text-sm font-semibold text-foreground break-all">{r.to}</div>
-                        {r.ok ? null : (
-                          <div className="text-xs text-muted-foreground mt-1 break-all">{r.error || "Failed"}</div>
-                        )}
-                      </div>
-                      {r.ok ? (
-                        <Badge variant="outline" className="rounded-full border-emerald-500/30 bg-emerald-500/10 text-emerald-700">
-                          Sent
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline" className="rounded-full border-destructive/30 bg-destructive/10 text-destructive">
-                          Failed
-                        </Badge>
-                      )}
+            <div className="space-y-4">
+              <StatRow
+                items={[
+                  { label: "Total", value: sendResult.summary?.total ?? 0 },
+                  { label: "Sent", value: sendResult.summary?.sent ?? 0, tone: "success" },
+                  { label: "Failed", value: sendResult.summary?.failed ?? 0, tone: "danger" },
+                ]}
+              />
+              <div className="divide-y divide-border overflow-hidden rounded-xl border border-border">
+                {(sendResult.results || []).map((r) => (
+                  <div key={r.to} className="flex items-start justify-between gap-3 px-4 py-3">
+                    <div className="min-w-0">
+                      <p className="break-all text-sm font-medium text-foreground">{r.to}</p>
+                      {!r.ok && <p className="mt-0.5 break-all text-xs text-muted-foreground">{r.error || "Failed"}</p>}
                     </div>
-                  ))}
-                </div>
+                    <StatusPill label={r.ok ? "Sent" : "Failed"} tone={r.ok ? "success" : "danger"} />
+                  </div>
+                ))}
               </div>
             </div>
           )}
         </DialogContent>
       </Dialog>
+
+      {dialog}
     </AdminShell>
   )
 }
 
+function StepTitle({ n, title }: { n: number; title: string }) {
+  return (
+    <span className="flex items-center gap-2.5">
+      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">{n}</span>
+      {title}
+    </span>
+  )
+}

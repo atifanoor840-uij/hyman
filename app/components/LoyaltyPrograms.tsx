@@ -1,62 +1,49 @@
 "use client";
 
-import {
-	RotateCcw,
-	Zap,
-	MessageCircle,
-	DollarSign,
-	FileCheck,
-	ShieldCheck,
-} from "lucide-react";
+import { RotateCcw, Zap, ShieldCheck, Lock, BadgeCheck, KeyRound } from "lucide-react";
 
 const loyaltyCards = [
 	{
 		title: "Free Retry",
 		desc: "One free retry per evaluation phase. If you hit a rule, use your retry and continue — no extra fee.",
-		icon: <RotateCcw className="h-6 w-6" />,
+		visual: <RetryVisual />,
 		bullets: ["One retry per phase", "No additional cost", "Continue where you left off"],
 	},
 	{
 		title: "Account in 2 Seconds",
 		desc: "Get your funded account credentials instantly. No waiting — start trading within seconds of passing.",
-		icon: <Zap className="h-6 w-6" />,
+		visual: <AccountVisual />,
 		bullets: ["Instant credentials", "Same-day access", "No approval delays"],
 	},
 	{
 		title: "24/7 Live Chat Support",
 		desc: "Real humans, real-time. Get help anytime — our support team is available around the clock.",
-		icon: <MessageCircle className="h-6 w-6" />,
+		visual: <ChatVisual />,
 		bullets: ["Live chat 24/7", "Fast response times", "Dedicated support team"],
 	},
 	{
 		title: "Fast Payouts",
 		desc: "Request your profits and get paid quickly. Most payouts processed within 24–48 hours.",
-		icon: <DollarSign className="h-6 w-6" />,
+		visual: <PayoutVisual />,
 		bullets: ["24–48 hour processing", "Multiple payout methods", "No hidden fees"],
 	},
 	{
 		title: "Transparent Rules",
 		desc: "Clear trading rules, no surprises. Know exactly what you can and can't do before you trade.",
-		icon: <FileCheck className="h-6 w-6" />,
+		visual: <RulesVisual />,
 		bullets: ["Clear limits", "Fair conditions", "No grey areas"],
 	},
 	{
 		title: "Secure & Verified",
 		desc: "Your account and data are protected. We use industry-standard security for all traders.",
-		icon: <ShieldCheck className="h-6 w-6" />,
+		visual: <SecurityVisual />,
 		bullets: ["Secure platform", "Verified payouts", "Trusted by traders"],
 	},
 ];
 
 export default function LoyaltyPrograms() {
 	return (
-		<section id="loyalty" className="relative overflow-hidden bg-white py-20 md:py-28">
-			{/* Aura background */}
-			<div className="pointer-events-none absolute inset-0">
-				<div className="absolute -top-24 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_center,rgba(168,85,247,0.20),transparent_60%)] blur-2xl" />
-				<div className="absolute -bottom-28 -left-24 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.14),transparent_60%)] blur-2xl" />
-				<div className="absolute -bottom-24 -right-24 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle_at_center,rgba(147,51,234,0.14),transparent_60%)] blur-2xl" />
-			</div>
+		<section id="loyalty" className="relative overflow-hidden bg-slate-50/80 py-20 md:py-28">
 			<div className="mx-auto max-w-7xl px-6 md:px-10">
 				{/* Header row */}
 				<div className="mb-10 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
@@ -82,27 +69,10 @@ export default function LoyaltyPrograms() {
 				</div>
 
 				{/* Infinite Scrolling Carousel */}
-				<div className="relative overflow-hidden">
-					<div className="flex animate-scroll gap-6 py-1">
-						{/* First set of cards */}
-						{loyaltyCards.map((card, index) => (
-							<LoyaltyCard
-								key={`first-${index}`}
-								title={card.title}
-								desc={card.desc}
-								icon={card.icon}
-								bullets={card.bullets}
-							/>
-						))}
-						{/* Duplicate set for seamless loop */}
-						{loyaltyCards.map((card, index) => (
-							<LoyaltyCard
-								key={`second-${index}`}
-								title={card.title}
-								desc={card.desc}
-								icon={card.icon}
-								bullets={card.bullets}
-							/>
+				<div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_4%,black_96%,transparent)]">
+					<div className="flex animate-scroll gap-6 py-3">
+						{[...loyaltyCards, ...loyaltyCards].map((card, index) => (
+							<LoyaltyCard key={index} {...card} hidden={index >= loyaltyCards.length} />
 						))}
 					</div>
 				</div>
@@ -111,52 +81,165 @@ export default function LoyaltyPrograms() {
 	);
 }
 
-function CheckIcon() {
-	return (
-		<svg className="h-4 w-4 shrink-0 text-[#22c55e]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-			<path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-		</svg>
-	);
-}
-
 function LoyaltyCard({
 	title,
 	desc,
-	icon,
+	visual,
 	bullets,
+	hidden,
 }: {
 	title: string;
 	desc: string;
-	icon: React.ReactNode;
-	bullets?: string[];
+	visual: React.ReactNode;
+	bullets: string[];
+	hidden?: boolean;
 }) {
 	return (
-		<article className="group relative flex-shrink-0 w-[320px] overflow-hidden rounded-2xl border border-slate-200/70 bg-white/70 p-6 shadow-[0_10px_40px_rgba(15,23,42,0.08)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-slate-300/80 hover:shadow-[0_18px_60px_rgba(15,23,42,0.12)]">
-			{/* Aura */}
-			<div className="pointer-events-none absolute -inset-1 opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100">
-				<div className="absolute inset-0 rounded-[18px] bg-[conic-gradient(from_180deg_at_50%_50%,rgba(168,85,247,0.18)_0deg,rgba(147,51,234,0.14)_120deg,rgba(16,185,129,0.16)_240deg,rgba(168,85,247,0.18)_360deg)]" />
-			</div>
-			<div className="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(80%_60%_at_30%_0%,rgba(168,85,247,0.10),transparent_60%)]" />
-			<div className="relative">
-				<div className="mb-4 flex items-center gap-3">
-					<div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200/70 bg-white/60 text-slate-900 shadow-sm">
-						<span className="text-purple-600">{icon}</span>
-					</div>
-					<h3 className="font-sans text-base font-semibold tracking-tight text-slate-900">{title}</h3>
-				</div>
-				<p className="mb-4 text-[13px] leading-relaxed text-slate-600">{desc}</p>
-			{bullets && (
-				<ul className="space-y-2.5">
-					{bullets.map((b) => (
-						<li key={b} className="flex items-center gap-2.5 text-[13px] text-slate-700">
-							<CheckIcon />
-							<span>{b}</span>
-						</li>
-					))}
-				</ul>
-			)}
-				<div className="mt-5 h-px w-full bg-gradient-to-r from-slate-200/0 via-slate-200/80 to-slate-200/0" />
-			</div>
+		<article
+			aria-hidden={hidden}
+			className="group relative w-[340px] flex-shrink-0 overflow-hidden rounded-2xl border border-[#e6e9ef] bg-white p-6 shadow-[0_10px_30px_rgba(0,0,0,0.05)] transition hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.08)]"
+		>
+			{visual}
+			<h3 className="font-sans mt-5 text-lg font-semibold tracking-tight text-[#0b0b0f]">{title}</h3>
+			<p className="mt-2 text-sm leading-relaxed text-[#2e2e35]/75">{desc}</p>
+			<ul className="mt-4 space-y-2 text-xs text-[#2e2e35]/70">
+				{bullets.map((b) => (
+					<li key={b} className="flex items-start gap-2">
+						<span className="mt-0.5 text-[#5235ff]">✓</span>
+						<span>{b}</span>
+					</li>
+				))}
+			</ul>
 		</article>
+	);
+}
+
+/* ---------- Card visuals (fixed h-44 panel, like the payout cards) ---------- */
+
+function LightPanel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+	return (
+		<div className={`flex h-44 flex-col justify-center rounded-2xl border border-[#e6e9ef] bg-white p-5 ${className}`}>
+			{children}
+		</div>
+	);
+}
+
+function DarkPanel({ children }: { children: React.ReactNode }) {
+	return (
+		<div className="flex h-44 flex-col justify-center rounded-2xl border border-[#dadfea] bg-gradient-to-b from-[#0d1326] to-[#0a0f22] p-5 text-white shadow-[inset_0_0_1px_rgba(255,255,255,0.06)]">
+			{children}
+		</div>
+	);
+}
+
+function RetryVisual() {
+	return (
+		<DarkPanel>
+			<div className="flex items-center justify-between">
+				<div className="text-[10px] uppercase tracking-wider text-white/60">Phase 1 · Evaluation</div>
+				<span className="rounded-full bg-emerald-400/15 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">1 retry left</span>
+			</div>
+			<div className="font-sans mt-2 text-3xl font-bold tracking-tight">$0.00 fee</div>
+			<button
+				tabIndex={-1}
+				className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#5235ff] to-[#00d99f] px-4 py-2.5 text-sm font-semibold text-[#0b0b0f]"
+			>
+				<RotateCcw className="h-4 w-4" /> Use Free Retry
+			</button>
+		</DarkPanel>
+	);
+}
+
+function AccountVisual() {
+	return (
+		<LightPanel>
+			<div className="flex items-center justify-between">
+				<div className="text-[10px] font-semibold uppercase tracking-wider text-[#2e2e35]/50">Funded account</div>
+				<span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">
+					<span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Active
+				</span>
+			</div>
+			<div className="mt-3 space-y-2 rounded-xl border border-[#e6e9ef] bg-slate-50/60 p-3 font-mono text-xs text-[#0b0b0f]">
+				<div className="flex justify-between"><span className="text-[#2e2e35]/50">Login</span><span>GZ-204817</span></div>
+				<div className="flex justify-between"><span className="text-[#2e2e35]/50">Server</span><span>GenzProp-Live</span></div>
+			</div>
+			<div className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-[#5235ff]">
+				<Zap className="h-3.5 w-3.5" /> Issued in 2.0s
+			</div>
+		</LightPanel>
+	);
+}
+
+function ChatVisual() {
+	return (
+		<LightPanel className="gap-2.5">
+			<div className="max-w-[80%] self-start rounded-2xl rounded-bl-sm bg-slate-100 px-3 py-2 text-xs text-[#0b0b0f]">
+				How fast are payouts processed?
+			</div>
+			<div className="max-w-[80%] self-end rounded-2xl rounded-br-sm bg-gradient-to-r from-[#5235ff] to-[#7c5cff] px-3 py-2 text-xs text-white">
+				Most are done within 24–48 hours 👋
+			</div>
+			<div className="flex items-center gap-2 text-[10px] text-[#2e2e35]/50">
+				<span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Support online · replies in ~1 min
+			</div>
+		</LightPanel>
+	);
+}
+
+function PayoutVisual() {
+	return (
+		<DarkPanel>
+			<div className="text-[10px] uppercase tracking-wider text-white/60">Payout status</div>
+			<div className="font-sans mt-2 text-3xl font-bold tracking-tight">$2,800.00</div>
+			<div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-white/10">
+				<div className="h-full w-4/5 rounded-full bg-gradient-to-r from-[#5235ff] to-[#00d99f]" />
+			</div>
+			<div className="mt-2 flex justify-between text-[10px] text-white/60">
+				<span>Approved</span>
+				<span>Est. &lt; 48h</span>
+			</div>
+		</DarkPanel>
+	);
+}
+
+function RulesVisual() {
+	const rules = [
+		{ label: "Profit target", value: "8%" },
+		{ label: "Daily loss limit", value: "5%" },
+		{ label: "Max drawdown", value: "10%" },
+	];
+	return (
+		<LightPanel>
+			<div className="divide-y divide-[#e6e9ef] rounded-xl border border-[#e6e9ef]">
+				{rules.map((r) => (
+					<div key={r.label} className="flex items-center justify-between px-3 py-2.5 text-xs">
+						<span className="text-[#2e2e35]/70">{r.label}</span>
+						<span className="font-semibold text-[#0b0b0f]">{r.value}</span>
+					</div>
+				))}
+			</div>
+		</LightPanel>
+	);
+}
+
+function SecurityVisual() {
+	const items = [
+		{ Icon: Lock, label: "SSL" },
+		{ Icon: KeyRound, label: "2FA" },
+		{ Icon: BadgeCheck, label: "KYC" },
+	];
+	return (
+		<LightPanel className="items-center">
+			<div className="flex h-14 w-14 items-center justify-center rounded-xl border border-[#e6e9ef] bg-slate-50/50">
+				<ShieldCheck className="h-8 w-8 text-[#5235ff]" />
+			</div>
+			<div className="mt-4 flex gap-2">
+				{items.map(({ Icon, label }) => (
+					<span key={label} className="inline-flex items-center gap-1.5 rounded-full border border-[#e6e9ef] bg-white px-3 py-1 text-xs font-medium text-[#0b0b0f]">
+						<Icon className="h-3.5 w-3.5 text-[#5235ff]" /> {label}
+					</span>
+				))}
+			</div>
+		</LightPanel>
 	);
 }

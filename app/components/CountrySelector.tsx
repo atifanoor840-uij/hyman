@@ -109,11 +109,11 @@ export default function CountrySelector({
 				type="button"
 				onClick={() => !disabled && setIsOpen(!isOpen)}
 				disabled={disabled}
-				className={`mt-2 w-full rounded-2xl border px-5 py-4 text-left text-base font-semibold tracking-wide transition focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10 ${
+				className={`h-12 w-full rounded-xl border px-4 text-left text-[15px] transition focus:border-[#5235ff] focus:outline-none focus:ring-4 focus:ring-[#5235ff]/10 ${
 					error
-						? 'border-red-500 bg-red-50 text-red-900'
-						: 'border-zinc-200 bg-zinc-50 text-zinc-900'
-				} ${disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:border-zinc-300'}`}
+						? 'border-red-300 bg-red-50/40 text-red-900'
+						: 'border-slate-200 bg-white text-[#0b1020]'
+				} ${disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:border-slate-300'}`}
 			>
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-3">

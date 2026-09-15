@@ -1,14 +1,11 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { AdminShell } from "@/components/admin/admin-shell"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import EmptyState from "@/components/ui/empty-state"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Switch } from "@/components/ui/switch"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import {
   adminListCoupons,
   adminCreateCoupon,
@@ -17,18 +14,44 @@ import {
   type AdminCoupon,
 } from "@/lib/api/app-client"
 import { ApiClientError } from "@/lib/api/client"
-import { Loader2, ShieldAlert, Percent, Trash2 } from "lucide-react"
+import {
+  DataTable,
+  EmptyBlock,
+  ErrorBlock,
+  Field,
+  FilterTabs,
+  LoadingBlock,
+  Notice,
+  Panel,
+  SearchBox,
+  StatusPill,
+  Toolbar,
+  inputClass,
+  shortDate,
+  useConfirm,
+} from "@/components/admin/admin-ui"
+import { Check, Copy, Percent, Plus, Trash2 } from "lucide-react"
+
+type Filter = "all" | "active" | "inactive" | "expired"
 
 const EMPTY_FORM = { code: "", discountPercent: "", expiresAt: "" }
+
+const isExpired = (c: AdminCoupon) => !!c.expiresAt && new Date(c.expiresAt).getTime() < Date.now()
 
 export default function AdminCouponsPage() {
   const [coupons, setCoupons] = useState<AdminCoupon[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [filter, setFilter] = useState<Filter>("all")
+  const [search, setSearch] = useState("")
+  const [createOpen, setCreateOpen] = useState(false)
   const [form, setForm] = useState(EMPTY_FORM)
   const [creating, setCreating] = useState(false)
   const [createError, setCreateError] = useState<string | null>(null)
   const [busyCode, setBusyCode] = useState<string | null>(null)
+  const [copied, setCopied] = useState<string | null>(null)
+  const [notice, setNotice] = useState<{ tone: "success" | "error"; text: string } | null>(null)
+  const { confirm, dialog } = useConfirm()
 
   const refresh = async () => {
     setLoading(true)
@@ -47,6 +70,26 @@ export default function AdminCouponsPage() {
     refresh()
   }, [])
 
+  const counts = useMemo(
+    () => ({
+      all: coupons.length,
+      active: coupons.filter((c) => c.status === "active" && !isExpired(c)).length,
+      inactive: coupons.filter((c) => c.status !== "active").length,
+      expired: coupons.filter(isExpired).length,
+    }),
+    [coupons],
+  )
+
+  const visible = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    return coupons.filter((c) => {
+      if (filter === "active" && !(c.status === "active" && !isExpired(c))) return false
+      if (filter === "inactive" && c.status === "active") return false
+      if (filter === "expired" && !isExpired(c)) return false
+      return !q || c.code.toLowerCase().includes(q)
+    })
+  }, [coupons, filter, search])
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
     setCreateError(null)
@@ -62,7 +105,9 @@ export default function AdminCouponsPage() {
         discountPercent: discount,
         expiresAt: form.expiresAt ? new Date(form.expiresAt).toISOString() : null,
       })
+      setNotice({ tone: "success", text: `Coupon ${form.code.trim()} created.` })
       setForm(EMPTY_FORM)
+      setCreateOpen(false)
       await refresh()
     } catch (err) {
       setCreateError(err instanceof ApiClientError ? err.message : "Failed to create coupon.")
@@ -77,114 +122,187 @@ export default function AdminCouponsPage() {
       await adminUpdateCoupon(coupon.code, { status: coupon.status === "active" ? "inactive" : "active" })
       await refresh()
     } catch (err) {
-      setError(err instanceof ApiClientError ? err.message : "Failed to update coupon.")
+      setNotice({ tone: "error", text: err instanceof ApiClientError ? err.message : "Failed to update coupon." })
     } finally {
       setBusyCode(null)
     }
   }
 
   const handleDelete = async (code: string) => {
+    const { ok } = await confirm({
+      title: `Delete coupon ${code}?`,
+      description: "Customers won’t be able to use this code any more. To pause it instead, switch it off.",
+      confirmLabel: "Delete coupon",
+      tone: "danger",
+    })
+    if (!ok) return
     setBusyCode(code)
     try {
       await adminDeleteCoupon(code)
+      setNotice({ tone: "success", text: `Coupon ${code} deleted.` })
       await refresh()
     } catch (err) {
-      setError(err instanceof ApiClientError ? err.message : "Failed to delete coupon.")
+      setNotice({ tone: "error", text: err instanceof ApiClientError ? err.message : "Failed to delete coupon." })
     } finally {
       setBusyCode(null)
     }
   }
 
-  return (
-    <AdminShell title="Coupons" description="Create and manage discount codes for the checkout flow.">
-      <Card className="p-4 mb-4">
-        <form onSubmit={handleCreate} className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end">
-          <div className="space-y-1">
-            <Label className="text-xs">Code</Label>
-            <Input value={form.code} onChange={(e) => setForm((f) => ({ ...f, code: e.target.value.toUpperCase() }))} placeholder="WELCOME10" />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-xs">Discount %</Label>
-            <Input
-              type="number"
-              min={1}
-              max={100}
-              value={form.discountPercent}
-              onChange={(e) => setForm((f) => ({ ...f, discountPercent: e.target.value }))}
-              placeholder="10"
-            />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-xs">Expires (optional)</Label>
-            <Input type="date" value={form.expiresAt} onChange={(e) => setForm((f) => ({ ...f, expiresAt: e.target.value }))} />
-          </div>
-          <div className="flex items-center gap-3">
-            <Button type="submit" size="sm" disabled={creating} className="gap-1">
-              <Percent className="w-3.5 h-3.5" /> {creating ? "Adding…" : "Add coupon"}
-            </Button>
-          </div>
-          {createError && <p className="col-span-full text-sm text-destructive">{createError}</p>}
-        </form>
-      </Card>
+  const copyCode = (code: string) => {
+    void navigator.clipboard?.writeText(code)
+    setCopied(code)
+    setTimeout(() => setCopied(null), 1500)
+  }
 
-      <Card className="overflow-hidden">
-        {loading ? (
-          <div className="flex justify-center py-16">
-            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-          </div>
-        ) : error ? (
-          <EmptyState icon={<ShieldAlert className="w-8 h-8 text-muted-foreground" />} title="Failed to load" description={error} />
-        ) : coupons.length === 0 ? (
-          <EmptyState icon={<Percent className="w-8 h-8 text-muted-foreground" />} title="No coupons" description="Add a discount code above." />
-        ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Code</TableHead>
-                  <TableHead>Discount</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Expires</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {coupons.map((c) => (
-                  <TableRow key={c.code}>
-                    <TableCell className="font-mono font-semibold">{c.code}</TableCell>
-                    <TableCell>{c.discountPercent}%</TableCell>
-                    <TableCell>
-                      <button onClick={() => toggleStatus(c)} disabled={busyCode === c.code}>
-                        <Badge
-                          className={
-                            c.status === "active"
-                              ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 cursor-pointer"
-                              : "bg-muted text-muted-foreground cursor-pointer"
-                          }
-                        >
-                          {c.status}
-                        </Badge>
-                      </button>
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
-                      {c.expiresAt ? new Date(c.expiresAt).toLocaleDateString() : "Never"}
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
-                      {c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "—"}
-                    </TableCell>
-                    <TableCell>
-                      <Button size="sm" variant="ghost" disabled={busyCode === c.code} onClick={() => handleDelete(c.code)}>
-                        <Trash2 className="w-3.5 h-3.5 text-destructive" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+  return (
+    <AdminShell
+      title="Coupons"
+      description="Discount codes customers can enter at checkout."
+      actions={
+        <Button
+          className="h-10 gap-2 rounded-xl"
+          onClick={() => {
+            setForm(EMPTY_FORM)
+            setCreateError(null)
+            setCreateOpen(true)
+          }}
+        >
+          <Plus className="h-4 w-4" /> New coupon
+        </Button>
+      }
+    >
+      <div className="space-y-4">
+        {notice && (
+          <Notice tone={notice.tone} onDismiss={() => setNotice(null)}>
+            {notice.text}
+          </Notice>
         )}
-      </Card>
+
+        <Panel>
+          <Toolbar>
+            <FilterTabs<Filter>
+              value={filter}
+              onChange={setFilter}
+              options={[
+                { value: "all", label: "All", count: counts.all },
+                { value: "active", label: "Usable now", count: counts.active },
+                { value: "inactive", label: "Switched off", count: counts.inactive },
+                { value: "expired", label: "Expired", count: counts.expired },
+              ]}
+            />
+            <SearchBox value={search} onChange={setSearch} placeholder="Search code" />
+          </Toolbar>
+
+          {loading && coupons.length === 0 ? (
+            <LoadingBlock label="Loading coupons…" />
+          ) : error ? (
+            <ErrorBlock message={error} onRetry={() => void refresh()} />
+          ) : visible.length === 0 ? (
+            <EmptyBlock
+              icon={Percent}
+              title={coupons.length ? "No matching coupons" : "No coupons yet"}
+              description={coupons.length ? "Try another filter or clear the search." : "Create a discount code to share with customers."}
+            />
+          ) : (
+            <DataTable head={["Code", "Discount", "Status", "Expires", "Created", "On / off"]}>
+              {visible.map((c) => {
+                const expired = isExpired(c)
+                return (
+                  <tr key={c.code}>
+                    <td>
+                      <button
+                        type="button"
+                        onClick={() => copyCode(c.code)}
+                        className="group inline-flex items-center gap-2 rounded-lg border border-dashed border-border bg-muted/50 px-2.5 py-1 font-mono text-sm font-semibold text-foreground hover:border-primary/40"
+                        title="Copy code"
+                      >
+                        {c.code}
+                        {copied === c.code ? (
+                          <Check className="h-3.5 w-3.5 text-emerald-600" />
+                        ) : (
+                          <Copy className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
+                        )}
+                      </button>
+                    </td>
+                    <td className="text-base font-semibold tabular-nums text-foreground">{c.discountPercent}% off</td>
+                    <td>{expired ? <StatusPill status="expired" /> : <StatusPill status={c.status === "active" ? "active" : "inactive"} />}</td>
+                    <td className="whitespace-nowrap text-xs text-muted-foreground">{c.expiresAt ? shortDate(c.expiresAt) : "Never"}</td>
+                    <td className="whitespace-nowrap text-xs text-muted-foreground">{shortDate(c.createdAt)}</td>
+                    <td>
+                      <div className="flex items-center justify-end gap-2">
+                        <Switch
+                          checked={c.status === "active"}
+                          disabled={busyCode === c.code}
+                          onCheckedChange={() => void toggleStatus(c)}
+                          aria-label={c.status === "active" ? `Switch off ${c.code}` : `Switch on ${c.code}`}
+                        />
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8 rounded-lg text-muted-foreground hover:bg-red-50 hover:text-red-600"
+                          disabled={busyCode === c.code}
+                          onClick={() => void handleDelete(c.code)}
+                          aria-label={`Delete ${c.code}`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
+            </DataTable>
+          )}
+        </Panel>
+      </div>
+
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent className="rounded-2xl sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>New coupon</DialogTitle>
+            <DialogDescription>Customers enter this code at checkout to get the discount.</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleCreate} className="space-y-4">
+            <Field label="Code" hint="Letters and numbers, shown in capitals." htmlFor="c-code">
+              <Input
+                id="c-code"
+                className={`${inputClass} font-mono uppercase`}
+                value={form.code}
+                onChange={(e) => setForm((f) => ({ ...f, code: e.target.value.toUpperCase() }))}
+                placeholder="WELCOME10"
+              />
+            </Field>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Discount (%)" htmlFor="c-discount">
+                <Input
+                  id="c-discount"
+                  type="number"
+                  min={1}
+                  max={100}
+                  className={inputClass}
+                  value={form.discountPercent}
+                  onChange={(e) => setForm((f) => ({ ...f, discountPercent: e.target.value }))}
+                  placeholder="10"
+                />
+              </Field>
+              <Field label="Expires on" hint="Leave empty for no expiry." htmlFor="c-exp">
+                <Input id="c-exp" type="date" className={inputClass} value={form.expiresAt} onChange={(e) => setForm((f) => ({ ...f, expiresAt: e.target.value }))} />
+              </Field>
+            </div>
+            {createError && <Notice tone="error">{createError}</Notice>}
+            <div className="flex justify-end gap-2">
+              <Button type="button" variant="outline" className="rounded-xl" onClick={() => setCreateOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" className="rounded-xl" disabled={creating}>
+                {creating ? "Creating…" : "Create coupon"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {dialog}
     </AdminShell>
   )
 }

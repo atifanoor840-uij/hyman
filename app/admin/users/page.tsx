@@ -2,27 +2,52 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { AdminShell } from "@/components/admin/admin-shell"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import EmptyState from "@/components/ui/empty-state"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { adminListUsers, adminUpdateUser, crmImpersonate, type AdminUserRow } from "@/lib/api/app-client"
 import { ApiClientError } from "@/lib/api/client"
-import { Loader2, Search, ShieldAlert, Users, LogIn } from "lucide-react"
+import {
+  DataTable,
+  EmptyBlock,
+  ErrorBlock,
+  Field,
+  FilterTabs,
+  LoadingBlock,
+  NativeSelect,
+  Notice,
+  Panel,
+  Person,
+  SearchBox,
+  StatusPill,
+  Toolbar,
+  inputClass,
+  shortDate,
+  useConfirm,
+} from "@/components/admin/admin-ui"
+import { BadgeCheck, LogIn, Pencil, RefreshCcw, Users } from "lucide-react"
+
+type Filter = "all" | "active" | "suspended" | "unverified" | "staff"
+
+const ROLE_LABEL: Record<string, string> = {
+  customer: "Customer",
+  collaborator: "Collaborator",
+  support: "Support",
+  admin: "Admin",
+}
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<AdminUserRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState("")
+  const [filter, setFilter] = useState<Filter>("all")
   const [editing, setEditing] = useState<AdminUserRow | null>(null)
   const [form, setForm] = useState({ name: "", phone: "", country: "", role: "customer", status: "active" })
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [notice, setNotice] = useState<{ tone: "success" | "error"; text: string } | null>(null)
+  const { confirm, dialog } = useConfirm()
 
   const refresh = async () => {
     setLoading(true)
@@ -41,11 +66,27 @@ export default function AdminUsersPage() {
     refresh()
   }, [])
 
+  const counts = useMemo(
+    () => ({
+      all: users.length,
+      active: users.filter((u) => u.status === "active").length,
+      suspended: users.filter((u) => u.status !== "active").length,
+      unverified: users.filter((u) => !u.emailVerified).length,
+      staff: users.filter((u) => u.role !== "customer").length,
+    }),
+    [users],
+  )
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
-    if (!q) return users
-    return users.filter((u) => u.email.toLowerCase().includes(q) || u.name.toLowerCase().includes(q))
-  }, [users, search])
+    return users.filter((u) => {
+      if (filter === "active" && u.status !== "active") return false
+      if (filter === "suspended" && u.status === "active") return false
+      if (filter === "unverified" && u.emailVerified) return false
+      if (filter === "staff" && u.role === "customer") return false
+      return !q || u.email.toLowerCase().includes(q) || u.name.toLowerCase().includes(q)
+    })
+  }, [users, search, filter])
 
   const openEdit = (u: AdminUserRow) => {
     setEditing(u)
@@ -55,12 +96,22 @@ export default function AdminUsersPage() {
 
   const handleSave = async () => {
     if (!editing) return
+    if (form.status === "suspended" && editing.status !== "suspended") {
+      const { ok } = await confirm({
+        title: "Suspend this user?",
+        description: `${editing.email} won’t be able to sign in until you reactivate the account.`,
+        confirmLabel: "Suspend",
+        tone: "danger",
+      })
+      if (!ok) return
+    }
     setSaving(true)
     setSaveError(null)
     try {
       await adminUpdateUser(editing.id, form)
       await refresh()
       setEditing(null)
+      setNotice({ tone: "success", text: `Saved changes for ${editing.email}.` })
     } catch (err) {
       setSaveError(err instanceof ApiClientError ? err.message : "Failed to save.")
     } finally {
@@ -68,125 +119,154 @@ export default function AdminUsersPage() {
     }
   }
 
-  const handleImpersonate = async (userId: string) => {
+  const handleImpersonate = async (u: AdminUserRow) => {
+    const { ok } = await confirm({
+      title: `Log in as ${u.name || u.email}?`,
+      description: "You’ll be signed out of admin in this browser and their dashboard opens in a new tab.",
+      confirmLabel: "Continue",
+    })
+    if (!ok) return
     try {
-      await crmImpersonate(userId)
+      await crmImpersonate(u.id)
       window.open("/dashboard/overview", "_blank")
     } catch (err) {
-      setSaveError(err instanceof ApiClientError ? err.message : "Failed to impersonate user.")
+      setNotice({ tone: "error", text: err instanceof ApiClientError ? err.message : "Failed to log in as user." })
     }
   }
 
-  return (
-    <AdminShell title="Users" description="View and manage customer accounts.">
-      <Card className="p-4 mb-4">
-        <div className="flex items-center gap-2 max-w-sm">
-          <Search className="w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Search by name or email…" value={search} onChange={(e) => setSearch(e.target.value)} />
-        </div>
-      </Card>
+  const set = (key: keyof typeof form) => (v: string) => setForm((f) => ({ ...f, [key]: v }))
 
-      <Card className="overflow-hidden">
-        {loading ? (
-          <div className="flex justify-center py-16">
-            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-          </div>
-        ) : error ? (
-          <EmptyState icon={<ShieldAlert className="w-8 h-8 text-muted-foreground" />} title="Failed to load" description={error} />
-        ) : filtered.length === 0 ? (
-          <EmptyState icon={<Users className="w-8 h-8 text-muted-foreground" />} title="No users" description="No users match your search." />
-        ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Verified</TableHead>
-                  <TableHead>Joined</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map((u) => (
-                  <TableRow key={u.id}>
-                    <TableCell className="font-medium">{u.name}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{u.email}</TableCell>
-                    <TableCell><Badge variant="secondary" className="capitalize">{u.role}</Badge></TableCell>
-                    <TableCell>
-                      <Badge className={u.status === "active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"}>
-                        {u.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{u.emailVerified ? "Yes" : "No"}</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "—"}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline" onClick={() => openEdit(u)}>Edit</Button>
-                        <Button size="sm" variant="ghost" onClick={() => handleImpersonate(u.id)}>
-                          <LogIn className="w-3.5 h-3.5" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+  return (
+    <AdminShell
+      title="Users"
+      description="Find customers, update their details, or suspend access."
+      actions={
+        <Button variant="outline" className="h-10 gap-2 rounded-xl border-border bg-card" onClick={() => void refresh()} disabled={loading}>
+          <RefreshCcw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh
+        </Button>
+      }
+    >
+      <div className="space-y-4">
+        {notice && (
+          <Notice tone={notice.tone} onDismiss={() => setNotice(null)}>
+            {notice.text}
+          </Notice>
         )}
-      </Card>
+
+        <Panel>
+          <Toolbar>
+            <FilterTabs<Filter>
+              value={filter}
+              onChange={setFilter}
+              options={[
+                { value: "all", label: "All", count: counts.all },
+                { value: "active", label: "Active", count: counts.active },
+                { value: "suspended", label: "Suspended", count: counts.suspended },
+                { value: "unverified", label: "Unverified email", count: counts.unverified },
+                { value: "staff", label: "Staff", count: counts.staff },
+              ]}
+            />
+            <SearchBox value={search} onChange={setSearch} placeholder="Search name or email" />
+          </Toolbar>
+
+          {loading && users.length === 0 ? (
+            <LoadingBlock label="Loading users…" />
+          ) : error ? (
+            <ErrorBlock message={error} onRetry={() => void refresh()} />
+          ) : filtered.length === 0 ? (
+            <EmptyBlock icon={Users} title="No matching users" description="Try another filter or clear the search." />
+          ) : (
+            <DataTable head={["User", "Role", "Status", "Email", "Country", "Joined", ""]}>
+              {filtered.map((u) => (
+                <tr key={u.id}>
+                  <td>
+                    <Person name={u.name} email={u.email} />
+                  </td>
+                  <td>
+                    <span className="text-sm text-foreground">{ROLE_LABEL[u.role] ?? u.role}</span>
+                  </td>
+                  <td>
+                    <StatusPill status={u.status} />
+                  </td>
+                  <td>
+                    {u.emailVerified ? (
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700">
+                        <BadgeCheck className="h-4 w-4" /> Verified
+                      </span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">Not verified</span>
+                    )}
+                  </td>
+                  <td className="text-sm text-muted-foreground">{u.country || "—"}</td>
+                  <td className="whitespace-nowrap text-xs text-muted-foreground">{shortDate(u.createdAt)}</td>
+                  <td>
+                    <div className="flex items-center justify-end gap-1.5">
+                      <Button size="sm" variant="outline" className="h-8 gap-1.5 rounded-lg border-border" onClick={() => openEdit(u)}>
+                        <Pencil className="h-3.5 w-3.5" /> Edit
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 rounded-lg"
+                        onClick={() => void handleImpersonate(u)}
+                        title="Log in as this user"
+                        aria-label={`Log in as ${u.email}`}
+                      >
+                        <LogIn className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </DataTable>
+          )}
+        </Panel>
+      </div>
 
       <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
-        <DialogContent>
+        <DialogContent className="rounded-2xl sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Edit {editing?.email}</DialogTitle>
+            <DialogTitle>Edit user</DialogTitle>
+            <DialogDescription>{editing?.email}</DialogDescription>
           </DialogHeader>
-          <div className="space-y-3">
-            <div className="space-y-1">
-              <Label>Name</Label>
-              <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
-            </div>
-            <div className="space-y-1">
-              <Label>Phone</Label>
-              <Input value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} />
-            </div>
-            <div className="space-y-1">
-              <Label>Country</Label>
-              <Input value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))} />
-            </div>
-            <div className="space-y-1">
-              <Label>Role</Label>
-              <select
-                value={form.role}
-                onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
-              >
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Field label="Full name" className="sm:col-span-2" htmlFor="u-name">
+              <Input id="u-name" className={inputClass} value={form.name} onChange={(e) => set("name")(e.target.value)} />
+            </Field>
+            <Field label="Phone" htmlFor="u-phone">
+              <Input id="u-phone" className={inputClass} value={form.phone} onChange={(e) => set("phone")(e.target.value)} />
+            </Field>
+            <Field label="Country" htmlFor="u-country">
+              <Input id="u-country" className={inputClass} value={form.country} onChange={(e) => set("country")(e.target.value)} />
+            </Field>
+            <Field label="Role" hint="Controls admin access." htmlFor="u-role">
+              <NativeSelect id="u-role" value={form.role} onChange={set("role")}>
                 <option value="customer">Customer</option>
                 <option value="collaborator">Collaborator</option>
                 <option value="support">Support</option>
                 <option value="admin">Admin</option>
-              </select>
-            </div>
-            <div className="space-y-1">
-              <Label>Status</Label>
-              <select
-                value={form.status}
-                onChange={(e) => setForm((f) => ({ ...f, status: e.target.value }))}
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
-              >
+              </NativeSelect>
+            </Field>
+            <Field label="Account status" hint="Suspended users can’t sign in." htmlFor="u-status">
+              <NativeSelect id="u-status" value={form.status} onChange={set("status")}>
                 <option value="active">Active</option>
                 <option value="suspended">Suspended</option>
-              </select>
-            </div>
-            {saveError && <p className="text-sm text-destructive">{saveError}</p>}
-            <Button className="w-full" disabled={saving} onClick={handleSave}>
+              </NativeSelect>
+            </Field>
+          </div>
+          {saveError && <Notice tone="error">{saveError}</Notice>}
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" className="rounded-xl" onClick={() => setEditing(null)}>
+              Cancel
+            </Button>
+            <Button className="rounded-xl" disabled={saving} onClick={() => void handleSave()}>
               {saving ? "Saving…" : "Save changes"}
             </Button>
           </div>
         </DialogContent>
       </Dialog>
+
+      {dialog}
     </AdminShell>
   )
 }

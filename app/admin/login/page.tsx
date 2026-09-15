@@ -52,21 +52,24 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-xl">
+    <div className="relative min-h-screen overflow-hidden bg-[#0b1020] flex items-center justify-center px-4 py-10">
+      <div className="pointer-events-none absolute -left-40 -top-40 h-[560px] w-[560px] rounded-full bg-[radial-gradient(circle,rgba(82,53,255,0.4),transparent_65%)]" />
+      <div className="pointer-events-none absolute -bottom-48 -right-40 h-[560px] w-[560px] rounded-full bg-[radial-gradient(circle,rgba(0,217,159,0.14),transparent_65%)]" />
+      <div className="relative w-full max-w-md">
         <div className="mb-6 flex items-center justify-between">
-          <Link href="/" className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors">
+          <Link href="/" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">
             ← Back to site
           </Link>
-          <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/70 px-3 py-1.5 text-xs font-semibold text-muted-foreground">
+          <div className="inline-flex items-center gap-2 rounded-full bg-white/[0.06] px-3 py-1.5 text-xs font-semibold text-slate-300 ring-1 ring-white/10">
             <Shield className="h-4 w-4" />
             Admin sign in
           </div>
         </div>
 
-        <Card className="rounded-3xl border border-border/80 bg-card shadow-sm overflow-hidden">
-          <div className="border-b border-border/80 bg-muted/20 px-6 py-5">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Enter credentials</h1>
+        <Card className="rounded-2xl border-0 bg-card shadow-2xl shadow-black/40 overflow-hidden">
+          <div className="border-b border-border px-7 pt-7 pb-5 sm:px-8">
+            <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-[#0b1020]"><img src="/logo.png" alt="GenzProp" className="h-7 w-7 object-contain" /></span>
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">Admin console</h1>
             <p className="mt-1 text-xs sm:text-sm text-muted-foreground">Sign in with email and password to continue.</p>
           </div>
 
@@ -77,7 +80,7 @@ export default function AdminLoginPage() {
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+                <Label htmlFor="email" className="text-sm font-medium text-foreground">
                   Email
                 </Label>
                 <div className="relative">
@@ -87,14 +90,14 @@ export default function AdminLoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="admin@company.com"
-                    className="h-14 rounded-2xl pl-11 text-base md:text-base border-border/70 bg-background/40"
+                    className="h-12 rounded-xl pl-11 text-[15px] md:text-[15px] shadow-none focus-visible:ring-4 focus-visible:ring-primary/10 focus-visible:ring-offset-0 border-input bg-card"
                     autoComplete="username"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+                <Label htmlFor="password" className="text-sm font-medium text-foreground">
                   Password
                 </Label>
                 <div className="relative">
@@ -105,7 +108,7 @@ export default function AdminLoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter password"
-                    className="h-14 rounded-2xl pl-11 text-base md:text-base pr-10 border-border/70 bg-background/40"
+                    className="h-12 rounded-xl pl-11 text-[15px] md:text-[15px] shadow-none focus-visible:ring-4 focus-visible:ring-primary/10 focus-visible:ring-offset-0 pr-10 border-input bg-card"
                     autoComplete="current-password"
                     onKeyDown={(e) => e.key === "Enter" && void submitCredentials()}
                   />
@@ -121,10 +124,10 @@ export default function AdminLoginPage() {
               </div>
 
               <div className="flex items-center justify-between gap-2 pt-1">
-                <Button asChild variant="outline" className="h-12 px-5 text-base rounded-2xl border-border/70">
+                <Button asChild variant="outline" className="h-11 px-4 text-sm rounded-xl border-border">
                   <Link href="/login">User login</Link>
                 </Button>
-                <Button type="button" onClick={() => void submitCredentials()} className="h-12 px-6 text-base rounded-2xl" disabled={loading}>
+                <Button type="button" onClick={() => void submitCredentials()} className="h-11 px-5 text-sm rounded-xl shadow-sm shadow-primary/30" disabled={loading}>
                   {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
                   Sign in
                   <ArrowRight className="h-4 w-4 ml-2" />

@@ -8,14 +8,19 @@ import { Footer } from "@/components/footer"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
+  AlertCircle,
   ArrowRight,
+  BadgeCheck,
   BarChart3,
   Check,
   CreditCard,
   Hourglass,
+  LineChart,
   Loader2,
   ShoppingCart,
   Trophy,
+  Wallet,
+  type LucideIcon,
 } from "lucide-react"
 import { listMyOrders, listMyAccounts, payOrder, type OrderWithPlan, type TradingAccount } from "@/lib/api/app-client"
 import { ApiClientError } from "@/lib/api/client"
@@ -209,13 +214,13 @@ export default function OverviewPage() {
             hideHeroInfoCards
             actions={
               <div className="flex w-full flex-wrap items-center justify-start md:justify-end gap-2">
-                <Button asChild variant="outline" className="h-10 rounded-full px-4 text-sm font-medium gap-2">
+                <Button asChild variant="outline" className="h-10 rounded-xl border-border bg-card px-4 text-sm font-medium gap-2">
                   <Link href="/dashboard">
                     <BarChart3 className="h-4 w-4" />
                     Trading dashboard
                   </Link>
                 </Button>
-                <Button asChild className="h-10 rounded-full px-5 text-sm font-medium gap-2">
+                <Button asChild className="h-10 rounded-xl px-5 text-sm font-medium gap-2 shadow-sm shadow-primary/25">
                   <Link href="/buy-challenge">
                     <ShoppingCart className="h-4 w-4" />
                     New challenge
@@ -226,29 +231,31 @@ export default function OverviewPage() {
           />
 
           {error && (
-            <div className="mb-4 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-foreground">{error}</div>
+            <div className="mt-5 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-foreground">{error}</div>
           )}
 
           {/* Summary */}
-          <Card className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-none">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-border/70">
-              <SummaryItem label="In progress" value={summary.trading} hint="Challenges you're trading now" loading={isLoading} />
-              <SummaryItem label="Funded" value={summary.funded} hint="Accounts eligible for payouts" loading={isLoading} />
-              <SummaryItem
-                label="Needs action"
-                value={summary.attention}
-                hint={summary.attention ? "Orders waiting for payment" : "Nothing waiting on you"}
-                loading={isLoading}
-                highlight={summary.attention > 0}
-              />
-              <SummaryItem
-                label="Total invested"
-                value={usd(summary.invested)}
-                hint={`${summary.passed} passed · ${summary.ended} ended`}
-                loading={isLoading}
-              />
-            </div>
-          </Card>
+          <div className="mt-6 grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
+            <SummaryItem icon={LineChart} tone="violet" label="In progress" value={summary.trading} hint="Challenges you're trading now" loading={isLoading} />
+            <SummaryItem icon={BadgeCheck} tone="emerald" label="Funded" value={summary.funded} hint="Accounts eligible for payouts" loading={isLoading} />
+            <SummaryItem
+              icon={AlertCircle}
+              tone="amber"
+              label="Needs action"
+              value={summary.attention}
+              hint={summary.attention ? "Orders waiting for payment" : "Nothing waiting on you"}
+              loading={isLoading}
+              highlight={summary.attention > 0}
+            />
+            <SummaryItem
+              icon={Wallet}
+              tone="sky"
+              label="Total invested"
+              value={usd(summary.invested)}
+              hint={`${summary.passed} passed · ${summary.ended} ended`}
+              loading={isLoading}
+            />
+          </div>
 
           {/* Next step */}
           {!isLoading && nextStep && <NextStep row={nextStep} />}
@@ -261,7 +268,7 @@ export default function OverviewPage() {
                 <p className="mt-0.5 text-sm text-muted-foreground">Track progress, finish payments, and open analytics for each account.</p>
               </div>
               {rows.length > 0 && (
-                <div className="inline-flex w-fit rounded-full border border-border/70 bg-card p-1 text-sm">
+                <div className="inline-flex w-fit max-w-full overflow-x-auto rounded-xl border border-border bg-card p-1 text-sm">
                   {(
                     [
                       ["all", `All (${rows.length})`],
@@ -274,8 +281,8 @@ export default function OverviewPage() {
                       key={key}
                       type="button"
                       onClick={() => setFilter(key)}
-                      className={`rounded-full px-3.5 py-1.5 font-medium transition-colors ${
-                        filter === key ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
+                      className={`whitespace-nowrap rounded-lg px-3.5 py-1.5 font-medium transition-colors ${
+                        filter === key ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted hover:text-foreground"
                       }`}
                     >
                       {label}
@@ -319,31 +326,46 @@ export default function OverviewPage() {
 // Pieces
 // ---------------------------------------------------------------------------
 
+const ICON_TONES = {
+  violet: "bg-[#efecff] text-[#5235ff]",
+  emerald: "bg-emerald-50 text-emerald-600",
+  amber: "bg-amber-50 text-amber-600",
+  sky: "bg-sky-50 text-sky-600",
+} as const
+
 function SummaryItem({
+  icon: Icon,
+  tone,
   label,
   value,
   hint,
   loading,
   highlight,
-  className = "",
 }: {
+  icon: LucideIcon
+  tone: keyof typeof ICON_TONES
   label: string
   value: string | number
   hint: string
   loading: boolean
   highlight?: boolean
-  className?: string
 }) {
   return (
-    <div className={`bg-card p-5 sm:p-6 ${className}`}>
-      <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-        {highlight && <span className="h-2 w-2 rounded-full bg-amber-500" />}
-        {label}
+    <div
+      className={`rounded-2xl border bg-card p-4 shadow-[0_1px_2px_rgba(16,24,40,0.04)] sm:p-5 ${
+        highlight ? "border-amber-300 ring-4 ring-amber-100" : "border-border"
+      }`}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm font-medium text-muted-foreground">{label}</p>
+        <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${ICON_TONES[tone]}`}>
+          <Icon className="h-[18px] w-[18px]" />
+        </span>
+      </div>
+      <p className="mt-3 text-2xl font-semibold tracking-tight tabular-nums text-foreground sm:text-3xl">
+        {loading ? <span className="inline-block h-8 w-16 animate-pulse rounded-md bg-muted align-middle" /> : value}
       </p>
-      <p className="mt-2 text-3xl font-semibold tracking-tight tabular-nums text-foreground">
-        {loading ? <span className="inline-block h-8 w-16 rounded-md bg-muted animate-pulse align-middle" /> : value}
-      </p>
-      <p className="mt-1 text-sm text-muted-foreground">{hint}</p>
+      <p className="mt-1 truncate text-xs text-muted-foreground sm:text-sm">{hint}</p>
     </div>
   )
 }
@@ -372,39 +394,36 @@ function NextStep({ row }: { row: { order: OrderWithPlan; account: TradingAccoun
   const awaiting = row.state === "awaiting_payment"
 
   return (
-    <Card className="mt-4 rounded-2xl border border-border/70 bg-card shadow-none">
-      <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-        <div className="flex items-start gap-4 min-w-0">
-          <div
-            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
-              awaiting ? "bg-amber-500/10 text-amber-600" : "bg-sky-500/10 text-sky-600"
-            }`}
-          >
-            {awaiting ? <CreditCard className="h-5 w-5" /> : <BarChart3 className="h-5 w-5" />}
+    <div className="relative mt-4 overflow-hidden rounded-2xl bg-[#0b1020] text-white">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(50%_120%_at_100%_0%,rgba(82,53,255,0.45),transparent_60%)]" />
+      <div className="relative flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <div className="flex min-w-0 items-start gap-4">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/15">
+            {awaiting ? <CreditCard className="h-5 w-5 text-amber-300" /> : <BarChart3 className="h-5 w-5 text-[#a89bff]" />}
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-medium text-muted-foreground">Next step</p>
-            <p className="mt-0.5 text-base font-semibold text-foreground">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Next step</p>
+            <p className="mt-1 text-base font-semibold sm:text-lg">
               {awaiting ? `Complete payment for your ${title}` : `Keep trading your ${title}`}
             </p>
-            <p className="mt-0.5 text-sm text-muted-foreground">{STATE_META[row.state].hint}</p>
-            {payError && <p className="mt-1 text-sm text-destructive">{payError}</p>}
+            <p className="mt-0.5 text-sm text-slate-300">{STATE_META[row.state].hint}</p>
+            {payError && <p className="mt-1 text-sm text-red-300">{payError}</p>}
           </div>
         </div>
         {awaiting ? (
-          <Button onClick={pay} disabled={paying} className="h-10 shrink-0 rounded-full px-5 gap-2">
+          <Button onClick={pay} disabled={paying} className="h-10 shrink-0 gap-2 rounded-xl bg-white px-5 text-[#0b1020] hover:bg-white/90">
             {paying ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
             Pay {usd(row.order.amountPaid, 2)}
           </Button>
         ) : (
-          <Button asChild className="h-10 shrink-0 rounded-full px-5 gap-2">
+          <Button asChild className="h-10 shrink-0 gap-2 rounded-xl bg-white px-5 text-[#0b1020] hover:bg-white/90">
             <Link href={`/dashboard?orderId=${encodeURIComponent(row.order.id)}`}>
               Open analytics <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
         )}
       </div>
-    </Card>
+    </div>
   )
 }
 
@@ -470,10 +489,14 @@ function ChallengeCard({ order, account, state }: { order: OrderWithPlan; accoun
   const showAccount = account && ["phase1", "phase2", "funded"].includes(state)
 
   return (
-    <Card className="flex flex-col rounded-2xl border border-border/70 bg-card shadow-none transition-colors hover:border-border">
+    <Card className="flex flex-col rounded-2xl border border-border bg-card shadow-[0_1px_2px_rgba(16,24,40,0.04)] transition-shadow hover:shadow-[0_12px_32px_rgba(16,24,40,0.08)]">
       <div className="p-5 sm:p-6 flex-1">
         {/* Title row */}
         <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 items-start gap-3">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#0b1020] text-xs font-bold text-white">
+            {size >= 1000 ? `${Math.round(size / 1000)}K` : "—"}
+          </span>
           <div className="min-w-0">
             <h3 className="text-lg font-semibold tracking-tight text-foreground">
               {plan ? `${usd(size)} ${plan.name}` : "Challenge"}
@@ -481,6 +504,7 @@ function ChallengeCard({ order, account, state }: { order: OrderWithPlan; accoun
             <p className="mt-0.5 text-sm text-muted-foreground">
               {[plan?.platform?.toUpperCase(), `Purchased ${shortDate(order.createdAt)}`].filter(Boolean).join(" · ")}
             </p>
+          </div>
           </div>
           <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${tone.pill}`}>
             <span className={`h-1.5 w-1.5 rounded-full ${tone.dot}`} />
@@ -497,7 +521,7 @@ function ChallengeCard({ order, account, state }: { order: OrderWithPlan; accoun
 
         {/* Account figures */}
         {showAccount && account && (
-          <div className="mt-5 rounded-xl bg-muted/40 p-4">
+          <div className="mt-5 rounded-xl border border-border bg-muted/50 p-4">
             <div className="grid grid-cols-3 gap-4">
               <Figure label="Balance" value={usd(account.balance, 2)} />
               <Figure label="Equity" value={usd(account.equity, 2)} />
@@ -515,8 +539,8 @@ function ChallengeCard({ order, account, state }: { order: OrderWithPlan; accoun
                   </span>
                   <span className="font-medium tabular-nums text-foreground">{progress.toFixed(0)}%</span>
                 </div>
-                <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-background">
-                  <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${progress}%` }} />
+                <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-border">
+                  <div className="h-full rounded-full bg-gradient-to-r from-[#5235ff] to-[#00b386] transition-all" style={{ width: `${progress}%` }} />
                 </div>
               </div>
             )}
@@ -538,27 +562,27 @@ function ChallengeCard({ order, account, state }: { order: OrderWithPlan; accoun
       </div>
 
       {/* Footer */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/70 px-5 py-3.5 sm:px-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-b-2xl border-t border-border bg-muted/40 px-5 py-3.5 sm:px-6">
         <span className="text-xs text-muted-foreground">
           Order <span className="font-mono">#{order.id.slice(0, 8)}</span> · {usd(order.amountPaid, 2)}
         </span>
         {state === "awaiting_payment" ? (
-          <Button size="sm" onClick={pay} disabled={paying} className="h-9 rounded-full px-4 gap-2">
+          <Button size="sm" onClick={pay} disabled={paying} className="h-9 rounded-lg px-4 gap-2">
             {paying ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
             Complete payment
           </Button>
         ) : state === "passed" ? (
-          <Button asChild size="sm" variant="outline" className="h-9 rounded-full px-4 gap-2">
+          <Button asChild size="sm" variant="outline" className="h-9 rounded-lg px-4 gap-2">
             <Link href="/dashboard/achievement">
               <Trophy className="h-4 w-4" /> View certificate
             </Link>
           </Button>
         ) : state === "preparing" ? (
-          <Button size="sm" variant="outline" disabled className="h-9 rounded-full px-4">
+          <Button size="sm" variant="outline" disabled className="h-9 rounded-lg px-4">
             Awaiting delivery
           </Button>
         ) : (
-          <Button asChild size="sm" variant={state === "failed" ? "outline" : "default"} className="h-9 rounded-full px-4 gap-2">
+          <Button asChild size="sm" variant={state === "failed" ? "outline" : "default"} className="h-9 rounded-lg px-4 gap-2">
             <Link href={`/dashboard?orderId=${encodeURIComponent(order.id)}`}>
               <BarChart3 className="h-4 w-4" /> View analytics
             </Link>
@@ -600,12 +624,12 @@ function EmptyOrders() {
         ))}
       </ol>
       <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
-        <Button asChild className="h-10 rounded-full px-5 gap-2">
+        <Button asChild className="h-10 rounded-xl px-5 gap-2">
           <Link href="/buy-challenge">
             Start a challenge <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>
-        <Button asChild variant="outline" className="h-10 rounded-full px-5">
+        <Button asChild variant="outline" className="h-10 rounded-xl px-5">
           <Link href="/rules">Read the rules</Link>
         </Button>
       </div>

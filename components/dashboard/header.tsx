@@ -273,121 +273,216 @@ export function Header({
     setTimeout(() => setCopiedField(null), 1500)
   }
 
+  const displayName = userData?.name || userData?.username || "Trader"
+  const firstName = displayName.split(" ")[0]
+  const showAccountCard = useOrderIdSelect || (variant === "dashboard-hero" && !hideHeroInfoCards)
+
   return (
-    <header className="space-y-3 md:space-y-4 animate-slide-in-up w-full min-w-0">
-      <div className="relative -mx-3 -mt-3 overflow-hidden border-b border-purple-400/30 bg-gradient-to-r from-purple-800 via-purple-950 to-purple-800 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] md:-mx-4 md:-mt-4 lg:-mx-5 lg:-mt-5">
-        <div className="flex w-max animate-ticker whitespace-nowrap text-xs sm:text-sm font-semibold text-white/90">
+    <header className="w-full min-w-0 space-y-5">
+      {/* Promo strip */}
+      <div className="relative -mx-3 -mt-3 overflow-hidden bg-[#0b1020] py-2 md:-mx-4 md:-mt-4 lg:-mx-5 lg:-mt-5">
+        <div className="flex w-max animate-ticker whitespace-nowrap text-xs font-medium tracking-wide text-slate-300">
           <span>{saleTickerText.repeat(6)}</span>
           <span aria-hidden="true">{saleTickerText.repeat(6)}</span>
         </div>
       </div>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 min-w-0">
-        <div className={`flex items-center gap-2 flex-1 min-w-0 w-full ${useOrderIdSelect ? "" : "sm:max-w-md"}`}>
-          <MobileNav />
 
-          <div className="relative flex flex-1 min-w-0 items-center gap-2">
-            {useOrderIdSelect ? (
-              <>
-                <div className="flex w-full min-w-0 items-center gap-2">
-                  <div className="relative min-w-0 flex-1">
-                    <Select value={selectedOrderId} onValueChange={setSelectedOrderId}>
-                      <SelectTrigger
-                        className="w-full min-h-[44px] sm:h-9 h-11 px-3 sm:px-3.5 rounded-2xl bg-gradient-to-b from-background/80 to-background/60 border border-border/70 shadow-sm backdrop-blur-md transition-all duration-200 hover:border-border focus:ring-2 focus:ring-primary/30 focus:ring-offset-0"
-                        disabled={isLoadingOrders}
-                        aria-label="Select order ID"
-                      >
-                        {isLoadingOrders ? (
-                          <div className="flex items-center gap-2">
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            <span>Loading orders...</span>
-                          </div>
-                        ) : (
-                          <div className="flex min-w-0 flex-col items-start text-left leading-tight">
-                            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                              Order ID
-                            </span>
-                            {selectedOrderMeta ? (
-                              <span className="mt-0.5 flex min-w-0 items-center gap-2">
-                                <span className="truncate text-sm font-bold text-foreground">
-                                  {selectedOrderMeta.order_id}
-                                </span>
-                                <span className="hidden sm:inline text-xs text-muted-foreground">
-                                  {selectedOrderMeta.challenge_type} • ${selectedOrderMeta.account_size}
-                                </span>
-                              </span>
-                            ) : (
-                              <span className="mt-0.5 text-sm font-bold text-foreground">
-                                {selectableOrders.length === 0 ? "No orders found" : "Select an order"}
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </SelectTrigger>
-                      <SelectContent className="rounded-2xl border border-border/70 bg-background/95 backdrop-blur-md shadow-xl">
-                        {selectableOrders.length === 0 && !isLoadingOrders ? (
-                          <div className="px-3 py-2 text-sm text-muted-foreground text-center">
-                            No orders available
-                          </div>
-                        ) : (
-                          selectableOrders.map((order) => (
-                            <SelectItem
-                              key={order.order_id}
-                              value={order.order_id}
-                              textValue={order.order_id}
-                              className="rounded-xl py-2.5 focus:bg-muted/60 data-[highlighted]:bg-muted/60"
-                            >
-                              <div className="flex flex-col">
-                                <span className="text-sm font-semibold text-foreground">{order.order_id}</span>
-                                <span className="text-xs text-muted-foreground">
-                                  {order.challenge_type} • ${order.account_size}
-                                </span>
-                              </div>
-                            </SelectItem>
-                          ))
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="hidden md:flex items-center gap-1.5 rounded-xl border border-border/60 bg-card/80 px-2 py-1.5 shrink-0">
-                    {stageFlow.steps.map((step, idx) => {
-                      const isDone = stageFlow.current >= idx
-                      const isCurrent = stageFlow.current === idx
-                      return (
-                        <div key={step} className="flex items-center gap-1.5">
-                          <span
-                            className={`rounded-md px-2 py-1 text-[11px] font-semibold whitespace-nowrap ${
-                              isDone
-                                ? isCurrent
-                                  ? "bg-primary/15 text-primary"
-                                  : "bg-emerald-500/15 text-emerald-600"
-                                : "bg-muted text-muted-foreground"
-                            }`}
-                          >
-                            {step}
-                          </span>
-                          {idx < stageFlow.steps.length - 1 ? (
-                            <span className="text-xs text-muted-foreground/70">→</span>
-                          ) : null}
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search trades, pairs..."
-                  className="pl-9 pr-3 md:pr-16 h-9 text-sm bg-card border-border transition-all duration-300 focus:shadow-lg focus:shadow-primary/10"
-                />
-                <kbd className="hidden md:inline-block absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground bg-muted rounded border border-border">
-                  ⌘F
-                </kbd>
-              </>
-            )}
+      {/* Utility bar */}
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2">
+          <MobileNav />
+          <div className="relative hidden md:block">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search pages, orders…"
+              className="h-10 w-72 rounded-xl border-border bg-card pl-9 pr-12 text-sm shadow-none"
+            />
+            <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md border border-border bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
+              ⌘K
+            </kbd>
           </div>
         </div>
+
+        <div className="flex shrink-0 items-center gap-2">
+          <Button variant="outline" size="icon" className="h-10 w-10 rounded-xl border-border bg-card text-muted-foreground hover:text-foreground" aria-label="Messages">
+            <Mail className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" size="icon" className="relative h-10 w-10 rounded-xl border-border bg-card text-muted-foreground hover:text-foreground" aria-label="Notifications">
+            <Bell className="h-4 w-4" />
+            <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-primary ring-2 ring-card" />
+          </Button>
+          <div className="flex min-w-0 items-center gap-2.5 rounded-xl border border-border bg-card py-1.5 pl-1.5 pr-3">
+            <Avatar className="h-7 w-7 shrink-0">
+              <AvatarImage src={userData?.image ?? undefined} alt={displayName} />
+              <AvatarFallback className="bg-gradient-to-br from-[#5235ff] to-[#7c3aed] text-[11px] font-semibold text-white">
+                {userData ? getUserInitials() : <User className="h-3.5 w-3.5" aria-hidden />}
+              </AvatarFallback>
+            </Avatar>
+            <div className="hidden min-w-0 leading-tight sm:block">
+              <p className="max-w-[160px] truncate text-sm font-semibold text-foreground" title={displayName}>{displayName}</p>
+              <p className="max-w-[160px] truncate text-[11px] text-muted-foreground" title={userData?.email || ""}>{userData?.email || ""}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Page title */}
+      {title != null && (
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div className="min-w-0">
+            {backHref && (
+              <Link
+                href={backHref}
+                className="mb-2 inline-flex w-fit items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                {backLabel}
+              </Link>
+            )}
+            {badge ? (
+              <p className="mb-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-primary">{badge}</p>
+            ) : variant === "dashboard-hero" && userData ? (
+              <p className="mb-1.5 text-sm text-muted-foreground">Welcome back, {firstName} 👋</p>
+            ) : null}
+            <h1 className="break-words text-2xl font-semibold tracking-tight text-foreground md:text-[28px]">{title}</h1>
+            {description != null && <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{description}</p>}
+          </div>
+          {actions && !showAccountCard && (
+            <div className="flex w-full flex-wrap items-center gap-2 md:w-auto md:justify-end">{actions}</div>
+          )}
+        </div>
+      )}
+
+      {/* Account card: order selector, stage flow, credentials */}
+      {showAccountCard && (
+        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+          <div className="flex flex-col gap-4 p-4 sm:p-5 lg:flex-row lg:items-center lg:justify-between">
+            {useOrderIdSelect ? (
+              <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-center">
+                <div className="min-w-0 sm:w-80">
+                  <Select value={selectedOrderId} onValueChange={setSelectedOrderId}>
+                    <SelectTrigger
+                      className="h-12 w-full rounded-xl border-border bg-muted/50 px-3.5 shadow-none focus:ring-2 focus:ring-primary/25 focus:ring-offset-0"
+                      disabled={isLoadingOrders}
+                      aria-label="Select order ID"
+                    >
+                      {isLoadingOrders ? (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Loading orders…
+                        </div>
+                      ) : (
+                        <div className="flex min-w-0 flex-col items-start text-left leading-tight">
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Trading account</span>
+                          {selectedOrderMeta ? (
+                            <span className="mt-0.5 flex min-w-0 items-center gap-2">
+                              <span className="truncate text-sm font-semibold text-foreground">{selectedOrderMeta.order_id}</span>
+                              <span className="hidden truncate text-xs text-muted-foreground sm:inline">
+                                {selectedOrderMeta.challenge_type} · ${selectedOrderMeta.account_size}
+                              </span>
+                            </span>
+                          ) : (
+                            <span className="mt-0.5 text-sm font-semibold text-foreground">
+                              {selectableOrders.length === 0 ? "No orders found" : "Select an order"}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border border-border bg-popover shadow-xl">
+                      {selectableOrders.length === 0 && !isLoadingOrders ? (
+                        <div className="px-3 py-2 text-center text-sm text-muted-foreground">No orders available</div>
+                      ) : (
+                        selectableOrders.map((order) => (
+                          <SelectItem key={order.order_id} value={order.order_id} textValue={order.order_id} className="rounded-lg py-2.5">
+                            <div className="flex flex-col">
+                              <span className="text-sm font-semibold">{order.order_id}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {order.challenge_type} · ${order.account_size}
+                              </span>
+                            </div>
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Stage flow */}
+                <ol className="flex items-center gap-2">
+                  {stageFlow.steps.map((step, idx) => {
+                    const isDone = stageFlow.current > idx
+                    const isCurrent = stageFlow.current === idx
+                    return (
+                      <li key={step} className="flex items-center gap-2">
+                        <span
+                          className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ${
+                            isCurrent
+                              ? "bg-primary text-primary-foreground"
+                              : isDone
+                                ? "bg-emerald-500/10 text-emerald-700"
+                                : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {isDone && <Check className="h-3 w-3" />}
+                          {step}
+                        </span>
+                        {idx < stageFlow.steps.length - 1 && <span className="h-px w-4 bg-border" />}
+                      </li>
+                    )
+                  })}
+                </ol>
+              </div>
+            ) : (
+              <div />
+            )}
+            {actions && <div className="flex flex-wrap items-center gap-2 lg:justify-end">{actions}</div>}
+          </div>
+
+          {variant === "dashboard-hero" && !hideHeroInfoCards && (
+            <div className="grid grid-cols-1 gap-px border-t border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                {
+                  label: "Platform login",
+                  value:
+                    resolvedForHeader?.credential?.platform_login != null
+                      ? String(resolvedForHeader.credential.platform_login)
+                      : "—",
+                  key: "hero-login",
+                  icon: MonitorSmartphone,
+                },
+                { label: "Password", value: resolvedForHeader?.credential?.platform_password || "—", key: "hero-password", icon: KeyRound },
+                { label: "Server", value: resolvedForHeader?.credential?.server || "—", key: "hero-server", icon: Server },
+                { label: "Status", value: headerStatus, key: "hero-status", icon: Activity },
+              ].map((item: { label: string; value: string; key: string; icon: LucideIcon }) => (
+                <div key={item.key} className="group flex items-center justify-between gap-3 bg-card px-4 py-3.5 sm:px-5">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+                      <item.icon className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-medium text-muted-foreground">{item.label}</p>
+                      <p className="truncate font-mono text-sm font-semibold text-foreground" title={item.value}>
+                        {item.value}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 shrink-0 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
+                    onClick={() => item.value !== "—" && copyToClipboard(item.key, item.value)}
+                    disabled={item.value === "—"}
+                    aria-label={`Copy ${item.label}`}
+                  >
+                    {copiedField === item.key ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4" />}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
         <Dialog open={credentialsOpen} onOpenChange={setCredentialsOpen}>
           <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
@@ -628,151 +723,6 @@ export function Header({
             )}
           </DialogContent>
         </Dialog>
-
-        <div className="flex items-center gap-1.5 md:gap-2 shrink-0 flex-shrink-0">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-all duration-300 min-h-[44px] min-w-[44px] h-11 w-11 sm:h-8 sm:w-8 touch-manipulation rounded-xl"
-          >
-            <Mail className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-all duration-300 min-h-[44px] min-w-[44px] h-11 w-11 sm:h-8 sm:w-8 touch-manipulation rounded-xl"
-          >
-            <Bell className="h-4 w-4" />
-            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-destructive rounded-full animate-pulse" />
-          </Button>
-
-          <div className="flex items-center gap-2 pl-2 md:pl-3 border-l border-border min-w-0">
-            <Avatar className="w-9 h-9 md:w-9 md:h-9 ring-2 ring-purple-400/35 shadow-[0_10px_24px_rgba(88,28,135,0.18)] transition-all duration-300 hover:ring-purple-300/55 shrink-0">
-              <AvatarImage src={userData?.image ?? undefined} alt={userData?.username || userData?.name || 'User'} />
-              <AvatarFallback className="bg-gradient-to-br from-purple-600/35 via-purple-950/35 to-muted text-white/90">
-                <User className="h-4 w-4 opacity-90" aria-hidden />
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0 flex flex-col justify-center">
-              <p className="text-sm font-semibold text-foreground truncate" title={userData?.username || userData?.name || 'User'}>
-                {userData?.username || userData?.name || 'User'}
-              </p>
-              <p className="text-xs text-muted-foreground truncate hidden sm:block" title={userData?.email || ''}>
-                {userData?.email || ''}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {title != null && (
-        variant === "dashboard-hero" ? (
-          <div className="mt-1 rounded-2xl border border-border/80 bg-card px-4 py-4 md:px-6 md:py-5 shadow-sm">
-            {backHref && (
-              <Link
-                href={backHref}
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-fit mb-4"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                {backLabel}
-              </Link>
-            )}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-7">
-              <div className="space-y-2 min-w-0">
-                {!hideHeroInfoCards && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 w-full max-w-5xl">
-                    {[
-                      {
-                        label: "Platform Login",
-                        value:
-                          resolvedForHeader?.credential?.platform_login != null
-                            ? String(resolvedForHeader.credential.platform_login)
-                            : "—",
-                        key: "hero-login",
-                        icon: MonitorSmartphone,
-                      },
-                      {
-                        label: "Password",
-                        value: resolvedForHeader?.credential?.platform_password || "—",
-                        key: "hero-password",
-                        icon: KeyRound,
-                      },
-                      {
-                        label: "Server",
-                        value: resolvedForHeader?.credential?.server || "—",
-                        key: "hero-server",
-                        icon: Server,
-                      },
-                      {
-                        label: "Status",
-                        value: headerStatus,
-                        key: "hero-status",
-                        icon: Activity,
-                      },
-                    ].map((item: { label: string; value: string; key: string; icon: LucideIcon }) => (
-                      <div
-                        key={item.key}
-                        className="group rounded-xl border border-border/70 bg-gradient-to-br from-muted/45 to-muted/20 px-3 py-2.5 min-w-0 shadow-sm"
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="min-w-0">
-                            <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                              <item.icon className="h-3.5 w-3.5" />
-                              {item.label}
-                            </p>
-                            <p className="text-sm font-semibold text-foreground truncate mt-1" title={item.value}>
-                              {item.value}
-                            </p>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 shrink-0 rounded-lg border border-border/60 bg-background/40 hover:bg-background/70"
-                            onClick={() => item.value !== "—" && copyToClipboard(item.key, item.value)}
-                            disabled={item.value === "—"}
-                            aria-label={`Copy ${item.label}`}
-                          >
-                            {copiedField === item.key ? (
-                              <Check className="h-3.5 w-3.5 text-emerald-500" />
-                            ) : (
-                              <Copy className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
-                            )}
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {actions && (
-                <div className="flex w-full md:w-auto flex-wrap items-center justify-start md:justify-end gap-2 md:gap-3">
-                  {actions}
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
-          <>
-            <div className="px-0 pl-0 sm:pl-10 md:pl-16 lg:pl-20 min-w-0">
-              <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground mb-1 break-words">
-                {title}
-              </h1>
-              {description != null && (
-                <p className="text-xs md:text-sm text-muted-foreground break-words">
-                  {description}
-                </p>
-              )}
-            </div>
-
-            {actions && (
-              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto flex-wrap">
-                {actions}
-              </div>
-            )}
-          </>
-        )
-      )}
     </header>
   )
 }

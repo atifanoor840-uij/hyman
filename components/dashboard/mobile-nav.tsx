@@ -1,21 +1,23 @@
 "use client"
 
+import type { ReactNode } from "react"
 import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Sidebar } from "./sidebar"
 
-export function MobileNav() {
+export function MobileNav({ sidebar }: { sidebar?: ReactNode }) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="lg:hidden hover:bg-secondary transition-all duration-300">
-          <Menu className="w-6 h-6" />
+        <Button variant="outline" size="icon" className="h-10 w-10 shrink-0 rounded-xl border-border bg-card lg:hidden">
+          <Menu className="h-5 w-5" />
           <span className="sr-only">Open menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="p-0 w-64">
-        <Sidebar />
+      <SheetContent side="left" className="w-64 border-0 bg-[#0b1020] p-0 [&>button]:z-40 [&>button]:text-white">
+        <SheetTitle className="sr-only">Navigation</SheetTitle>
+        {sidebar ?? <Sidebar />}
       </SheetContent>
     </Sheet>
   )

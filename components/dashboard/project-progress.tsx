@@ -27,7 +27,7 @@ export function ProjectProgress(props: ProjectProgressProps) {
 
   return (
     <Card
-      className="p-4 md:p-6 transition-shadow duration-200 hover:shadow-md animate-slide-in-up overflow-hidden min-w-0"
+      className="rounded-2xl border-border p-4 md:p-6 transition-shadow duration-200 hover:shadow-md animate-slide-in-up overflow-hidden min-w-0"
       style={{ animationDelay: "800ms" }}
     >
       <h2 className="text-lg font-semibold text-foreground mb-4">Account Performance</h2>

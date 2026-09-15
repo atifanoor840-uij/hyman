@@ -3,10 +3,10 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import { User, Lock, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
 import SuccessPopup from '../components/SuccessPopup';
-import Navbar from '../components/Navbar';
+import Toast from '../components/Toast';
+import AuthShell, { authFieldClass, authInputClass, authLabelClass, authPrimaryButtonClass } from '../components/AuthShell';
 import { signinRequest } from '../../lib/api/auth-client';
 import { ApiClientError } from '../../lib/api/client';
 import {
@@ -17,8 +17,6 @@ import {
 	clearLoginAttempts,
 	getRemainingLockoutTime,
 } from '../../lib/auth-utils';
-
-const CURRENT_YEAR = new Date().getFullYear();
 
 export default function LoginPage() {
 	const router = useRouter();
@@ -189,138 +187,95 @@ export default function LoginPage() {
 	};
 
 	return (
-		<div className="min-h-screen flex flex-col bg-gradient-to-br from-white via-white to-zinc-50 text-black">
-			<Navbar variant="sticky" />
-			<main className="flex-1 min-h-0">
-				<div className="mx-auto flex w-full max-w-[640px] flex-col items-stretch px-6 py-10 sm:py-14">
-					{/* Header */}
-					<div className="flex flex-col items-center text-center">
-						<div className="flex items-center justify-center gap-3">
-							<Image src="/logo.png" alt="GenzProp" width={44} height={44} className="object-contain" />
-							<span className="text-2xl font-bold text-black tracking-tight">GenzProp</span>
-						</div>
-						<h1 className="mt-4 text-3xl font-bold tracking-tight text-black">Welcome back</h1>
-						<p className="mt-2 text-base text-zinc-600">Sign in to continue to your dashboard.</p>
+		<AuthShell
+			title="Welcome back"
+			subtitle="Sign in to continue to your trading dashboard."
+			footer={
+				<>
+					Don&apos;t have an account?{' '}
+					<Link href="/signup" className="font-semibold text-[#5235ff] hover:text-[#4527f0]">
+						Create one
+					</Link>
+				</>
+			}
+		>
+			<form onSubmit={handleSubmit} className="space-y-5" noValidate>
+				{/* Email */}
+				<div className="space-y-2">
+					<label htmlFor="email" className={authLabelClass}>
+						Email address
+					</label>
+					<div className={authFieldClass(!!formErrors.email)}>
+						<Mail className={`h-[18px] w-[18px] shrink-0 ${formErrors.email ? 'text-red-400' : 'text-slate-400'}`} />
+						<input
+							id="email"
+							type="email"
+							autoComplete="email"
+							value={email}
+							onChange={handleFormChange('email')}
+							placeholder="name@company.com"
+							className={authInputClass}
+						/>
 					</div>
+					{formErrors.email && <p className="text-sm text-red-600">{formErrors.email}</p>}
+				</div>
 
-					<form onSubmit={handleSubmit} className="mt-8">
-						{/* Card */}
-						<div className="rounded-3xl border border-zinc-200/70 bg-white/80 backdrop-blur-xl p-7 sm:p-10 shadow-[0_18px_60px_rgba(0,0,0,0.10)] space-y-6">
-						{/* Email */}
-						<div className="space-y-2">
-							<label htmlFor="email" className="block text-sm font-semibold text-zinc-500 uppercase tracking-wider">
-								Email address
-							</label>
-							<div
-								className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-5 py-4 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
-									formErrors.email
-										? 'border-red-300 bg-red-50/50 focus-within:border-red-400 focus-within:ring-red-500/10'
-										: 'border-zinc-200 hover:border-zinc-300'
-								}`}
-							>
-								<User className={`w-5 h-5 shrink-0 ${formErrors.email ? 'text-red-400' : 'text-zinc-400'} transition-colors`} />
-								<input
-									id="email"
-									type="email"
-									value={email}
-									onChange={handleFormChange('email')}
-									placeholder="name@company.com"
-									className="flex-1 min-w-0 bg-transparent text-base font-medium text-zinc-900 placeholder:text-zinc-400 outline-none"
-								/>
-							</div>
-							{formErrors.email && (
-								<p className="text-sm font-medium text-red-600 flex items-center gap-1">{formErrors.email}</p>
-							)}
-						</div>
-
-						{/* Password */}
-						<div className="space-y-2">
-							<label htmlFor="password" className="block text-sm font-semibold text-zinc-500 uppercase tracking-wider">
-								Password
-							</label>
-							<div
-								className={`flex items-center gap-3 rounded-xl border bg-zinc-50/80 px-5 py-4 transition-all duration-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-black ${
-									formErrors.password
-										? 'border-red-300 bg-red-50/50 focus-within:border-red-400 focus-within:ring-red-500/10'
-										: 'border-zinc-200 hover:border-zinc-300'
-								}`}
-							>
-								<Lock className={`w-5 h-5 shrink-0 ${formErrors.password ? 'text-red-400' : 'text-zinc-400'} transition-colors`} />
-								<input
-									id="password"
-									type={showPassword ? 'text' : 'password'}
-									value={password}
-									onChange={handleFormChange('password')}
-									placeholder="Enter your password"
-									className="flex-1 min-w-0 bg-transparent text-base font-medium text-zinc-900 placeholder:text-zinc-400 outline-none"
-								/>
-								<button
-									type="button"
-									onClick={() => setShowPassword((p) => !p)}
-									className="shrink-0 p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 hover:bg-zinc-200/60 transition-colors"
-									aria-label={showPassword ? 'Hide password' : 'Show password'}
-								>
-									{showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-								</button>
-							</div>
-							{formErrors.password && (
-								<p className="text-sm font-medium text-red-600 flex items-center gap-1">{formErrors.password}</p>
-							)}
-						</div>
-
-						{/* Remember me + Forgot password */}
-						<div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-							<label className="flex items-center gap-2.5 cursor-pointer group">
-								<input
-									type="checkbox"
-									checked={rememberMe}
-									onChange={(e) => setRememberMe(e.target.checked)}
-									className="h-5 w-5 rounded border-zinc-300 text-black focus:ring-2 focus:ring-black/20 focus:ring-offset-0"
-								/>
-								<span className="text-base text-zinc-600 group-hover:text-zinc-900 transition-colors">Remember this device</span>
-							</label>
-							<Link
-								href="/forgot-password"
-								className="text-base font-medium text-zinc-600 hover:text-black transition-colors"
-							>
-								Forgot password?
-							</Link>
-						</div>
-
-						{/* Submit */}
+				{/* Password */}
+				<div className="space-y-2">
+					<div className="flex items-center justify-between">
+						<label htmlFor="password" className={authLabelClass}>
+							Password
+						</label>
+						<Link href="/forgot-password" className="text-sm font-medium text-[#5235ff] hover:text-[#4527f0]">
+							Forgot password?
+						</Link>
+					</div>
+					<div className={authFieldClass(!!formErrors.password)}>
+						<Lock className={`h-[18px] w-[18px] shrink-0 ${formErrors.password ? 'text-red-400' : 'text-slate-400'}`} />
+						<input
+							id="password"
+							type={showPassword ? 'text' : 'password'}
+							autoComplete="current-password"
+							value={password}
+							onChange={handleFormChange('password')}
+							placeholder="Enter your password"
+							className={authInputClass}
+						/>
 						<button
-							type="submit"
-							disabled={isLoading}
-							className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-black px-6 py-4 text-base font-bold text-white shadow-sm hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+							type="button"
+							onClick={() => setShowPassword((p) => !p)}
+							className="-mr-1.5 shrink-0 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+							aria-label={showPassword ? 'Hide password' : 'Show password'}
 						>
-							{isLoading ? (
-								<>
-									<svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-										<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-										<path
-											className="opacity-75"
-											fill="currentColor"
-											d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-										/>
-									</svg>
-									Signing in…
-								</>
-							) : (
-								'Sign in'
-							)}
+							{showPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
 						</button>
 					</div>
-					</form>
-
-					<p className="mt-6 text-center text-base text-zinc-600">
-						Don&apos;t have an account?{' '}
-						<Link href="/signup" className="font-semibold text-black underline underline-offset-2 hover:no-underline">
-							Sign up
-						</Link>
-					</p>
-
-					<p className="mt-10 text-center text-xs text-zinc-400">© {CURRENT_YEAR} GenzProp. All rights reserved.</p>
+					{formErrors.password && <p className="text-sm text-red-600">{formErrors.password}</p>}
 				</div>
+
+				<label className="flex w-fit cursor-pointer items-center gap-2.5">
+					<input
+						type="checkbox"
+						checked={rememberMe}
+						onChange={(e) => setRememberMe(e.target.checked)}
+						className="h-4 w-4 rounded border-slate-300 accent-[#5235ff]"
+					/>
+					<span className="text-sm text-slate-600">Keep me signed in on this device</span>
+				</label>
+
+				<button type="submit" disabled={isLoading} className={authPrimaryButtonClass}>
+					{isLoading ? (
+						<>
+							<Loader2 className="h-4 w-4 animate-spin" />
+							Signing in…
+						</>
+					) : (
+						<>
+							Sign in <ArrowRight className="h-4 w-4" />
+						</>
+					)}
+				</button>
+			</form>
 
 			{toastType === 'success' && toastMessage && (
 				<SuccessPopup
@@ -333,7 +288,19 @@ export default function LoginPage() {
 					}}
 				/>
 			)}
-			</main>
-		</div>
+
+			{toastType !== 'success' && toastMessage && (
+				<Toast
+					message={toastMessage}
+					type={toastType}
+					title={toastTitle}
+					duration={5000}
+					onClose={() => {
+						setToastMessage(null);
+						setToastTitle(undefined);
+					}}
+				/>
+			)}
+		</AuthShell>
 	);
 }
