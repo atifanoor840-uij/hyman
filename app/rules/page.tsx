@@ -12,21 +12,23 @@ const display = Poppins({ subsets: ['latin'], weight: ['600', '700', '800'] });
 
 /** Card order and labels on /rules — each slug must exist in HELP_CATEGORIES */
 const RULES_CARD_SLUGS = [
-	'getting-started',
-	'dashboard',
-	'prohibited-strategies',
-	'funding-payouts',
-	'trading-rules-guidelines',
 	'general',
+	'account-types',
+	'challenge-requirements',
+	'trading-rules-guidelines',
+	'funding-payouts',
+	'prohibited-strategies',
+	'account-reference',
 ] as const;
 
 const DISPLAY_TITLES: Record<(typeof RULES_CARD_SLUGS)[number], string> = {
-	'getting-started': 'Get Started',
-	dashboard: 'Dashboard',
-	'prohibited-strategies': 'Prohibited Strategies',
-	'funding-payouts': 'Funding and payout',
-	'trading-rules-guidelines': 'Trading Rules and Guidelines',
-	general: 'General rules',
+	general: 'General',
+	'account-types': 'Account Types',
+	'challenge-requirements': 'Challenge Requirements',
+	'trading-rules-guidelines': 'Trading Rules',
+	'funding-payouts': 'Withdrawals',
+	'prohibited-strategies': 'Prohibited Trading Practices',
+	'account-reference': 'Account Structure & Limits',
 };
 
 const categoryBySlug = Object.fromEntries(HELP_CATEGORIES.map((c) => [c.slug, c]));

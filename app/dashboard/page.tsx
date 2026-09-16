@@ -13,7 +13,7 @@ import { ShoppingCart, BarChart3, CheckCircle2, AlertTriangle, XCircle, Mail } f
 import { getMyAccount, getOrderCredentialsForStats, findOrderById, type Order } from "@/lib/api/auth"
 import { Card } from "@/components/ui/card"
 import { Activity } from "lucide-react"
-import { getAccountRules } from "@/lib/rules-config"
+import { GLOBAL_RULES, getAccountRules, getAccountRuleType, getMinDays, getMaxDrawdownPct } from "@/lib/rules-config"
 import { useSearchParams } from "next/navigation"
 
 function getAccountStatusLabel(order: Order | null): string {
@@ -289,6 +289,7 @@ function DashboardPageInner() {
   const statsUnavailable =
     hasActiveOrder && !!orderForStats && !ordersLoading && !statsLoading && !stats && statsError
   const accountRules = getAccountRules(orderForStats?.challenge_type)
+  const accountRuleType = getAccountRuleType(orderForStats?.challenge_type)
   const resolvedCreds = getOrderCredentialsForStats(orderForStats)
   const accountStats = stats?.statistics?.account_stats
   const dailyPerf = stats?.statistics?.equity_curve?.daily_performance || []
@@ -297,13 +298,16 @@ function DashboardPageInner() {
     resolvedCreds?.credential?.profit_target != null
       ? Number(resolvedCreds.credential.profit_target)
       : (initialBalance * 8) / 100
-  const dailyDrawdownLimit = parseInt(accountRules.dailyDrawdown, 10) || 5
-  const maxDrawdownLimit = parseInt(accountRules.maxDrawdown, 10) || 10
+  const dailyDrawdownLimit = GLOBAL_RULES.dailyDrawdownPct
+  // Step 1/Step 2 keep the same 10% overall limit in evaluation and funded; Instant is 6%.
+  const isFundedStage = String(orderForStats?.status ?? "").toLowerCase().includes("live") || !!orderForStats?.live_credentials
+  const maxDrawdownLimit = getMaxDrawdownPct(accountRuleType, isFundedStage ? "funded" : "challenge")
   const dailyDrawdownCurrent = dailyPerf.length
     ? Math.abs(dailyPerf.reduce((w, d) => (Math.abs(d.drawdown) > Math.abs(w.drawdown) ? d : w)).drawdown ?? 0)
     : 0
   const drawdownUsed = Math.abs(accountStats?.drawdown_percent ?? 0)
-  const minTradingDaysRequired = accountRules.minTradingDays > 0 ? accountRules.minTradingDays : 5
+  const minDays = getMinDays(accountRuleType, isFundedStage ? "funded" : "challenge")
+  const minTradingDaysRequired = minDays.total
   const minTradingDaysOk = dailyPerf.length >= minTradingDaysRequired
   const violationsWithDates = useMemo(() => {
     const list: { type: string; value: string; limit: string; date: string }[] = []
@@ -447,7 +451,7 @@ function DashboardPageInner() {
                         value={drawdownUsed}
                         max={maxDrawdownLimit}
                         label="Max drawdown"
-                        maxLabel={`Max ${accountRules.maxDrawdown}`}
+                        maxLabel={`Max ${maxDrawdownLimit}%`}
                         displayValue={`${drawdownUsed.toFixed(2)}%`}
                         color={drawdownUsed >= maxDrawdownLimit ? "#dc2626" : "#f97316"}
                       />
@@ -455,7 +459,11 @@ function DashboardPageInner() {
                     <div className="space-y-2 pt-2 border-t border-border/60">
                       {minTradingDaysRequired > 0 && (
                         <div className="flex justify-between items-center gap-2 py-2 border-b border-border/40">
-                          <span className="text-xs font-medium text-muted-foreground">Minimum Trading Days</span>
+                          <span className="text-xs font-medium text-muted-foreground">
+                            {minDays.tradingDays > 0
+                              ? `Minimum Days (${minDays.profitableDays} profitable + ${minDays.tradingDays} trading)`
+                              : `Minimum Profitable Days`}
+                          </span>
                           <span className={`text-sm font-semibold tabular-nums ${minTradingDaysOk ? "text-emerald-600" : "text-foreground"}`}>
                             {dailyPerf.length} of {minTradingDaysRequired}
                           </span>
@@ -463,16 +471,46 @@ function DashboardPageInner() {
                         </div>
                       )}
                       <div className="flex justify-between items-center gap-2 py-2 border-b border-border/40">
-                        <span className="text-xs font-medium text-muted-foreground">Weekend Holding</span>
-                        <span className="text-sm font-semibold text-foreground">{accountRules.weekendHolding}</span>
+                        <span className="text-xs font-medium text-muted-foreground">Profitable Day threshold</span>
+                        <span className="text-sm font-semibold text-foreground">{GLOBAL_RULES.profitableDayPct}% / day</span>
+                      </div>
+                      <div className="flex justify-between items-center gap-2 py-2 border-b border-border/40">
+                        <span className="text-xs font-medium text-muted-foreground">Minimum Holding Time</span>
+                        <span className="text-sm font-semibold text-foreground">{accountRules.minHoldingTime}</span>
+                      </div>
+                      <div className="flex justify-between items-center gap-2 py-2 border-b border-border/40">
+                        <span className="text-xs font-medium text-muted-foreground">Leverage</span>
+                        <span className="text-sm font-semibold text-foreground">{accountRules.leverage}</span>
+                      </div>
+                      <div className="flex justify-between items-center gap-2 py-2 border-b border-border/40">
+                        <span className="text-xs font-medium text-muted-foreground">Profit Consistency Rule</span>
+                        <span className="text-sm font-semibold text-foreground">None</span>
                       </div>
                       <div className="flex justify-between items-center gap-2 py-2 border-b border-border/40">
                         <span className="text-xs font-medium text-muted-foreground">Overnight Holding</span>
                         <span className="text-sm font-semibold text-foreground">{accountRules.overnightHolding}</span>
                       </div>
                       <div className="flex justify-between items-center gap-2 py-2 border-b border-border/40">
+                        <span className="text-xs font-medium text-muted-foreground">Weekend Holding</span>
+                        <span className="text-sm font-semibold text-foreground">{accountRules.weekendHolding}</span>
+                      </div>
+                      <div className="flex justify-between items-center gap-2 py-2 border-b border-border/40">
+                        <span className="text-xs font-medium text-muted-foreground">News Trading</span>
+                        <span className="text-sm font-semibold text-foreground text-right">
+                          {isFundedStage ? accountRules.newsFunded : accountRules.newsChallenge}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center gap-2 py-2 border-b border-border/40">
+                        <span className="text-xs font-medium text-muted-foreground">Trade Layering</span>
+                        <span className="text-sm font-semibold text-foreground text-right">{accountRules.layering}</span>
+                      </div>
+                      <div className="flex justify-between items-center gap-2 py-2 border-b border-border/40">
                         <span className="text-xs font-medium text-muted-foreground">Hedging</span>
                         <span className="text-sm font-semibold text-foreground">{accountRules.hedging}</span>
+                      </div>
+                      <div className="flex justify-between items-center gap-2 py-2">
+                        <span className="text-xs font-medium text-muted-foreground">Daily reset</span>
+                        <span className="text-sm font-semibold text-foreground">{GLOBAL_RULES.dailyResetUtc}</span>
                       </div>
                     </div>
                     <div className="flex gap-2">

@@ -1,6 +1,15 @@
 /**
  * Help center collections under /rules/help — category list + article bodies.
- * Body strings use **double asterisks** for bold segments; paragraphs separated by blank lines.
+ *
+ * This is the authoritative GenzProp Help Center content. Rule numbers here must
+ * match `lib/rules-config.ts`, which is the single source of truth used by the
+ * dashboard, buy page and pricing tables.
+ *
+ * Body markup understood by `components/rules/help-article-body.tsx`:
+ *   `## Heading`   section heading      `- item`     bullet list
+ *   `1. item`      numbered list        `| a | b |`  table (first row = header)
+ *   `> note`       callout              `**bold**`   inline bold
+ * Blocks are separated by blank lines.
  */
 
 export type HelpArticle = {
@@ -15,239 +24,757 @@ export type HelpCategory = {
 	articles: HelpArticle[];
 };
 
-const ph = (topic: string) =>
-	`This guide covers **${topic}** at GenzProp. For official program rules and numbers, see the **Trading Rules** section on our rules page.\n\nIf anything is unclear, contact support — we're happy to help.`;
-
 export const HELP_CATEGORIES: HelpCategory[] = [
-	{
-		slug: 'challenge-rules',
-		title: 'Challenge rules',
-		articles: [
-			{
-				slug: 'sigma-instant-rules',
-				title: 'Instant — rules overview',
-				body: `**Instant** accounts use simulated capital under real market conditions. There is no separate evaluation phase.\n\nKey points include **balance-based drawdowns**, **leverage 1:100**, restrictions on scalping, grid, martingale, hedging, and EAs, plus **consistency** and **payout** rules.\n\nSee the full **Rules by Account Type** section on the main rules page for the complete list.`,
-			},
-			{
-				slug: 'beta-challenge-rules',
-				title: 'Step 2 — challenge rules overview',
-				body: `**Step 2** programs follow our standard challenge structure with **daily and maximum drawdown** limits calculated from your account balance.\n\n**EA use**, **overnight** and **weekend holding**, and **news trading** are allowed under Step 2 rules where stated. An **inactivity rule** may apply if no trades are opened for an extended period.\n\nRefer to the rules page for exact percentages and conditions.`,
-			},
-			{
-				slug: 'alpha-challenge-rules',
-				title: 'Step 1 — challenge rules overview',
-				body: `**Step 1** typically includes a **single evaluation phase** before funded access, with **minimum trading days**, **drawdown limits**, and **profit split** tiers.\n\n**Weekend holding**, certain strategies, and **minimum trade holding time** on live accounts may apply. Always confirm current terms on the **Rules** page.`,
-			},
-		],
-	},
-	{
-		slug: 'getting-started',
-		title: 'Get Started',
-		articles: [
-			{
-				slug: 'what-is-GenzProp',
-				title: 'What is GenzProp?',
-				body: `GenzProp is a **proprietary trading firm** that provides traders with access to **funded trading accounts**, allowing them to trade financial markets **without risking their own capital** while keeping a **major share of the profits** they generate.`,
-			},
-			{
-				slug: 'how-to-purchase-challenge',
-				title: 'How can I purchase the Challenge?',
-				body: `🛠 **Step-by-Step**\n\n**Create Your Account**\n\nVisit the **GenzProp website** and create your account.\n\n**Choose Your Challenge**\n\nSelect the **evaluation program** that suits your trading style.\n\n**Select Account Size**\n\nChoose your preferred account size, typically ranging from **$5,000 to $200,000**.\n\n**Complete Payment**\n\nComplete the payment using the available methods such as **credit/debit card**, **cryptocurrency**, or other supported payment options.\n\n**Receive Your Account Details**\n\nYour **trading account credentials** will be delivered to your email within minutes, including **platform login details** and access to the **GenzProp dashboard**.`,
-			},
-			{
-				slug: 'which-trading-platforms-supported',
-				title: 'Which Trading Platforms are Supported?',
-				body: `GenzProp offers traders access to both **MetaTrader 4 (MT4)** and **MetaTrader 5 (MT5)**, two of the most widely used trading platforms in the industry.\n\n**Desktop**\n\nTrade from the **desktop terminal** for Windows and macOS where supported.\n\n**Web**\n\nUse the **web-based** platform in your browser when you cannot install software.\n\n**Mobile**\n\nDownload the **MT4/MT5 mobile apps** for iOS and Android to manage positions on the go.\n\nYou will receive **server and login** details for your program after purchase or account assignment.`,
-			},
-		],
-	},
+	// -----------------------------------------------------------------------
 	{
 		slug: 'general',
 		title: 'General',
 		articles: [
-			{ slug: 'who-can-join', title: 'Who can join GenzProp?', body: ph('eligibility and who our programs are for') },
-			{ slug: 'fees-and-refunds', title: 'Fees and refundable fees', body: ph('how fees work and when refunds may apply') },
-			{ slug: 'kyc-and-compliance', title: 'KYC and compliance', body: ph('verification and compliance expectations') },
-			{ slug: 'support-hours', title: 'Support and response times', body: ph('how to reach support') },
-			{ slug: 'legal-disclaimer', title: 'Educational & simulated trading disclaimer', body: ph('how our services are described legally') },
+			{
+				slug: 'are-you-a-broker',
+				title: 'Are you a broker?',
+				body: `**No, GenzProp is not a broker.** We are a proprietary trading firm.
+
+We do not accept client deposits for live market trading. Traders simply purchase an evaluation challenge to test their trading strategies within our simulated institutional environment.`,
+			},
+			{
+				slug: 'am-i-trading-with-real-funds',
+				title: 'Am I trading with real funds?',
+				body: `**No.** GenzProp provides simulated accounts where all trading is conducted with virtual funds. These accounts allow us to identify and evaluate consistent, high-performing trading strategies.
+
+Once you successfully pass the evaluation stages, you retain access to our simulated environment as a funded trader, earning performance fees based on your simulated trading results.`,
+			},
+			{
+				slug: 'trading-platforms-available',
+				title: 'What trading platforms are available?',
+				body: `We offer access to both **MetaTrader 4 (MT4)** and **MetaTrader 5 (MT5)**.
+
+You receive your server and login details for your program after purchase or account assignment.`,
+			},
+			{
+				slug: 'how-long-to-receive-credentials',
+				title: 'How long does it take to receive account credentials?',
+				body: `Your delivery timeframe depends on your selected payment method:
+
+- **Card payments:** your account details are generated and sent immediately after your payment is confirmed.
+- **Cryptocurrency:** credentials are sent as soon as the transaction is confirmed on the blockchain.
+
+> **Note:** Always verify you are using the correct network and transferring the full amount, including network gas fees. Underpaid transactions may delay delivery and require manual refund handling, subject to network fee deductions.`,
+			},
+			{
+				slug: 'prior-trading-experience',
+				title: 'Do I need prior trading experience to apply?',
+				body: `No formal experience is required to purchase an assessment with GenzProp.
+
+However, because our evaluations are designed around strict risk parameters, achieving consistency without foundational trading knowledge is challenging.`,
+			},
+			{
+				slug: 'country-restrictions',
+				title: 'Are there any country restrictions?',
+				body: `**No.** We welcome traders globally with no regional restrictions.`,
+			},
+			{
+				slug: 'liability-and-account-responsibility',
+				title: 'Liability and Account Responsibility',
+				body: `GenzProp provides the simulated infrastructure and tools, but you remain in complete control of your execution and security.
+
+- **Account security:** you are strictly responsible for protecting your login credentials. Sharing access with third parties or account management services is prohibited. GenzProp is not liable for compromised credentials resulting from personal email or device security breaches.
+- **Simulated environment, real discipline:** although balances are virtual, execution requires professional discipline. You are responsible for every executed trade, risk setting, and drawdown level.
+- **Operational liability:** GenzProp is not responsible for losses or breaches caused by trader error, local internet outages, or client-side issues.`,
+			},
+			{
+				slug: 'what-happens-if-i-fail',
+				title: 'What happens if I fail an evaluation or funded account?',
+				body: `If an account violates any trading rule, it is **permanently closed**, and progress is reset.
+
+- Accounts cannot be restarted or resumed from a failed phase; continuing with GenzProp requires purchasing a new evaluation.
+- Some rule breaches may not trigger automated flags immediately and will be confirmed during manual reviews by our risk team.`,
+			},
+			{
+				slug: 'inactivity-rule',
+				title: 'Is there an inactivity rule?',
+				body: `**Yes.** You must execute at least one trade every **30 consecutive days** to keep your account active.
+
+If an account shows no trading activity for 30 days starting from your first executed trade, it will be marked as inactive and closed due to a breach.`,
+			},
 		],
 	},
+
+	// -----------------------------------------------------------------------
 	{
-		slug: 'dashboard',
-		title: 'Dashboard',
+		slug: 'account-types',
+		title: 'Account Types',
 		articles: [
 			{
-				slug: 'how-long-credentials',
-				title: 'How Long Will It Take to Receive My Credentials?',
-				body: `The time required to receive your **trading credentials** depends on the **successful confirmation of your payment**.\n\nOnce your payment is confirmed, whether made through **card** or **cryptocurrency**, your trading account credentials will be generated **automatically**.\n\nYou will be able to access your credentials directly from your **GenzProp dashboard**, and they will also be sent to your **registered email address** for your convenience.\n\nIn most cases, this process is completed **shortly after** the payment is successfully confirmed.`,
-			},
-			{
-				slug: 'switch-between-accounts',
-				title: 'How Can I Switch Between Accounts on the Dashboard?',
-				body: `If you have **multiple accounts** with GenzProp, you can easily switch between them directly from your dashboard.\n\n**Follow these steps:**\n\n**Click** on the **account selection dropdown** located in the **top-right corner** of your dashboard near your profile name.\n\n**Open** the dropdown menu to view the list of available **account types** or **programs** linked to your profile.\n\n**Select** the **account number** you want to access from the list.\n\nOnce selected, the dashboard will **update automatically** to display the information and statistics for that specific account.\n\nThis feature allows traders to quickly navigate between multiple accounts and manage them conveniently from one place. 🚀`,
-			},
-			{
-				slug: 'dashboard-features',
-				title: `What Features do we offer in our trader's dashboard?`,
-				body: `**1. Account Information**\n\nDisplays basic account details such as account ID, type, platform, size, start date, and current status.\n\n**2. Balance & Equity**\n\nShows the current account balance, equity, floating P/L, and closed profit or loss.\n\n**3. Profit Target Tracking**\n\nTracks the trader's progress toward reaching the required profit target to pass the phase.\n\n**4. Drawdown Monitoring**\n\nMonitors daily and overall loss limits and shows the remaining drawdown available.\n\n**5. Trading Statistics**\n\nProvides key performance metrics such as total trades, win rate, average win/loss, and profit factor.\n\n**6. Trading History**\n\nDisplays a complete record of all executed trades with detailed information.\n\n**7. Rule Monitoring**\n\nShows whether the trader is complying with all trading rules and risk limits.\n\n**8. Platform Credentials**\n\nProvides trading platform login details including ID, password, server, and download links.\n\n**9. Profit Split & Payouts**\n\nShows available profits, profit split percentage, withdrawable amount, and payout history.\n\n**10. Certificates**\n\nProvides downloadable certificates for passing phases and becoming a funded trader.\n\n**11. Notifications**\n\nDisplays important alerts such as rule warnings, drawdown alerts, phase results, and payout updates.\n\n**12. Account Actions**\n\nAllows traders to reset accounts, restart challenges, buy add-ons, or upgrade accounts.\n\n**13. Support**\n\nGives access to customer support through live chat, tickets, FAQ, and community channels.\n\n**In Short:**\n\nThe prop firm dashboard provides traders with **account status**, **performance analytics**, **rule tracking**, **trade history**, **payouts**, and **account management** in one place.`,
+				slug: 'what-account-types-does-genzprop-offer',
+				title: 'What account types does GenzProp offer?',
+				body: `GenzProp offers three account types:
+
+- **Step 1** — a single-phase challenge with one profit target.
+- **Step 2** — a two-phase evaluation with a separate Phase 1 and Phase 2 profit target.
+- **Instant** — a funded-style account with no challenge phase; you are evaluated live while trading.
+
+Once you successfully complete a Step 1 or Step 2 challenge, your account moves to the **Funded Stage**.
+
+Instant accounts are already funded from day one and progress through their own requirements to unlock full withdrawal eligibility.`,
 			},
 		],
 	},
+
+	// -----------------------------------------------------------------------
 	{
-		slug: 'prohibited-strategies',
-		title: 'Prohibited strategies',
+		slug: 'challenge-requirements',
+		title: 'Challenge Requirements',
 		articles: [
 			{
-				slug: 'prohibited-trading-practices',
-				title: 'Prohibited Trading Practices – GenzProp',
-				body: `At GenzProp, we aim to maintain a fair, professional, and sustainable trading environment for all traders. Any trading activity that attempts to exploit system delays, technical weaknesses, or avoids real market risk is strictly forbidden.\n\nThese rules ensure that traders are evaluated based on real trading skill, proper risk management, and genuine market participation.\n\nIf any prohibited activity is detected, the account may face actions such as:\n\n• Profit cancellation\n• Account suspension\n• Account termination\n• Removal from the GenzProp program\n\nThese actions may be applied without prior notice, especially on Instant and Funded Accounts.\n\n**Reverse Arbitrage**\n\nWhat It Means:\n\nReverse arbitrage happens when a trader tries to take advantage of price delays between different platforms or brokers instead of trading the actual market.\n\nThis usually occurs when a trader sees a price move on one platform and quickly trades on another platform where the price has not updated yet.\n\nWhy It Is Not Allowed:\n\nThis practice is not considered real trading because it relies on technical delays instead of market analysis.\n\nIt also creates an unfair advantage over other traders.\n\nExample:\n\nA trader sees EUR/USD move up on another broker first and immediately opens a buy trade on GenzProp before the price updates there.\n\n**Hedging Between Multiple Accounts**\n\nWhat It Means:\n\nHedging between accounts means opening opposite trades on different accounts for the same instrument.\n\nHedging inside a single account may be acceptable depending on trading conditions, but hedging across multiple GenzProp accounts is strictly prohibited.\n\nWhy It Is Not Allowed:\n\nThis removes real market risk because one account will gain when the other loses.\n\nThe goal of GenzProp is to evaluate real trading performance.\n\nExample:\n\nOpening a Buy trade on EUR/USD on one account and a Sell trade on EUR/USD on another account at the same time.\n\n**Tick Scalping**\n\nWhat It Means:\n\nTick scalping refers to opening and closing trades extremely quickly (within seconds) to capture very small price movements.\n\nThis is often done using automated systems.\n\nGenzProp Rule:\n\nTick scalping is not allowed on Instant and Funded Accounts.\n\nHard Violation:\n\nIf 3 trades are closed in less than 10 seconds within one hour, it may be considered a rule violation.\n\nWhy It Is Not Allowed:\n\n• Exploits execution speed rather than trading skill\n• Creates unnecessary load on trading systems\n• Does not represent meaningful market analysis\n\nExample:\n\nOpening and closing several trades within a few seconds to gain only 1–2 pips repeatedly.\n\n**Trade Layering**\n\nWhat It Means:\n\nTrade layering happens when a trader opens multiple trades too quickly within a short time period.\n\nInstead of waiting for a proper setup, the trader keeps adding positions rapidly.\n\nGenzProp Rule:\n\nOnly one trade can be opened within a 5-minute period.\n\nOpening another trade before 5 minutes from the previous trade opening may be considered a violation.\n\nWhy It Is Not Allowed:\n\n• Creates excessive exposure very quickly\n• Can imitate grid or aggressive strategies\n• Prevents proper risk control\n\nExample:\n\nOpening a trade at 10:00 and opening another trade at 10:03.\n\n**Minimum Trade Holding Time**\n\nGenzProp Rule:\n\nAll trades on Instant and Funded Accounts must remain open for at least 3 minutes before they are closed.\n\nTrades closed earlier than this time may be considered a violation.\n\nWhy This Rule Exists:\n\nThis rule helps prevent:\n\n• Tick scalping\n• Latency trading\n• Ultra-high-frequency trading strategies\n\nExample:\n\nOpening a trade at 10:00 and closing it at 10:01:30 would violate the rule.\n\nClosing it at 10:03 or later is acceptable.\n\n**Abusive Automated Trading**\n\nWhat It Means:\n\nUsing trading robots (EAs) or algorithms in a way that abuses system delays or technical gaps.\n\nAutomation itself is not always prohibited, but using bots to exploit infrastructure is not allowed.\n\nWhy It Is Not Allowed:\n\n• Exploits platform mechanics\n• Generates artificial profits\n• Does not reflect real trading decisions\n\nExample:\n\nA bot opening dozens of trades per minute to benefit from execution delays.\n\n**Latency Trading**\n\nWhat It Means:\n\nLatency trading occurs when a trader attempts to benefit from milliseconds of delay between price feeds.\n\nInstead of reacting to real market movement, the trader reacts to delayed price updates.\n\nWhy It Is Not Allowed:\n\n• Creates unfair advantages\n• Disrupts platform performance\n• Does not represent genuine market trading\n\nExample:\n\nSeeing a price movement on a fast data feed and entering a trade on GenzProp before the price updates.\n\n**Martingale and Grid Strategies**\n\nWhat They Mean:\n\nMartingale Strategy:\n\nIncreasing the trade size after each losing trade in an attempt to recover previous losses with one winning trade.\n\nGrid Strategy:\n\nOpening many buy and sell orders at fixed price levels without proper risk management.\n\nWhy These Strategies Are Not Allowed:\n\n• Can create extremely large losses\n• Lead to uncontrolled exposure\n• Do not follow responsible risk management\n\nExample:\n\nA trader doubles the position size after each loss hoping that one winning trade will recover all previous losses.\n\n**Excessive or Hyperactive Trading**\n\nWhat It Means:\n\nOpening, modifying, or cancelling a large number of trades within a very short period without a clear strategy.\n\nWhy It Is Not Allowed:\n\n• Can overload trading servers\n• Often indicates automated exploitation\n• Not considered professional trading behavior\n\nExample:\n\nOpening hundreds of trades in a single day without clear trading logic.\n\n**Account Sharing**\n\nWhat It Means:\n\nAllowing another person to trade your account or using external services to pass a challenge.\n\nWhy It Is Not Allowed:\n\nGenzProp accounts must be traded only by the registered trader.\n\nAccount sharing can violate identity verification and security policies.\n\nExample:\n\nHiring someone else to trade your GenzProp account.\n\n**Exploiting Platform Errors**\n\nWhat It Means:\n\nTaking advantage of technical problems such as:\n\n• Frozen prices\n• Incorrect spreads\n• Execution delays\n• Data errors\n\nWhy It Is Not Allowed:\n\nThese situations do not reflect real trading conditions.\n\nExample:\n\nOpening trades during a known platform glitch to profit from incorrect prices.\n\n**Gambling Behavior**\n\nWhat It Means:\n\nTrading randomly without proper analysis or risk management.\n\nThis includes emotional trading or extremely high-risk positions.\n\nWhy It Is Not Allowed:\n\nGenzProp promotes professional and disciplined trading, not luck-based speculation.\n\nExample:\n\nOpening a very large trade after a loss in an attempt to recover quickly without analysis.\n\n**Account Rolling**\n\nWhat It Means:\n\nBuying many evaluation accounts and applying extremely risky strategies until one account passes by chance.\n\nWhy It Is Not Allowed:\n\nThis approach relies on probability instead of consistent trading performance.\n\nExample:\n\nPurchasing multiple accounts repeatedly and using very high risk until one account passes the challenge.`,
+				slug: 'step-1-requirements',
+				title: 'Step 1 — requirements',
+				body: `## Profit Target
+
+| Stage | Target |
+| Phase 1 | 10% |
+| Phase 2 | None |
+| Funded | None |
+
+The profit target is verified strictly on **closed account balance**. All open positions and pending orders must be completely closed for target verification.
+
+**Example ($100,000 account):** initial balance is $100,000. Required profit is $10,000. Balance must hit $110,000 with no active exposures to pass Phase 1.
+
+## Minimum Profitable Days
+
+- **Requirement:** 3 Profitable Days during the challenge.
+- **Definition:** a day qualifies as a Profitable Day when the end-of-day balance is at least **0.5%** of the initial balance higher than the highest recorded previous closing balance.
+- **Condition:** trading sessions without a +0.5% balance increase do not count toward this requirement, regardless of trade volume.
+- **Funded Stage:** 5 qualifying days in total — 3 Profitable Days plus 2 Trading Days.
+
+## Maximum Daily Loss
+
+- **Limit:** 4% of the initial account balance ($4,000 on a $100k account).
+- **Calculation:** measured from the previous day's closing balance; both closed trades and floating losses count.
+- **Reset:** the threshold resets every day at **00:00 UTC**, shown on your dashboard countdown.
+
+## Maximum Loss (Account Equity Requirement)
+
+- **Limit:** 10% from the initial balance.
+- **Structure:** static and fixed from the starting balance; it does not trail upward with profits.
+- **Example ($100,000 account):** equity or balance cannot fall below $90,000 at any point.
+
+## Leverage, Holding and News
+
+- **Leverage:** 1:100 across every asset class.
+- **Minimum holding time:** 3 minutes on every trade.
+- **Overnight holding:** allowed by default. Swap/rollover charges apply as normal.
+- **Weekend holding:** not allowed by default — available as a paid add-on at checkout.
+- **News trading:** unrestricted during the challenge. On the Funded Stage a 10-minute restricted window applies.
+- **Inactivity:** 30 consecutive calendar days without a trade closes the account.
+- **Payout frequency:** bi-weekly (every 14 calendar days) once funded.`,
 			},
 			{
-				slug: 'ea-scalping-martingale',
-				title: 'Summary of prohibited strategy categories',
-				body: `Key prohibited areas at GenzProp include:\n\n• Reverse arbitrage and latency exploitation\n• Hedging between multiple accounts\n• Tick scalping and ultra-fast execution abuse\n• Trade layering and aggressive position stacking\n• Abusive automation and infrastructure exploitation\n• Martingale and grid-style risk escalation\n• Account sharing and challenge-pass outsourcing\n• Exploiting known platform errors\n• Gambling-style, non-systematic risk behavior\n• Account rolling across many high-risk evaluations\n\nAll traders are expected to follow disciplined, risk-managed, and genuine market trading behavior.`,
+				slug: 'step-2-requirements',
+				title: 'Step 2 — requirements',
+				body: `## Profit Target
+
+| Stage | Target ($100k account) |
+| Phase 1 | 10% ($10,000) |
+| Phase 2 | 5% ($5,000) |
+| Funded | None |
+
+Verification is balance-based with zero active or pending positions.
+
+## Minimum Profitable Days & Trading Days
+
+- **Evaluation (Phase 1 & Phase 2):** 3 Profitable Days per phase.
+- **Funded Stage:** 3 Profitable Days and a minimum of 2 Trading Days (5 days total).
+- **Definition:** the daily closing balance must exceed the previous high-water mark by at least **+0.5%** of the starting capital.
+
+## Maximum Daily Loss (Daily Drawdown)
+
+- **Evaluation and Funded:** 4% of the initial balance ($4,000 on a $100k account).
+- **Calculation:** resets daily at **00:00 UTC** based on the previous closing balance.
+
+## Maximum Drawdown (Account Equity Requirement)
+
+- **Limit:** 10% — static from the initial balance, in both Evaluation and Funded.
+- **Example ($100,000 account):** the equity/balance floor is $90,000 in every stage.
+
+## Leverage, Holding and News
+
+- **Leverage:** 1:100 across every asset class.
+- **Minimum holding time:** 3 minutes on every trade.
+- **Overnight holding:** allowed by default. Swap/rollover charges apply as normal.
+- **Weekend holding:** not allowed by default — available as a paid add-on at checkout.
+- **News trading:** unrestricted during Phase 1 and Phase 2. On the Funded Stage a 10-minute restricted window applies.`,
+			},
+			{
+				slug: 'instant-funding-requirements',
+				title: 'Instant Funding — requirements',
+				body: `## Profit Target
+
+**None (0%).** Instant gives you direct access to funded capital from day one, without evaluation phases.
+
+## Minimum Profitable Days & Trading Days
+
+- **Requirement:** 3 Profitable Days and a minimum of 2 Trading Days — 5 qualifying days in total.
+- **Definition:** a Profitable Day requires a closing daily balance at least **+0.5%** higher than the prior high balance.
+
+## Maximum Daily Loss (Daily Drawdown)
+
+- **Limit:** 4% of the initial balance ($4,000 on a $100k account).
+- **Calculation:** evaluated continuously against the previous day's close; resets at **00:00 UTC**.
+
+## Maximum Drawdown (Account Equity Requirement)
+
+- **Limit:** 6% from the initial balance (static).
+- **Example ($100,000 account):** equity/balance must never touch or breach $94,000.
+
+## Leverage, Holding and News
+
+- **Leverage:** 1:100 across all instruments.
+- **Minimum holding time:** 3 minutes on every trade.
+- **Trade layering:** one trade per 5-minute window, and a maximum of **2 concurrent layers**. Opening a 3rd layer fails the account.
+- **Overnight holding:** allowed by default. Swap/rollover charges apply as normal.
+- **Weekend holding:** not allowed by default — available as a paid add-on at checkout.
+- **News trading:** a 10-minute restricted window applies (5 minutes before and after high-impact releases).
+- **Account fee:** evaluation fees are not returned on Instant accounts.`,
+			},
+			{
+				slug: 'comparison-summary-table',
+				title: 'Comparison Summary Table',
+				body: `## GenzProp Account Rules Comparison
+
+| Parameter | Step 1 | Step 2 | Instant |
+| Profit Target | Phase 1: 10%, Funded: none | Phase 1: 10%, Phase 2: 5%, Funded: none | None (direct funded) |
+| Daily Drawdown (Evaluation) | 4% | 4% | N/A |
+| Daily Drawdown (Funded / Instant) | 4% | 4% | 4% |
+| Max Drawdown (Evaluation) | 10% | 10% | N/A |
+| Max Drawdown (Funded / Instant) | 10% | 10% | 6% |
+| Min Profitable Days (Evaluation) | 3 days | 3 days per phase | N/A |
+| Funded Account Requirements | 3 Profitable Days & 2 Trading Days | 3 Profitable Days & 2 Trading Days | 3 Profitable Days & 2 Trading Days |
+| Minimum Holding Time | 3 minutes | 3 minutes | 3 minutes |
+| Leverage | 1:100 | 1:100 | 1:100 |
+| Profit Consistency Rule | None | None | None |
+| News Trading | Free (Evaluation), restricted window on Funded | Free (Evaluation), restricted window on Funded | Restricted window (soft breach) |
+| Overnight Holding | Allowed by default | Allowed by default | Allowed by default |
+| Weekend Holding | Paid add-on at checkout | Paid add-on at checkout | Paid add-on at checkout |
+
+## Notes
+
+- **News trading:** free and unrestricted during the Step 1 / Step 2 challenge phase. On Funded and Instant accounts a **10-minute restricted window** applies (5 minutes before and after high-impact news releases) — if a Stop Loss or Take Profit fires within that window it is treated as a **soft breach**.
+- **Overnight holding:** allowed on all plans by default — no add-on required. Swap/rollover charges apply as normal.
+- **Weekend holding:** not allowed by default — available only as an optional paid add-on at checkout.
+- **Profit consistency:** GenzProp does not apply a profit consistency rule on any account type.`,
 			},
 		],
 	},
-	{
-		slug: 'evaluation',
-		title: 'Evaluation',
-		articles: [
-			{ slug: 'evaluation-overview', title: 'How evaluation works', body: ph('evaluation phases and objectives') },
-			{ slug: 'pass-and-fail', title: 'Pass, fail, and resets', body: ph('what happens when you pass or breach rules') },
-			{ slug: 'profit-targets', title: 'Profit targets and drawdown', body: ph('how targets and drawdown are measured') },
-		],
-	},
+
+	// -----------------------------------------------------------------------
 	{
 		slug: 'trading-rules-guidelines',
-		title: 'Trading Rules and guidelines',
+		title: 'Trading Rules',
 		articles: [
 			{
-				slug: 'daily-drawdown-daily-loss-limit',
-				title: 'Daily Drawdown (Daily Loss Limit)',
-				body: `**Definition**\n\nThe Daily Drawdown, also known as the Daily Loss Limit, represents the maximum amount a trader is allowed to lose within a single trading day.\n\nAt GenzProp, the Daily Drawdown is calculated as an Equity-Based Static Drawdown, which means:\n\n• The limit is calculated based on the Initial Account Balance and measured from the start of each trading day.\n• The rule considers both closed trades and floating (unrealized) losses.\n• The daily limit resets at the beginning of each new trading day.\n• If at any moment during the day the account equity falls below the allowed daily limit, the account will breach the rule and fail the evaluation.\n\n**How the Daily Drawdown is Calculated**\n\nDaily Drawdown Limit = Start of Day Equity × Daily Drawdown %\n\nThe maximum loss allowed for the day is fixed once the trading day begins.\n\n**Example 1**\n\nStart of Day Equity: $100,000\nDaily Drawdown Limit: 4%\nMaximum Daily Loss: $100,000 × 4% = $4,000\nMinimum equity allowed during the day: $100,000 − $4,000 = $96,000\n\nIf the account equity reaches $96,000 or below at any time during the day, the account fails the challenge.\n\n**Example 2**\n\nStart of Day Equity: $103,000\nDaily Drawdown Limit: 4%\nMaximum Daily Loss: $103,000 × 4% = $4,120\nMinimum equity allowed during the day: $103,000 − $4,120 = $98,880\n\nIf the account equity drops to $98,880 or below during that trading day, the account violates the Daily Drawdown rule.\n\n**Important Notes**\n\n• The Daily Drawdown is equity-based, meaning open trades are included in the calculation.\n• The rule is monitored in real-time.\n• The Daily Drawdown resets automatically at the start of each new trading day.`,
-			},
-			{
-				slug: 'maximum-drawdown-overall-loss-limit',
-				title: 'Maximum Drawdown (Overall Loss Limit)',
-				body: `**Definition**\n\nThe Maximum Drawdown, also known as the Overall Loss Limit, is the maximum total loss allowed on the account during the entire evaluation period.\n\nAt GenzProp, the Maximum Drawdown is set at 10% of the Initial Account Balance. This limit is static, meaning it is always calculated from the initial balance and does not increase if the account makes profits.\n\nThe rule is monitored using both Balance and Equity, which means closed trades and floating (unrealized) losses are included.\n\nIf at any time the account Balance or Equity falls below the allowed drawdown level, the account will breach the rule and fail the evaluation.\n\n**How the Maximum Drawdown is Calculated**\n\nMaximum Drawdown Limit = Initial Account Balance × 10%\nMinimum allowed equity = Initial Account Balance − Maximum Drawdown\n\n**Example**\n\nInitial Account Balance: $100,000\nMaximum Drawdown: 10%\nMaximum loss allowed: $100,000 × 10% = $10,000\nMinimum allowed Balance or Equity: $100,000 − $10,000 = $90,000\n\n**Scenario**\n\n• The account starts with $100,000.\n• After profitable trading, the balance increases to $108,500.\n• Later, the account experiences losses and the balance drops to $95,400.\n• The account remains valid because the total loss from the initial balance is $4,600, which is still within the $10,000 maximum drawdown limit.`,
-			},
-			{
-				slug: 'stop-loss-policy',
-				title: 'Stop-Loss Policy',
-				body: `At GenzProp, the use of a Stop-Loss is not mandatory, but it is strongly recommended as part of responsible risk management.\n\nTrading without a stop-loss means the risk on the position is not predefined, and traders must carefully manage their exposure.\n\nIf the unrealized loss on a single instrument exceeds 50% of the Daily Drawdown limit, it may be considered excessive or one-sided risk exposure and may result in a rule violation.\n\nUsing stop-loss orders helps protect the account and maintain compliance with GenzProp risk management rules.`,
-			},
-			{
-				slug: 'minimum-holding-time-rule',
-				title: 'Minimum Holding Time Rule',
-				body: `At GenzProp, the minimum holding time for trades is 3 minutes on Instant and Funded Accounts. Any trade that is opened and closed in less than 3 minutes may be considered a rule violation.\n\nThis rule is implemented to prevent ultra-short-term trading strategies, such as tick scalping or latency exploitation, on funded capital.\n\nHowever, the Minimum Holding Time rule does not apply during the Evaluation Phase. Traders in Phase 1 and Phase 2 are allowed to close trades at any time without a minimum holding requirement.\n\n**Key Points**\n\n• Minimum holding time: 3 minutes\n• Applies to Instant and Funded Accounts only\n• Not applied during Phase 1 and Phase 2 (Evaluation)\n• Trades closed before 3 minutes on Instant or Funded Accounts may be considered non-compliant trading activity.`,
-			},
-			{
-				slug: 'profit-consistency-rule-30',
-				title: 'Profit Consistency Rule (30%)',
-				body: `To promote consistent and disciplined trading, GenzProp applies a 30% Profit Consistency Rule on Instant and Funded Accounts.\n\nUnder this rule, traders cannot generate more than 30% of the payout cycle profit from a single trade or a single trading day. This ensures that profits are achieved through stable and consistent trading, rather than one large position.\n\n**Important:** This rule does not apply during the Evaluation Phase (Phase 1 and Phase 2). Traders in the challenge phases are not restricted by the Profit Consistency Rule.\n\n**Profit Cap**\n\nEach payout cycle has a maximum profit cap of 6% of the account balance.\n\n**Example ($100,000 Account)**\n\nAccount Balance: $100,000\nMaximum Profit per Cycle (6%): $6,000\nApplying the 30% Consistency Rule: 30% of $6,000 = $1,800\n\nTherefore:\n\n• Maximum profit per trade = $1,800\n• Maximum profit per day = $1,800\n\nIf the profit from a single trade or a single day exceeds $1,800, it will be considered a rule violation.\n\n**Formula**\n\nMaximum allowed profit per trade or per day:\nAccount Balance × 6% × 30%\n\nThis equals 1.8% of the account balance.\n\n**Quick Examples**\n\n• $10,000 account: Profit cap $600, 30% rule limit $180\n• $50,000 account: Profit cap $3,000, 30% rule limit $900\n• $100,000 account: Profit cap $6,000, 30% rule limit $1,800\n\nTraders must ensure their profits remain within this limit to maintain payout eligibility on Instant and Funded Accounts.`,
-			},
-			{
-				slug: 'minimum-profitable-days-requirement',
-				title: 'Minimum Profitable Days Requirement',
-				body: `To successfully complete the Challenge Phase, traders must record at least 3 Winning Days.\n\nA Winning Day is a trading day in which the account achieves a minimum profit of 0.5% of the initial challenge balance within that same day. The profit is calculated based on equity, meaning both closed trades and floating profit are considered.\n\n**Key Points**\n\n• Each Winning Day must occur on a different calendar day.\n• Trading performance is reset daily at 00:00 UTC, as reflected on your dashboard.\n• Profits from multiple days cannot be combined to qualify as a Winning Day.\n\n**Example**\n\nInitial Challenge Balance: $100,000\nRequired profit for one Winning Day: 0.5% of $100,000 = $500\n\nScenario 1: Day 1 profit = $520 (counts as 1 Winning Day)\nScenario 2: Day 2 profit = $300 (does not qualify)\nScenario 3: Day 3 profit = $650 (counts as another Winning Day)\n\nIn this case, the trader has 2 Winning Days and must achieve one more qualifying day to meet the requirement of 3 Winning Days.`,
+				slug: 'profitable-day-and-trading-day',
+				title: 'What is a "Profitable Day" and a "Trading Day"?',
+				body: `## Profitable Day
+
+A **Profitable Day** is a single trading day (00:00–23:59 UTC) in which your account's profit reaches at least **0.5% of your initial account balance/equity**, calculated on an equity basis.
+
+## Trading Day
+
+A **Trading Day** simply requires that a trade was opened and closed on that calendar day, regardless of whether it was profitable.
+
+Every Profitable Day is automatically also a Trading Day.
+
+## Notes
+
+- Profitable Days must fall on separate calendar days — you cannot combine profit from different days to make one Profitable Day.
+- The daily reset happens at **00:00 UTC**, shown live on your dashboard countdown timer.`,
 			},
 			{
 				slug: 'minimum-trading-days-requirement',
 				title: 'Minimum Trading Days Requirement',
-				body: `To complete the Challenge Phase, traders must trade for at least 4 separate trading days.\n\nA trading day is counted when the trader opens and closes at least one trade during that day. This rule ensures that traders demonstrate consistent trading activity rather than achieving results in a very short period of time.\n\n**Key Points**\n\n• The minimum requirement is 4 trading days.\n• Trading days must occur on separate calendar days.\n• Reaching the profit target before completing 4 trading days will not immediately pass the challenge.\n\n**Example**\n\nInitial Account Balance: $100,000\nProfit Target: $10,000\n\nScenario:\n\n• Day 1 profit: $6,000\n• Day 2 profit: $4,000\n\nAlthough the trader has reached the $10,000 profit target, they have only traded for 2 days.\n\nThe trader must continue trading until at least 4 trading days are completed to successfully pass the challenge.`,
+				body: `| Account Type | Minimum Days Required |
+| Step 1 | 3 Profitable Days |
+| Step 2 | 3 Profitable Days |
+| Instant | 5 days total (3 Profitable Days + 2 Trading Days) |
+| All Funded Stages | 5 days total (3 Profitable Days + 2 Trading Days) |
+
+## For Instant and all Funded Stage accounts
+
+- You need **5 qualifying days in total** — 3 of them must be Profitable Days, and 2 more can be plain Trading Days (a trade simply opened and closed, profitable or not).
+- These do not need to happen in any fixed order — you do not have to finish all 3 Profitable Days first before the remaining days count. Since a Profitable Day is also a Trading Day, your Profitable Days count toward the total automatically.
+- This 5-day minimum does not apply to Step 1 / Step 2 challenge accounts, which only need 3 Profitable Days.
+
+See the **Withdrawal Eligibility** article for how this affects your payout.`,
+			},
+			{
+				slug: 'daily-reset',
+				title: 'When does the daily reset happen?',
+				body: `- All daily loss and Profitable Day calculations reset at **00:00 UTC**, based on dashboard time.
+- The dashboard countdown timer is the sole and final reference — not your broker's server time or your local time.
+- Losses or profits before 00:00 UTC count toward the current trading day; anything after counts toward the next.`,
+			},
+			{
+				slug: 'leverage',
+				title: 'What leverage does GenzProp offer?',
+				body: `Leverage is capped at **1:100** across every asset class, for all account types and stages:
+
+| Asset Class | Max Leverage |
+| Forex | 1:100 |
+| Indices | 1:100 |
+| Metals | 1:100 |
+| Energies | 1:100 |
+| Stocks | 1:100 |
+| Crypto | 1:100 |
+
+Leverage limits are set per instrument, not by account size. Higher leverage never exempts you from the Maximum Daily Drawdown, Maximum Loss, or margin requirements.`,
+			},
+			{
+				slug: 'stop-loss-policy',
+				title: 'Do I have to use a stop-loss?',
+				body: `**No.** Stop-loss orders are optional — there is no penalty for trading without one.
+
+That said, you are still fully responsible for managing your open risk and staying within the **Maximum Daily Drawdown** and **Maximum Loss** rules regardless of whether you use a stop-loss.`,
 			},
 			{
 				slug: 'news-trading-policy',
 				title: 'News Trading Policy',
-				body: `At GenzProp, news trading is allowed during both the Challenge Phase (Phase 1 and Phase 2) and the Funded Phase.\n\nTraders are permitted to open, close, or hold positions during high-impact economic news releases and major market events.\n\nHowever, traders should be aware that news events can cause increased volatility, wider spreads, and slippage. All trades placed during news events must still comply with GenzProp risk management rules, including Daily Drawdown and Maximum Loss limits.\n\nTraders are fully responsible for managing their risk when trading during high-impact news periods.`,
+				body: `## 1. Challenge Phase (Step 1 & Step 2)
+
+- You may trade freely during all news events with no restricted windows or execution limits.
+- Trades may be opened, closed, or modified directly during news events.
+
+## 2. Funded Stage & Instant Accounts — the 10-minute window
+
+- **The restricted window:** you may not open a new position or close an existing position on the affected instrument within **5 minutes before and 5 minutes after** a listed high-impact news announcement (a 10-minute total restricted window).
+- **Execution types covered:** this restriction applies to all forms of execution — manual market execution, pending orders, Stop-Loss (SL), and Take-Profit (TP).
+- **Holding through news:** holding an open trade through the news release is permitted, provided the position was opened more than 5 minutes prior to the start of the restricted event.
+
+## 3. Soft breach handling
+
+- If a pre-existing position's Stop-Loss or Take-Profit executes inside the 10-minute restricted window, it is classified as a **soft breach**.
+- **Account status:** your account will not be terminated.
+- **Profit treatment:** any realised profits generated from that specific execution are ineligible for withdrawal and will be deducted.
+- **Loss treatment:** any losses incurred during the restricted window remain the trader's sole responsibility and will not be reimbursed or reversed.
+
+## Affected economic announcements
+
+This restriction applies strictly to the specific currency or instrument linked to the event (as classified by standard calendars like Forex Factory or Myfxbook):
+
+- **Monetary policy:** interest rate decisions, rate statements, and central bank press conferences.
+- **Inflation & growth:** Consumer Price Index (CPI), Core PCE, and Gross Domestic Product (GDP) reports.
+- **Labor market:** Non-Farm Payrolls (NFP), Unemployment Rate, and Employment Change data.
+- **Activity indices:** Manufacturing and Services Purchasing Managers' Index (PMI).
+- **Speeches & press conferences:** restricted for their entire live duration, plus the standard 5-minute buffer before the start and after the conclusion.
+
+> **Relation to other rules:** this policy works in tandem with the Weekend Holding rule. Holding positions across the weekend closure requires the Weekend Holding add-on.
+
+## Frequently asked questions
+
+**Can I trade news during my challenge phase?** Yes. News trading is completely unrestricted on Step 1 and Step 2 evaluation accounts.
+
+**Can I trade news once I am on a Funded Stage or Instant account?** You cannot open or close trades on the affected currency or asset within 5 minutes before or 5 minutes after a listed high-impact news release. You may hold a running trade through the event as long as it was entered more than 5 minutes prior to the release.
+
+**What happens if my Stop-Loss or Take-Profit triggers inside the restricted window?** It is treated as a soft breach. The account remains active and will not be closed, but any profits earned from that execution cannot be withdrawn. Any incurred losses remain on the account balance.`,
 			},
 			{
-				slug: 'trade-layering-rule',
-				title: 'Trade Layering Rule',
-				body: `**What is Trade Layering?**\n\nTrade layering means opening multiple trades too quickly one after another instead of waiting some time between trades. This can create too much risk on the account in a very short time.\n\n**GenzProp Rule (Funded / Instant Accounts)**\n\n• A trader can open only one trade within a 5-minute period.\n• If another trade is opened before 5 minutes have passed from the previous trade opening, it will be considered trade layering.\n• If this rule is violated, the account may be terminated during the final review.\n\nThis rule applies even if the first trade is already closed.\n\n**Simple Example**\n\nAllowed:\n\n• Open a trade at 10:00\n• Open the next trade at 10:06\n\nSince more than 5 minutes passed, this is allowed.\n\nNot Allowed:\n\n• Open a trade at 10:00\n• Open another trade at 10:03\n\nSince the second trade was opened within 5 minutes, this is considered trade layering and may result in account failure.\n\n**Why This Rule Exists**\n\nThis rule helps prevent:\n\n• Excessive risk in a short time\n• Grid or aggressive scaling strategies\n• Uncontrolled position stacking\n\nIt ensures traders maintain disciplined and structured trade entries.`,
+				slug: 'trade-layering',
+				title: 'Trade Layering',
+				body: `## Standard rule (Funded Stage)
+
+Only **1 trade** may be opened within a **5-minute window** from the previous trade's opening time.
+
+Opening a second trade within that 5-minute window is a violation resulting in account termination, even if the first trade was already closed.
+
+The window is locked to the account's registration date and applies to all trades, regardless of when each is placed.
+
+## Instant accounts — additional cap
+
+Instant accounts have an additional restriction: a maximum of **2 concurrent layers** is allowed.
+
+Opening a 3rd layer at any time results in account failure, even if each entry was separated by 5 minutes or more.
+
+## Key points
+
+- **Funded Stage:** max 1 trade per 5-minute window from the previous trade's opening time — violation = account termination.
+- **Instant accounts:** max 2 concurrent layers — opening a 3rd = account failure.
+- The 5-minute window is fixed to the account's registration date, not reset per trade.
+- Applies to all trades regardless of when they are placed.`,
 			},
 			{
-				slug: 'general-rules-account-violation',
-				title: 'General Rules: What Happens If My GenzProp Account Violates a Trading Rule?',
-				body: `If a rule violation or any prohibited trading activity is detected on your GenzProp account, the account may be suspended and will no longer be eligible to continue in the program.\n\nThis means the account may lose the ability to:\n\n• Progress to the next evaluation stage\n• Qualify for a funded account\n• Receive any profit payouts or rewards\n\nGenzProp continuously monitors trading activity to ensure that all traders follow the firm's risk management guidelines and trading rules. Any confirmed breach of these rules may result in account termination in order to maintain a fair and disciplined trading environment.`,
+				slug: 'daily-drawdown',
+				title: 'Daily Drawdown',
+				body: `The **Maximum Daily Drawdown** represents the maximum loss permitted within a single trading day while trading under GenzProp account rules.
+
+The limit is calculated based on the **Initial Account Balance**, measured from the start of each trading day.
+
+The daily loss calculation includes:
+
+- All closed trades
+- All unrealized losses from open positions
+
+If the account balance or equity drops below the permitted threshold at any point during the trading day, the Maximum Daily Drawdown is triggered — **even if the account later recovers**.
+
+## How is the Maximum Daily Drawdown calculated?
+
+At any moment during the trading day, the combined loss of open and closed trades must not exceed:
+
+| Account Type | Max Daily Drawdown |
+| Step 1 / Step 2 (Challenge Phase) | 4% of Initial Account Balance |
+| Step 1 / Step 2 (Funded Stage) | 4% of Initial Account Balance |
+| Instant / Funded Account | 4% of Initial Account Balance |
+
+**Formula:** Current Daily Loss = results of closed positions for the day + unrealized result of open positions.
+
+This value must never exceed **4% of the Initial Account Balance**, for every GenzProp account type and stage.
+
+## Examples
+
+**Example 1 — Step 1 Challenge (4% limit).** Initial balance $10,000. Max daily drawdown = 4% × $10,000 = $400. Closed trades loss $150, unrealized loss $200. Current daily loss = $350 → within limit, no breach.
+
+**Example 2 — Step 2 Challenge, breach case.** Initial balance $25,000. Max daily drawdown = $1,000. Closed trades loss $600, unrealized loss $450. Current daily loss = $1,050 → limit exceeded, breach triggered even if the trade recovers later.
+
+**Example 3 — Instant / Funded account.** Initial balance $50,000. Max daily drawdown = $2,000. Closed trades loss $900, unrealized loss $1,200. Current daily loss = $2,100 → breach.
+
+**Example 4 — Instant / Funded account, safe case.** Initial balance $100,000. Max daily drawdown = $4,000. Closed trades +$500 profit, unrealized loss $1,200. Net current daily loss = $700 → well within the $4,000 limit.`,
+			},
+			{
+				slug: 'maximum-drawdown',
+				title: 'Maximum Drawdown',
+				body: `The **Maximum Loss** is the total loss limit you are allowed to reach on your account at any time while trading under GenzProp rules.
+
+It represents the maximum drawdown permitted on the account over its entire lifetime, not just within a single trading day.
+
+The Maximum Loss is calculated based on the **Initial Account Balance** and applies continuously from the moment the account is activated.
+
+If your balance or equity drops below the allowed threshold at any point, the rule is considered breached — even if the account later recovers.
+
+## How is the Maximum Loss calculated?
+
+At any time, the total loss on the account must not exceed:
+
+| Account Type | Maximum Loss |
+| Step 1 / Step 2 (Challenge Phase & Funded) | 10% of Initial Account Balance |
+| Instant / Funded Account | 6% of Initial Account Balance |
+
+**Formula:** Current Total Loss = Initial Account Balance − current balance or equity.
+
+## Examples
+
+**Example 1 — Step 1 / Step 2 (10% limit).** Initial balance $100,000, maximum loss $10,000. If balance or equity drops below $90,000, the rule is breached.
+
+**Example 2 — Instant / Funded account (6% limit).** Initial balance $100,000, maximum loss $6,000. If balance or equity drops below $94,000, the rule is breached.
+
+**Example 3 — account after profits (Step 1 / Step 2).** Initial balance $100,000, highest balance reached $108,500. Maximum loss remains $10,000 — if balance or equity drops below $90,000 the rule is breached. Maximum Loss is always based on the initial balance, not on profits or peak equity.
+
+**Example 4 — gradual drawdown (Instant / Funded).** Initial balance $100,000, current balance $96,200, total loss so far $3,800. The account remains valid until balance or equity reaches $94,000, at which point the account fails immediately and is terminated.
+
+## Key points
+
+- Applies to Step 1 / Step 2 (10%) and Instant / Funded (6%) accounts.
+- The rule is static and does not increase with profits.
+- Both balance and equity are monitored.
+- Open trades and floating losses are included.
+- Breaching the limit results in immediate account failure and permanent termination.
+
+Unlike the Maximum Daily Drawdown rule, this limit does not reset and remains in effect for the full duration of the account.`,
+			},
+			{
+				slug: 'minimum-trade-holding-time',
+				title: 'Minimum Trade Holding Time',
+				body: `GenzProp requires every trade to be held open for a minimum of **3 minutes** before it is closed.
+
+If a position is closed before 3 minutes have passed since it was opened, this is treated as a rule breach.
+
+## Why this rule exists
+
+This rule is in place to prevent high-frequency scalping, latency arbitrage, and other ultra-short-duration trading strategies that do not reflect genuine market risk-taking.
+
+## Rule summary
+
+**Trade Duration = trade close time − trade open time**
+
+- If trade duration is **less than 3 minutes** → breach
+- If trade duration is **3 minutes or more** → valid trade, no breach
+
+## Examples
+
+**Example 1 — valid trade.** Opened 10:00:00, closed 10:03:15. Duration 3 minutes 15 seconds → valid.
+
+**Example 2 — breach case.** Opened 14:20:00, closed 14:21:40. Duration 1 minute 40 seconds → breach.
+
+**Example 3 — edge case.** Opened 09:00:00, closed 09:03:00. Duration exactly 3 minutes → valid.
+
+## Key points
+
+- Applies to **all trades** on the account, in every phase and stage.
+- Minimum holding time: 3 minutes.
+- Closing a trade earlier than 3 minutes is flagged as a breach.
+- Applies regardless of profit or loss on the trade.`,
+			},
+			{
+				slug: 'profit-consistency-rule',
+				title: 'Profit Consistency Rule',
+				body: `**There is no profit consistency rule at GenzProp.**
+
+Some prop firms require that no single trading day accounts for more than a set percentage (e.g. 30–40%) of your total profit — this is called a profit consistency rule, and it is designed to discourage a trader from passing a challenge on the back of one lucky big trade.
+
+GenzProp does not enforce this rule. This means:
+
+- You can pass a challenge or reach payout with profits earned from a single strong trading day.
+- There is no requirement to "spread out" your profit evenly across multiple days.
+- You will not be flagged or penalised for having one day that generated most of your overall gains.
+
+## Key points
+
+- No minimum number of profitable trading days required for consistency purposes.
+- No cap on how much of your total profit can come from a single day.
+- All other applicable rules (Daily Loss Limit, Maximum Drawdown, Trade Layering, Minimum Holding Time, etc.) still apply as normal.`,
+			},
+			{
+				slug: 'weekend-holding',
+				title: 'Weekend Holding',
+				body: `By default, holding any position open during the weekend closure (**Friday 23:00 UTC – Sunday 23:00 UTC**) is prohibited for **all account types and stages**: Step 1, Step 2, and Instant, across both Challenge and Funded.
+
+This applies to all tradable instruments, including 24/7 assets like crypto, which must still follow the same weekend schedule.
+
+## Weekend Holding add-on
+
+Weekend holding is only permitted if the trader purchases the **Weekend Holding add-on** at checkout, for an additional fee.
+
+## Key points
+
+- Applies to all account types and stages: Step 1, Step 2, Instant, Challenge and Funded.
+- Prohibited by default — requires the paid Weekend Holding add-on to unlock.
+- Applies to all instruments, including 24/7 assets like crypto.
+- All other risk rules continue to apply in full even with the add-on — the trader accepts full responsibility for weekend gap risk, slippage, and equity/margin swings at market open.
+- Failure to comply without the add-on may result in trade removal, profit adjustment, withdrawal rejection, or account termination in repeat or severe cases.
+
+> **Overnight holding is different.** Holding positions overnight on a normal trading day is **allowed by default on every plan**, with no add-on required. Swap/rollover charges apply as normal.`,
 			},
 		],
 	},
-	{
-		slug: 'trading',
-		title: 'Trading',
-		articles: [
-			{ slug: 'instruments', title: 'What can I trade?', body: ph('available instruments') },
-			{ slug: 'execution', title: 'Execution and spreads', body: ph('execution') },
-		],
-	},
+
+	// -----------------------------------------------------------------------
 	{
 		slug: 'funding-payouts',
-		title: 'Funding and payouts',
+		title: 'Withdrawals',
 		articles: [
 			{
-				slug: 'when-can-i-request-payout',
-				title: 'When Can I Request a Payout?',
-				body: `You become eligible to request a payout from GenzProp once the following conditions are met:\n\n• Your account is fully funded\n• At least 15 calendar days have passed since your first trade\n• You have completed the minimum required number of profitable trading days\n• Each counted trading day must achieve at least 0.5% profit\n• Your account must be in overall profit\n• No open trades are present when submitting the payout request\n• All trading activity must comply with GenzProp rules\n\n**Note:**\n\nPayout eligibility is calculated from the date of your **first trade**, not the account creation date.`,
+				slug: 'withdrawal-eligibility',
+				title: 'When am I eligible to request a withdrawal?',
+				body: `A withdrawal request requires **all** of the following to be true:
+
+- At least **14 days** have passed since your account was received (funded).
+- Your account has met the required number of **Profitable Days**.
+- For Instant and Funded Stage accounts only: you have additionally completed the **2 required Trading Days** as part of the overall minimum days requirement.
+- Your account is in profit.
+- Your account has zero rule violations.
+- All your trading complies with GenzProp terms, rules, and guidelines.
+
+**No minimum profit threshold applies to any account type, including Instant.**`,
 			},
 			{
-				slug: 'payout-cycle',
-				title: 'Payout Cycle',
-				body: `GenzProp operates on a **bi-weekly payout system**.\n\n**Default Payout Schedule**\n\n• First Payout: Eligible after completing the required profitable trading days and meeting the minimum profit conditions.\n• Next Payouts: Available every 14 days (2 weeks) after the previous payout request.\n\n**Note:**\n\nCalendar days include weekends, and inactive trading days do not reset the payout cycle.`,
+				slug: 'profit-split',
+				title: 'How is profit split between me and GenzProp?',
+				body: `| Withdrawal Number | Trader Split | Firm Split |
+| 1st withdrawal | 80% | 20% |
+| 2nd withdrawal | 85% | 15% |
+| 3rd withdrawal | 90% | 10% |
+| 4th and all subsequent | 90% | 10% |
+
+The split only increases if every earlier withdrawal was completed with no rule violations. From the 3rd withdrawal onward, the split stays fixed at 90/10 for every future payout.
+
+GenzProp can adjust or reset your split if rules are not followed.`,
 			},
 			{
-				slug: 'minimum-withdrawal-amount',
-				title: 'Minimum Withdrawal Amount',
-				body: `The minimum payout amount for GenzProp funded accounts is:\n\n• Funded Trading Profits: Minimum $200\n\nWithdrawal requests below the minimum amount will not be processed.`,
+				slug: 'withdrawal-limit',
+				title: 'Is there a limit on how much I can withdraw at once?',
+				body: `**Yes.** The maximum withdrawable profit per payout period is capped at **6% of your Initial Account Balance**, regardless of how much profit you earned in that period. This applies to all funded accounts (Step 1, Step 2, and Instant).
+
+Profit above the 6% cap is not lost — it stays on your account and can be withdrawn in a future payout period, as long as all rules are respected.`,
 			},
 			{
-				slug: 'trading-conditions-before-withdrawal',
-				title: 'Trading Conditions Before Withdrawal',
-				body: `To ensure fair payout processing at GenzProp, the following conditions must be met:\n\n• All profits must be realized profits (closed trades only)\n• Floating profits are not counted toward withdrawal eligibility\n• The account must remain within all risk management limits\n• Accounts with rule violations may have payout requests rejected.`,
+				slug: 'withdrawal-processing-time',
+				title: 'How long do withdrawals take?',
+				body: `- Withdrawals run on a **bi-weekly** schedule (every 14 calendar days).
+- Most payouts are processed within about **48 working hours**; some may take **5–7 working days**.
+- After you submit a withdrawal request, **all open trades must be closed immediately**, and no new trades can be opened until the withdrawal is processed. Trading after a request can lead to your withdrawal being cancelled or other account action.
+- Only **realised** profit is withdrawable — unrealized/floating profit does not count.`,
 			},
 			{
-				slug: 'trading-activity-after-request',
-				title: 'Trading Activity After Request',
-				body: `Once a payout request is submitted at GenzProp:\n\n• All open trades must be closed\n• Traders must not open new positions until the payout review process is completed\n\nThis ensures accurate profit calculation and proper payout processing.`,
+				slug: 'account-fee-refund',
+				title: 'Do I get my account fee back?',
+				body: `Your full account fee is returned with your **first successful withdrawal**, as long as there are no rule violations.
+
+If that withdrawal is rejected for a violation, the fee return is voided.
+
+**Fees are not returned on Instant accounts.**`,
 			},
 			{
-				slug: 'payment-methods',
-				title: 'Payment Methods',
-				body: `GenzProp currently supports the following payout method:\n\n**Cryptocurrency**\n\n• No processing fees charged by GenzProp\n• Payments are sent directly to your provided wallet address\n• Fast and secure transactions\n\n**Important:**\n\nPlease ensure your wallet address is correct, as incorrect details may result in payment delays or loss of funds.`,
-			},
-			{
-				slug: 'payout-processing-time',
-				title: 'Payout Processing Time',
-				body: `Most GenzProp payouts are processed within **1 week** after the payout request is submitted.\n\nProcessing time may vary depending on:\n\n• Internal compliance checks\n• Trading activity reviews\n• High-volume payout periods\n\nOnce the payout is completed, the account will automatically be reactivated for continued trading.`,
+				slug: 'after-a-withdrawal',
+				title: 'What happens to my account after a withdrawal?',
+				body: `After each successful withdrawal, your account's balance and equity are reset under the GenzProp reset policy, and a new trading cycle begins.
+
+All trading rules continue to apply as normal.`,
 			},
 		],
 	},
+
+	// -----------------------------------------------------------------------
 	{
-		slug: 'account-pricing',
-		title: 'Account size and pricing',
-		articles: [
-			{ slug: 'choose-size', title: 'Choosing an account size', body: ph('how to pick a size') },
-			{ slug: 'compare-programs', title: 'Comparing programs', body: ph('program differences') },
-			{ slug: 'scaling', title: 'Scaling and growth', body: ph('scaling rules') },
-		],
-	},
-	{
-		slug: 'platforms',
-		title: 'Platforms',
-		articles: [
-			{ slug: 'mt5-setup', title: 'MetaTrader 5 setup', body: ph('MT5 setup') },
-			{ slug: 'mt4-setup', title: 'MetaTrader 4 setup', body: ph('MT4 setup') },
-		],
-	},
-	{
-		slug: 'affiliate-marketing',
-		title: 'Affiliate Marketing',
+		slug: 'prohibited-strategies',
+		title: 'Prohibited Trading Practices',
 		articles: [
 			{
-				slug: 'affiliate-overview',
-				title: 'Affiliate program overview',
-				body: `GenzProp may offer **partner or affiliate** opportunities. Terms, commissions, and tracking are defined in the **partner agreement** when you enroll.\n\nVisit the **Partner** page for current signup and rules, or contact our team for **custom partnerships**.`,
+				slug: 'prohibited-trading-practices',
+				title: 'Prohibited Trading Practices',
+				body: `At GenzProp, we aim to discover and fund disciplined traders who demonstrate genuine market edge, solid risk management, and long-term consistency. To maintain a fair and realistic simulated environment, strategies designed to exploit platform mechanics, data lag, or system vulnerabilities are strictly forbidden.
+
+Engaging in any of the following prohibited behaviours across any account phase (Evaluation or Funded) may lead to **immediate account termination and forfeiture of rewards without prior notice**.
+
+## 1. Reverse Arbitrage
+
+**What it means:** exploiting artificial price discrepancies caused by platform connectivity lag, bridge delays, or server desynchronization, rather than trading true market inefficiencies.
+
+**Example:** a trader notices that Broker A's price feed lags behind Broker B by 500 milliseconds during high volatility. They place orders on GenzProp solely to capture the stale price before the feed catches up, carrying zero real market risk.
+
+## 2. Hedging Between Accounts
+
+**What it means:** opening opposing buy and sell positions on the same financial asset across two or more accounts owned by the same trader or coordinated among a group of traders.
+
+**Example:** you buy 10 lots of EUR/USD on Account A and simultaneously sell 10 lots of EUR/USD on Account B before a major news event. One account is guaranteed to blow up while the other passes the evaluation, bypassing genuine risk control.
+
+## 3. Tick Scalping
+
+**What it means:** entering and exiting positions within seconds to scalp fractions of a pip off platform latency or quote flickers.
+
+**Rule threshold:** closing **3 or more trades held for less than 10 seconds within a 1-hour window** constitutes an immediate hard breach.
+
+**Example:** opening a trade on XAU/USD and closing it 4 seconds later for a 2-pip gain, then repeating this pattern multiple times within minutes.
+
+## 4. Abusive Autotrading
+
+**What it means:** using Expert Advisors (EAs), bots, or algorithms engineered specifically to exploit server latency, queue delays, or platform glitches rather than executing legitimate technical or fundamental strategies.
+
+**Example:** deploying a high-frequency trading bot designed to flood the trading server with microsecond limit orders to front-run execution queues.
+
+## 5. Latency Trading
+
+**What it means:** taking advantage of millisecond differences between a high-speed institutional data feed and the simulated retail broker feed.
+
+**Example:** looking at an ultra-fast raw institutional feed and instantly firing orders on the retail platform knowing the retail chart will reflect that price change half a second later.
+
+## 6. Martingale & Grid Strategies
+
+**What it means:**
+
+- **Martingale:** doubling or multiplying lot sizes after losing trades to break even on a single retracement.
+- **Grid trading:** placing continuous buy and sell orders at rigid intervals without directional analysis, stop losses, or risk control.
+
+**Example:** you buy 1 lot of GBP/USD and it drops 20 pips. You then buy 2 lots; it drops another 20 pips, so you buy 4 lots, escalating position sizes exponentially until your account equity is exposed to catastrophic drawdown.
+
+## 7. Hyperactive Trading
+
+**What it means:** flooding the trading server with rapid orders, cancellations, or modifications inside extremely short windows without a credible analytical strategy.
+
+**Example:** an algorithm submitting 200 order modifications or cancel-replace requests per minute, creating artificial server load and spamming market depth logs.
+
+## 8. Account Sharing & Pass Services
+
+**What it means:** handing account credentials over to third parties, hiring "account passing" firms, or delegating trade management.
+
+**Example:** hiring a service to log into your GenzProp account via VPS and trade on your behalf to complete Phase 1.
+
+## 9. Exploiting Technical Errors & Glitches
+
+**What it means:** knowingly trading on mispriced instruments, frozen charts, faulty spreads, or broker-side software glitches.
+
+**Example:** a weekend rollover glitch causes BTC/USD to display a spread error or frozen quote 2% away from fair value. A trader repeatedly places orders into the frozen quote to lock in guaranteed profit when normal pricing resumes.
+
+## 10. Gambling & Unsystematic Trading
+
+**What it means:** reckless, emotional execution devoid of risk parameters — such as "all-in" revenge trading, over-leveraging the entire margin on a single binary bet, or trading without pre-calculated stop parameters.
+
+**Example:** after taking an initial 2% loss, a trader immediately opens the maximum allowed lot size on a single gold position hoping to recover the loss on one candle.
+
+## 11. Account Rolling (Churning Accounts)
+
+**What it means:** purchasing multiple assessment accounts at once and executing ultra-high-risk, reckless setups across them until one accidentally passes by luck.
+
+**Example:** purchasing five $100k accounts on the same day, opening maximum leverage positions on different volatile pairs across all five, and expecting four to fail while one hits the profit target by chance.
+
+## 12. Unauthorized Copy Trading
+
+**What it means:** replicating trades directly from external signals, public copy networks, or third-party providers without independent analysis or authorization.
+
+**Example:** connecting your GenzProp account to a public trading pool or social copy-trading app where hundreds of retail users execute the identical trade tickets and timestamps simultaneously.
+
+## 13. Price Arbitrage
+
+**What it means:** capturing discrepancies between delayed price feeds across different platforms where the trade does not reflect real-market risk or genuine liquidity interaction.
+
+**Example:** exploiting an artificial spread delay where Platform X updates 3 seconds slower than the broader market, locking in a synthetic, risk-free profit before the feed synchronizes.`,
+			},
+		],
+	},
+
+	// -----------------------------------------------------------------------
+	{
+		slug: 'account-reference',
+		title: 'Account Structure & Limits',
+		articles: [
+			{
+				slug: 'account-structure',
+				title: 'Account Structure',
+				body: `GenzProp offers **3 account types**:
+
+- Step 1
+- Step 2
+- Instant
+
+A **Funded Stage** is reached after successfully completing Step 1 or Step 2. Instant accounts are funded from day one.`,
+			},
+			{
+				slug: 'profitable-days-requirement',
+				title: 'Profitable Days Requirement',
+				body: `Applies to all account types: Step 1, Step 2, Instant, and all Funded Stages.
+
+| Account Type | Minimum Profitable Days |
+| Step 1 | 3 |
+| Step 2 | 3 |
+| Instant | 5 (3 Profitable + 2 Trading) |
+| All Funded Stages | 5 (3 Profitable + 2 Trading) |
+
+## Definition
+
+- A Profitable Day is a single trading day in which profit reaches at least **0.5%** of the account's initial starting balance/equity.
+- Calculated on an equity basis.
+- Daily reset occurs at **00:00 UTC**.
+- Profitable Days must fall on separate calendar days.
+- Profits from different days cannot be combined to form one Profitable Day.`,
+			},
+			{
+				slug: 'what-is-the-maximum-daily-drawdown',
+				title: 'What is the Maximum Daily Drawdown?',
+				body: `- The Maximum Daily Drawdown is **4% of your Initial Account Balance**, applying to every account type and stage (Challenge and Funded).
+- This is a **static** limit — it does not grow with profits or your peak equity.
+- Both balance and equity are monitored, including floating losses on open trades.
+- Breaching this limit results in immediate account failure for that trading day.`,
+			},
+			{
+				slug: 'what-is-the-maximum-loss-limit',
+				title: 'What is the Maximum Loss (Overall) limit?',
+				body: `The Maximum Loss is the total loss allowed on the account over its entire lifetime:
+
+| Account Type | Maximum Loss |
+| Step 1 / Step 2 (Challenge & Funded) | 10% of Initial Account Balance |
+| Instant / Funded Account | 6% of Initial Account Balance |
+
+- The limit is **static** and is always measured from the Initial Account Balance — it never trails upward with profits.
+- Both balance and equity are monitored, including floating losses on open positions.
+- Breaching it fails and permanently terminates the account, regardless of any later recovery.
+- All daily loss and Profitable Day calculations reset at **00:00 UTC**, based on dashboard time. The dashboard countdown timer is the sole and final reference — not your broker's server time or your local time.`,
 			},
 		],
 	},

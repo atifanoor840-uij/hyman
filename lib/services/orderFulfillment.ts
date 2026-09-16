@@ -6,6 +6,7 @@ import { createAccountFromInventory } from "./tradingAccounts"
 import { findOrderById, updateOrderStatus } from "./orders"
 import { createNotification } from "./notifications"
 import { recordReferralIfApplicable } from "./referrals"
+import { applyOfferBenefitsOnDelivery } from "./offerFulfillment"
 
 /**
  * Runs after a payment gateway confirms payment. Tries to auto-assign an
@@ -55,4 +56,8 @@ export async function fulfillOrder(orderId: string): Promise<void> {
     message: `Your ${plan.name} account is ready. Check your dashboard for login credentials.`,
     type: "order",
   })
+
+  // Grants anything the order's offer entitles them to (BOGO second account,
+  // free add-on). A free_retry stays pending until the challenge is failed.
+  await applyOfferBenefitsOnDelivery(orderId)
 }

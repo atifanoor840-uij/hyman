@@ -14,6 +14,7 @@ import { issueCertificate } from "@/lib/services/certificates"
 import { createNotification } from "@/lib/services/notifications"
 import { findUserById } from "@/lib/services/users"
 import { writeAuditLog } from "@/lib/services/auditLog"
+import { applyOfferBenefitsOnDelivery, grantFreeRetryOnFailure } from "@/lib/services/offerFulfillment"
 
 export const dynamic = "force-dynamic"
 
@@ -117,8 +118,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
           type: "order",
         })
       }
+
+      // A free_retry offer is spent here: the trader gets a replacement order
+      // and, where stock allows, a fresh account straight away.
+      const retryOrderId = await grantFreeRetryOnFailure(id)
+      if (retryOrderId) {
+        await audit("free-retry", `Free retry granted on order ${id} — replacement order ${retryOrderId}.`)
+      }
+
       await audit("fail", `${session.email} marked order ${id} as failed. ${reason}`.trim())
-      return NextResponse.json({ ok: true })
+      return NextResponse.json({ ok: true, retryOrderId })
     }
 
     if (body.action === "complete-inventory" || body.action === "complete-manual") {
@@ -179,6 +188,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
           type: "order",
         })
       }
+
+      // Manual delivery must grant offer benefits too, otherwise a BOGO bought
+      // while inventory was empty would silently lose its second account.
+      await applyOfferBenefitsOnDelivery(id)
       await audit(
         body.action,
         `${session.email} ${body.action === "complete-inventory" ? "delivered from inventory" : "manually delivered"} ${phase} credentials for order ${id}.`

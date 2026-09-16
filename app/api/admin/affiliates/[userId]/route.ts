@@ -36,7 +36,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ us
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
-  const { session, error } = await withSession(["admin"])
+  const { session, error } = await withSession(["admin", "support"])
   if (error) return error
   const { userId } = await params
 

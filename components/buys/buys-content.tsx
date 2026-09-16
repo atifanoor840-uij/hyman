@@ -7,11 +7,22 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Info, X, Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
-import { listPlans, createOrder, payOrder, validateCoupon, type ChallengePlan } from "@/lib/api/app-client"
+import { Info, X, Check, ChevronLeft, ChevronRight, Loader2, Tag, Gift } from "lucide-react"
+import {
+  listPlans,
+  createOrder,
+  payOrder,
+  validatePromoCode,
+  listPlanPromos,
+  type ChallengePlan,
+  type PromoValidation,
+  type AvailableCoupon,
+  type IncludedOffer,
+} from "@/lib/api/app-client"
 import { ApiClientError } from "@/lib/api/client"
 import SuccessPopup from "@/app/components/SuccessPopup"
 import { trackInitiateCheckout, trackViewContent } from "@/components/MetaPixel"
+import { GLOBAL_RULES, getAccountRules, type AccountRuleType } from "@/lib/rules-config"
 
 const createEventId = (prefix: string) => `${prefix}.${Date.now().toString(36)}.${Math.random().toString(36).slice(2, 10)}`
 
@@ -27,9 +38,6 @@ const ACCOUNT_TYPE_ORDER: Array<{ key: string; planName: string; label: string }
   { key: "sigma", planName: "Genz Instant", label: "Genz Instant" },
 ]
 
-// Hardcoded trading rules shown for every account size. Percent rules also show the $ amount per size.
-const DAILY_DRAWDOWN_PCT = 4
-const MAX_DRAWDOWN_PCT = 8
 
 const paymentMethods = [
   { id: "nowpayments", label: "Crypto (NOWPayments)", image: "https://fundednext.fra1.digitaloceanspaces.com/utility-files/6267395.png" },
@@ -44,19 +52,69 @@ function usd2(n: number) {
 
 type FeatureRow = { name: string; values: Record<string, string> }
 
-function buildFeatures(plansForType: ChallengePlan[]): FeatureRow[] {
+// Every number below comes from lib/rules-config.ts so the buy page, the dashboard
+// and the help centre can never drift apart.
+function buildFeatures(plansForType: ChallengePlan[], type: AccountRuleType): FeatureRow[] {
+  const rules = getAccountRules(type)
   const fill = (fn: (p: ChallengePlan) => string) =>
     Object.fromEntries(plansForType.map((p) => [p.id, fn(p)])) as Record<string, string>
   const pct = (percent: number) => (p: ChallengePlan) => `${percent}% (${usd(Math.round((p.size * percent) / 100))})`
 
+  const profitTarget = (p: ChallengePlan) => {
+    const { phase1, phase2 } = rules.profitTarget
+    if (phase1 == null) return "None"
+    const one = `${phase1}% (${usd(Math.round((p.size * phase1) / 100))})`
+    if (phase2 == null) return one
+    return `P1 ${one} · P2 ${phase2}% (${usd(Math.round((p.size * phase2) / 100))})`
+  }
+
+  const minDays =
+    rules.minProfitableDaysChallenge != null
+      ? `${rules.minProfitableDaysChallenge} profitable (challenge) · ${rules.minDaysTotalFunded} (funded)`
+      : `${rules.minDaysTotalFunded} (${rules.minProfitableDaysFunded} profitable + ${rules.minTradingDaysFunded} trading)`
+
   return [
-    { name: "Daily Drawdown", values: fill(pct(DAILY_DRAWDOWN_PCT)) },
-    { name: "Maximum Drawdown", values: fill(pct(MAX_DRAWDOWN_PCT)) },
-    { name: "Minimum Trading Days", values: fill(() => "5") },
-    { name: "Leverage", values: fill(() => "1:100") },
-    { name: "Hedging & News Trading", values: fill(() => "check") },
-    { name: "Layering", values: fill(() => "no") },
+    { name: "Profit Target", values: fill(profitTarget) },
+    { name: "Daily Drawdown", values: fill(pct(GLOBAL_RULES.dailyDrawdownPct)) },
+    { name: "Maximum Drawdown", values: fill(pct(parseFloat(rules.maxDrawdown))) },
+    { name: "Minimum Days", values: fill(() => minDays) },
+    { name: "Leverage", values: fill(() => rules.leverage) },
+    { name: "Minimum Holding Time", values: fill(() => rules.minHoldingTime) },
+    { name: "Profit Consistency Rule", values: fill(() => "None") },
+    { name: "Overnight Holding", values: fill(() => "check") },
+    { name: "Weekend Holding", values: fill(() => "Paid add-on") },
+    {
+      name: "News Trading",
+      values: fill(() =>
+        rules.minProfitableDaysChallenge != null
+          ? "Free in challenge · 10-min window when funded"
+          : "10-min restricted window"
+      ),
+    },
+    { name: "Trade Layering", values: fill(() => "no") },
   ]
+}
+
+/** Plain-language summary of the conditions that are easiest to breach. */
+function buildKeyRules(type: AccountRuleType): string[] {
+  const rules = getAccountRules(type)
+  const lines = [
+    `Daily loss limit ${rules.dailyDrawdown} and overall loss limit ${rules.maxDrawdown} — both measured from your initial balance and monitored on balance and equity, including floating losses.`,
+    `Both limits are static: they never trail up with profits. Daily counters reset at ${GLOBAL_RULES.dailyResetUtc}.`,
+    `A Profitable Day needs at least ${GLOBAL_RULES.profitableDayPct}% profit on that calendar day, measured on equity.`,
+    `Every trade must be held for at least ${rules.minHoldingTime}.`,
+    `No profit consistency rule — a single strong day can carry your whole target.`,
+    `Overnight holding is included. Weekend holding (${GLOBAL_RULES.weekendWindow}) needs the paid add-on.`,
+  ]
+  if (type === "sigma") {
+    lines.push(`One trade per ${GLOBAL_RULES.layeringWindowMinutes}-minute window and a maximum of ${GLOBAL_RULES.instantMaxConcurrentLayers} concurrent layers.`)
+    lines.push(`News: you cannot open or close on the affected instrument within ${GLOBAL_RULES.newsWindowMinutes} minutes either side of a high-impact release.`)
+  } else {
+    lines.push(`News trading is unrestricted during the challenge. On the funded stage a ${GLOBAL_RULES.newsWindowMinutes}-minutes-either-side window applies, and an SL/TP firing inside it is a soft breach.`)
+    lines.push(`Funded stage: one trade per ${GLOBAL_RULES.layeringWindowMinutes}-minute window from the previous trade's opening time.`)
+  }
+  lines.push(`No trade for ${GLOBAL_RULES.inactivityDays} consecutive days closes the account.`)
+  return lines
 }
 
 export function BuysContent() {
@@ -69,8 +127,14 @@ export function BuysContent() {
   const [selectedPlatform, setSelectedPlatform] = useState("mt5")
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<"nowpayments">("nowpayments")
   const [couponCode, setCouponCode] = useState("")
-  const [couponDiscount, setCouponDiscount] = useState<number | null>(null)
+  // An applied coupon OR offer — the checkout box accepts both.
+  const [promo, setPromo] = useState<Extract<PromoValidation, { valid: true }> | null>(null)
   const [couponError, setCouponError] = useState<string | null>(null)
+  const [applyingPromo, setApplyingPromo] = useState(false)
+  // Advertised coupon codes for this plan, and the offers already included.
+  const [availableCoupons, setAvailableCoupons] = useState<AvailableCoupon[]>([])
+  const [includedOffers, setIncludedOffers] = useState<IncludedOffer[]>([])
+  const [promosLoading, setPromosLoading] = useState(false)
   const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -89,7 +153,14 @@ export function BuysContent() {
     () => plans.filter((p) => p.name === activeTypeMeta.planName).sort((a, b) => a.size - b.size),
     [plans, activeTypeMeta]
   )
-  const features = useMemo(() => buildFeatures(plansForType), [plansForType])
+  const features = useMemo(
+    () => buildFeatures(plansForType, activeTypeMeta.key as AccountRuleType),
+    [plansForType, activeTypeMeta]
+  )
+  const keyRules = useMemo(
+    () => buildKeyRules(activeTypeMeta.key as AccountRuleType),
+    [activeTypeMeta]
+  )
   const selectedPlan = plans.find((p) => p.id === selectedPlanId) ?? null
 
   const handleAccountTypeChange = (key: string) => {
@@ -101,35 +172,71 @@ export function BuysContent() {
   const handleGetPlan = (planId: string) => {
     setSelectedPlanId(planId)
     setCouponCode("")
-    setCouponDiscount(null)
+    setPromo(null)
     setCouponError(null)
+    setAvailableCoupons([])
+    setIncludedOffers([])
     setSidebarOpen(true)
   }
 
   const closeSidebar = () => setSidebarOpen(false)
 
+  // Load the advertised codes for whichever plan is in the sidebar.
+  useEffect(() => {
+    if (!selectedPlanId) return
+    let cancelled = false
+    setPromosLoading(true)
+    listPlanPromos(selectedPlanId)
+      .then((res) => {
+        if (cancelled) return
+        setAvailableCoupons(res.coupons ?? [])
+        setIncludedOffers(res.offers ?? [])
+      })
+      .catch(() => {
+        // A failure here just means no extras are shown — checkout still works.
+        if (cancelled) return
+        setAvailableCoupons([])
+        setIncludedOffers([])
+      })
+      .finally(() => {
+        if (!cancelled) setPromosLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [selectedPlanId])
+
   const getPayableAmount = () => {
     if (!selectedPlan) return 0
-    if (couponDiscount) return Math.round(selectedPlan.price * (1 - couponDiscount / 100) * 100) / 100
+    // Non-discount offers (BOGO, free retry, free add-on) leave the price alone,
+    // so the server-computed finalPrice is the single source of truth here.
+    if (promo) return promo.finalPrice
     return selectedPlan.price
   }
 
-  const handleApplyCoupon = async () => {
-    if (!couponCode.trim()) return
+  const applyPromo = async (rawCode: string) => {
+    const code = rawCode.trim()
+    if (!code || !selectedPlan) return
+    setCouponCode(code)
     setCouponError(null)
+    setApplyingPromo(true)
     try {
-      const res = await validateCoupon(couponCode.trim())
-      if (res.valid && res.discountPercent != null) {
-        setCouponDiscount(res.discountPercent)
+      const res = await validatePromoCode(code, selectedPlan.id)
+      if (res.valid) {
+        setPromo(res)
       } else {
-        setCouponDiscount(null)
-        setCouponError("That coupon code is invalid or expired.")
+        setPromo(null)
+        setCouponError(res.message)
       }
-    } catch {
-      setCouponDiscount(null)
-      setCouponError("Failed to validate coupon.")
+    } catch (err) {
+      setPromo(null)
+      setCouponError(err instanceof ApiClientError ? err.message : "Could not check that code.")
+    } finally {
+      setApplyingPromo(false)
     }
   }
+
+  const handleApplyCoupon = () => applyPromo(couponCode)
 
   const handleProceedToCheckout = async () => {
     if (!selectedPlan) return
@@ -143,7 +250,7 @@ export function BuysContent() {
       const { order } = await createOrder({
         planId: selectedPlan.id,
         paymentMethod: selectedPaymentMethod,
-        couponCode: couponDiscount ? couponCode.trim() : undefined,
+        couponCode: promo ? promo.code : undefined,
       })
       closeSidebar()
       setSuccessPopup({ title: "Order Created!", message: "Redirecting to checkout to complete your payment..." })
@@ -280,6 +387,25 @@ export function BuysContent() {
           </div>
           )}
         </Card>
+
+        <div className="max-w-5xl mx-auto mt-4 rounded-xl border border-border bg-card/60 px-5 py-4">
+          <p className="text-sm font-semibold text-foreground">Key rules for {activeTypeMeta.label}</p>
+          <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
+            {keyRules.map((line) => (
+              <li key={line} className="flex gap-2">
+                <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-primary" />
+                <span>{line}</span>
+              </li>
+            ))}
+          </ul>
+          <Link
+            href="/rules"
+            className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+          >
+            Read the full rules
+            <ChevronRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
       </div>
 
       <div
@@ -413,23 +539,104 @@ export function BuysContent() {
 
               <div className="h-px bg-border/60" />
 
+              {includedOffers.length > 0 && (
+                <>
+                  <div className="space-y-3 animate-slide-in-up" style={{ animationDelay: "165ms" }}>
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      <p className="text-sm font-semibold text-foreground">Included with this plan</p>
+                    </div>
+                    <div className="space-y-1.5">
+                      {includedOffers.map((o) => (
+                        <div
+                          key={`${o.type}-${o.name}`}
+                          className="flex items-start gap-3 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-3 py-2.5"
+                        >
+                          <Gift className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-foreground">{o.shortLabel}</p>
+                            <p className="mt-0.5 text-xs text-muted-foreground">{o.summary}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Applied automatically — no code needed.
+                    </p>
+                  </div>
+
+                  <div className="h-px bg-border/60" />
+                </>
+              )}
+
               <div className="space-y-3 animate-slide-in-up" style={{ animationDelay: "175ms" }}>
                 <div className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                  <p className="text-sm font-semibold text-foreground">Coupon</p>
+                  <p className="text-sm font-semibold text-foreground">Coupon code</p>
                 </div>
                 <div className="flex gap-2">
                   <input
                     value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value)}
-                    placeholder="Enter coupon code"
-                    className="flex-1 h-9 rounded-md border border-input bg-transparent px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    placeholder="Enter code"
+                    className="flex-1 h-9 rounded-md border border-input bg-transparent px-3 text-sm uppercase outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   />
-                  <Button type="button" variant="outline" size="sm" onClick={handleApplyCoupon}>
-                    Apply
+                  <Button type="button" variant="outline" size="sm" onClick={handleApplyCoupon} disabled={applyingPromo}>
+                    {applyingPromo ? "Checking…" : "Apply"}
                   </Button>
                 </div>
-                {couponDiscount != null && <p className="text-xs text-emerald-600">Coupon applied: {couponDiscount}% off</p>}
+
+                {/* Advertised coupon codes for this plan — tap to apply. */}
+                {promosLoading ? (
+                  <p className="text-xs text-muted-foreground">Checking for available codes…</p>
+                ) : availableCoupons.length > 0 ? (
+                  <div className="space-y-1.5">
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Available for this account{selectedPlan ? ` (${usd(selectedPlan.size)})` : ""}
+                    </p>
+                    {availableCoupons.map((c) => {
+                      const applied = promo?.code === c.code
+                      return (
+                        <button
+                          key={c.code}
+                          type="button"
+                          disabled={applyingPromo || applied}
+                          onClick={() => void applyPromo(c.code)}
+                          className={`flex w-full items-start gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors ${
+                            applied
+                              ? "border-emerald-500/40 bg-emerald-500/5"
+                              : "border-dashed border-border hover:border-primary/40 hover:bg-primary/5"
+                          }`}
+                        >
+                          <Tag className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                          <span className="min-w-0 flex-1">
+                            <span className="flex items-center gap-2">
+                              <span className="font-mono text-sm font-semibold text-foreground">{c.code}</span>
+                              {c.discountAmount > 0 && (
+                                <span className="text-xs font-semibold text-emerald-600">
+                                  save {usd2(c.discountAmount)}
+                                </span>
+                              )}
+                            </span>
+                            <span className="mt-0.5 block text-xs text-muted-foreground">{c.summary}</span>
+                          </span>
+                          <span className="shrink-0 self-center text-xs font-semibold text-primary">
+                            {applied ? "Applied" : "Apply"}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                ) : null}
+                {promo && (
+                  <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-3 py-2">
+                    <p className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                      <Check className="h-3.5 w-3.5" />
+                      {promo.code} applied
+                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">{promo.summary}</p>
+                  </div>
+                )}
                 {couponError && <p className="text-xs text-destructive">{couponError}</p>}
               </div>
 
@@ -445,6 +652,18 @@ export function BuysContent() {
                     <span className="text-muted-foreground">Plan price</span>
                     <span className="font-medium text-foreground">{selectedPlan ? usd2(selectedPlan.price) : "$0.00"}</span>
                   </div>
+                  {promo && promo.discountAmount > 0 && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">{promo.code}</span>
+                      <span className="font-medium text-emerald-600">−{usd2(promo.discountAmount)}</span>
+                    </div>
+                  )}
+                  {includedOffers.map((o) => (
+                    <div key={`sum-${o.type}-${o.name}`} className="flex items-start justify-between gap-3 text-sm">
+                      <span className="text-muted-foreground">{o.shortLabel}</span>
+                      <span className="text-right text-xs font-medium text-emerald-600">Included</span>
+                    </div>
+                  ))}
                   <div className="h-px bg-border/60" />
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-semibold text-foreground">Total</span>

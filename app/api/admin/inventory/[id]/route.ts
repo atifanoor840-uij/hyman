@@ -32,7 +32,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { session, error } = await withSession(["admin"])
+  const { session, error } = await withSession(["admin", "support"])
   if (error) return error
   const { id } = await params
 

@@ -10,59 +10,95 @@ import {
   Scale,
   ExternalLink,
 } from "lucide-react"
+import { GLOBAL_RULES } from "@/lib/rules-config"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
 const rules = [
   {
-    title: "Trading rules",
-    description: "Core limits for your evaluation and funded account.",
+    title: "Loss limits",
+    description: "Both limits are static from your initial balance and include floating losses.",
     icon: Activity,
     iconBg: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
     items: [
-      "Maximum daily loss: 5% of initial balance. Trading halts until next day if reached.",
-      "Maximum total drawdown: 10% of initial balance. Account fails if exceeded.",
-      "Profit target Phase 1: 8%. Phase 2: 5%.",
-      "Minimum trading days: 4 in Phase 1, 4 in Phase 2.",
-      "Overnight and weekend holding allowed. No max position hold time.",
+      `Maximum daily loss: ${GLOBAL_RULES.dailyDrawdownPct}% of the initial balance — every account type and stage. Breaching it fails the account for that day, even if it recovers later.`,
+      "Maximum overall loss: 10% of the initial balance on Step 1 and Step 2 (challenge and funded), 6% on Instant. Breaching it permanently terminates the account.",
+      "Neither limit trails upward with profits — both are always measured from the initial balance, on balance and equity.",
+      `Daily loss and Profitable Day counters reset at ${GLOBAL_RULES.dailyResetUtc}. The dashboard countdown is the only reference — not broker or local time.`,
     ],
   },
   {
-    title: "Account & risk rules",
-    description: "Account usage and risk management requirements.",
+    title: "Targets and qualifying days",
+    description: "What you have to reach before you pass or get paid.",
+    icon: Calendar,
+    iconBg: "bg-sky-500/10 text-sky-600 dark:text-sky-400",
+    items: [
+      "Profit target — Step 1: 10% in Phase 1. Step 2: 10% in Phase 1, 5% in Phase 2. Instant: none. Targets are verified on closed balance with no open or pending positions.",
+      `A Profitable Day is a calendar day (00:00–23:59 UTC) where profit reaches at least ${GLOBAL_RULES.profitableDayPct}% of your initial balance, on an equity basis.`,
+      "Step 1 / Step 2 challenge: 3 Profitable Days. Instant and every funded stage: 5 days total — 3 Profitable Days plus 2 plain Trading Days, in any order.",
+      "There is no profit consistency rule. A single strong day can carry your whole target.",
+    ],
+  },
+  {
+    title: "Trading rules",
+    description: "How trades must be placed and held.",
     icon: Shield,
     iconBg: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
     items: [
-      "One account per person. Multiple accounts require approval.",
-      "Expert Advisors (EAs) and copy trading are allowed.",
-      "Consistency rule: no single day may exceed 40% of total profit target.",
-      "Same login and server must be used for evaluation and funded account.",
+      `Minimum holding time: ${GLOBAL_RULES.minHoldingTimeMinutes} minutes on every trade, in every phase. Closing earlier is a breach.`,
+      `Leverage is capped at ${GLOBAL_RULES.leverage} across every asset class, for all account types and sizes.`,
+      `Trade layering — funded stage: one trade per ${GLOBAL_RULES.layeringWindowMinutes}-minute window from the previous trade's opening time. Instant adds a hard cap of ${GLOBAL_RULES.instantMaxConcurrentLayers} concurrent layers.`,
+      "Stop-loss orders are optional — there is no penalty for trading without one, but the loss limits still apply.",
+      "Overnight holding is allowed by default on every plan; swap/rollover charges apply as normal.",
+      `Weekend holding (${GLOBAL_RULES.weekendWindow}) is prohibited by default on all types and stages, including crypto — it requires the paid Weekend Holding add-on at checkout.`,
+      `News trading is unrestricted during Step 1 / Step 2. On funded and Instant accounts you may not open or close the affected instrument within ${GLOBAL_RULES.newsWindowMinutes} minutes either side of a high-impact release; an SL/TP firing inside that window is a soft breach — the account survives but that profit is not withdrawable.`,
+      `Inactivity: at least one trade every ${GLOBAL_RULES.inactivityDays} consecutive days, or the account is closed.`,
     ],
   },
   {
-    title: "General rules",
-    description: "Terms and compliance requirements.",
+    title: "Withdrawals",
+    description: "Eligibility, caps, and the profit split.",
+    icon: Percent,
+    iconBg: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+    items: [
+      `You can request a withdrawal once ${GLOBAL_RULES.withdrawalEligibilityDays} days have passed since the account was funded, the required days are met, the account is in profit, and there are no rule violations.`,
+      "There is no minimum profit threshold on any account type, including Instant.",
+      `Each payout period is capped at ${GLOBAL_RULES.withdrawalCapPct}% of your initial balance. Profit above the cap stays on the account for a future payout.`,
+      "Profit split: 80/20 on the first withdrawal, 85/15 on the second, then 90/10 from the third onward — provided every earlier withdrawal was clean.",
+      `Payouts run bi-weekly (every ${GLOBAL_RULES.payoutCycleDays} calendar days). Most are processed within about 48 working hours; some take 5–7 working days.`,
+      "After you submit a request, close all open trades and do not open new ones until it is processed. Only realised profit counts.",
+      "Your account fee is returned with your first successful withdrawal — not on Instant accounts, and voided if the withdrawal is rejected for a violation.",
+    ],
+  },
+  {
+    title: "Prohibited practices",
+    description: "Strategies that exploit platform mechanics rather than the market.",
     icon: Scale,
     iconBg: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
     items: [
-      "You must be 18+ and comply with your jurisdiction's laws.",
-      "We reserve the right to amend rules. Changes apply to new evaluations only.",
-      "Abuse, manipulation, or arbitrage strategies may result in account termination.",
+      "Reverse arbitrage, latency trading, and price arbitrage across delayed feeds.",
+      "Hedging between two or more accounts — hedging inside a single account is fine.",
+      `Tick scalping — closing ${GLOBAL_RULES.tickScalpTradesPerHour} or more trades held under 10 seconds within a 1-hour window is an immediate hard breach.`,
+      "Abusive autotrading, hyperactive order flooding, martingale and grid strategies.",
+      "Account sharing, pass services, and unauthorized copy trading.",
+      "Exploiting technical errors, frozen quotes, or faulty spreads; gambling-style trading; account rolling.",
+      "Confirmed breaches may lead to immediate termination and forfeiture of rewards, without prior notice.",
     ],
   },
 ]
 
 const quickRef = [
-  { label: "Max daily loss", value: "5%", icon: TrendingDown },
-  { label: "Max drawdown", value: "10%", icon: Percent },
-  { label: "Min trading days", value: "4 + 4", icon: Calendar },
+  { label: "Max daily loss", value: `${GLOBAL_RULES.dailyDrawdownPct}%`, icon: TrendingDown },
+  { label: "Max overall loss", value: "10% / 6%", icon: Percent },
+  { label: "Min days", value: "3 or 5", icon: Calendar },
+  { label: "Leverage", value: GLOBAL_RULES.leverage, icon: Scale },
 ]
 
 export function FactsRulesContent() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Quick reference strip */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {quickRef.map((item) => (
           <div
             key={item.label}

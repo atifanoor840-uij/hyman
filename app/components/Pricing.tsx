@@ -11,15 +11,50 @@ import {
 	SiApplepay,
 } from "react-icons/si";
 import SaleTimer from "./SaleTimer";
+import { GLOBAL_RULES } from "@/lib/rules-config";
 
-const FEATURES = [
-	{ label: "Hedging and News Trading is Allowed", included: true },
-	{ label: "Layering not allowed", included: false },
-	{ label: "Minimum trading days 5", included: true },
-	{ label: "Daily drawdown 4%", included: true },
-	{ label: "Maximum drawdown 8%", included: true },
-	{ label: "Leverage 1:100", included: true },
-];
+/** Per-tier feature list. Numbers come from lib/rules-config.ts. */
+const FEATURES_BY_TIER: Record<string, Array<{ label: string; included: boolean }>> = {
+	Step1: [
+		{ label: "Profit target 10% (Phase 1)", included: true },
+		{ label: "3 profitable days to pass", included: true },
+		{ label: `Daily drawdown ${GLOBAL_RULES.dailyDrawdownPct}%`, included: true },
+		{ label: "Maximum drawdown 10%", included: true },
+		{ label: `Leverage ${GLOBAL_RULES.leverage}`, included: true },
+		{ label: "Minimum holding time 3 min", included: true },
+		{ label: "No profit consistency rule", included: true },
+		{ label: "Overnight holding included", included: true },
+		{ label: "News free in challenge", included: true },
+		{ label: "Weekend holding — paid add-on", included: false },
+		{ label: "Trade layering not allowed", included: false },
+	],
+	Step2: [
+		{ label: "Profit target 10% then 5%", included: true },
+		{ label: "3 profitable days per phase", included: true },
+		{ label: `Daily drawdown ${GLOBAL_RULES.dailyDrawdownPct}%`, included: true },
+		{ label: "Maximum drawdown 10%", included: true },
+		{ label: `Leverage ${GLOBAL_RULES.leverage}`, included: true },
+		{ label: "Minimum holding time 3 min", included: true },
+		{ label: "No profit consistency rule", included: true },
+		{ label: "Overnight holding included", included: true },
+		{ label: "News free in challenge", included: true },
+		{ label: "Weekend holding — paid add-on", included: false },
+		{ label: "Trade layering not allowed", included: false },
+	],
+	Instant: [
+		{ label: "No profit target — funded day one", included: true },
+		{ label: "5 days (3 profitable + 2 trading)", included: true },
+		{ label: `Daily drawdown ${GLOBAL_RULES.dailyDrawdownPct}%`, included: true },
+		{ label: "Maximum drawdown 6%", included: true },
+		{ label: `Leverage ${GLOBAL_RULES.leverage}`, included: true },
+		{ label: "Minimum holding time 3 min", included: true },
+		{ label: "No profit consistency rule", included: true },
+		{ label: "Overnight holding included", included: true },
+		{ label: "News: 10-min restricted window", included: false },
+		{ label: "Weekend holding — paid add-on", included: false },
+		{ label: "Max 2 concurrent layers", included: false },
+	],
+};
 
 const TIERS = [
 	{
@@ -69,6 +104,7 @@ export default function Pricing() {
 
 	const currentTier = TIERS.find((t) => t.id === selectedTierId) ?? TIERS[0];
 	const accounts = currentTier.accounts;
+	const features = FEATURES_BY_TIER[currentTier.id] ?? FEATURES_BY_TIER.Step1;
 
 	const formatSizeK = (size: number) => (size >= 1000 ? `${size / 1000}K` : String(size));
 	const realPrice = (discounted: number) => Number((discounted * 1.65).toFixed(2));
@@ -127,7 +163,7 @@ export default function Pricing() {
 
 							{/* Feature list - compact */}
 							<ul className="space-y-2.5">
-								{FEATURES.map(({ label, included }) => (
+								{features.map(({ label, included }) => (
 									<li key={label} className="flex items-center justify-between gap-2">
 										<span className="text-xs font-medium text-slate-800 leading-tight">{label}</span>
 										{included ? (

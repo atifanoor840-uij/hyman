@@ -34,7 +34,7 @@ import { Check, Copy, Percent, Plus, Trash2 } from "lucide-react"
 
 type Filter = "all" | "active" | "inactive" | "expired"
 
-const EMPTY_FORM = { code: "", discountPercent: "", expiresAt: "" }
+const EMPTY_FORM = { code: "", discountPercent: "", expiresAt: "", showAtCheckout: false }
 
 const isExpired = (c: AdminCoupon) => !!c.expiresAt && new Date(c.expiresAt).getTime() < Date.now()
 
@@ -104,6 +104,7 @@ export default function AdminCouponsPage() {
         code: form.code.trim(),
         discountPercent: discount,
         expiresAt: form.expiresAt ? new Date(form.expiresAt).toISOString() : null,
+        showAtCheckout: form.showAtCheckout,
       })
       setNotice({ tone: "success", text: `Coupon ${form.code.trim()} created.` })
       setForm(EMPTY_FORM)
@@ -113,6 +114,18 @@ export default function AdminCouponsPage() {
       setCreateError(err instanceof ApiClientError ? err.message : "Failed to create coupon.")
     } finally {
       setCreating(false)
+    }
+  }
+
+  const toggleVisibility = async (coupon: AdminCoupon) => {
+    setBusyCode(coupon.code)
+    try {
+      await adminUpdateCoupon(coupon.code, { showAtCheckout: !coupon.showAtCheckout })
+      await refresh()
+    } catch (err) {
+      setNotice({ tone: "error", text: err instanceof ApiClientError ? err.message : "Failed to update coupon." })
+    } finally {
+      setBusyCode(null)
     }
   }
 
@@ -204,7 +217,7 @@ export default function AdminCouponsPage() {
               description={coupons.length ? "Try another filter or clear the search." : "Create a discount code to share with customers."}
             />
           ) : (
-            <DataTable head={["Code", "Discount", "Status", "Expires", "Created", "On / off"]}>
+            <DataTable head={["Code", "Discount", "Status", "Shown at checkout", "Expires", "Created", "On / off"]}>
               {visible.map((c) => {
                 const expired = isExpired(c)
                 return (
@@ -226,6 +239,14 @@ export default function AdminCouponsPage() {
                     </td>
                     <td className="text-base font-semibold tabular-nums text-foreground">{c.discountPercent}% off</td>
                     <td>{expired ? <StatusPill status="expired" /> : <StatusPill status={c.status === "active" ? "active" : "inactive"} />}</td>
+                    <td>
+                      <Switch
+                        checked={c.showAtCheckout}
+                        disabled={busyCode === c.code}
+                        onCheckedChange={() => void toggleVisibility(c)}
+                        aria-label={c.showAtCheckout ? `Hide ${c.code} at checkout` : `Show ${c.code} at checkout`}
+                      />
+                    </td>
                     <td className="whitespace-nowrap text-xs text-muted-foreground">{c.expiresAt ? shortDate(c.expiresAt) : "Never"}</td>
                     <td className="whitespace-nowrap text-xs text-muted-foreground">{shortDate(c.createdAt)}</td>
                     <td>
@@ -289,6 +310,20 @@ export default function AdminCouponsPage() {
                 <Input id="c-exp" type="date" className={inputClass} value={form.expiresAt} onChange={(e) => setForm((f) => ({ ...f, expiresAt: e.target.value }))} />
               </Field>
             </div>
+            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-border p-3">
+              <Switch
+                checked={form.showAtCheckout}
+                onCheckedChange={(v) => setForm((f) => ({ ...f, showAtCheckout: v }))}
+                aria-label="Show at checkout"
+              />
+              <span className="min-w-0">
+                <span className="block text-sm font-medium text-foreground">Show at checkout</span>
+                <span className="block text-xs text-muted-foreground">
+                  Lists this code in the checkout sidebar so customers can apply it with one tap. Leave off for private
+                  codes — they still work when typed in.
+                </span>
+              </span>
+            </label>
             {createError && <Notice tone="error">{createError}</Notice>}
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" className="rounded-xl" onClick={() => setCreateOpen(false)}>

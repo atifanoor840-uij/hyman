@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   const { session, error } = await withSession(["admin", "support"])
   if (error) return error
 
-  let body: { code?: string; discountPercent?: number; status?: string; expiresAt?: string | null }
+  let body: { code?: string; discountPercent?: number; status?: string; expiresAt?: string | null; showAtCheckout?: boolean }
   try {
     body = await req.json()
   } catch {
@@ -32,7 +32,13 @@ export async function POST(req: NextRequest) {
 
   let coupon
   try {
-    coupon = await createCoupon({ code, discountPercent, status: body.status, expiresAt: body.expiresAt ?? null })
+    coupon = await createCoupon({
+      code,
+      discountPercent,
+      status: body.status,
+      expiresAt: body.expiresAt ?? null,
+      showAtCheckout: body.showAtCheckout === true,
+    })
   } catch (err) {
     const message = err instanceof Error && err.message.includes("duplicate") ? "That coupon code already exists." : "Failed to create coupon."
     return NextResponse.json({ message }, { status: 409 })

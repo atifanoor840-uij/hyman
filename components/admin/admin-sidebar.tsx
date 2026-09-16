@@ -13,6 +13,7 @@ import {
   LogOut,
   Tag,
   Percent,
+  Gift,
   Handshake,
 } from "lucide-react"
 import { AppSidebar, type NavGroup } from "@/components/workspace/app-sidebar"
@@ -26,6 +27,7 @@ const groups: NavGroup[] = [
       { icon: Users, label: "Users", href: "/admin/users" },
       { icon: Tag, label: "Pricing", href: "/admin/pricing" },
       { icon: Percent, label: "Coupons", href: "/admin/coupons" },
+      { icon: Gift, label: "Offers", href: "/admin/offers" },
       { icon: Handshake, label: "Affiliates", href: "/admin/affiliates" },
     ],
   },

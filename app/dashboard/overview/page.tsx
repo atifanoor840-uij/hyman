@@ -25,6 +25,7 @@ import {
 import { listMyOrders, listMyAccounts, payOrder, type OrderWithPlan, type TradingAccount } from "@/lib/api/app-client"
 import { ApiClientError } from "@/lib/api/client"
 import { trackPurchaseEnhanced } from "@/components/MetaPixel"
+import { GLOBAL_RULES, getAccountRules, getAccountRuleType, getMinDays, getMaxDrawdownPct } from "@/lib/rules-config"
 
 // ---------------------------------------------------------------------------
 // Order state, expressed in plain language
@@ -488,6 +489,14 @@ function ChallengeCard({ order, account, state }: { order: OrderWithPlan; accoun
   const progress = target > 0 ? Math.max(0, Math.min(100, ((account?.totalPl ?? 0) / target) * 100)) : 0
   const showAccount = account && ["phase1", "phase2", "funded"].includes(state)
 
+  // Rule limits for this plan, straight from lib/rules-config.ts.
+  const ruleType = getAccountRuleType(plan?.name)
+  const rules = getAccountRules(plan?.name)
+  const stage: "challenge" | "funded" = state === "funded" ? "funded" : "challenge"
+  const maxDdPct = getMaxDrawdownPct(ruleType, stage)
+  const minDays = getMinDays(ruleType, stage)
+  const usdPct = (pct: number) => (size > 0 ? usd(Math.round((size * pct) / 100)) : `${pct}%`)
+
   return (
     <Card className="flex flex-col rounded-2xl border border-border bg-card shadow-[0_1px_2px_rgba(16,24,40,0.04)] transition-shadow hover:shadow-[0_12px_32px_rgba(16,24,40,0.08)]">
       <div className="p-5 sm:p-6 flex-1">
@@ -551,6 +560,38 @@ function ChallengeCard({ order, account, state }: { order: OrderWithPlan; accoun
           </div>
         )}
 
+        {/* Rule limits that apply to this account */}
+        {state !== "awaiting_payment" && state !== "failed" && (
+          <div className="mt-5 rounded-xl border border-border bg-card p-4">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                {rules.label} · rules for this account
+              </p>
+              <Link href="/rules" className="text-xs font-medium text-primary hover:underline">
+                Full rules
+              </Link>
+            </div>
+            <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2.5 sm:grid-cols-3">
+              <RuleFigure label="Daily loss limit" value={`${GLOBAL_RULES.dailyDrawdownPct}%`} sub={usdPct(GLOBAL_RULES.dailyDrawdownPct)} />
+              <RuleFigure label="Max loss limit" value={`${maxDdPct}%`} sub={usdPct(maxDdPct)} />
+              <RuleFigure
+                label={minDays.tradingDays > 0 ? "Minimum days" : "Profitable days"}
+                value={String(minDays.total)}
+                sub={minDays.tradingDays > 0 ? `${minDays.profitableDays} profitable + ${minDays.tradingDays} trading` : `${GLOBAL_RULES.profitableDayPct}% profit each`}
+              />
+              <RuleFigure label="Min holding time" value={rules.minHoldingTime} />
+              <RuleFigure label="Leverage" value={rules.leverage} />
+              <RuleFigure label="Consistency rule" value="None" />
+            </dl>
+            <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+              Loss limits are static from your initial balance and include floating losses. Counters reset at{" "}
+              {GLOBAL_RULES.dailyResetUtc}. Overnight holding is included; weekend holding ({GLOBAL_RULES.weekendWindow})
+              needs the paid add-on.{" "}
+              {stage === "funded" ? rules.newsFunded === "—" ? null : `News: ${rules.newsFunded}.` : "News trading is unrestricted during the challenge."}
+            </p>
+          </div>
+        )}
+
         {state === "preparing" && (
           <div className="mt-5 flex items-center gap-3 rounded-xl bg-muted/40 p-4 text-sm text-muted-foreground">
             <Hourglass className="h-4 w-4 shrink-0" />
@@ -590,6 +631,16 @@ function ChallengeCard({ order, account, state }: { order: OrderWithPlan; accoun
         )}
       </div>
     </Card>
+  )
+}
+
+function RuleFigure({ label, value, sub }: { label: string; value: string; sub?: string }) {
+  return (
+    <div className="min-w-0">
+      <dt className="truncate text-[11px] text-muted-foreground">{label}</dt>
+      <dd className="mt-0.5 truncate text-sm font-semibold tabular-nums text-foreground">{value}</dd>
+      {sub ? <p className="truncate text-[11px] text-muted-foreground">{sub}</p> : null}
+    </div>
   )
 }
 

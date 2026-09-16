@@ -160,6 +160,12 @@ export function OrderDetailsView({ orderId }: { orderId: string }) {
                 <Field label="Amount paid">{money(order.amountPaid)}</Field>
                 <Field label="Payment method"><span className="capitalize">{order.paymentMethod}</span></Field>
                 <Field label="Coupon">{order.couponUsed ?? "—"}</Field>
+                <Field label="Offer">{order.offerCode ?? "—"}</Field>
+                {order.retryOfOrderId && (
+                  <Field label="Free retry of">
+                    <code className="font-mono text-sm">{order.retryOfOrderId}</code>
+                  </Field>
+                )}
                 <Field label="Gateway ref"><code className="font-mono text-sm">{order.gatewayRef ?? "—"}</code></Field>
                 <Field label="Created">{formatDate(order.createdAt)}</Field>
                 <Field label="Updated">{formatDate(order.updatedAt)}</Field>

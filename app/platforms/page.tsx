@@ -61,7 +61,7 @@ const platforms: Platform[] = [
 			execution: 'Market & Instant Execution',
 			spreads: 'From 0.5 pips',
 			instruments: 'Forex, CFDs, Metals',
-			leverage: 'Up to 1:500',
+			leverage: 'Up to 1:100',
 			minimumDeposit: '$50',
 			platformType: 'Desktop, Mobile, Web',
 		},

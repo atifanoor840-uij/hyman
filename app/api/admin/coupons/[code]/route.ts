@@ -10,7 +10,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ co
   if (error) return error
   const { code } = await params
 
-  let body: { discountPercent?: number; status?: string; expiresAt?: string | null }
+  let body: { discountPercent?: number; status?: string; expiresAt?: string | null; showAtCheckout?: boolean }
   try {
     body = await req.json()
   } catch {
@@ -21,6 +21,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ co
   if (body.discountPercent !== undefined) patch.discountPercent = Number(body.discountPercent)
   if (body.status !== undefined) patch.status = body.status
   if (body.expiresAt !== undefined) patch.expiresAt = body.expiresAt
+  if (body.showAtCheckout !== undefined) patch.showAtCheckout = body.showAtCheckout === true
 
   const coupon = await updateCoupon(decodeURIComponent(code), patch)
 
@@ -37,7 +38,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ co
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ code: string }> }) {
-  const { session, error } = await withSession(["admin"])
+  const { session, error } = await withSession(["admin", "support"])
   if (error) return error
   const { code } = await params
 

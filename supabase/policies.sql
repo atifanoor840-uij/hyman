@@ -26,6 +26,8 @@ alter table public.audit_logs                  enable row level security;
 alter table public.email_verification_tokens   enable row level security;
 alter table public.referrals                   enable row level security;
 alter table public.newsletter_subscribers      enable row level security;
+alter table public.offers                      enable row level security;
+alter table public.offer_redemptions           enable row level security;
 
 -- ---------------------------------------------------------------------------
 -- coupons — public read only (as exported)

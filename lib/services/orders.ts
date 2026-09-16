@@ -8,6 +8,9 @@ export interface OrderRow {
   userId: string | null
   planId: string | null
   couponUsed: string | null
+  offerCode: string | null
+  retryOfOrderId: string | null
+  weekendHoldingAddon: boolean | null
   amountPaid: number
   paymentMethod: string
   status: string
@@ -16,7 +19,8 @@ export interface OrderRow {
   updatedAt: string | null
 }
 
-const COLUMNS = "id,userId,planId,couponUsed,amountPaid,paymentMethod,status,gatewayRef,createdAt,updatedAt"
+const COLUMNS =
+  "id,userId,planId,couponUsed,offerCode,retryOfOrderId,weekendHoldingAddon,amountPaid,paymentMethod,status,gatewayRef,createdAt,updatedAt"
 
 export async function listOrdersForUser(userId: string): Promise<OrderRow[]> {
   const supabase = createServiceRoleClient()
@@ -49,6 +53,11 @@ export interface CreateOrderInput {
   amountPaid: number
   paymentMethod: string
   couponUsed?: string | null
+  offerCode?: string | null
+  /** Set when a free_retry entitlement creates this replacement order. */
+  retryOfOrderId?: string | null
+  weekendHoldingAddon?: boolean | null
+  status?: string
 }
 
 export async function createOrder(input: CreateOrderInput): Promise<OrderRow> {
@@ -62,7 +71,10 @@ export async function createOrder(input: CreateOrderInput): Promise<OrderRow> {
       amountPaid: input.amountPaid,
       paymentMethod: input.paymentMethod,
       couponUsed: input.couponUsed ?? null,
-      status: "pending_payment",
+      offerCode: input.offerCode ?? null,
+      retryOfOrderId: input.retryOfOrderId ?? null,
+      weekendHoldingAddon: input.weekendHoldingAddon ?? null,
+      status: input.status ?? "pending_payment",
     })
     .select(COLUMNS)
     .single()

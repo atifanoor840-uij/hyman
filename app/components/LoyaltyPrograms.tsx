@@ -204,9 +204,10 @@ function PayoutVisual() {
 
 function RulesVisual() {
 	const rules = [
-		{ label: "Profit target", value: "8%" },
-		{ label: "Daily loss limit", value: "5%" },
+		{ label: "Profit target", value: "10%" },
+		{ label: "Daily loss limit", value: "4%" },
 		{ label: "Max drawdown", value: "10%" },
+		{ label: "Consistency rule", value: "None" },
 	];
 	return (
 		<LightPanel>

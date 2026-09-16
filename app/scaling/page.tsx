@@ -8,46 +8,44 @@ import { HEADER_IMAGE_3 } from '@/lib/header-image';
 const bodyFont = Inter({ subsets: ['latin'], weight: ['400', '500', '600'] });
 const display = Poppins({ subsets: ['latin'], weight: ['600', '700', '800'] });
 
+// Profit split ladder, per lib/rules-config.ts PROFIT_SPLIT. The split rises with
+// each clean withdrawal and is fixed at 90/10 from the third onward.
 const scalingTiers = [
 	{
-		level: 'Level 1',
-		accountSize: '$5,000 - $10,000',
-		profitShare: '50%',
-		stars: 1,
-		requirements: ['Complete evaluation', '5 successful payouts', 'Maintain consistency'],
-		benefits: ['Standard support', 'Monthly payouts', 'Basic analytics'],
-	},
-	{
-		level: 'Level 2',
-		accountSize: '$25,000 - $50,000',
-		profitShare: '60%',
-		stars: 2,
-		requirements: ['10 successful payouts', 'Consistent profitability', 'Low drawdown'],
-		benefits: ['Priority support', 'Bi-weekly payouts', 'Advanced analytics', 'Trading tools'],
-	},
-	{
-		level: 'Level 3',
-		accountSize: '$100,000 - $200,000',
-		profitShare: '70%',
-		stars: 3,
-		requirements: ['20 successful payouts', 'Excellent track record', 'High win rate'],
-		benefits: ['VIP support', 'Weekly payouts', 'Custom analytics', 'Premium tools', 'Dedicated manager'],
-	},
-	{
-		level: 'Level 4',
-		accountSize: '$500,000 - $1,000,000',
+		level: '1st Withdrawal',
+		accountSize: 'All account sizes',
 		profitShare: '80%',
-		stars: 4,
-		requirements: ['50 successful payouts', 'Outstanding performance', 'Proven consistency'],
-		benefits: ['24/7 VIP support', 'Instant payouts', 'Custom solutions', 'All premium features', 'Personal account manager'],
+		stars: 3,
+		requirements: [
+			'14 days since your account was funded',
+			'3 Profitable Days + 2 Trading Days completed',
+			'Account in profit with zero rule violations',
+		],
+		benefits: ['80/20 split', 'Bi-weekly payout cycle', 'Account fee returned (except Instant)'],
 	},
 	{
-		level: 'Level 5',
-		accountSize: '$2,000,000+',
+		level: '2nd Withdrawal',
+		accountSize: 'All account sizes',
+		profitShare: '85%',
+		stars: 4,
+		requirements: [
+			'First withdrawal completed with no rule violations',
+			'A further 14-day payout cycle completed',
+			'Account in profit with zero rule violations',
+		],
+		benefits: ['85/15 split', 'Bi-weekly payout cycle', 'Priority support'],
+	},
+	{
+		level: '3rd Withdrawal and onward',
+		accountSize: 'All account sizes',
 		profitShare: '90%',
 		stars: 5,
-		requirements: ['100+ successful payouts', 'Elite performance', 'Institutional-level results'],
-		benefits: ['White-glove service', 'Instant payouts', 'Fully customized', 'All features', 'Executive support', 'Co-marketing opportunities'],
+		requirements: [
+			'Every earlier withdrawal completed with no rule violations',
+			'A further 14-day payout cycle completed',
+			'Account in profit with zero rule violations',
+		],
+		benefits: ['90/10 split, fixed for every future payout', 'Bi-weekly payout cycle', 'VIP support'],
 	},
 ];
 
@@ -70,28 +68,18 @@ const StarRating = ({ stars }: { stars: number }) => {
 
 const milestones = [
 	{
-		milestone: 'First Payout',
-		description: 'Complete your first successful payout and unlock Level 1 scaling.',
-		reward: '50% Profit Share',
-	},
-	{
-		milestone: '10 Payouts',
-		description: 'Reach 10 successful payouts to advance to Level 2.',
-		reward: '60% Profit Share',
-	},
-	{
-		milestone: '20 Payouts',
-		description: 'Achieve 20 payouts and unlock Level 3 benefits.',
-		reward: '70% Profit Share',
-	},
-	{
-		milestone: '50 Payouts',
-		description: 'Reach elite status with 50 successful payouts.',
+		milestone: '1st Withdrawal',
+		description: 'Wait 14 days from funding, complete 3 Profitable Days plus 2 Trading Days, and finish in profit with a clean rule record.',
 		reward: '80% Profit Share',
 	},
 	{
-		milestone: '100+ Payouts',
-		description: 'Join the top tier with 100+ successful payouts.',
+		milestone: '2nd Withdrawal',
+		description: 'Complete your first payout with no rule violations, then the next 14-day cycle.',
+		reward: '85% Profit Share',
+	},
+	{
+		milestone: '3rd Withdrawal and onward',
+		description: 'Keep every payout clean and the split stays fixed at its maximum for every future withdrawal.',
 		reward: '90% Profit Share',
 	},
 ];
@@ -144,7 +132,7 @@ export default function ScalingPage() {
 							Earn Up to 90% Profit Share
 						</h2>
 						<p className="text-[#37353E]/80 mb-8 max-w-3xl mx-auto text-lg">
-							Our scaling program rewards consistent performance. Start at 50% profit share and scale up to 90% 
+							Your profit split rises with every clean payout. Start at 80% on your first withdrawal and reach 90% 
 							as you demonstrate excellence. The better you perform, the more you earn.
 						</p>
 						<div className="flex flex-wrap items-center justify-center gap-6">
@@ -154,13 +142,13 @@ export default function ScalingPage() {
 							</div>
 							<div className="h-12 w-px bg-[#e5e5e5]"></div>
 							<div className="text-center">
-								<div className={`${display.className} text-3xl font-bold text-[#5235ff]`}>5</div>
-								<div className="text-sm text-[#37353E]/70">Scaling Levels</div>
+								<div className={`${display.className} text-3xl font-bold text-[#5235ff]`}>3</div>
+								<div className="text-sm text-[#37353E]/70">Withdrawals to Max Split</div>
 							</div>
 							<div className="h-12 w-px bg-[#e5e5e5]"></div>
 							<div className="text-center">
-								<div className={`${display.className} text-3xl font-bold text-[#5235ff]`}>100+</div>
-								<div className="text-sm text-[#37353E]/70">Payouts to Max Level</div>
+								<div className={`${display.className} text-3xl font-bold text-[#5235ff]`}>14</div>
+								<div className="text-sm text-[#37353E]/70">Day Payout Cycle</div>
 							</div>
 						</div>
 					</div>

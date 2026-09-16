@@ -34,12 +34,44 @@ export interface ChallengePlan {
 export const listPlans = () => getJson<{ plans: ChallengePlan[] }>("/api/plans")
 export const validateCoupon = (code: string) => postJson<{ valid: boolean; discountPercent?: number }>("/api/coupons/validate", { code })
 
+/** Result of checking a coupon code against a plan. Offers are automatic and have no code. */
+export type PromoValidation =
+  | { valid: true; kind: "coupon"; code: string; discountPercent: number; finalPrice: number; discountAmount: number; summary: string }
+  | { valid: false; message: string }
+
+export const validatePromoCode = (code: string, planId: string) =>
+  postJson<PromoValidation>("/api/promo/validate", { code, planId })
+
+/** A coupon code the admin opted to advertise, shown as a tappable card at checkout. */
+export interface AvailableCoupon {
+  code: string
+  summary: string
+  finalPrice: number
+  discountAmount: number
+  expiresAt: string | null
+}
+
+/** An offer that applies automatically to this plan — shown as included, not tappable. */
+export interface IncludedOffer {
+  name: string
+  type: OfferType
+  summary: string
+  shortLabel: string
+}
+
+export const listPlanPromos = (planId: string) =>
+  getJson<{ coupons: AvailableCoupon[]; offers: IncludedOffer[] }>(
+    `/api/promo/available?planId=${encodeURIComponent(planId)}`
+  )
+
 // ---- Orders ----
 export interface OrderWithPlan {
   id: string
   userId: string | null
   planId: string | null
   couponUsed: string | null
+  offerCode?: string | null
+  retryOfOrderId?: string | null
   amountPaid: number
   paymentMethod: string
   status: string
@@ -196,15 +228,48 @@ export interface AdminCoupon {
   code: string
   discountPercent: number
   status: string
+  /** When true, the code is advertised in the checkout sidebar. */
+  showAtCheckout: boolean
   createdAt: string | null
   expiresAt: string | null
 }
 export const adminListCoupons = () => getJson<{ coupons: AdminCoupon[] }>("/api/admin/coupons")
-export const adminCreateCoupon = (input: { code: string; discountPercent: number; status?: string; expiresAt?: string | null }) =>
+export const adminCreateCoupon = (input: { code: string; discountPercent: number; status?: string; expiresAt?: string | null; showAtCheckout?: boolean }) =>
   postJson<{ coupon: AdminCoupon }>("/api/admin/coupons", input)
-export const adminUpdateCoupon = (code: string, patch: Partial<Pick<AdminCoupon, "discountPercent" | "status" | "expiresAt">>) =>
+export const adminUpdateCoupon = (code: string, patch: Partial<Pick<AdminCoupon, "discountPercent" | "status" | "expiresAt" | "showAtCheckout">>) =>
   patchJson<{ coupon: AdminCoupon }>(`/api/admin/coupons/${encodeURIComponent(code)}`, patch)
 export const adminDeleteCoupon = (code: string) => del<{ ok: true }>(`/api/admin/coupons/${encodeURIComponent(code)}`)
+
+// ---- Admin: offers ----
+export const OFFER_TYPES = ["bogo", "free_retry", "free_addon"] as const
+export type OfferType = (typeof OFFER_TYPES)[number]
+
+export interface AdminOffer {
+  id: string
+  /** Optional internal reference for reporting; customers never type it. */
+  code: string | null
+  name: string
+  type: OfferType
+  /** Empty = applies to every plan. Otherwise these challenge_plans.id values. */
+  planIds: string[]
+  status: string
+  startsAt: string | null
+  expiresAt: string | null
+  maxRedemptions: number | null
+  perUserLimit: number | null
+  timesRedeemed: number
+  description: string | null
+  createdAt: string | null
+  updatedAt: string | null
+}
+
+export type AdminOfferInput = Omit<AdminOffer, "id" | "timesRedeemed" | "createdAt" | "updatedAt">
+
+export const adminListOffers = () => getJson<{ offers: AdminOffer[] }>("/api/admin/offers")
+export const adminCreateOffer = (input: AdminOfferInput) => postJson<{ offer: AdminOffer }>("/api/admin/offers", input)
+export const adminUpdateOffer = (id: string, patch: Partial<AdminOfferInput>) =>
+  patchJson<{ offer: AdminOffer }>(`/api/admin/offers/${id}`, patch)
+export const adminDeleteOffer = (id: string) => del<{ ok: true }>(`/api/admin/offers/${id}`)
 
 // ---- Admin: pricing catalog (challenge plans) ----
 export const adminListPlans = () => getJson<{ plans: ChallengePlan[] }>("/api/admin/plans")

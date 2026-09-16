@@ -76,6 +76,8 @@ create table if not exists public.coupons (
   code               text primary key,
   "discountPercent"  numeric not null,
   status             text not null default 'active',
+  -- Opt-in advertising: listed in the checkout sidebar.
+  "showAtCheckout"   boolean not null default false,
   "createdAt"        timestamptz default now(),
   "expiresAt"        timestamptz
 );
@@ -108,7 +110,9 @@ create table if not exists public.orders (
   "updatedAt"               timestamptz default now(),
   "referralBalanceApplied"  numeric,
   "weekendHoldingAddon"     boolean,
-  "legacyRules"             boolean
+  "legacyRules"             boolean,
+  "offerCode"               text,
+  "retryOfOrderId"          text
 );
 
 -- ---------------------------------------------------------------------------
@@ -271,6 +275,51 @@ create table if not exists public.newsletter_subscribers (
 );
 
 -- ---------------------------------------------------------------------------
+-- offers
+--
+-- Automatic perks. Coupons change the price and need a typed code; offers grant
+-- an extra and apply automatically to every matching order. See
+-- supabase/offers.sql for the standalone migration and full column notes.
+-- ---------------------------------------------------------------------------
+create table if not exists public.offers (
+  id                 text primary key default gen_random_uuid()::text,
+  -- Optional internal reference for reporting. Customers never type it.
+  code               text unique,
+  name               text not null,
+  -- bogo | free_retry | free_addon
+  type               text not null,
+  "planIds"          text[] not null default '{}',
+  status             text not null default 'active',
+  "startsAt"         timestamptz,
+  "expiresAt"        timestamptz,
+  "maxRedemptions"   integer,
+  "perUserLimit"     integer,
+  "timesRedeemed"    integer not null default 0,
+  description        text,
+  "createdAt"        timestamptz default now(),
+  "updatedAt"        timestamptz default now(),
+  constraint offers_type_check check (type in ('bogo', 'free_retry', 'free_addon')),
+  constraint offers_status_check check (status in ('active', 'inactive'))
+);
+
+-- ---------------------------------------------------------------------------
+-- offer_redemptions
+-- ---------------------------------------------------------------------------
+create table if not exists public.offer_redemptions (
+  id             text primary key default gen_random_uuid()::text,
+  "offerId"      text references public.offers (id) on delete set null,
+  "offerCode"    text not null,
+  "offerType"    text not null,
+  "userId"       text references public.users (id) on delete set null,
+  "orderId"      text references public.orders (id) on delete cascade,
+  status         text not null default 'pending',
+  notes          text,
+  "createdAt"    timestamptz default now(),
+  "fulfilledAt"  timestamptz,
+  constraint offer_redemptions_status_check check (status in ('pending', 'fulfilled', 'consumed'))
+);
+
+-- ---------------------------------------------------------------------------
 -- Indexes on FK-ish columns used for lookups
 -- ---------------------------------------------------------------------------
 create index if not exists idx_affiliates_referral_code on public.affiliates ("referralCode");
@@ -289,3 +338,9 @@ create index if not exists idx_audit_logs_user_id on public.audit_logs ("userId"
 create index if not exists idx_email_verification_tokens_user_id on public.email_verification_tokens ("userId");
 create index if not exists idx_referrals_affiliate_id on public.referrals ("affiliateId");
 create index if not exists idx_newsletter_subscribers_email on public.newsletter_subscribers (email);
+create index if not exists idx_offers_code on public.offers (code);
+create index if not exists idx_offers_status on public.offers (status);
+create index if not exists idx_offer_redemptions_offer_id on public.offer_redemptions ("offerId");
+create index if not exists idx_offer_redemptions_user_id on public.offer_redemptions ("userId");
+create index if not exists idx_offer_redemptions_order_id on public.offer_redemptions ("orderId");
+create index if not exists idx_offer_redemptions_status on public.offer_redemptions (status);

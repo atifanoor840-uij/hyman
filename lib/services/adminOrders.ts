@@ -7,6 +7,8 @@ export interface AdminOrderRow {
   userId: string | null
   planId: string | null
   couponUsed: string | null
+  offerCode: string | null
+  retryOfOrderId: string | null
   amountPaid: number
   paymentMethod: string
   status: string
@@ -22,7 +24,7 @@ export async function listAllOrdersDetailed(): Promise<AdminOrderRow[]> {
   const { data, error } = await supabase
     .from("orders")
     .select(
-      "id,userId,planId,couponUsed,amountPaid,paymentMethod,status,gatewayRef,createdAt,updatedAt,users!orders_userId_fkey(name,email),challenge_plans(name,size,platform)"
+      "id,userId,planId,couponUsed,offerCode,retryOfOrderId,amountPaid,paymentMethod,status,gatewayRef,createdAt,updatedAt,users!orders_userId_fkey(name,email),challenge_plans(name,size,platform)"
     )
     .order("createdAt", { ascending: false })
   if (error) throw error
@@ -39,7 +41,7 @@ export async function findOrderDetailed(id: string): Promise<AdminOrderDetailRow
   const { data, error } = await supabase
     .from("orders")
     .select(
-      "id,userId,planId,couponUsed,amountPaid,paymentMethod,status,gatewayRef,createdAt,updatedAt,users!orders_userId_fkey(name,email,phone,country,status,createdAt),challenge_plans(name,size,platform,price)"
+      "id,userId,planId,couponUsed,offerCode,retryOfOrderId,amountPaid,paymentMethod,status,gatewayRef,createdAt,updatedAt,users!orders_userId_fkey(name,email,phone,country,status,createdAt),challenge_plans(name,size,platform,price)"
     )
     .eq("id", id)
     .maybeSingle()

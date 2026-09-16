@@ -6,11 +6,13 @@ export interface CouponRow {
   code: string
   discountPercent: number
   status: string
+  /** When true, the code is advertised in the checkout sidebar. */
+  showAtCheckout: boolean
   createdAt: string | null
   expiresAt: string | null
 }
 
-const COUPON_COLUMNS = "code,discountPercent,status,createdAt,expiresAt"
+const COUPON_COLUMNS = "code,discountPercent,status,showAtCheckout,createdAt,expiresAt"
 
 export async function findValidCoupon(code: string): Promise<CouponRow | null> {
   const supabase = createServiceRoleClient()
@@ -34,11 +36,25 @@ export async function listCoupons(): Promise<CouponRow[]> {
   return (data as CouponRow[]) ?? []
 }
 
+/** Active, non-expired coupons the admin has opted into advertising. */
+export async function listPublicCoupons(): Promise<CouponRow[]> {
+  const supabase = createServiceRoleClient()
+  const { data, error } = await supabase
+    .from("coupons")
+    .select(COUPON_COLUMNS)
+    .eq("status", "active")
+    .eq("showAtCheckout", true)
+  if (error) throw error
+  const now = Date.now()
+  return ((data as CouponRow[]) ?? []).filter((c) => !c.expiresAt || new Date(c.expiresAt).getTime() >= now)
+}
+
 export interface CreateCouponInput {
   code: string
   discountPercent: number
   status?: string
   expiresAt?: string | null
+  showAtCheckout?: boolean
 }
 
 export async function createCoupon(input: CreateCouponInput): Promise<CouponRow> {
@@ -50,6 +66,7 @@ export async function createCoupon(input: CreateCouponInput): Promise<CouponRow>
       discountPercent: input.discountPercent,
       status: input.status ?? "active",
       expiresAt: input.expiresAt ?? null,
+      showAtCheckout: input.showAtCheckout ?? false,
     })
     .select(COUPON_COLUMNS)
     .single()
@@ -59,7 +76,7 @@ export async function createCoupon(input: CreateCouponInput): Promise<CouponRow>
 
 export async function updateCoupon(
   code: string,
-  patch: Partial<{ discountPercent: number; status: string; expiresAt: string | null }>
+  patch: Partial<{ discountPercent: number; status: string; expiresAt: string | null; showAtCheckout: boolean }>
 ): Promise<CouponRow> {
   const supabase = createServiceRoleClient()
   const { data, error } = await supabase

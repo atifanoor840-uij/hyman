@@ -33,10 +33,11 @@ import {
 import { Pencil, Plus, Tag, Trash2 } from "lucide-react"
 
 const ACCOUNT_TYPES = ["Genz Step1", "Genz Step2", "Genz Instant"]
+const ACCOUNT_SIZES = [3000, 5000, 10000, 50000, 100000, 200000, 500000]
 
 const EMPTY_FORM = {
   name: ACCOUNT_TYPES[0],
-  size: "",
+  size: "10000",
   price: "",
 }
 
@@ -59,6 +60,7 @@ export default function AdminPricingPage() {
   /** `null` = closed, `"new"` = creating, otherwise the plan being edited. */
   const [editing, setEditing] = useState<ChallengePlan | "new" | null>(null)
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
+  const [isCustomSize, setIsCustomSize] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [notice, setNotice] = useState<{ tone: "success" | "error"; text: string } | null>(null)
@@ -92,6 +94,7 @@ export default function AdminPricingPage() {
 
   const openCreate = () => {
     setForm(EMPTY_FORM)
+    setIsCustomSize(false)
     setSaveError(null)
     setEditing("new")
   }
@@ -102,6 +105,7 @@ export default function AdminPricingPage() {
       size: String(p.size),
       price: String(p.price),
     })
+    setIsCustomSize(!ACCOUNT_SIZES.includes(p.size))
     setSaveError(null)
     setEditing(p)
   }
@@ -245,12 +249,38 @@ export default function AdminPricingPage() {
                     {!ACCOUNT_TYPES.includes(form.name) && <option value={form.name}>{form.name}</option>}
                   </NativeSelect>
                 </Field>
-                <Field label="Account size ($)" htmlFor="p-size">
-                  {numberInput("size", "p-size", "10000")}
+                <Field label="Account size ($)" htmlFor="p-size-select">
+                  <NativeSelect
+                    id="p-size-select"
+                    value={isCustomSize ? "custom" : form.size}
+                    onChange={(v) => {
+                      if (v === "custom") {
+                        setIsCustomSize(true)
+                        if (ACCOUNT_SIZES.includes(Number(form.size))) {
+                          setForm((f) => ({ ...f, size: "" }))
+                        }
+                      } else {
+                        setIsCustomSize(false)
+                        setForm((f) => ({ ...f, size: v }))
+                      }
+                    }}
+                  >
+                    {ACCOUNT_SIZES.map((s) => (
+                      <option key={s} value={String(s)}>
+                        {money(s, 0)}
+                      </option>
+                    ))}
+                    <option value="custom">Custom size…</option>
+                  </NativeSelect>
                 </Field>
                 <Field label="Price ($)" htmlFor="p-price">
                   {numberInput("price", "p-price", "89")}
                 </Field>
+                {isCustomSize && (
+                  <Field label="Custom size ($)" className="sm:col-span-2" htmlFor="p-size-custom">
+                    {numberInput("size", "p-size-custom", "Enter custom size, e.g. 25000")}
+                  </Field>
+                )}
               </div>
             </FormSection>
 
