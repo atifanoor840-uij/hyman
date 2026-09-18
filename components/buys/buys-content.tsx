@@ -7,7 +7,8 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Info, X, Check, ChevronLeft, ChevronRight, Loader2, Tag, Gift } from "lucide-react"
+import { Info, X, Check, ChevronLeft, ChevronRight, Loader2, Tag, Gift, QrCode } from "lucide-react"
+import { ScanPayDialog } from "@/components/buys/scan-pay-dialog"
 import {
   listPlans,
   createOrder,
@@ -39,12 +40,17 @@ const ACCOUNT_TYPE_ORDER: Array<{ key: string; planName: string; label: string }
 ]
 
 
-type PaymentMethodId = "boomfi" | "nowpayments"
+type PaymentMethodId = "boomfi" | "nowpayments" | "manual_crypto"
 
-const paymentMethods: Array<{ id: PaymentMethodId; label: string; image: string }> = [
-  { id: "boomfi", label: "Crypto / Card (BoomFi)", image: "https://cdn.prod.website-files.com/673f3cfcea6f215bd7496933/679b71802ca84648093a8d98_Favicon.png" },
-  { id: "nowpayments", label: "Crypto (NOWPayments)", image: "https://fundednext.fra1.digitaloceanspaces.com/utility-files/6267395.png" },
+// `hidden` methods stay wired up but aren't offered — flip it back to re-enable
+// (and add the id to ENABLED_PAYMENT_METHODS in app/api/orders/route.ts).
+const ALL_PAYMENT_METHODS: Array<{ id: PaymentMethodId; label: string; image?: string; hidden?: boolean }> = [
+  { id: "manual_crypto", label: "Scan & Pay (USDT, BTC)" },
+  { hidden: true, id: "boomfi", label: "Crypto / Card (BoomFi)", image: "https://cdn.prod.website-files.com/673f3cfcea6f215bd7496933/679b71802ca84648093a8d98_Favicon.png" },
+  { hidden: true, id: "nowpayments", label: "Crypto (NOWPayments)", image: "https://fundednext.fra1.digitaloceanspaces.com/utility-files/6267395.png" },
 ]
+
+const paymentMethods = ALL_PAYMENT_METHODS.filter((m) => !m.hidden)
 
 function usd(n: number) {
   return `$${n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
@@ -128,7 +134,7 @@ export function BuysContent() {
   const [activeAccountType, setActiveAccountType] = useState("alpha")
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null)
   const [selectedPlatform, setSelectedPlatform] = useState("mt5")
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethodId>("boomfi")
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethodId>(paymentMethods[0].id)
   const [couponCode, setCouponCode] = useState("")
   // An applied coupon OR offer — the checkout box accepts both.
   const [promo, setPromo] = useState<Extract<PromoValidation, { valid: true }> | null>(null)
@@ -143,6 +149,8 @@ export function BuysContent() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [successPopup, setSuccessPopup] = useState<{ title: string; message: string } | null>(null)
+  // "Scan & pay" order waiting for the customer to transfer and upload a screenshot.
+  const [scanPayOrder, setScanPayOrder] = useState<{ id: string; amount: number } | null>(null)
 
   useEffect(() => {
     trackViewContent("GenzProp Plans / Buy Challenge", "Checkout")
@@ -256,6 +264,11 @@ export function BuysContent() {
         couponCode: promo ? promo.code : undefined,
       })
       closeSidebar()
+      if (selectedPaymentMethod === "manual_crypto") {
+        setScanPayOrder({ id: order.id, amount: order.amountPaid })
+        setIsSubmitting(false)
+        return
+      }
       setSuccessPopup({ title: "Order Created!", message: "Redirecting to checkout to complete your payment..." })
       const { checkoutUrl } = await payOrder(order.id)
       setTimeout(() => {
@@ -531,8 +544,12 @@ export function BuysContent() {
                       >
                         {selectedPaymentMethod === method.id && <div className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />}
                       </div>
-                      <div className="w-full h-12 relative">
-                        <Image src={method.image} alt={method.label} fill className="object-contain" unoptimized />
+                      <div className="w-full h-12 relative flex items-center justify-center">
+                        {method.image ? (
+                          <Image src={method.image} alt={method.label} fill className="object-contain" unoptimized />
+                        ) : (
+                          <QrCode className="h-9 w-9 text-foreground" />
+                        )}
                       </div>
                       <span className="text-xs font-medium text-foreground text-center">{method.label}</span>
                     </button>
@@ -725,6 +742,21 @@ export function BuysContent() {
           </div>
         </div>
       </div>
+
+      {scanPayOrder && (
+        <ScanPayDialog
+          orderId={scanPayOrder.id}
+          amountUsd={scanPayOrder.amount}
+          onClose={() => setScanPayOrder(null)}
+          onSubmitted={() => {
+            setScanPayOrder(null)
+            setSuccessPopup({ title: "Payment submitted!", message: "We'll verify your transfer and activate your account shortly." })
+            setTimeout(() => {
+              window.location.href = "/dashboard/billing"
+            }, 2500)
+          }}
+        />
+      )}
 
       {successPopup && (
         <SuccessPopup message={successPopup.message} title={successPopup.title} duration={2500} onClose={() => setSuccessPopup(null)} />

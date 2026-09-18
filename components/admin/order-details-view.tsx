@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import EmptyState from "@/components/ui/empty-state"
-import { adminGetOrder, crmImpersonate, type AdminOrderDetail, type TradingAccount } from "@/lib/api/app-client"
+import { adminApprovePayment, adminGetOrder, adminRejectPayment, crmImpersonate, type AdminOrderDetail, type TradingAccount } from "@/lib/api/app-client"
 import { ApiClientError } from "@/lib/api/client"
 import { BarChart3, Copy, Check, Eye, EyeOff, LineChart, Loader2, LogIn, ShieldAlert } from "lucide-react"
 
@@ -30,10 +30,12 @@ function statusBadgeClass(status: string) {
     case "funded":
       return "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
     case "failed":
+    case "payment_rejected":
     case "breached":
     case "disabled":
       return "bg-red-500/10 text-red-600 border-red-500/20"
     case "processing":
+    case "pending_review":
       return "bg-purple-500/10 text-purple-600 border-purple-500/20"
     default:
       return "bg-amber-500/10 text-amber-600 border-amber-500/20"
@@ -84,6 +86,8 @@ export function OrderDetailsView({ orderId }: { orderId: string }) {
   const [actionError, setActionError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
+  const [reloadKey, setReloadKey] = useState(0)
+
   useEffect(() => {
     setLoading(true)
     setError(null)
@@ -92,7 +96,30 @@ export function OrderDetailsView({ orderId }: { orderId: string }) {
       .then((res) => setOrder(res.order))
       .catch((err) => setError(err instanceof ApiClientError ? err.message : "Failed to load order."))
       .finally(() => setLoading(false))
-  }, [orderId])
+  }, [orderId, reloadKey])
+
+  const reviewPayment = async (approve: boolean) => {
+    if (!order) return
+    let reason: string | undefined
+    if (approve) {
+      if (!window.confirm(`Approve ${money(order.amountPaid)} and activate this order? Only do this after confirming the transfer on-chain.`)) return
+    } else {
+      const input = window.prompt("Reason for rejecting (sent to the customer, optional):")
+      if (input === null) return
+      reason = input.trim() || undefined
+    }
+    setBusy(true)
+    setActionError(null)
+    try {
+      if (approve) await adminApprovePayment(order.id)
+      else await adminRejectPayment(order.id, reason)
+      setReloadKey((k) => k + 1)
+    } catch (err) {
+      setActionError(err instanceof ApiClientError ? err.message : "Failed to update payment.")
+    } finally {
+      setBusy(false)
+    }
+  }
 
   // Replaces the admin session in this browser with the user's session, then opens their dashboard.
   const openAsUser = async (path: string) => {
@@ -146,6 +173,54 @@ export function OrderDetailsView({ orderId }: { orderId: string }) {
             </div>
             {actionError && <p className="mt-3 text-sm text-destructive">{actionError}</p>}
           </Card>
+
+          {order.paymentProof && (
+            <Card className="rounded-2xl p-5 sm:p-6">
+              <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+                <div>
+                  <h3 className="text-lg font-semibold">Payment screenshot</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Paid {money(order.amountPaid)} via {order.paymentProof.network ?? "crypto"}. Check the TXID on-chain before approving.
+                  </p>
+                </div>
+                {order.status === "pending_review" && (
+                  <div className="flex flex-wrap gap-2">
+                    <Button variant="outline" className="h-10 rounded-xl" disabled={busy} onClick={() => reviewPayment(false)}>
+                      Reject
+                    </Button>
+                    <Button className="h-10 rounded-xl" disabled={busy} onClick={() => reviewPayment(true)}>
+                      {busy && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                      Approve payment
+                    </Button>
+                  </div>
+                )}
+              </div>
+              <div className="mb-4">
+                <Field label="Transaction ID (TXID)">
+                  {order.paymentProof.txid ? (
+                    <span className="inline-flex flex-wrap items-center gap-2">
+                      <code className="break-all rounded bg-muted px-2 py-0.5 font-mono text-sm">{order.paymentProof.txid}</code>
+                      {order.paymentProof.explorerUrl && (
+                        <a href={order.paymentProof.explorerUrl} target="_blank" rel="noreferrer" className="text-sm font-medium text-primary hover:underline">
+                          View on explorer ↗
+                        </a>
+                      )}
+                    </span>
+                  ) : (
+                    "—"
+                  )}
+                </Field>
+              </div>
+              {order.paymentProof.url ? (
+                <a href={order.paymentProof.url} target="_blank" rel="noreferrer" className="block w-fit">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- short-lived signed URL */}
+                  <img src={order.paymentProof.url} alt="Payment screenshot" className="max-h-[420px] rounded-xl border border-border object-contain" />
+                </a>
+              ) : (
+                <p className="text-sm text-muted-foreground">Screenshot could not be loaded.</p>
+              )}
+            </Card>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5">
             <Card className="rounded-2xl p-5 sm:p-6">

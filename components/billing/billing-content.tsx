@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Receipt, Loader2 } from "lucide-react"
 import { listMyOrders, payOrder, type OrderWithPlan } from "@/lib/api/app-client"
+import { ScanPayDialog } from "@/components/buys/scan-pay-dialog"
 import { ApiClientError } from "@/lib/api/client"
 import { trackPurchaseEnhanced } from "@/components/MetaPixel"
 
@@ -25,6 +26,12 @@ function formatCreatedAt(iso: string | null): string {
   }
 }
 
+const PAYMENT_METHOD_LABELS: Record<string, string> = {
+  manual_crypto: "Scan & Pay",
+  boomfi: "BoomFi",
+  nowpayments: "NOWPayments",
+}
+
 const getStatusBadge = (status: string) => {
   switch (status) {
     case "active":
@@ -34,6 +41,10 @@ const getStatusBadge = (status: string) => {
       return <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-xs">Pending payment</Badge>
     case "processing":
       return <Badge className="bg-purple-500/10 text-purple-600 border-purple-500/20 text-xs">Processing</Badge>
+    case "pending_review":
+      return <Badge className="bg-purple-500/10 text-purple-600 border-purple-500/20 text-xs">Verifying payment</Badge>
+    case "payment_rejected":
+      return <Badge className="bg-red-500/10 text-red-600 border-red-500/20 text-xs">Payment not verified</Badge>
     case "failed":
       return <Badge className="bg-red-500/10 text-red-600 border-red-500/20 text-xs">Failed</Badge>
     default:
@@ -43,6 +54,7 @@ const getStatusBadge = (status: string) => {
 
 export function BillingContent() {
   const [orders, setOrders] = useState<OrderWithPlan[]>([])
+  const [scanPayOrder, setScanPayOrder] = useState<{ id: string; amount: number } | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [payingId, setPayingId] = useState<string | null>(null)
@@ -108,6 +120,11 @@ export function BillingContent() {
   }, [])
 
   const handleComplete = async (orderId: string) => {
+    const order = orders.find((o) => o.id === orderId)
+    if (order?.paymentMethod === "manual_crypto") {
+      setScanPayOrder({ id: order.id, amount: order.amountPaid })
+      return
+    }
     setPayingId(orderId)
     try {
       const { checkoutUrl } = await payOrder(orderId)
@@ -166,7 +183,7 @@ export function BillingContent() {
                       <TableCell className="text-sm py-3 uppercase">{order.challenge_plans?.platform ?? "—"}</TableCell>
                       <TableCell className="font-mono text-xs text-muted-foreground py-3">{order.id.slice(0, 8)}</TableCell>
                       <TableCell className="text-sm text-muted-foreground py-3">{formatCreatedAt(order.createdAt)}</TableCell>
-                      <TableCell className="text-sm py-3 capitalize">{order.paymentMethod || "—"}</TableCell>
+                      <TableCell className="text-sm py-3 capitalize">{PAYMENT_METHOD_LABELS[order.paymentMethod] ?? (order.paymentMethod || "—")}</TableCell>
                       <TableCell className="text-sm py-3">${order.amountPaid.toFixed(2)}</TableCell>
                       <TableCell className="py-3">{getStatusBadge(order.status)}</TableCell>
                       <TableCell className="px-4 py-3">
@@ -194,6 +211,17 @@ export function BillingContent() {
           )}
         </CardContent>
       </Card>
+      {scanPayOrder && (
+        <ScanPayDialog
+          orderId={scanPayOrder.id}
+          amountUsd={scanPayOrder.amount}
+          onClose={() => setScanPayOrder(null)}
+          onSubmitted={() => {
+            setOrders((prev) => prev.map((o) => (o.id === scanPayOrder.id ? { ...o, status: "pending_review" } : o)))
+            setScanPayOrder(null)
+          }}
+        />
+      )}
     </div>
   )
 }

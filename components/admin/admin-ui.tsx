@@ -56,7 +56,7 @@ export function Panel({
 /** Row of small summary numbers shown above a list. */
 export function StatRow({ items }: { items: { label: string; value: ReactNode; tone?: Tone; hint?: string }[] }) {
   return (
-    <div className={cn("grid gap-3", items.length >= 4 ? "grid-cols-2 lg:grid-cols-4" : "grid-cols-1 sm:grid-cols-3")}>
+    <div className={cn("grid gap-3", items.length >= 5 ? "grid-cols-2 lg:grid-cols-5" : items.length >= 4 ? "grid-cols-2 lg:grid-cols-4" : "grid-cols-1 sm:grid-cols-3")}>
       {items.map((s) => (
         <div key={s.label} className="rounded-2xl border border-border bg-card px-4 py-3.5 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
           <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">

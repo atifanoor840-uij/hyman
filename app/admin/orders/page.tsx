@@ -47,7 +47,10 @@ import {
 } from "@/components/admin/admin-ui"
 import { CheckCircle2, Eye, LogIn, MoreHorizontal, PackageCheck, RefreshCcw, ShoppingCart, XCircle } from "lucide-react"
 
-type Filter = "all" | "delivery" | "unpaid" | "active" | "passed" | "failed"
+type Filter = "all" | "review" | "delivery" | "unpaid" | "active" | "passed" | "failed"
+
+/** Orders that never turned into a confirmed payment. */
+const UNPAID = ["pending_payment", "pending_review", "payment_rejected"]
 
 /** Paid, but the customer hasn't received trading credentials yet. */
 const needsDelivery = (o: AdminOrderRow) => o.status === "processing" || (o.status === "active" && o.accounts.length === 0)
@@ -92,6 +95,7 @@ export default function AdminOrdersPage() {
   const counts = useMemo(
     () => ({
       all: orders.length,
+      review: orders.filter((o) => o.status === "pending_review").length,
       delivery: orders.filter(needsDelivery).length,
       unpaid: orders.filter((o) => o.status === "pending_payment").length,
       active: orders.filter((o) => o.status === "active" && o.accounts.length > 0).length,
@@ -102,13 +106,14 @@ export default function AdminOrdersPage() {
   )
 
   const revenue = useMemo(
-    () => orders.filter((o) => o.status !== "pending_payment").reduce((s, o) => s + (o.amountPaid || 0), 0),
+    () => orders.filter((o) => !UNPAID.includes(o.status)).reduce((s, o) => s + (o.amountPaid || 0), 0),
     [orders],
   )
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     return orders.filter((o) => {
+      if (filter === "review" && o.status !== "pending_review") return false
       if (filter === "delivery" && !needsDelivery(o)) return false
       if (filter === "unpaid" && o.status !== "pending_payment") return false
       if (filter === "active" && !(o.status === "active" && o.accounts.length > 0)) return false
@@ -230,6 +235,7 @@ export default function AdminOrdersPage() {
       <div className="space-y-4">
         <StatRow
           items={[
+            { label: "Payment review", value: counts.review, tone: "warning", hint: "Scan & pay screenshots to check" },
             { label: "Needs delivery", value: counts.delivery, tone: "warning", hint: "Paid, no account sent yet" },
             { label: "Awaiting payment", value: counts.unpaid, tone: "neutral", hint: "Checkout not completed" },
             { label: "Active challenges", value: counts.active, tone: "success", hint: "Customers trading now" },
@@ -250,6 +256,7 @@ export default function AdminOrdersPage() {
               onChange={setFilter}
               options={[
                 { value: "all", label: "All", count: counts.all },
+                { value: "review", label: "Payment review", count: counts.review },
                 { value: "delivery", label: "Needs delivery", count: counts.delivery },
                 { value: "unpaid", label: "Awaiting payment", count: counts.unpaid },
                 { value: "active", label: "Active", count: counts.active },

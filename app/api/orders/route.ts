@@ -9,6 +9,10 @@ import { clearSession } from "@/lib/auth/session"
 
 export const dynamic = "force-dynamic"
 
+// Methods customers can pick at checkout. BoomFi and NOWPayments are paused
+// for now; add them back here (and unhide them in components/buys/buys-content.tsx).
+const ENABLED_PAYMENT_METHODS = ["manual_crypto"]
+
 export async function GET() {
   const { session, error } = await withSession()
   if (error) return error
@@ -36,7 +40,7 @@ export async function POST(req: NextRequest) {
 
   const planId = (body.planId ?? "").trim()
   const paymentMethod = (body.paymentMethod ?? "").trim()
-  if (!planId || !["nowpayments", "boomfi"].includes(paymentMethod)) {
+  if (!planId || !ENABLED_PAYMENT_METHODS.includes(paymentMethod)) {
     return NextResponse.json({ message: "planId and a valid paymentMethod are required." }, { status: 422 })
   }
 

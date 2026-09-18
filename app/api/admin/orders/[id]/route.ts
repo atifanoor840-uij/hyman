@@ -15,12 +15,16 @@ import { createNotification } from "@/lib/services/notifications"
 import { findUserById } from "@/lib/services/users"
 import { writeAuditLog } from "@/lib/services/auditLog"
 import { applyOfferBenefitsOnDelivery, grantFreeRetryOnFailure } from "@/lib/services/offerFulfillment"
+import { fulfillOrder } from "@/lib/services/orderFulfillment"
+import { decodeProofRef, explorerUrl, getSignedProofUrl, networkLabelForProof } from "@/lib/services/payments/manualCrypto"
 
 export const dynamic = "force-dynamic"
 
 const PHASES = ["phase1", "phase2", "funded"] as const
 
 type Body =
+  | { action: "approve-payment" }
+  | { action: "reject-payment"; reason?: string }
   | { action: "pass" }
   | { action: "fail"; reason?: string }
   | { action: "complete-inventory"; inventoryId: string; phase: string }
@@ -47,7 +51,16 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     const order = await findOrderDetailed(id)
     if (!order) return NextResponse.json({ message: "Order not found." }, { status: 404 })
     const accounts = await listAccountsForOrder(id)
-    return NextResponse.json({ order: { ...order, accounts } })
+    const proof = decodeProofRef(order.gatewayRef)
+    const paymentProof = proof
+      ? {
+          url: await getSignedProofUrl(proof.path),
+          network: networkLabelForProof(proof.path),
+          txid: proof.txid,
+          explorerUrl: proof.txid ? explorerUrl(proof.path, proof.txid) : null,
+        }
+      : null
+    return NextResponse.json({ order: { ...order, accounts, paymentProof } })
   } catch (err) {
     return errorResponse(err, "Failed to load order.")
   }
@@ -73,6 +86,32 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     const plan = order.planId ? await findChallengePlanById(order.planId) : null
     const audit = (action: string, description: string) =>
       writeAuditLog({ userId: session.sub, userName: session.email, targetId: id, targetType: "order", action, description })
+
+    // "Scan & pay": an admin checks the uploaded screenshot against the wallet.
+    if (body.action === "approve-payment" || body.action === "reject-payment") {
+      if (order.paymentMethod !== "manual_crypto" || order.status !== "pending_review") {
+        return NextResponse.json({ message: "This order has no payment awaiting review." }, { status: 409 })
+      }
+      if (body.action === "approve-payment") {
+        await fulfillOrder(id)
+        await audit("approve-payment", `${session.email} approved the manual crypto payment for order ${id}.`)
+        return NextResponse.json({ ok: true })
+      }
+      const reason = str(body.reason)
+      await updateOrderStatus(id, "payment_rejected")
+      if (user) {
+        await createNotification({
+          userId: user.id,
+          title: "Payment not verified",
+          message: reason
+            ? `We couldn't verify your payment. ${reason}`
+            : "We couldn't verify your payment. Please contact helpdesk@genzprop.com with your transaction details.",
+          type: "order",
+        })
+      }
+      await audit("reject-payment", `${session.email} rejected the manual crypto payment for order ${id}. ${reason}`.trim())
+      return NextResponse.json({ ok: true })
+    }
 
     if (body.action === "pass") {
       if (order.status === "passed") {

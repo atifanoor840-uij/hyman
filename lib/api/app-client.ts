@@ -90,8 +90,25 @@ export interface OrderWithPlan {
   challenge_plans: { name: string; size: number; platform: string | null; price: number } | null
 }
 export const listMyOrders = () => getJson<{ orders: OrderWithPlan[] }>("/api/orders")
-export const createOrder = (input: { planId: string; paymentMethod: "nowpayments" | "boomfi"; couponCode?: string }) =>
+export const createOrder = (input: { planId: string; paymentMethod: "nowpayments" | "boomfi" | "manual_crypto"; couponCode?: string }) =>
   postJson<{ order: OrderWithPlan }>("/api/orders", input)
+export interface ManualWallet {
+  id: string
+  label: string
+  network: string
+  asset: string
+  address: string
+  qrImage: string | null
+}
+export const listManualWallets = () =>
+  getJson<{ wallets: ManualWallet[]; rates: Record<string, number> }>("/api/payments/manual-wallets")
+export const submitPaymentProof = (orderId: string, network: string, txid: string, screenshot: File) => {
+  const form = new FormData()
+  form.append("network", network)
+  form.append("txid", txid)
+  form.append("screenshot", screenshot)
+  return request<{ ok: true }>(`/api/orders/${orderId}/proof`, { method: "POST", body: form })
+}
 export const payOrder = (orderId: string) => postJson<{ checkoutUrl: string }>(`/api/orders/${orderId}/pay`, {})
 
 // ---- Accounts ----
@@ -181,8 +198,13 @@ export interface AdminOrderRow extends OrderWithPlan {
 export const adminListOrders = () => getJson<{ orders: AdminOrderRow[] }>("/api/admin/orders")
 export interface AdminOrderDetail extends Omit<AdminOrderRow, "users"> {
   users: { name: string; email: string; phone: string | null; country: string | null; status: string; createdAt: string | null } | null
+  /** "Scan & pay" orders: signed screenshot URL and the network the customer paid on. */
+  paymentProof?: { url: string | null; network: string | null; txid: string | null; explorerUrl: string | null } | null
 }
 export const adminGetOrder = (id: string) => getJson<{ order: AdminOrderDetail }>(`/api/admin/orders/${id}`)
+export const adminApprovePayment = (id: string) => patchJson<{ ok: true }>(`/api/admin/orders/${id}`, { action: "approve-payment" })
+export const adminRejectPayment = (id: string, reason?: string) =>
+  patchJson<{ ok: true }>(`/api/admin/orders/${id}`, { action: "reject-payment", reason })
 export const adminPassOrder = (id: string) => patchJson<{ ok: true }>(`/api/admin/orders/${id}`, { action: "pass" })
 export const adminFailOrder = (id: string, reason?: string) => patchJson<{ ok: true }>(`/api/admin/orders/${id}`, { action: "fail", reason })
 export const adminCompleteFromInventory = (id: string, inventoryId: string, phase: string) =>
