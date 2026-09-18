@@ -10,7 +10,7 @@ export const COMPANY = {
 	brand: "GenzProp",
 	country: "Pakistan",
 	site: "genzprop.com",
-	supportEmail: "support@genzprop.com",
+	supportEmail: "helpdesk@genzprop.com",
 } as const;
 
 /** e.g. "Nexthorne Pvt Ltd — Company Registration No. 0311554" */

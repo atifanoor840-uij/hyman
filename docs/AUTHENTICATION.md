@@ -222,7 +222,7 @@ HTTPS encryption prevents MITM attacks. Ensure valid SSL certificates.
 ## Support
 
 For authentication issues or security concerns, contact:
-- Support: support@GenzProp.com
+- Support: helpdesk@genzprop.com
 - Security: security@GenzProp.com
 
 ## License

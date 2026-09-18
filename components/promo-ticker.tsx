@@ -1,8 +1,10 @@
 "use client";
 /* Bar height h-10 (2.5rem) must match --promo-ticker-height in app/globals.css */
 
+import { useEffect } from "react";
 import { BadgePercent, Copy } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { usePublicCoupons } from "@/hooks/use-public-coupons";
 
 function CodePill({ code }: { code: string }) {
   const copy = async () => {
@@ -51,6 +53,18 @@ function Segment({
 }
 
 export default function PromoTicker() {
+  const coupons = usePublicCoupons();
+  const hidden = coupons !== null && coupons.length === 0;
+
+  // With nothing to advertise the bar disappears, so pull the navbar back up.
+  useEffect(() => {
+    const root = document.documentElement.style;
+    if (hidden) root.setProperty("--promo-ticker-height", "0px");
+    else root.removeProperty("--promo-ticker-height");
+  }, [hidden]);
+
+  if (hidden) return null;
+
   return (
     <div
       className="fixed left-0 right-0 top-0 z-[101] flex h-10 items-center border-b border-purple-400/30 bg-gradient-to-r from-purple-800 via-purple-950 to-purple-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
@@ -59,9 +73,16 @@ export default function PromoTicker() {
       aria-label="Promotional offers"
     >
       <div className="mx-auto flex h-full w-full max-w-7xl items-center justify-center gap-4 overflow-x-auto px-3 py-0 [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-10 sm:px-6 [&::-webkit-scrollbar]:hidden">
-        <Segment labelPrefix="VIP Promo:" boldOffer="65% OFF" code="VIP65" />
-        <div className="h-4 w-px shrink-0 bg-white/25" aria-hidden />
-        <Segment labelPrefix="Existing Customer Promo:" boldOffer="10% OFF" code="BF10" />
+        {coupons?.map((coupon, i) => (
+          <div key={coupon.code} className="flex shrink-0 items-center gap-4 sm:gap-10">
+            {i > 0 && <div className="h-4 w-px shrink-0 bg-white/25" aria-hidden />}
+            <Segment
+              labelPrefix={i === 0 ? "Limited Promo:" : "Promo:"}
+              boldOffer={`${coupon.discountPercent}% OFF`}
+              code={coupon.code}
+            />
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo, useRef } from "react"
 import Link from "next/link"
 import { Search, Mail, Bell, Loader2, KeyRound, Copy, Check, Wallet, TrendingUp, ChevronLeft, Server, MonitorSmartphone, Activity, User } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
+import { usePublicCoupons } from "@/hooks/use-public-coupons"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -54,8 +55,6 @@ interface HeaderProps {
   /** Badge text for dashboard-hero (e.g. "Live trading overview", "Achievements") */
   badge?: string
 }
-
-const saleTickerText = "🔥 Sale — 20% off challenges • Use code WELCOME20 • Limited time • "
 
 export function Header({
   title,
@@ -273,19 +272,26 @@ export function Header({
     setTimeout(() => setCopiedField(null), 1500)
   }
 
+  const coupons = usePublicCoupons()
+  const saleTickerText = coupons?.length
+    ? coupons.map((c) => `🔥 Sale — ${c.discountPercent}% off challenges • Use code ${c.code} • `).join("")
+    : ""
+
   const displayName = userData?.name || userData?.username || "Trader"
   const firstName = displayName.split(" ")[0]
   const showAccountCard = useOrderIdSelect || (variant === "dashboard-hero" && !hideHeroInfoCards)
 
   return (
     <header className="w-full min-w-0 space-y-5">
-      {/* Promo strip */}
-      <div className="relative -mx-3 -mt-3 overflow-hidden bg-[#0b1020] py-2 md:-mx-4 md:-mt-4 lg:-mx-5 lg:-mt-5">
-        <div className="flex w-max animate-ticker whitespace-nowrap text-xs font-medium tracking-wide text-slate-300">
-          <span>{saleTickerText.repeat(6)}</span>
-          <span aria-hidden="true">{saleTickerText.repeat(6)}</span>
+      {/* Promo strip — codes come from the admin coupons panel */}
+      {saleTickerText && (
+        <div className="relative -mx-3 -mt-3 overflow-hidden bg-[#0b1020] py-2 md:-mx-4 md:-mt-4 lg:-mx-5 lg:-mt-5">
+          <div className="flex w-max animate-ticker whitespace-nowrap text-xs font-medium tracking-wide text-slate-300">
+            <span>{saleTickerText.repeat(6)}</span>
+            <span aria-hidden="true">{saleTickerText.repeat(6)}</span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Utility bar */}
       <div className="flex items-center justify-between gap-3">

@@ -1,4 +1,4 @@
-export type PaymentGateway = "oxapay" | "nowpayments"
+export type PaymentGateway = "oxapay" | "nowpayments" | "boomfi"
 
 export interface CreateInvoiceInput {
   orderId: string

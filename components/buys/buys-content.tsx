@@ -39,7 +39,10 @@ const ACCOUNT_TYPE_ORDER: Array<{ key: string; planName: string; label: string }
 ]
 
 
-const paymentMethods = [
+type PaymentMethodId = "boomfi" | "nowpayments"
+
+const paymentMethods: Array<{ id: PaymentMethodId; label: string; image: string }> = [
+  { id: "boomfi", label: "Crypto / Card (BoomFi)", image: "https://cdn.prod.website-files.com/673f3cfcea6f215bd7496933/679b71802ca84648093a8d98_Favicon.png" },
   { id: "nowpayments", label: "Crypto (NOWPayments)", image: "https://fundednext.fra1.digitaloceanspaces.com/utility-files/6267395.png" },
 ]
 
@@ -125,7 +128,7 @@ export function BuysContent() {
   const [activeAccountType, setActiveAccountType] = useState("alpha")
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null)
   const [selectedPlatform, setSelectedPlatform] = useState("mt5")
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<"nowpayments">("nowpayments")
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethodId>("boomfi")
   const [couponCode, setCouponCode] = useState("")
   // An applied coupon OR offer — the checkout box accepts both.
   const [promo, setPromo] = useState<Extract<PromoValidation, { valid: true }> | null>(null)
@@ -514,7 +517,7 @@ export function BuysContent() {
                   {paymentMethods.map((method) => (
                     <button
                       key={method.id}
-                      onClick={() => setSelectedPaymentMethod(method.id as "nowpayments")}
+                      onClick={() => setSelectedPaymentMethod(method.id)}
                       className={`relative flex flex-col items-center gap-2 p-3.5 rounded-xl border transition-all duration-200 group ${
                         selectedPaymentMethod === method.id
                           ? "border-primary bg-primary/5 shadow-md shadow-primary/10"

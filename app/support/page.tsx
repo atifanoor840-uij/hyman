@@ -74,7 +74,7 @@ const helpCategories = [
 const faqs = [
 	{
 		q: 'How do I contact support?',
-		a: 'You can reach our support team 24/7 through live chat on our platform, email at support@GenzProp.com, or through our contact form. Average response time is under 2 hours.',
+		a: 'You can reach our support team 24/7 through live chat on our platform, email at helpdesk@genzprop.com, or through our contact form. Average response time is under 2 hours.',
 	},
 	{
 		q: 'What are your support hours?',

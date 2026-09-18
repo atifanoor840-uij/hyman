@@ -42,6 +42,15 @@ export type PromoValidation =
 export const validatePromoCode = (code: string, planId: string) =>
   postJson<PromoValidation>("/api/promo/validate", { code, planId })
 
+/** A site-wide coupon the admin opted to advertise (promo bar, pricing section). */
+export interface PublicCoupon {
+  code: string
+  discountPercent: number
+  expiresAt: string | null
+}
+
+export const listPublicCoupons = () => getJson<{ coupons: PublicCoupon[] }>("/api/promo/public")
+
 /** A coupon code the admin opted to advertise, shown as a tappable card at checkout. */
 export interface AvailableCoupon {
   code: string
@@ -81,7 +90,7 @@ export interface OrderWithPlan {
   challenge_plans: { name: string; size: number; platform: string | null; price: number } | null
 }
 export const listMyOrders = () => getJson<{ orders: OrderWithPlan[] }>("/api/orders")
-export const createOrder = (input: { planId: string; paymentMethod: "nowpayments"; couponCode?: string }) =>
+export const createOrder = (input: { planId: string; paymentMethod: "nowpayments" | "boomfi"; couponCode?: string }) =>
   postJson<{ order: OrderWithPlan }>("/api/orders", input)
 export const payOrder = (orderId: string) => postJson<{ checkoutUrl: string }>(`/api/orders/${orderId}/pay`, {})
 

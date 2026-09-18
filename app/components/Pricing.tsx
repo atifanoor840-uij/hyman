@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Check, Minus } from "lucide-react";
 import {
@@ -12,6 +12,8 @@ import {
 } from "react-icons/si";
 import SaleTimer from "./SaleTimer";
 import { GLOBAL_RULES } from "@/lib/rules-config";
+import { listPlans, type ChallengePlan } from "@/lib/api/app-client";
+import { usePublicCoupons } from "@/hooks/use-public-coupons";
 
 /** Per-tier feature list. Numbers come from lib/rules-config.ts. */
 const FEATURES_BY_TIER: Record<string, Array<{ label: string; included: boolean }>> = {
@@ -56,63 +58,51 @@ const FEATURES_BY_TIER: Record<string, Array<{ label: string; included: boolean 
 	],
 };
 
+/** Tabs on the landing page, mapped to the plan names used in the admin panel. */
 const TIERS = [
-	{
-		id: "Step1",
-		label: "Step 1",
-		accounts: [
-			{ size: 3000, price: 14 },
-			{ size: 5000, price: 23 },
-			{ size: 10000, price: 32 },
-			{ size: 50000, price: 49 },
-			{ size: 100000, price: 103 },
-			{ size: 200000, price: 145 },
-			{ size: 500000, price: 240 },
-		],
-	},
-	{
-		id: "Step2",
-		label: "Step 2",
-		accounts: [
-			{ size: 3000, price: 9 },
-			{ size: 5000, price: 14 },
-			{ size: 10000, price: 23 },
-			{ size: 50000, price: 42 },
-			{ size: 100000, price: 82 },
-			{ size: 200000, price: 123 },
-			{ size: 500000, price: 200 },
-		],
-	},
-	{
-		id: "Instant",
-		label: "Instant",
-		accounts: [
-			{ size: 3000, price: 29 },
-			{ size: 5000, price: 38 },
-			{ size: 10000, price: 50 },
-			{ size: 50000, price: 91 },
-			{ size: 100000, price: 180 },
-			{ size: 200000, price: 323 },
-			{ size: 500000, price: 900 },
-		],
-	},
+	{ id: "Step1", label: "Step 1", planName: "Genz Step1" },
+	{ id: "Step2", label: "Step 2", planName: "Genz Step2" },
+	{ id: "Instant", label: "Instant", planName: "Genz Instant" },
 ] as const;
 
+const money = (n: number) =>
+	`$${n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+
 export default function Pricing() {
+	const [plans, setPlans] = useState<ChallengePlan[] | null>(null);
 	const [selectedTierId, setSelectedTierId] = useState<string>("Step1");
-	const [selectedAccount, setSelectedAccount] = useState<number>(3000);
+	const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+	const coupons = usePublicCoupons();
+	// The biggest advertised code (the API sorts by discount) drives the "with code" price.
+	const coupon = coupons?.[0] ?? null;
+
+	useEffect(() => {
+		listPlans()
+			.then((r) => setPlans(r.plans))
+			.catch(() => setPlans([]));
+	}, []);
 
 	const currentTier = TIERS.find((t) => t.id === selectedTierId) ?? TIERS[0];
-	const accounts = currentTier.accounts;
 	const features = FEATURES_BY_TIER[currentTier.id] ?? FEATURES_BY_TIER.Step1;
+	const accounts = useMemo(() => {
+		// One card per size; if a size exists on several platforms, show the cheapest.
+		const bySize = new Map<number, ChallengePlan>();
+		for (const p of plans ?? []) {
+			if (p.name !== currentTier.planName) continue;
+			const existing = bySize.get(p.size);
+			if (!existing || p.price < existing.price) bySize.set(p.size, p);
+		}
+		return [...bySize.values()].sort((x, y) => x.size - y.size);
+	}, [plans, currentTier.planName]);
+	const selectedId = accounts.some((a) => a.id === selectedPlanId) ? selectedPlanId : accounts[0]?.id;
 
 	const formatSizeK = (size: number) => (size >= 1000 ? `${size / 1000}K` : String(size));
-	const realPrice = (discounted: number) => Number((discounted * 1.65).toFixed(2));
+	const discounted = (price: number) =>
+		coupon ? Math.round(price * (1 - coupon.discountPercent / 100) * 100) / 100 : price;
 
 	const handleTierChange = (tierId: string) => {
 		setSelectedTierId(tierId);
-		const tier = TIERS.find((t) => t.id === tierId);
-		if (tier) setSelectedAccount(tier.accounts[0].size);
+		setSelectedPlanId(null);
 	};
 
 	return (
@@ -182,15 +172,24 @@ export default function Pricing() {
 
 						{/* Right column: Professional pricing cards */}
 						<div className="grid grid-cols-2 md:grid-cols-5 gap-4 lg:gap-5 w-full min-h-[240px]">
+							{plans === null &&
+								Array.from({ length: 5 }).map((_, i) => (
+									<div key={i} className="min-h-[220px] md:min-h-[240px] rounded-xl bg-white border border-zinc-200 animate-pulse" />
+								))}
+							{plans !== null && accounts.length === 0 && (
+								<p className="col-span-full self-center text-center text-sm text-zinc-500">
+									No accounts available for this plan right now.
+								</p>
+							)}
 							{accounts.map((account) => {
-								const isSelected = selectedAccount === account.size;
+								const isSelected = selectedId === account.id;
 								const sizeLabel = formatSizeK(account.size);
-								const real = realPrice(account.price);
+								const finalPrice = discounted(account.price);
 								return (
 									<button
-										key={account.size}
+										key={account.id}
 										type="button"
-										onClick={() => setSelectedAccount(account.size)}
+										onClick={() => setSelectedPlanId(account.id)}
 										className={`flex flex-col rounded-xl p-5 md:p-6 text-left transition-all duration-200 min-h-[220px] md:min-h-[240px] ${
 											isSelected
 												? "bg-black text-white shadow-lg"
@@ -213,14 +212,20 @@ export default function Pricing() {
 										</p>
 										{/* Price */}
 										<div className="mt-auto pt-5">
-											<div className={`text-xs ${isSelected ? "text-white/70" : "text-slate-500"}`}>
-												<span className="line-through">${real}</span>
-												<span className="ml-1">Real (+65%)</span>
-											</div>
+											{coupon && (
+												<div className={`text-xs ${isSelected ? "text-white/70" : "text-slate-500"}`}>
+													<span className="line-through">{money(account.price)}</span>
+													<span className="ml-1">-{coupon.discountPercent}%</span>
+												</div>
+											)}
 											<span className={`text-2xl md:text-3xl font-bold block ${isSelected ? "text-white" : "text-slate-900"}`}>
-												${account.price}
+												{money(finalPrice)}
 											</span>
-											<div className={`text-xs ${isSelected ? "text-white/70" : "text-slate-500"}`}>Discounted</div>
+											{coupon && (
+												<div className={`text-xs ${isSelected ? "text-white/70" : "text-slate-500"}`}>
+													with code <span className="font-semibold">{coupon.code}</span>
+												</div>
+											)}
 										</div>
 									</button>
 								);

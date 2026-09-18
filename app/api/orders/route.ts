@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 
   const planId = (body.planId ?? "").trim()
   const paymentMethod = (body.paymentMethod ?? "").trim()
-  if (!planId || paymentMethod !== "nowpayments") {
+  if (!planId || !["nowpayments", "boomfi"].includes(paymentMethod)) {
     return NextResponse.json({ message: "planId and a valid paymentMethod are required." }, { status: 422 })
   }
 

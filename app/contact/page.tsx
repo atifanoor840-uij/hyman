@@ -96,8 +96,8 @@ export default function ContactPage() {
 									</div>
 									<div>
 										<h3 className="font-semibold text-[#0b0b0f] mb-1">Email</h3>
-										<a href="mailto:support@GenzProp.com" className="text-[#5235ff] hover:underline">
-											support@GenzProp.com
+										<a href="mailto:helpdesk@genzprop.com" className="text-[#5235ff] hover:underline">
+											helpdesk@genzprop.com
 										</a>
 										<p className="text-sm text-[#37353E]/70 mt-1">We respond within 24 hours</p>
 									</div>

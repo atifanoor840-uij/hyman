@@ -481,7 +481,7 @@ For issues or questions:
 - Check spam folder first
 - Wait 2-3 minutes for email delivery
 - Use resend button if needed
-- Contact: support@GenzProp.com
+- Contact: helpdesk@genzprop.com
 
 ---
 

@@ -4,6 +4,7 @@ import { findOrderById, setOrderGatewayRef } from "@/lib/services/orders"
 import { findChallengePlanById } from "@/lib/services/challengePlans"
 import { createOxapayInvoice } from "@/lib/services/payments/oxapay"
 import { createNowPaymentsInvoice } from "@/lib/services/payments/nowpayments"
+import { createBoomfiPaylink } from "@/lib/services/payments/boomfi"
 
 export const dynamic = "force-dynamic"
 
@@ -41,6 +42,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           successUrl: `${origin}/dashboard/billing`,
           cancelUrl: `${origin}/dashboard/billing`,
         }
+      )
+      await setOrderGatewayRef(order.id, result.gatewayRef)
+      return NextResponse.json({ checkoutUrl: result.checkoutUrl })
+    }
+
+    if (order.paymentMethod === "boomfi") {
+      const result = await createBoomfiPaylink(
+        { orderId: order.id, amount: order.amountPaid, currency: "USD", description: `${plan?.name ?? "Challenge"} — GenzProp` },
+        { successUrl: `${origin}/dashboard/billing`, failureUrl: `${origin}/dashboard/billing` }
       )
       await setOrderGatewayRef(order.id, result.gatewayRef)
       return NextResponse.json({ checkoutUrl: result.checkoutUrl })
