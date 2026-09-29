@@ -76,11 +76,13 @@ export default function RootLayout({
             alt=""
           />
         </noscript>
+        {/* Chatify Live Chat Support */}
         <Script
-          id="chatway"
-          src="https://cdn.chatway.app/widget.js?id=Hwp2KLWVNhLU"
+          id="chatify"
+          src="https://chat-system-wabd.vercel.app/widget.js"
+          data-workspace-id="e14f34a7-32d8-4653-8294-ea1eec4eb869"
           strategy="afterInteractive"
-          async
+          defer
         />
       </body>
     </html>
